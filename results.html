@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Charter Quotes — SkyVayu</title>
+<link rel="stylesheet" href="css/base.css"/>
+<link rel="stylesheet" href="css/app.css"/>
+</head>
+<body>
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <div class="logo-mark"><svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" stroke="var(--gold)" stroke-width="0.75"/><path d="M8 18 L16 8 L24 18 L20 18 L20 24 L12 24 L12 18 Z" fill="none" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
+    <div class="logo-text"><span class="logo-sky">Sky</span><span class="logo-vayu">Vayu</span></div>
+  </a>
+  <nav class="nav-links"><a href="booking.html">← Modify search</a></nav>
+</nav>
+<div class="page-wrap">
+  <div class="page-hero"><h2>Charter quotes</h2><p>Operators have been notified of your request</p></div>
+  <div class="trip-summary">
+    <div class="trip-item"><span id="rs-route">—</span>Route</div>
+    <div class="trip-item"><span id="rs-date">—</span>Departure</div>
+    <div class="trip-item"><span id="rs-pax">—</span>Pax</div>
+    <div class="trip-item"><span id="rs-type">—</span>Trip type</div>
+  </div>
+  <div id="timer-block" class="card" style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">Quoting window closes in</div><div id="timer-display" style="font-family:var(--font-display);font-size:22px;font-weight:400;color:var(--gold);letter-spacing:2px;">60:00</div></div>
+      <div style="text-align:right;"><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px;">Operators notified</div><div id="timer-op-count" style="font-size:24px;font-weight:500;color:var(--blue-light);">—</div></div>
+    </div>
+    <div style="width:100%;height:6px;background:rgba(133,183,235,0.12);border-radius:3px;overflow:hidden;"><div id="timer-bar" style="height:100%;width:100%;background:#185FA5;border-radius:3px;transition:width 1s linear,background 1s ease;"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:6px;"><span style="font-size:10px;color:var(--text-tertiary);">Now</span><span style="font-size:10px;color:var(--text-tertiary);">60 min</span></div>
+  </div>
+  <div id="expired-banner" style="display:none;background:rgba(186,117,23,0.1);border:0.5px solid rgba(186,117,23,0.3);border-radius:var(--radius-lg);padding:14px 18px;margin-bottom:20px;"><p style="font-size:13px;font-weight:500;color:#EF9F27;margin-bottom:3px;">Quoting window closed</p><p style="font-size:12px;color:var(--text-secondary);">No new quotes will be added. Select one below to proceed.</p></div>
+  <div id="section-received" style="display:none;"><div class="section-label" id="label-received">Quotes received — 0</div><div id="list-received"></div></div>
+  <div id="section-pending" style="display:none;"><div class="section-label" id="label-pending">Calculating quote — 0</div><div id="list-pending"></div></div>
+  <div id="state-empty" style="text-align:center;padding:52px 20px 40px;">
+    <div style="width:52px;height:52px;border-radius:50%;background:var(--bg-card);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#85B7EB" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    <p style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px;">Waiting for operators</p>
+    <p style="font-size:13px;color:var(--text-secondary);line-height:1.6;">All operators have been notified.<br>Quotes will appear here as they respond.</p>
+  </div>
+  <button class="btn-outline" onclick="window.location.href='booking.html'">← Modify search</button>
+</div>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/results.js"></script>
+</body>
+</html>
