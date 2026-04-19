@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Book a Charter Flight — SkyVayu</title>
+<link rel="stylesheet" href="css/base.css"/>
+<link rel="stylesheet" href="css/app.css"/>
+</head>
+<body>
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <div class="logo-mark"><svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" stroke="var(--gold)" stroke-width="0.75"/><path d="M8 18 L16 8 L24 18 L20 18 L20 24 L12 24 L12 18 Z" fill="none" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
+    <div class="logo-text"><span class="logo-sky">Sky</span><span class="logo-vayu">Vayu</span></div>
+  </a>
+  <nav class="nav-links"><a href="index.html">Home</a><a href="index.html#section-how">How it works</a></nav>
+</nav>
+<div class="page-wrap">
+  <div class="page-hero"><h1>Book a charter flight</h1><p>Real-time quotes from verified operators across India</p></div>
+  <div class="card">
+    <div class="trip-type-row">
+      <button class="trip-type-btn active" id="tt-oneway" onclick="setTripType('oneway')">One way</button>
+      <button class="trip-type-btn" id="tt-return" onclick="setTripType('return')">Round trip</button>
+      <button class="trip-type-btn" id="tt-multi" onclick="setTripType('multi')">Multiple sectors</button>
+    </div>
+    <div id="oneway-wrap">
+      <div class="grid-2">
+        <div class="field-group"><label class="field-label">Departure city</label><div class="ac-wrap"><input type="text" id="departure" placeholder="e.g. Mumbai" autocomplete="off" oninput="acInput(this,'ac-dep');clearErr(this)" onkeydown="acKey(event,'ac-dep')" onfocus="acInput(this,'ac-dep')" onblur="acBlur('ac-dep')"/><div class="ac-dropdown" id="ac-dep"></div></div><span class="error-msg" id="err-departure">Please enter a departure city</span></div>
+        <div class="field-group"><label class="field-label">Destination city</label><div class="ac-wrap"><input type="text" id="destination" placeholder="e.g. Delhi" autocomplete="off" oninput="acInput(this,'ac-dest');clearErr(this)" onkeydown="acKey(event,'ac-dest')" onfocus="acInput(this,'ac-dest')" onblur="acBlur('ac-dest')"/><div class="ac-dropdown" id="ac-dest"></div></div><span class="error-msg" id="err-destination">Please enter a destination city</span></div>
+      </div>
+      <div class="grid-2">
+        <div class="field-group"><label class="field-label">Departure date</label><input type="date" id="flight-date" oninput="clearErr(this)"/><span class="error-msg" id="err-flight-date">Please select a departure date</span></div>
+        <div class="field-group"><label class="field-label">Departure time</label><input type="time" id="flight-time"/></div>
+      </div>
+      <div class="grid-2" id="return-row">
+        <div class="field-group"><label class="field-label">Return date</label><input type="date" id="return-date" oninput="clearErr(this)"/><span class="error-msg" id="err-return-date">Please select a return date</span></div>
+        <div class="field-group"><label class="field-label">Return time</label><input type="time" id="return-time"/></div>
+      </div>
+      <div class="field-group"><label class="field-label">Number of passengers</label><input type="number" id="passengers" min="1" max="50" placeholder="e.g. 4" oninput="clearErr(this)"/><span class="error-msg" id="err-passengers">Please enter number of passengers</span></div>
+    </div>
+    <div id="multi-sector-wrap">
+      <div id="sectors-list"></div>
+      <button class="btn-add-sector" onclick="addSector()">+ Add sector</button>
+      <div class="field-group" style="margin-top:14px;"><label class="field-label">Number of passengers</label><input type="number" id="passengers-multi" min="1" max="50" placeholder="e.g. 4"/></div>
+    </div>
+    <hr class="divider"/>
+    <div class="otp-section" id="otp-section">
+      <div class="otp-header"><div class="otp-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#85B7EB" stroke-width="2" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="otp-title">Verify your mobile number</div></div></div>
+      <div class="otp-verified" id="otp-verified"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#97C459" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><span id="otp-verified-text">Mobile number verified</span></div>
+      <div id="otp-phone-wrap">
+        <div class="phone-row">
+          <div class="country-dd" id="country-dd" onclick="toggleCountryDD()"><img id="country-dd-flag" class="dd-flag-trigger" src="https://flagcdn.com/w20/in.png" alt="IN"/><span id="country-dd-code">+91</span><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg><div class="country-dd-list" id="country-dd-list"><div class="country-dd-search-wrap"><input type="text" class="country-dd-search" id="country-dd-search" placeholder="Search country..." oninput="filterCountries(this.value)" onclick="event.stopPropagation()"/></div><div id="country-dd-items"></div></div></div>
+          <input type="hidden" id="country-code" value="+91"/>
+          <input type="text" id="otp-phone" placeholder="Mobile number" style="flex:1;" oninput="clearErr(this)"/>
+          <button class="btn-send-otp" id="btn-send-otp" onclick="sendOTP()">Send OTP</button>
+        </div>
+        <span class="error-msg" id="err-otp-phone">Please enter a valid mobile number</span>
+      </div>
+      <div id="otp-entry-wrap" style="display:none;">
+        <div class="otp-input-row">
+          <div class="otp-digits">
+            <input type="text" class="otp-digit" maxlength="1" id="otp-d1" oninput="otpNext(this,'otp-d2')" onkeydown="otpBack(event,this,'')"/>
+            <input type="text" class="otp-digit" maxlength="1" id="otp-d2" oninput="otpNext(this,'otp-d3')" onkeydown="otpBack(event,this,'otp-d1')"/>
+            <input type="text" class="otp-digit" maxlength="1" id="otp-d3" oninput="otpNext(this,'otp-d4')" onkeydown="otpBack(event,this,'otp-d2')"/>
+            <input type="text" class="otp-digit" maxlength="1" id="otp-d4" oninput="otpNext(this,'otp-d5')" onkeydown="otpBack(event,this,'otp-d3')"/>
+            <input type="text" class="otp-digit" maxlength="1" id="otp-d5" oninput="otpNext(this,'otp-d6')" onkeydown="otpBack(event,this,'otp-d4')"/>
+            <input type="text" class="otp-digit" maxlength="1" id="otp-d6" oninput="otpNext(this,'')" onkeydown="otpBack(event,this,'otp-d5')"/>
+          </div>
+          <button class="btn-verify-otp" onclick="verifyOTP()">Verify</button>
+        </div>
+        <div class="otp-resend">Didn't receive it? <a onclick="resendOTP()">Resend OTP</a> · <a onclick="changePhone()">Change number</a></div>
+        <span class="error-msg" id="err-otp-code">Incorrect OTP. Please try again.</span>
+      </div>
+    </div>
+    <hr class="divider"/>
+    <div class="req-label">Special requirements</div>
+    <div class="grid-3">
+      <div class="field-group" data-req="medivac"><label class="field-label">Medivac flight?</label><div class="toggle-group"><button class="toggle-btn" onclick="tog(this)">Yes</button><button class="toggle-btn active" onclick="tog(this)">No</button></div></div>
+      <div class="field-group" data-req="pets"><label class="field-label">Pets?</label><div class="toggle-group"><button class="toggle-btn" onclick="tog(this)">Yes</button><button class="toggle-btn active" onclick="tog(this)">No</button></div></div>
+      <div class="field-group" data-req="infants"><label class="field-label">Infants / children?</label><div class="toggle-group"><button class="toggle-btn" onclick="tog(this)">Yes</button><button class="toggle-btn active" onclick="tog(this)">No</button></div></div>
+    </div>
+    <button class="btn-primary" id="btn-search" onclick="goToResults()">Search available operators →</button>
+  </div>
+</div>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/airports.js"></script>
+<script src="js/otp.js"></script>
+<script src="js/booking.js"></script>
+</body>
+</html>
