@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Booking Confirmed — SkyVayu</title>
+<link rel="stylesheet" href="css/base.css"/>
+<link rel="stylesheet" href="css/app.css"/>
+</head>
+<body>
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <div class="logo-mark"><svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" stroke="var(--gold)" stroke-width="0.75"/><path d="M8 18 L16 8 L24 18 L20 18 L20 24 L12 24 L12 18 Z" fill="none" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
+    <div class="logo-text"><span class="logo-sky">Sky</span><span class="logo-vayu">Vayu</span></div>
+  </a>
+</nav>
+<div class="page-wrap">
+  <div class="success-banner">
+    <div class="check-circle"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#97C459" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+    <p style="font-family:var(--font-display);font-size:26px;font-weight:400;color:var(--green-light);margin-bottom:4px;">Booking confirmed</p>
+    <p style="font-size:13px;color:rgba(151,196,89,0.7);" id="conf-notice"></p>
+    <div class="ref-box"><span style="font-size:12px;color:var(--text-secondary);">Booking reference</span><span class="ref-code" id="conf-ref"></span></div>
+  </div>
+  <div class="section-label">Flight summary</div>
+  <div class="card">
+    <div class="row"><span class="row-label">Route</span><span class="row-value" id="conf-route"></span></div>
+    <div class="row"><span class="row-label">Date &amp; time</span><span class="row-value" id="conf-date"></span></div>
+    <div class="row"><span class="row-label">Operator</span><span class="row-value" id="conf-op"></span></div>
+    <div class="row"><span class="row-label">Aircraft</span><span class="row-value" id="conf-aircraft"></span></div>
+    <div class="row"><span class="row-label">Passengers</span><span class="row-value" id="conf-pax"></span></div>
+    <div class="row"><span class="row-label">Booked by</span><span class="row-value" id="conf-client-name"></span></div>
+    <div class="row"><span class="row-label">Contact</span><span class="row-value" style="font-size:12px;" id="conf-client-contact"></span></div>
+    <div class="row"><span class="row-label">Amount paid</span><span class="row-value" style="font-family:var(--font-display);font-size:18px;color:var(--gold);" id="conf-total"></span></div>
+  </div>
+  <div class="section-label">What happens next</div>
+  <div class="card">
+    <ul class="timeline">
+      <li><div class="tl-dot tl-done"></div><div><p class="tl-text">Booking request sent</p><p class="tl-sub">Operator notified immediately</p></div></li>
+      <li><div class="tl-dot tl-done"></div><div><p class="tl-text">Operator confirmation</p><p class="tl-sub" id="conf-op-tl"></p></div></li>
+      <li><div class="tl-dot tl-pending"></div><div><p class="tl-text">Flight briefing</p><p class="tl-sub">Operator will share final details 24hrs before departure</p></div></li>
+      <li><div class="tl-dot tl-pending"></div><div><p class="tl-text">Departure</p><p class="tl-sub" id="conf-dep"></p></div></li>
+    </ul>
+  </div>
+  <button class="btn-primary" onclick="window.location.href='booking.html'">Book another flight</button>
+  <button class="btn-outline" onclick="window.print()">Download confirmation</button>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var raw = sessionStorage.getItem('sv_confirmation');
+  if (!raw) return;
+  try {
+    var c = JSON.parse(raw);
+    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val || '—'; }
+    setText('conf-ref',            c.ref);
+    setText('conf-notice',         'Confirmation will be sent to ' + c.client_email);
+    setText('conf-route',          c.route);
+    setText('conf-date',           c.date);
+    setText('conf-op',             c.op_name);
+    setText('conf-aircraft',       c.aircraft);
+    setText('conf-pax',            c.pax);
+    setText('conf-client-name',    c.client_name);
+    setText('conf-client-contact', c.client_email + ' · ' + c.client_phone);
+    setText('conf-total',          c.total);
+    setText('conf-op-tl',          c.op_name + ' confirmed your booking');
+    setText('conf-dep',            c.date);
+  } catch(e) { console.error('Could not load confirmation data', e); }
+});
+</script>
+</body>
+</html>
