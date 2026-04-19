@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Confirm &amp; Pay — SkyVayu</title>
+<link rel="stylesheet" href="css/base.css"/>
+<link rel="stylesheet" href="css/app.css"/>
+</head>
+<body>
+<nav>
+  <a class="logo-wrap" href="index.html">
+    <div class="logo-mark"><svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="15" stroke="var(--gold)" stroke-width="0.75"/><path d="M8 18 L16 8 L24 18 L20 18 L20 24 L12 24 L12 18 Z" fill="none" stroke="var(--gold)" stroke-width="1.2" stroke-linejoin="round"/></svg></div>
+    <div class="logo-text"><span class="logo-sky">Sky</span><span class="logo-vayu">Vayu</span></div>
+  </a>
+  <nav class="nav-links"><a href="results.html">← Back to quotes</a></nav>
+</nav>
+<div class="page-wrap">
+  <div class="page-hero"><h2>Confirm &amp; pay</h2><p id="pay-subtitle">Complete your booking</p></div>
+  <div class="section-label">Booking summary</div>
+  <div class="card">
+    <div class="row"><span class="row-label">Operator</span><span class="row-value" id="pay-op"></span></div>
+    <div class="row"><span class="row-label">Aircraft</span><span class="row-value" id="pay-aircraft"></span></div>
+    <div class="row"><span class="row-label">Route</span><span class="row-value" id="pay-route"></span></div>
+    <div class="row"><span class="row-label">Date &amp; time</span><span class="row-value" id="pay-date"></span></div>
+    <div class="row"><span class="row-label">Passengers</span><span class="row-value" id="pay-pax"></span></div>
+    <div class="row"><span class="row-label">Charter fee</span><span class="row-value" id="pay-charter"></span></div>
+    <div class="row"><span class="row-label">Platform fee</span><span class="row-value" id="pay-platform"></span></div>
+    <div class="total-row"><span style="font-size:14px;font-weight:500;color:var(--text-secondary);">Total payable</span><span style="font-family:var(--font-display);font-size:28px;font-weight:400;color:var(--gold);" id="pay-total"></span></div>
+  </div>
+  <div class="section-label">Your details</div>
+  <div class="card">
+    <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">We need these to send your booking confirmation and keep you updated on your flight.</p>
+    <div class="field-group"><label class="field-label">Full name</label><input type="text" id="client-name" placeholder="e.g. Rahul Sharma" oninput="clearErr(this)"/><span class="error-msg" id="err-client-name">Please enter your full name</span></div>
+    <div class="grid-2">
+      <div class="field-group"><label class="field-label">Email address</label><input type="text" id="client-email" placeholder="you@email.com" oninput="clearErr(this)"/><span class="error-msg" id="err-client-email">Please enter a valid email address</span></div>
+      <div class="field-group"><label class="field-label">Phone number</label><input type="text" id="client-phone" placeholder="+91 98765 43210" oninput="clearErr(this)"/><span class="error-msg" id="err-client-phone">Please enter your phone number</span></div>
+    </div>
+  </div>
+  <div class="section-label">Payment method</div>
+  <div class="card">
+    <div class="pay-tabs">
+      <button class="pay-tab active" id="tab-card" onclick="switchTab('card')">Card</button>
+      <button class="pay-tab" id="tab-upi" onclick="switchTab('upi')">UPI</button>
+      <button class="pay-tab" id="tab-nb" onclick="switchTab('nb')">Net banking</button>
+    </div>
+    <div class="pay-panel active" id="panel-card">
+      <div class="field-group"><label class="field-label">Card number</label><input type="text" placeholder="1234 5678 9012 3456" maxlength="19"/></div>
+      <div class="field-group"><label class="field-label">Cardholder name</label><input type="text" placeholder="As on card"/></div>
+      <div class="grid-2">
+        <div class="field-group"><label class="field-label">Expiry</label><input type="text" placeholder="MM / YY" maxlength="7"/></div>
+        <div class="field-group"><label class="field-label">CVV</label><input type="password" placeholder="•••" maxlength="4"/></div>
+      </div>
+    </div>
+    <div class="pay-panel" id="panel-upi">
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">Choose your UPI app</p>
+      <div class="upi-apps"><button class="upi-app active" onclick="selUpi(this)">GPay</button><button class="upi-app" onclick="selUpi(this)">PhonePe</button><button class="upi-app" onclick="selUpi(this)">Paytm</button><button class="upi-app" onclick="selUpi(this)">BHIM</button></div>
+      <div class="field-group"><label class="field-label">Or enter UPI ID</label><input type="text" placeholder="yourname@upi"/></div>
+    </div>
+    <div class="pay-panel" id="panel-nb">
+      <p style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">Select your bank</p>
+      <div class="bank-option active" onclick="selBank(this)"><input type="radio" name="bank" checked/><span>HDFC Bank</span></div>
+      <div class="bank-option" onclick="selBank(this)"><input type="radio" name="bank"/><span>ICICI Bank</span></div>
+      <div class="bank-option" onclick="selBank(this)"><input type="radio" name="bank"/><span>SBI</span></div>
+      <div class="bank-option" onclick="selBank(this)"><input type="radio" name="bank"/><span>Axis Bank</span></div>
+    </div>
+  </div>
+  <button class="btn-success" id="pay-btn" onclick="confirmBooking()">Pay &amp; confirm booking</button>
+  <button class="btn-outline" onclick="window.location.href='results.html'">← Back to quotes</button>
+</div>
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script src="js/payment.js"></script>
+</body>
+</html>
