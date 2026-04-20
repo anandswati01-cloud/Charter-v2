@@ -25,14 +25,20 @@ html{scroll-behavior:smooth}body{font-family:var(--font);background:var(--bg);co
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;cursor:pointer;transition:background .15s;color:var(--text-secondary);font-size:13px;}.nav-item:hover{background:rgba(0,0,0,0.04);color:var(--text);}.nav-item.active{background:var(--blue-faint);color:var(--gold);border-right:2px solid var(--gold);}
 .nav-badge{margin-left:auto;background:var(--gold);color:#fff;font-size:10px;font-weight:500;padding:1px 7px;border-radius:10px;min-width:18px;text-align:center;}
 .sidebar-footer{margin-top:auto;padding:16px 20px;border-top:0.5px solid var(--border);}.btn-logout{width:100%;height:36px;background:transparent;border:0.5px solid var(--border-hover);border-radius:var(--radius);color:var(--text-secondary);font-size:12px;font-family:var(--font);cursor:pointer;transition:all .2s;}.btn-logout:hover{border-color:var(--red);color:var(--red);}
-.main{flex:1;overflow-y:auto;}.main-header{padding:24px 28px 0;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}.page-title{font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--gold);padding-bottom:20px;}.main-content{padding:24px 28px;}
+.main{flex:1;overflow-y:auto;}
+.main-header{padding:24px 28px 0;border-bottom:0.5px solid var(--border);}
+.page-title{font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--gold);padding-bottom:14px;}
+.subtabs{display:flex;gap:4px;padding:0;}
+.subtab{padding:10px 18px;font-size:13px;font-weight:500;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:8px;}.subtab:hover{color:var(--text-secondary);}.subtab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.subtab-count{background:rgba(196,134,10,0.15);color:var(--gold);font-size:11px;font-weight:500;padding:1px 7px;border-radius:10px;min-width:18px;text-align:center;}.subtab.active .subtab-count{background:var(--gold);color:#fff;}
+.main-content{padding:24px 28px;}
 .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;}.stat-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;}.stat-num{font-family:var(--font-display);font-size:32px;font-weight:300;color:var(--gold);line-height:1;}.stat-label{font-size:12px;color:var(--text-tertiary);margin-top:4px;}
 .card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);margin-bottom:16px;}.card-header{padding:16px 20px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;}.card-title{font-size:13px;font-weight:500;color:var(--text);}.card-body{padding:20px;}
 .query-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;margin-bottom:12px;transition:border-color .2s;}.query-card:hover{border-color:var(--border-hover);}
 .query-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}.query-route{font-size:16px;font-weight:500;color:var(--text);}.query-meta{font-size:12px;color:var(--text-tertiary);margin-top:2px;}
-.badge{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;}.badge-active{background:var(--blue-faint);color:var(--gold);border:0.5px solid var(--blue-border);}.badge-quoted{background:var(--amber-faint);color:var(--amber);border:0.5px solid rgba(196,134,10,0.3);}.badge-accepted{background:var(--green-faint);color:var(--green-light);border:0.5px solid rgba(59,109,17,0.3);}
+.badge{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;}.badge-active{background:var(--blue-faint);color:var(--gold);border:0.5px solid var(--blue-border);}.badge-shared{background:var(--amber-faint);color:var(--amber);border:0.5px solid rgba(196,134,10,0.3);}.badge-accepted{background:var(--green-faint);color:var(--green-light);border:0.5px solid rgba(59,109,17,0.3);}
 .query-details{display:flex;gap:20px;flex-wrap:wrap;}.query-detail{font-size:12px;color:var(--text-secondary);}.query-detail span{color:var(--text-tertiary);margin-right:4px;}
-.query-timer{font-size:12px;color:var(--amber);font-weight:500;}.query-actions{display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:0.5px solid var(--border);}
+.query-timer{font-size:12px;color:var(--amber);font-weight:500;margin-top:8px;}.query-actions{display:flex;gap:8px;margin-top:14px;padding-top:14px;border-top:0.5px solid var(--border);}
 .btn-sm{height:34px;padding:0 16px;font-size:12px;font-weight:500;border-radius:var(--radius);cursor:pointer;font-family:var(--font);border:none;transition:all .2s;}.btn-blue{background:var(--gold);color:#fff;}.btn-blue:hover{background:#a87208;}.btn-outline-sm{background:transparent;border:0.5px solid var(--border-hover);color:var(--text-secondary);}.btn-outline-sm:hover{border-color:var(--blue-border);color:var(--gold);}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:24px;}.modal-overlay.open{display:flex;}
 .modal{background:var(--bg-card);border:0.5px solid var(--border-hover);border-radius:var(--radius-lg);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
@@ -62,71 +68,337 @@ textarea.field-input{height:80px;padding:10px 14px;resize:vertical;}
     <div style="text-align:center;margin-top:12px;"><a href="../index.html" style="font-size:12px;color:var(--text-tertiary);text-decoration:none;">&larr; Back to SkyVayu</a></div>
   </div>
 </div>
+
 <div id="page-dashboard">
   <div class="sidebar">
     <div class="sidebar-logo"><span class="sky">Sky</span><span class="vayu">Vayu</span><div class="portal-tag">Operator Portal</div></div>
     <div class="operator-card"><div class="op-name" id="sidebar-name"></div><div class="op-role" id="sidebar-role"></div><div class="op-online">Online</div></div>
     <div class="nav-section">
-      <div class="nav-label">Queries</div>
-      <div class="nav-item active" onclick="showTab('active')">Active queries <span class="nav-badge" id="badge-active">0</span></div>
-      <div class="nav-item" onclick="showTab('quoted')">Quotes pending <span class="nav-badge" id="badge-quoted" style="background:rgba(196,134,10,0.15);color:var(--amber);">0</span></div>
-      <div class="nav-item" onclick="showTab('shared')">Quotes shared <span class="nav-badge" id="badge-shared" style="background:rgba(107,89,64,0.15);color:var(--text-secondary);">0</span></div>
-      <div class="nav-item" onclick="showTab('confirmed')">Booking confirmed <span class="nav-badge" id="badge-confirmed" style="background:rgba(59,109,17,0.15);color:var(--green-light);">0</span></div>
+      <div class="nav-item active" id="nav-queries" onclick="showSection('queries')">Queries <span class="nav-badge" id="nav-badge-queries">0</span></div>
     </div>
     <div class="nav-section">
       <div class="nav-label">Management</div>
-      <div class="nav-item" onclick="showTab('fleet')">Fleet</div>
-      <div class="nav-item" id="nav-employees" onclick="showTab('employees')">Employees</div>
+      <div class="nav-item" id="nav-fleet" onclick="showSection('fleet')">Fleet</div>
+      <div class="nav-item" id="nav-employees" onclick="showSection('employees')">Employees</div>
     </div>
     <div class="sidebar-footer"><button class="btn-logout" onclick="doLogout()">Sign out</button></div>
   </div>
+
   <div class="main">
-    <div id="tab-active"><div class="main-header"><div class="page-title">Active queries</div></div><div class="main-content"><div class="stat-row"><div class="stat-card"><div class="stat-num" id="stat-active">0</div><div class="stat-label">Active queries</div></div><div class="stat-card"><div class="stat-num" id="stat-quoted">0</div><div class="stat-label">Quotes pending</div></div><div class="stat-card"><div class="stat-num" id="stat-confirmed">0</div><div class="stat-label">Confirmed this month</div></div></div><div id="active-queries-list"><div class="loading">Loading queries...</div></div></div></div>
-    <div id="tab-quoted" style="display:none;"><div class="main-header"><div class="page-title">Quotes pending</div></div><div class="main-content"><div id="quoted-queries-list"><div class="loading">Loading...</div></div></div></div>
-    <div id="tab-shared" style="display:none;"><div class="main-header"><div class="page-title">Quotes shared</div></div><div class="main-content"><div id="shared-queries-list"><div class="loading">Loading...</div></div></div></div>
-    <div id="tab-confirmed" style="display:none;"><div class="main-header"><div class="page-title">Booking confirmed</div></div><div class="main-content"><div id="confirmed-roster-list"><div class="loading">Loading...</div></div></div></div>
-    <div id="tab-fleet" style="display:none;"><div class="main-header"><div class="page-title">Fleet management</div></div><div class="main-content"><div class="aircraft-grid" id="aircraft-grid"></div><button class="btn-add" onclick="openAircraftModal()" style="margin-top:16px;">+ Add aircraft</button></div></div>
-    <div id="tab-employees" style="display:none;"><div class="main-header"><div class="page-title">Employee accounts</div></div><div class="main-content"><div class="card"><div class="card-header"><span class="card-title">Team members</span><button class="btn-sm btn-blue" onclick="openEmployeeModal()">+ Add employee</button></div><div class="card-body"><div id="employees-list"><div class="loading">Loading...</div></div></div></div></div></div>
+    <div id="section-queries">
+      <div class="main-header">
+        <div class="page-title">Queries</div>
+        <div class="subtabs">
+          <div class="subtab active" data-subtab="active" onclick="showSubtab('active')">Active <span class="subtab-count" id="count-active">0</span></div>
+          <div class="subtab" data-subtab="shared" onclick="showSubtab('shared')">Quotes shared <span class="subtab-count" id="count-shared">0</span></div>
+          <div class="subtab" data-subtab="confirmed" onclick="showSubtab('confirmed')">Booking confirmed <span class="subtab-count" id="count-confirmed">0</span></div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-num" id="stat-active">0</div><div class="stat-label">Active queries</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-shared">0</div><div class="stat-label">Quotes shared</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-confirmed">0</div><div class="stat-label">Confirmed bookings</div></div>
+        </div>
+        <div id="list-active"><div class="loading">Loading...</div></div>
+        <div id="list-shared" style="display:none;"><div class="loading">Loading...</div></div>
+        <div id="list-confirmed" style="display:none;"><div class="loading">Loading...</div></div>
+      </div>
+    </div>
+
+    <div id="section-fleet" style="display:none;">
+      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Fleet management</div></div>
+      <div class="main-content">
+        <div class="aircraft-grid" id="aircraft-grid"></div>
+        <button class="btn-add" onclick="openAircraftModal()" style="margin-top:16px;">+ Add aircraft</button>
+      </div>
+    </div>
+
+    <div id="section-employees" style="display:none;">
+      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Employee accounts</div></div>
+      <div class="main-content">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Team members</span><button class="btn-sm btn-blue" onclick="openEmployeeModal()">+ Add employee</button></div>
+          <div class="card-body"><div id="employees-list"><div class="loading">Loading...</div></div></div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<div class="modal-overlay" id="quote-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Submit quote</span><button class="modal-close" onclick="closeModal('quote-modal')">&times;</button></div><div class="modal-body"><div id="quote-query-info" style="background:rgba(0,0,0,0.04);border-radius:var(--radius);padding:12px 14px;margin-bottom:20px;font-size:13px;color:var(--text-secondary);"></div><div class="field-group"><label class="field-label">Select aircraft</label><select class="select-input" id="quote-aircraft" onchange="onAircraftChange()"><option value="">Choose aircraft...</option></select></div><div class="charge-grid"><div class="field-group"><label class="field-label">Base charge (Rs.)</label><input type="number" class="field-input" id="q-base" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Handling fee (Rs.)</label><input type="number" class="field-input" id="q-handling" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Crew accommodation (Rs.)</label><input type="number" class="field-input" id="q-crew" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Catering (Rs.)</label><input type="number" class="field-input" id="q-catering" placeholder="0" oninput="calcQuote()"/></div></div><div style="background:var(--bg-secondary);border-radius:var(--radius);padding:14px 16px;border:0.5px solid var(--border);"><div class="charge-row"><span class="charge-label">Subtotal</span><span class="charge-value" id="q-subtotal">Rs.0</span></div><div class="charge-row"><span class="charge-label">GST (18%)</span><span class="charge-value" id="q-gst">Rs.0</span></div><div class="total-row"><span class="total-label">Total quote</span><span class="total-value" id="q-total">Rs.0</span></div></div><div class="field-group" style="margin-top:16px;"><label class="field-label">Notes to client (optional)</label><textarea class="field-input" id="q-notes" placeholder="Any additional information..."></textarea></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('quote-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="submitQuote()">Submit quote</button></div></div></div>
+
+<div class="modal-overlay" id="quote-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Submit quote</span><button class="modal-close" onclick="closeModal('quote-modal')">&times;</button></div><div class="modal-body"><div id="quote-query-info" style="background:rgba(0,0,0,0.04);border-radius:var(--radius);padding:12px 14px;margin-bottom:20px;font-size:13px;color:var(--text-secondary);"></div><div class="field-group"><label class="field-label">Select aircraft</label><select class="select-input" id="quote-aircraft" onchange="onAircraftChange()"><option value="">Choose aircraft...</option></select></div><div class="charge-grid"><div class="field-group"><label class="field-label">Base charge (Rs.)</label><input type="number" class="field-input" id="q-base" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Handling fee (Rs.)</label><input type="number" class="field-input" id="q-handling" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Crew accommodation (Rs.)</label><input type="number" class="field-input" id="q-crew" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Catering (Rs.)</label><input type="number" class="field-input" id="q-catering" placeholder="0" oninput="calcQuote()"/></div></div><div style="background:var(--bg-secondary);border-radius:var(--radius);padding:14px 16px;border:0.5px solid var(--border);"><div class="charge-row"><span class="charge-label">Subtotal</span><span class="charge-value" id="q-subtotal">Rs.0</span></div><div class="charge-row"><span class="charge-label">GST (18%)</span><span class="charge-value" id="q-gst">Rs.0</span></div><div class="total-row"><span class="total-label">Total quote</span><span class="total-value" id="q-total">Rs.0</span></div></div><div class="field-group" style="margin-top:16px;"><label class="field-label">Notes to client (optional)</label><textarea class="field-input" id="q-notes" placeholder="Any additional information..."></textarea></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('quote-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="submitQuote()">Share quote with client</button></div></div></div>
+
 <div class="modal-overlay" id="aircraft-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Add aircraft</span><button class="modal-close" onclick="closeModal('aircraft-modal')">&times;</button></div><div class="modal-body"><div class="field-group"><label class="field-label">Aircraft type</label><input type="text" class="field-input" id="ac-type" placeholder="e.g. Citation XLS"/></div><div class="field-group"><label class="field-label">Registration</label><input type="text" class="field-input" id="ac-reg" placeholder="e.g. VT-ABC"/></div><div class="field-group"><label class="field-label">Seats</label><input type="number" class="field-input" id="ac-seats" placeholder="e.g. 8" min="1" max="50"/></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('aircraft-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="saveAircraft()">Add aircraft</button></div></div></div>
+
 <div class="modal-overlay" id="employee-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Add employee</span><button class="modal-close" onclick="closeModal('employee-modal')">&times;</button></div><div class="modal-body"><div class="field-group"><label class="field-label">Full name</label><input type="text" class="field-input" id="emp-name" placeholder="Employee full name"/></div><div class="field-group"><label class="field-label">Username</label><input type="text" class="field-input" id="emp-username" placeholder="Choose a username"/></div><div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="emp-password" placeholder="Set a password"/></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('employee-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="saveEmployee()">Create account</button></div></div></div>
+
 <div class="modal-overlay" id="register-modal"><div class="modal" style="max-width:480px;"><div class="modal-header"><span class="modal-title">Register your company</span><button class="modal-close" onclick="closeModal('register-modal')">&times;</button></div><div class="modal-body"><div class="field-group"><label class="field-label">Company name</label><input type="text" class="field-input" id="reg-company" placeholder="e.g. Club One Air Pvt Ltd"/></div><div class="field-group"><label class="field-label">Your full name</label><input type="text" class="field-input" id="reg-name" placeholder="Owner / Director name"/></div><div class="field-group"><label class="field-label">Choose username</label><input type="text" class="field-input" id="reg-username" placeholder="Used to log in"/></div><div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="reg-password" placeholder="Set a password"/></div><div class="field-group"><label class="field-label">Phone number</label><input type="text" class="field-input" id="reg-phone" placeholder="10-digit mobile number"/></div><div id="reg-error" class="login-error"></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('register-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="submitRegistration()">Submit registration</button></div></div></div>
+
 <div id="page-pending" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--bg);padding:24px;"><div style="text-align:center;max-width:400px;"><div style="font-family:var(--font-display);font-size:28px;color:var(--gold);margin-bottom:12px;">Registration submitted</div><div style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:24px;">Your company registration is under review. You will be able to log in once approved. This usually takes less than 24 hours.</div><button class="btn-primary" style="width:auto;padding:0 24px;" onclick="document.getElementById('page-pending').style.display='none';document.getElementById('page-login').style.display='flex';">Back to login</button></div></div>
+
 <div class="toast" id="toast"></div>
+
 <script>
-var SUPABASE_URL = SKYVAYU_CONFIG.supabaseUrl;
-var SUPABASE_KEY = SKYVAYU_CONFIG.supabaseKey;
-var currentUser=null,currentOperator=null,currentQueryId=null,aircraftList=[],lastCharges={},allMyQuotes=[];
+var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
+var currentUser=null,currentOperator=null,currentQueryId=null,aircraftList=[],lastCharges={};
+var allActiveQueries=[],allMyQuotes=[];
+var refreshInterval=null;
+
 function sbFetch(path,opts){opts=opts||{};var headers={'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};if(opts.prefer)headers['Prefer']=opts.prefer;return fetch(SUPABASE_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:headers,body:opts.body?JSON.stringify(opts.body):undefined}).then(function(r){if(r.status===204||r.headers.get('content-length')==='0')return{ok:r.ok,status:r.status,data:[]};return r.json().then(function(d){return{ok:r.ok,status:r.status,data:d};}).catch(function(){return{ok:r.ok,status:r.status,data:[]};});});}
-async function doLogin(){var username=document.getElementById('login-username').value.trim();var password=document.getElementById('login-password').value;var errEl=document.getElementById('login-error');errEl.classList.remove('show');if(!username||!password){errEl.textContent='Please enter username and password';errEl.classList.add('show');return;}var btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='Signing in...';try{var userRes=await sbFetch('operator_users?username=eq.'+encodeURIComponent(username));if(!userRes.ok||!userRes.data||!userRes.data.length)throw new Error('bad');var user=userRes.data[0];if(!user.is_active)throw new Error('inactive');if((user.password_hash||'').trim()!==(password||'').trim())throw new Error('bad');var opRes=await sbFetch('operators?id=eq.'+user.operator_id);if(!opRes.ok||!opRes.data||!opRes.data.length)throw new Error('no op');var op=opRes.data[0];if(op.approval_status==='pending'){document.getElementById('page-login').style.display='none';document.getElementById('page-pending').style.display='flex';btn.disabled=false;btn.textContent='Sign in';return;}if(op.approval_status==='rejected'){errEl.textContent='Your registration was not approved.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Sign in';return;}currentUser=user;currentOperator=op;sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:new Date().toISOString()}});document.getElementById('page-login').style.display='none';document.getElementById('page-dashboard').classList.add('active');document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;document.getElementById('sidebar-role').textContent=currentOperator.company_name+(currentUser.role==='owner'?' | Owner':' | Sales');applyRoleRestrictions();loadDashboard();}catch(e){errEl.textContent='Invalid username or password';errEl.classList.add('show');}btn.disabled=false;btn.textContent='Sign in';}
-function doLogout(){currentUser=null;currentOperator=null;document.getElementById('page-dashboard').classList.remove('active');document.getElementById('page-login').style.display='flex';document.getElementById('login-username').value='';document.getElementById('login-password').value='';}
-function showTab(tab){['active','quoted','shared','confirmed','fleet','employees'].forEach(function(t){var el=document.getElementById('tab-'+t);if(el)el.style.display='none';});document.getElementById('tab-'+tab).style.display='block';document.querySelectorAll('.nav-item').forEach(function(el){el.classList.remove('active');});var ni=document.querySelector('[onclick="showTab(\''+tab+'\')"]');if(ni)ni.classList.add('active');if(tab==='fleet')loadFleet();if(tab==='employees')loadEmployees();if(tab==='shared')renderSharedQueries();if(tab==='confirmed')loadConfirmedTab();}
-async function loadDashboard(){await loadQueries();loadFleet();}
+
+async function doLogin(){
+  var username=document.getElementById('login-username').value.trim();
+  var password=document.getElementById('login-password').value;
+  var errEl=document.getElementById('login-error');errEl.classList.remove('show');
+  if(!username||!password){errEl.textContent='Please enter username and password';errEl.classList.add('show');return;}
+  var btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='Signing in...';
+  try{
+    var userRes=await sbFetch('operator_users?username=eq.'+encodeURIComponent(username));
+    if(!userRes.ok||!userRes.data||!userRes.data.length)throw new Error('bad');
+    var user=userRes.data[0];
+    if(!user.is_active)throw new Error('inactive');
+    if((user.password_hash||'').trim()!==(password||'').trim())throw new Error('bad');
+    var opRes=await sbFetch('operators?id=eq.'+user.operator_id);
+    if(!opRes.ok||!opRes.data||!opRes.data.length)throw new Error('no op');
+    var op=opRes.data[0];
+    if(op.approval_status==='pending'){document.getElementById('page-login').style.display='none';document.getElementById('page-pending').style.display='flex';btn.disabled=false;btn.textContent='Sign in';return;}
+    if(op.approval_status==='rejected'){errEl.textContent='Your registration was not approved.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Sign in';return;}
+    currentUser=user;currentOperator=op;
+    sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:new Date().toISOString()}});
+    document.getElementById('page-login').style.display='none';
+    document.getElementById('page-dashboard').classList.add('active');
+    document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
+    document.getElementById('sidebar-role').textContent=currentOperator.company_name+(currentUser.role==='owner'?' | Owner':' | Sales');
+    applyRoleRestrictions();
+    loadAllData();
+    refreshInterval=setInterval(loadAllData,5000);
+  }catch(e){errEl.textContent='Invalid username or password';errEl.classList.add('show');}
+  btn.disabled=false;btn.textContent='Sign in';
+}
+
+function doLogout(){
+  if(refreshInterval){clearInterval(refreshInterval);refreshInterval=null;}
+  currentUser=null;currentOperator=null;
+  document.getElementById('page-dashboard').classList.remove('active');
+  document.getElementById('page-login').style.display='flex';
+  document.getElementById('login-username').value='';
+  document.getElementById('login-password').value='';
+}
+
+function showSection(section){
+  ['queries','fleet','employees'].forEach(function(s){
+    var el=document.getElementById('section-'+s);if(el)el.style.display='none';
+    var nav=document.getElementById('nav-'+s);if(nav)nav.classList.remove('active');
+  });
+  document.getElementById('section-'+section).style.display='block';
+  document.getElementById('nav-'+section).classList.add('active');
+  if(section==='fleet')loadFleet();
+  if(section==='employees')loadEmployees();
+  if(section==='queries')loadAllData();
+}
+
+function showSubtab(tab){
+  ['active','shared','confirmed'].forEach(function(t){
+    document.getElementById('list-'+t).style.display='none';
+    document.querySelector('.subtab[data-subtab="'+t+'"]').classList.remove('active');
+  });
+  document.getElementById('list-'+tab).style.display='block';
+  document.querySelector('.subtab[data-subtab="'+tab+'"]').classList.add('active');
+}
+
 function fmtDate(d){if(!d)return'—';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
 function fmtPrice(n){return'Rs.'+Number(n).toLocaleString('en-IN');}
 function timeRemaining(expiresAt){var diff=new Date(expiresAt)-new Date();if(diff<=0)return'Expired';var mins=Math.floor(diff/60000);var secs=Math.floor((diff%60000)/1000);return mins+'m '+secs+'s remaining';}
-async function loadQueries(){var opId=currentOperator.id;var aRes=await sbFetch('queries?status=eq.open&order=created_at.desc');var qRes=await sbFetch('quotes?operator_id=eq.'+opId+'&select=*,queries(*)&order=created_at.desc');var allQ=qRes.ok?qRes.data:[];var aq=aRes.ok?aRes.data:[];allMyQuotes=allQ;var qi=allQ.map(function(q){return q.query_id;});var uq=aq.filter(function(q){return!qi.includes(q.id);});var pq=allQ.filter(function(q){return q.status==='pending';});var sq=allQ.filter(function(q){return q.status==='shared';});var cq=allQ.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';});document.getElementById('stat-active').textContent=uq.length;document.getElementById('stat-quoted').textContent=pq.length;document.getElementById('stat-confirmed').textContent=cq.length;document.getElementById('badge-active').textContent=uq.length;document.getElementById('badge-quoted').textContent=pq.length;document.getElementById('badge-shared').textContent=sq.length;document.getElementById('badge-confirmed').textContent=cq.length;renderActiveQueries(uq);renderQuotedQueries(pq);}
-function renderActiveQueries(queries){var el=document.getElementById('active-queries-list');if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No active queries</div><div class="empty-sub">New client queries will appear here</div></div>';return;}el.innerHTML=queries.map(function(q){var r=q.trip_type==='multi'?'Multiple sectors':(q.departure||'-')+' → '+(q.destination||'-');var timer=q.expires_at?timeRemaining(q.expires_at):'';return'<div class="query-card"><div class="query-top"><div><div class="query-route">'+r+'</div><div class="query-meta">'+fmtDate(q.flight_date)+(q.flight_time?' at '+q.flight_time:'')+'</div></div><span class="badge badge-active">Active</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+(q.passengers||'-')+'</div>'+(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')+(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'+(timer?'<div class="query-timer" id="timer-'+q.id+'">'+timer+'</div>':'')+'<div class="query-actions"><button class="btn-sm btn-blue" onclick="openQuoteModal(\''+q.id+'\')">Submit quote</button></div></div>';}).join('');queries.forEach(function(q){if(q.expires_at)setInterval(function(){var t=document.getElementById('timer-'+q.id);if(t)t.textContent=timeRemaining(q.expires_at);},1000);});}
-function renderQuotedQueries(quotes){var el=document.getElementById('quoted-queries-list');if(!el)return;if(!quotes.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No pending quotes</div></div>';return;}el.innerHTML=quotes.map(function(q){var query=q.queries||{};var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'-')+' → '+(query.destination||'-');return'<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+'</div><div class="query-meta">'+fmtDate(query.flight_date)+' | '+(q.aircraft_type||'')+'</div></div><span class="badge badge-quoted">Quoted</span></div><div class="query-details"><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div></div>';}).join('');}
-function renderSharedQueries(){var shared=allMyQuotes.filter(function(q){return q.status==='shared';});var el=document.getElementById('shared-queries-list');if(!el)return;if(!shared.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No shared quotes</div></div>';return;}el.innerHTML=shared.map(function(q){var query=q.queries||{};var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'-')+' → '+(query.destination||'-');return'<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+'</div><div class="query-meta">'+fmtDate(query.flight_date)+'</div></div><span class="badge" style="background:rgba(107,89,64,0.1);color:var(--text-secondary);border:0.5px solid var(--border);">Shared</span></div><div class="query-details"><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div></div>';}).join('');}
-async function loadConfirmedTab(){var el=document.getElementById('confirmed-roster-list');if(!el)return;el.innerHTML='<div class="loading">Loading...</div>';var res=await sbFetch('quotes?operator_id=eq.'+currentOperator.id+'&select=*,queries(*)&order=created_at.desc');var confirmed=(res.ok?res.data:[]).filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';});if(!confirmed.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No confirmed bookings yet</div></div>';return;}el.innerHTML=confirmed.map(function(q){var qr=q.queries||{};var route=qr.trip_type==='multi'?'Multiple sectors':(qr.departure||'-')+' → '+(qr.destination||'-');return'<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+'</div><div class="query-meta">'+fmtDate(qr.flight_date)+(qr.flight_time?' at '+qr.flight_time:'')+' | '+(q.aircraft_type||'-')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+(qr.passengers||'-')+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div></div>';}).join('');}
-async function loadFleet(){var res=await sbFetch('aircraft?operator_id=eq.'+currentOperator.id+'&is_active=eq.true&order=created_at.asc');aircraftList=res.ok?res.data:[];var grid=document.getElementById('aircraft-grid');if(!aircraftList.length){grid.innerHTML='<div style="grid-column:span 2;"><div class="empty-state"><div class="empty-title">No aircraft added</div><div class="empty-sub">Add your fleet to start submitting quotes</div></div></div>';return;}grid.innerHTML=aircraftList.map(function(a){return'<div class="aircraft-card"><button class="aircraft-remove" onclick="removeAircraft(\''+a.id+'\')">&times;</button><div class="aircraft-type">'+a.aircraft_type+'</div><div class="aircraft-reg">'+a.registration+'</div>'+(a.seats?'<div class="aircraft-seats">'+a.seats+' seats</div>':'')+'</div>';}).join('');}
-async function saveAircraft(){var type=document.getElementById('ac-type').value.trim();var reg=document.getElementById('ac-reg').value.trim();var seats=parseInt(document.getElementById('ac-seats').value)||null;if(!type||!reg){showToast('Please enter aircraft type and registration','error');return;}var res=await sbFetch('aircraft',{method:'POST',prefer:'return=representation',body:{operator_id:currentOperator.id,aircraft_type:type,registration:reg,seats:seats}});if(res.ok){closeModal('aircraft-modal');document.getElementById('ac-type').value='';document.getElementById('ac-reg').value='';document.getElementById('ac-seats').value='';loadFleet();showToast('Aircraft added','success');}else showToast('Failed to add aircraft','error');}
+
+async function loadAllData(){
+  if(!currentOperator)return;
+  var opId=currentOperator.id;
+  var aRes=await sbFetch('queries?status=eq.open&order=created_at.desc');
+  var qRes=await sbFetch('quotes?operator_id=eq.'+opId+'&select=*,queries(*)&order=created_at.desc');
+  allActiveQueries=aRes.ok?aRes.data:[];
+  allMyQuotes=qRes.ok?qRes.data:[];
+
+  var quotedQueryIds=allMyQuotes.map(function(q){return q.query_id;});
+  var unquoted=allActiveQueries.filter(function(q){return!quotedQueryIds.includes(q.id);});
+  var shared=allMyQuotes.filter(function(q){return q.status==='shared';});
+  var confirmed=allMyQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';});
+
+  document.getElementById('stat-active').textContent=unquoted.length;
+  document.getElementById('stat-shared').textContent=shared.length;
+  document.getElementById('stat-confirmed').textContent=confirmed.length;
+  document.getElementById('count-active').textContent=unquoted.length;
+  document.getElementById('count-shared').textContent=shared.length;
+  document.getElementById('count-confirmed').textContent=confirmed.length;
+  document.getElementById('nav-badge-queries').textContent=unquoted.length+shared.length;
+
+  renderActiveList(unquoted);
+  renderSharedList(shared);
+  renderConfirmedList(confirmed);
+}
+
+function renderActiveList(queries){
+  var el=document.getElementById('list-active');
+  if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No active queries</div><div class="empty-sub">New client queries will appear here</div></div>';return;}
+  el.innerHTML=queries.map(function(q){
+    var r=q.trip_type==='multi'?'Multiple sectors':(q.departure||'-')+' → '+(q.destination||'-');
+    var timer=q.expires_at?timeRemaining(q.expires_at):'';
+    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+r+'</div><div class="query-meta">'+fmtDate(q.flight_date)+(q.flight_time?' at '+q.flight_time:'')+'</div></div><span class="badge badge-active">Active</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+(q.passengers||'-')+'</div>'+(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')+(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'+(timer?'<div class="query-timer">'+timer+'</div>':'')+'<div class="query-actions"><button class="btn-sm btn-blue" onclick="openQuoteModal(\''+q.id+'\')">Submit quote</button></div></div>';
+  }).join('');
+}
+
+function renderSharedList(quotes){
+  var el=document.getElementById('list-shared');
+  if(!quotes.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No quotes shared yet</div><div class="empty-sub">Submit a quote on an active query and it will appear here</div></div>';return;}
+  el.innerHTML=quotes.map(function(q){
+    var query=q.queries||{};
+    var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'-')+' → '+(query.destination||'-');
+    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' &middot; '+(q.aircraft_type||'')+(q.aircraft_registration?' ('+q.aircraft_registration+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+(query.passengers||'-')+'</div><div class="query-detail"><span>Your quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+q.notes+'</div>':'')+'</div>';
+  }).join('');
+}
+
+function renderConfirmedList(quotes){
+  var el=document.getElementById('list-confirmed');
+  if(!quotes.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No confirmed bookings yet</div><div class="empty-sub">When a client accepts your quote and pays, it will show up here</div></div>';return;}
+  el.innerHTML=quotes.map(function(q){
+    var query=q.queries||{};
+    var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'-')+' → '+(query.destination||'-');
+    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' &middot; '+(q.aircraft_type||'')+(q.aircraft_registration?' ('+q.aircraft_registration+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+(query.passengers||'-')+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
+  }).join('');
+}
+
+async function loadFleet(){
+  var res=await sbFetch('aircraft?operator_id=eq.'+currentOperator.id+'&is_active=eq.true&order=created_at.asc');
+  aircraftList=res.ok?res.data:[];
+  var grid=document.getElementById('aircraft-grid');
+  if(!aircraftList.length){grid.innerHTML='<div style="grid-column:span 2;"><div class="empty-state"><div class="empty-title">No aircraft added</div><div class="empty-sub">Add your fleet to start submitting quotes</div></div></div>';return;}
+  grid.innerHTML=aircraftList.map(function(a){
+    return '<div class="aircraft-card"><button class="aircraft-remove" onclick="removeAircraft(\''+a.id+'\')">&times;</button><div class="aircraft-type">'+a.aircraft_type+'</div><div class="aircraft-reg">'+a.registration+'</div>'+(a.seats?'<div class="aircraft-seats">'+a.seats+' seats</div>':'')+'</div>';
+  }).join('');
+}
+
+async function saveAircraft(){
+  var type=document.getElementById('ac-type').value.trim();
+  var reg=document.getElementById('ac-reg').value.trim();
+  var seats=parseInt(document.getElementById('ac-seats').value)||null;
+  if(!type||!reg){showToast('Please enter aircraft type and registration','error');return;}
+  var res=await sbFetch('aircraft',{method:'POST',prefer:'return=representation',body:{operator_id:currentOperator.id,aircraft_type:type,registration:reg,seats:seats}});
+  if(res.ok){closeModal('aircraft-modal');document.getElementById('ac-type').value='';document.getElementById('ac-reg').value='';document.getElementById('ac-seats').value='';loadFleet();showToast('Aircraft added','success');}
+  else showToast('Failed to add aircraft','error');
+}
+
 async function removeAircraft(id){if(!confirm('Remove this aircraft?'))return;await sbFetch('aircraft?id=eq.'+id,{method:'PATCH',body:{is_active:false}});loadFleet();showToast('Aircraft removed','success');}
-async function loadEmployees(){var eRes=await sbFetch('operator_users?operator_id=eq.'+currentOperator.id+'&role=eq.employee&order=created_at.asc');var emps=eRes.ok?eRes.data:[];var el=document.getElementById('employees-list');if(!emps.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No employees added</div><div class="empty-sub">Create accounts for your sales team</div></div>';return;}el.innerHTML=emps.map(function(e){var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();var online=e.last_login&&(new Date()-new Date(e.last_login))<1800000;return'<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:0.5px solid var(--border);"><div style="display:flex;align-items:center;gap:12px;"><div style="width:36px;height:36px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--gold);">'+ini+'</div><div><div style="font-size:13px;font-weight:500;color:var(--text);">'+(e.full_name||e.username)+'</div><div style="font-size:11px;color:var(--text-tertiary);">@'+e.username+'</div></div></div><span style="font-size:11px;color:'+(online?'var(--green-light)':'var(--text-tertiary)')+';">'+(online?'Online':'Offline')+'</span></div>';}).join('');}
-async function saveEmployee(){var name=document.getElementById('emp-name').value.trim();var username=document.getElementById('emp-username').value.trim();var password=document.getElementById('emp-password').value;if(!name||!username||!password){showToast('Please fill in all fields','error');return;}var res=await sbFetch('operator_users',{method:'POST',prefer:'return=representation',body:{operator_id:currentOperator.id,full_name:name,username:username,password_hash:password,role:'employee'}});if(res.ok){closeModal('employee-modal');document.getElementById('emp-name').value='';document.getElementById('emp-username').value='';document.getElementById('emp-password').value='';loadEmployees();showToast('Employee account created','success');}else showToast('Username already taken or error occurred','error');}
-async function openQuoteModal(queryId){currentQueryId=queryId;var res=await sbFetch('queries?id=eq.'+queryId);var query=res.data&&res.data[0];if(!query)return;var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'—')+' → '+(query.destination||'—');document.getElementById('quote-query-info').innerHTML='<strong style="color:var(--text);">'+route+'</strong><br>'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' &nbsp;|&nbsp; '+query.passengers+' pax';var sel=document.getElementById('quote-aircraft');sel.innerHTML='<option value="">Choose aircraft...</option>'+aircraftList.map(function(a){return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'">'+a.aircraft_type+'  |  '+a.registration+'</option>';}).join('');['q-base','q-handling','q-crew','q-catering','q-notes'].forEach(function(id){document.getElementById(id).value='';});calcQuote();document.getElementById('quote-modal').classList.add('open');}
-function onAircraftChange(){var id=document.getElementById('quote-aircraft').value;if(!id||!lastCharges[id])return;var l=lastCharges[id];document.getElementById('q-base').value=l.base||'';document.getElementById('q-handling').value=l.handling||'';document.getElementById('q-crew').value=l.crew||'';document.getElementById('q-catering').value=l.catering||'';calcQuote();}
-function calcQuote(){var b=parseFloat(document.getElementById('q-base').value)||0;var h=parseFloat(document.getElementById('q-handling').value)||0;var c=parseFloat(document.getElementById('q-crew').value)||0;var ca=parseFloat(document.getElementById('q-catering').value)||0;var s=b+h+c+ca;var g=Math.round(s*0.18);var t=s+g;document.getElementById('q-subtotal').textContent=fmtPrice(s);document.getElementById('q-gst').textContent=fmtPrice(g);document.getElementById('q-total').textContent=fmtPrice(t);}
-async function submitQuote(){var aircraftId=document.getElementById('quote-aircraft').value;var b=parseFloat(document.getElementById('q-base').value)||0;var h=parseFloat(document.getElementById('q-handling').value)||0;var c=parseFloat(document.getElementById('q-crew').value)||0;var ca=parseFloat(document.getElementById('q-catering').value)||0;var notes=document.getElementById('q-notes').value.trim();if(!aircraftId){showToast('Please select an aircraft','error');return;}if(!b){showToast('Please enter at least a base charge','error');return;}var s=b+h+c+ca;var g=Math.round(s*0.18);var t=s+g;var sel=document.getElementById('quote-aircraft');var opt=sel.options[sel.selectedIndex];var at=opt.dataset.type;var ar=opt.dataset.reg;var qRes=await sbFetch('quotes',{method:'POST',prefer:'return=representation',body:{query_id:currentQueryId,operator_id:currentOperator.id,operator_name:currentOperator.company_name,aircraft_id:aircraftId,aircraft_type:at,aircraft_registration:ar,price:t,notes:notes,status:'pending',submitted_by:currentUser.id}});if(!qRes.ok){showToast('Failed to submit quote','error');return;}var qId=qRes.data[0].id;await sbFetch('quote_items',{method:'POST',body:{quote_id:qId,base_charge:b,handling_fee:h,crew_accommodation:c,catering:ca,gst_amount:g,total:t}});lastCharges[aircraftId]={base:b,handling:h,crew:c,catering:ca};closeModal('quote-modal');showToast('Quote submitted successfully!','success');loadDashboard();}
-async function submitRegistration(){var company=document.getElementById('reg-company').value.trim();var name=document.getElementById('reg-name').value.trim();var username=document.getElementById('reg-username').value.trim();var password=document.getElementById('reg-password').value;var phone=document.getElementById('reg-phone').value.trim();var errEl=document.getElementById('reg-error');errEl.classList.remove('show');if(!company||!name||!username||!password){errEl.textContent='Please fill in all fields';errEl.classList.add('show');return;}var check=await sbFetch('operator_users?username=eq.'+encodeURIComponent(username));if(check.ok&&check.data&&check.data.length){errEl.textContent='Username already taken';errEl.classList.add('show');return;}var opRes=await sbFetch('operators',{method:'POST',prefer:'return=representation',body:{company_name:company,owner_name:name,owner_phone:phone,approval_status:'pending'}});if(!opRes.ok||!opRes.data||!opRes.data.length){errEl.textContent='Registration failed. Please try again.';errEl.classList.add('show');return;}var opId=opRes.data[0].id;var userRes=await sbFetch('operator_users',{method:'POST',body:{operator_id:opId,full_name:name,username:username,password_hash:password,role:'owner',phone:phone,is_active:true}});if(!userRes.ok){errEl.textContent='Failed to create account.';errEl.classList.add('show');return;}closeModal('register-modal');document.getElementById('page-login').style.display='none';document.getElementById('page-pending').style.display='flex';}
+
+async function loadEmployees(){
+  var eRes=await sbFetch('operator_users?operator_id=eq.'+currentOperator.id+'&role=eq.employee&order=created_at.asc');
+  var emps=eRes.ok?eRes.data:[];
+  var el=document.getElementById('employees-list');
+  if(!emps.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No employees added</div><div class="empty-sub">Create accounts for your sales team</div></div>';return;}
+  el.innerHTML=emps.map(function(e){
+    var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+    var online=e.last_login&&(new Date()-new Date(e.last_login))<1800000;
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:0.5px solid var(--border);"><div style="display:flex;align-items:center;gap:12px;"><div style="width:36px;height:36px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--gold);">'+ini+'</div><div><div style="font-size:13px;font-weight:500;color:var(--text);">'+(e.full_name||e.username)+'</div><div style="font-size:11px;color:var(--text-tertiary);">@'+e.username+'</div></div></div><span style="font-size:11px;color:'+(online?'var(--green-light)':'var(--text-tertiary)')+';">'+(online?'Online':'Offline')+'</span></div>';
+  }).join('');
+}
+
+async function saveEmployee(){
+  var name=document.getElementById('emp-name').value.trim();
+  var username=document.getElementById('emp-username').value.trim();
+  var password=document.getElementById('emp-password').value;
+  if(!name||!username||!password){showToast('Please fill in all fields','error');return;}
+  var res=await sbFetch('operator_users',{method:'POST',prefer:'return=representation',body:{operator_id:currentOperator.id,full_name:name,username:username,password_hash:password,role:'employee'}});
+  if(res.ok){closeModal('employee-modal');document.getElementById('emp-name').value='';document.getElementById('emp-username').value='';document.getElementById('emp-password').value='';loadEmployees();showToast('Employee account created','success');}
+  else showToast('Username already taken or error occurred','error');
+}
+
+async function openQuoteModal(queryId){
+  currentQueryId=queryId;
+  var res=await sbFetch('queries?id=eq.'+queryId);
+  var query=res.data&&res.data[0];if(!query)return;
+  var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'—')+' → '+(query.destination||'—');
+  document.getElementById('quote-query-info').innerHTML='<strong style="color:var(--text);">'+route+'</strong><br>'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' &nbsp;|&nbsp; '+query.passengers+' pax';
+  var sel=document.getElementById('quote-aircraft');
+  sel.innerHTML='<option value="">Choose aircraft...</option>'+aircraftList.map(function(a){return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'">'+a.aircraft_type+'  |  '+a.registration+'</option>';}).join('');
+  ['q-base','q-handling','q-crew','q-catering','q-notes'].forEach(function(id){document.getElementById(id).value='';});
+  calcQuote();
+  document.getElementById('quote-modal').classList.add('open');
+}
+
+function onAircraftChange(){
+  var id=document.getElementById('quote-aircraft').value;if(!id||!lastCharges[id])return;
+  var l=lastCharges[id];
+  document.getElementById('q-base').value=l.base||'';
+  document.getElementById('q-handling').value=l.handling||'';
+  document.getElementById('q-crew').value=l.crew||'';
+  document.getElementById('q-catering').value=l.catering||'';
+  calcQuote();
+}
+
+function calcQuote(){
+  var b=parseFloat(document.getElementById('q-base').value)||0;
+  var h=parseFloat(document.getElementById('q-handling').value)||0;
+  var c=parseFloat(document.getElementById('q-crew').value)||0;
+  var ca=parseFloat(document.getElementById('q-catering').value)||0;
+  var s=b+h+c+ca;var g=Math.round(s*0.18);var t=s+g;
+  document.getElementById('q-subtotal').textContent=fmtPrice(s);
+  document.getElementById('q-gst').textContent=fmtPrice(g);
+  document.getElementById('q-total').textContent=fmtPrice(t);
+}
+
+async function submitQuote(){
+  var aircraftId=document.getElementById('quote-aircraft').value;
+  var b=parseFloat(document.getElementById('q-base').value)||0;
+  var h=parseFloat(document.getElementById('q-handling').value)||0;
+  var c=parseFloat(document.getElementById('q-crew').value)||0;
+  var ca=parseFloat(document.getElementById('q-catering').value)||0;
+  var notes=document.getElementById('q-notes').value.trim();
+  if(!aircraftId){showToast('Please select an aircraft','error');return;}
+  if(!b){showToast('Please enter at least a base charge','error');return;}
+  var s=b+h+c+ca;var g=Math.round(s*0.18);var t=s+g;
+  var sel=document.getElementById('quote-aircraft');var opt=sel.options[sel.selectedIndex];
+  var at=opt.dataset.type;var ar=opt.dataset.reg;
+  var qRes=await sbFetch('quotes',{method:'POST',prefer:'return=representation',body:{
+    query_id:currentQueryId,
+    operator_id:currentOperator.id,
+    operator_name:currentOperator.company_name,
+    aircraft_id:aircraftId,aircraft_type:at,aircraft_registration:ar,
+    price:t,notes:notes,status:'shared',submitted_by:currentUser.id
+  }});
+  if(!qRes.ok){showToast('Failed to submit quote','error');return;}
+  var qId=qRes.data[0].id;
+  await sbFetch('quote_items',{method:'POST',body:{quote_id:qId,base_charge:b,handling_fee:h,crew_accommodation:c,catering:ca,gst_amount:g,total:t}});
+  lastCharges[aircraftId]={base:b,handling:h,crew:c,catering:ca};
+  closeModal('quote-modal');
+  showToast('Quote shared with client','success');
+  await loadAllData();
+  showSubtab('shared');
+}
+
+async function submitRegistration(){
+  var company=document.getElementById('reg-company').value.trim();
+  var name=document.getElementById('reg-name').value.trim();
+  var username=document.getElementById('reg-username').value.trim();
+  var password=document.getElementById('reg-password').value;
+  var phone=document.getElementById('reg-phone').value.trim();
+  var errEl=document.getElementById('reg-error');errEl.classList.remove('show');
+  if(!company||!name||!username||!password){errEl.textContent='Please fill in all fields';errEl.classList.add('show');return;}
+  var check=await sbFetch('operator_users?username=eq.'+encodeURIComponent(username));
+  if(check.ok&&check.data&&check.data.length){errEl.textContent='Username already taken';errEl.classList.add('show');return;}
+  var opRes=await sbFetch('operators',{method:'POST',prefer:'return=representation',body:{company_name:company,owner_name:name,owner_phone:phone,approval_status:'pending'}});
+  if(!opRes.ok||!opRes.data||!opRes.data.length){errEl.textContent='Registration failed. Please try again.';errEl.classList.add('show');return;}
+  var opId=opRes.data[0].id;
+  var userRes=await sbFetch('operator_users',{method:'POST',body:{operator_id:opId,full_name:name,username:username,password_hash:password,role:'owner',phone:phone,is_active:true}});
+  if(!userRes.ok){errEl.textContent='Failed to create account.';errEl.classList.add('show');return;}
+  closeModal('register-modal');
+  document.getElementById('page-login').style.display='none';
+  document.getElementById('page-pending').style.display='flex';
+}
+
 function openAircraftModal(){document.getElementById('aircraft-modal').classList.add('open');}
 function openEmployeeModal(){document.getElementById('employee-modal').classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3000);}
 function applyRoleRestrictions(){var isEmp=currentUser&&currentUser.role==='employee';var ne=document.getElementById('nav-employees');if(ne)ne.style.display=isEmp?'none':'flex';}
+
 document.querySelectorAll('.modal-overlay').forEach(function(el){el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open');});});
 document.getElementById('page-login').style.display='flex';
 </script>
