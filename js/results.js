@@ -31,17 +31,45 @@ document.addEventListener('DOMContentLoaded', function() {
   if (queryId) {
     currentQueryId = queryId;
     subscribeToQuotes(queryId);
+    startQuotePolling(queryId);
   } else {
     showToast('No active query found. Please search again.', 'error');
   }
 });
+
+function startQuotePolling(queryId) {
+  async function pollOnce() {
+    try {
+      var SUPABASE_URL = SKYVAYU_CONFIG.supabaseUrl;
+      var SUPABASE_KEY = SKYVAYU_CONFIG.supabaseKey;
+      var res = await fetch(
+        SUPABASE_URL + '/rest/v1/quotes?query_id=eq.' + queryId + '&status=eq.shared&order=created_at.asc',
+        { headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY } }
+      );
+      if (!res.ok) return;
+      var quotes = await res.json();
+      if (!Array.isArray(quotes)) return;
+      quotes.forEach(function(q) {
+        injectQuote({
+          id: q.id,
+          operator_name: q.operator_name,
+          aircraft_type: q.aircraft_type,
+          seats: q.seats_available,
+          price: q.price,
+          notes: q.notes
+        });
+      });
+    } catch (e) { /* silent */ }
+  }
+  pollOnce();
+  setInterval(pollOnce, 4000);
+}
 
 function startTimer() {
   if (timerInterval) clearInterval(timerInterval);
   queryStartTime = Date.now();
   injectedIds    = {};
   document.getElementById('list-received').innerHTML   = '';
-  document.getElementById('list-pending').innerHTML    = '';
   document.getElementById('expired-banner').style.display = 'none';
   document.getElementById('timer-block').style.display    = 'block';
   document.getElementById('timer-display').classList.remove('timer-urgent');
@@ -86,14 +114,10 @@ function startTimer() {
 
 function updateResultsDisplay() {
   var received = document.querySelectorAll('#list-received .quote-card').length;
-  var pending  = document.querySelectorAll('#list-pending .quote-card').length;
-  var total    = received + pending;
-  document.getElementById('state-empty').style.display         = total === 0 ? 'block' : 'none';
+  document.getElementById('state-empty').style.display         = received === 0 ? 'block' : 'none';
   document.getElementById('section-received').style.display    = received > 0 ? 'block' : 'none';
-  document.getElementById('section-pending').style.display     = pending  > 0 ? 'block' : 'none';
   document.getElementById('label-received').textContent        = 'Quotes received — ' + received;
-  document.getElementById('label-pending').textContent         = 'Calculating quote — ' + pending;
-  document.getElementById('timer-op-count').textContent        = total > 0 ? total : '—';
+  document.getElementById('timer-op-count').textContent        = received > 0 ? received : '—';
 }
 
 function fmtPrice(p) { return '₹' + Number(p).toLocaleString('en-IN'); }
@@ -101,29 +125,24 @@ function fmtPrice(p) { return '₹' + Number(p).toLocaleString('en-IN'); }
 function injectQuote(q) {
   if (injectedIds[q.id]) return;
   injectedIds[q.id] = true;
-  if (q.type === 'pending') {
-    var html = '<div class="quote-card" id="qcard-' + q.id + '"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><p class="op-name">' + q.operator_name + '</p><p class="op-meta">Accepted · calculating quote</p></div><span class="badge badge-warning">Calculating</span></div></div>';
-    document.getElementById('list-pending').insertAdjacentHTML('beforeend', html);
-  } else {
-    var existing = document.getElementById('qcard-' + q.id);
-    if (existing) existing.remove();
-    var priceStr    = q.price ? fmtPrice(q.price) : '—';
-    var charterFee  = q.price ? fmtPrice(Math.round(q.price * 0.9)) : '—';
-    var platformFee = q.price ? fmtPrice(Math.round(q.price * 0.1)) : '—';
-    var html2 = '<div class="quote-card" id="qcard-' + q.id + '">'
-      + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">'
-      + '<div><p class="op-name">' + q.operator_name + '</p>'
-      + '<p class="op-meta">' + (q.aircraft_type || '') + (q.seats ? ' · ' + q.seats + ' seats' : '') + '</p></div>'
-      + '<span class="badge badge-success">Quote received</span></div>'
-      + '<div style="display:flex;justify-content:space-between;align-items:flex-end;">'
-      + '<div><span style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;">Total</span>'
-      + '<div style="font-family:var(--font-display);font-size:26px;font-weight:400;color:var(--gold);">' + priceStr + '</div>'
-      + (q.notes ? '<p style="font-size:12px;color:var(--text-secondary);margin-top:4px;">' + q.notes + '</p>' : '')
-      + '</div>'
-      + '<button class="btn-select" onclick="selectOp(\'' + q.operator_name + '\',\'' + (q.aircraft_type || '') + '\',\'' + priceStr + '\',\'' + charterFee + '\',\'' + platformFee + '\')">Select →</button>'
-      + '</div></div>';
-    document.getElementById('list-received').insertAdjacentHTML('beforeend', html2);
-  }
+  var existing = document.getElementById('qcard-' + q.id);
+  if (existing) existing.remove();
+  var priceStr    = q.price ? fmtPrice(q.price) : '—';
+  var charterFee  = q.price ? fmtPrice(Math.round(q.price * 0.9)) : '—';
+  var platformFee = q.price ? fmtPrice(Math.round(q.price * 0.1)) : '—';
+  var html2 = '<div class="quote-card" id="qcard-' + q.id + '">'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">'
+    + '<div><p class="op-name">' + q.operator_name + '</p>'
+    + '<p class="op-meta">' + (q.aircraft_type || '') + (q.seats ? ' · ' + q.seats + ' seats' : '') + '</p></div>'
+    + '<span class="badge badge-success">Quote received</span></div>'
+    + '<div style="display:flex;justify-content:space-between;align-items:flex-end;">'
+    + '<div><span style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;">Total</span>'
+    + '<div style="font-family:var(--font-display);font-size:26px;font-weight:400;color:var(--gold);">' + priceStr + '</div>'
+    + (q.notes ? '<p style="font-size:12px;color:var(--text-secondary);margin-top:4px;">' + q.notes + '</p>' : '')
+    + '</div>'
+    + '<button class="btn-select" onclick="selectOp(\'' + q.operator_name + '\',\'' + (q.aircraft_type || '') + '\',\'' + priceStr + '\',\'' + charterFee + '\',\'' + platformFee + '\')">Select →</button>'
+    + '</div></div>';
+  document.getElementById('list-received').insertAdjacentHTML('beforeend', html2);
   updateResultsDisplay();
 }
 
