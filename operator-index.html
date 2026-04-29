@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SkyVayu | Operator Portal</title>
+<script src="../js/config.js"></script>
+<link rel="stylesheet" href="operator.css"/>
+
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<div id="page-login">
+  <div class="login-box">
+    <div class="login-logo"><span class="sky">Sky</span><span class="vayu">Vayu</span></div>
+    <h1 class="login-title">Operator Portal</h1>
+    <p class="login-sub">Sign in to manage your queries and quotes</p>
+    <div class="login-error" id="login-error">Invalid username or password</div>
+    <div class="field-group"><label class="field-label">Username</label><input type="text" class="field-input" id="login-username" placeholder="Enter your username" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="login-password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign in</button>
+    <div style="text-align:center;margin-top:16px;"><button onclick="document.getElementById('register-modal').classList.add('open')" style="background:none;border:none;color:var(--text-tertiary);font-size:12px;cursor:pointer;">New operator? <span style="color:var(--gold);text-decoration:underline;">Register your company</span></button></div>
+  </div>
+</div>
+
+<!-- ================= DASHBOARD ================= -->
+<div id="page-dashboard">
+  <div class="sidebar">
+    <div class="sidebar-logo"><span class="sky">Sky</span><span class="vayu">Vayu</span><div class="portal-tag">Operator Portal</div></div>
+    <div class="operator-card">
+      <div class="op-name" id="sidebar-name"></div>
+      <div class="op-role" id="sidebar-role"></div>
+      <span class="role-tag" id="sidebar-role-tag">Admin</span>
+    </div>
+    <div class="nav-section">
+      <div class="nav-item active" id="nav-queries" onclick="showSection('queries')">Queries <span class="nav-badge" id="nav-badge-queries">0</span></div>
+      <div class="nav-item" id="nav-fleet" onclick="showSection('fleet')">Fleet</div>
+      <div class="nav-item" id="nav-roster" onclick="showSection('roster')">Roster</div>
+    </div>
+    <div class="nav-section" id="nav-admin-section">
+      <div class="nav-label">Administration</div>
+      <div class="nav-item" id="nav-employees" onclick="showSection('employees')">Employees</div>
+      <div class="nav-item" id="nav-revenue" onclick="showSection('revenue')">Revenue</div>
+    </div>
+    <div class="sidebar-footer"><button class="btn-logout" onclick="doLogout()">Sign out</button></div>
+  </div>
+
+  <div class="main">
+    <!-- QUERIES SECTION -->
+    <div id="section-queries">
+      <div class="main-header">
+        <div class="page-title">Queries</div>
+        <div class="subtabs">
+          <div class="subtab active" data-subtab="active" onclick="showSubtab('active')">Active <span class="subtab-count" id="count-active">0</span></div>
+          <div class="subtab" data-subtab="shared" onclick="showSubtab('shared')">Quotes shared <span class="subtab-count" id="count-shared">0</span></div>
+          <div class="subtab" data-subtab="confirmed" onclick="showSubtab('confirmed')">Booking confirmed <span class="subtab-count" id="count-confirmed">0</span></div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="stat-row">
+          <div class="stat-card"><div class="stat-num" id="stat-active">0</div><div class="stat-label">Active queries</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-shared">0</div><div class="stat-label" id="stat-shared-label">Quotes shared</div></div>
+          <div class="stat-card"><div class="stat-num" id="stat-confirmed">0</div><div class="stat-label" id="stat-confirmed-label">Confirmed bookings</div></div>
+        </div>
+        <div id="list-active"><div class="loading">Loading...</div></div>
+        <div id="list-shared" style="display:none;"><div class="loading">Loading...</div></div>
+        <div id="list-confirmed" style="display:none;"><div class="loading">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- FLEET SECTION -->
+    <div id="section-fleet" style="display:none;">
+      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Fleet</div></div>
+      <div class="main-content">
+        <div class="aircraft-grid" id="aircraft-grid"></div>
+        <button class="btn-add" id="btn-add-aircraft" onclick="openAircraftModal()" style="margin-top:16px;">+ Add aircraft</button>
+      </div>
+    </div>
+
+    <!-- ROSTER SECTION -->
+    <div id="section-roster" style="display:none;">
+      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Roster</div></div>
+      <div class="main-content">
+        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:12px;">Aircraft availability, next 30 days. Green = your bookings, blue = your own, grey = other employees.</div>
+        <div id="roster-grid" class="roster-wrap"><div class="loading">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- EMPLOYEES SECTION (admin only) -->
+    <div id="section-employees" style="display:none;">
+      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Employees</div></div>
+      <div class="main-content">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Team members</span><button class="btn-sm btn-blue" onclick="openEmployeeModal()">+ Add employee</button></div>
+          <div class="card-body"><div id="employees-list"><div class="loading">Loading...</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- REVENUE SECTION (admin only) -->
+    <div id="section-revenue" style="display:none;">
+      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Revenue</div></div>
+      <div class="main-content" id="revenue-content"><div class="loading">Loading...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+<div class="modal-overlay" id="quote-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Submit quote</span><button class="modal-close" onclick="closeQuoteModal()">&times;</button></div><div class="modal-body"><div id="quote-query-info" style="background:rgba(0,0,0,0.04);border-radius:var(--radius);padding:12px 14px;margin-bottom:20px;font-size:13px;color:var(--text-secondary);"></div><div class="field-group"><label class="field-label">Select aircraft</label><select class="select-input" id="quote-aircraft" onchange="onAircraftChange()"><option value="">Choose aircraft...</option></select><div id="quote-aircraft-help" style="font-size:11px;color:var(--text-tertiary);margin-top:4px;"></div></div><div class="charge-grid"><div class="field-group"><label class="field-label">Base charge (Rs.)</label><input type="number" class="field-input" id="q-base" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Handling fee (Rs.)</label><input type="number" class="field-input" id="q-handling" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Crew accommodation (Rs.)</label><input type="number" class="field-input" id="q-crew" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Catering (Rs.)</label><input type="number" class="field-input" id="q-catering" placeholder="0" oninput="calcQuote()"/></div></div><div style="background:var(--bg-secondary);border-radius:var(--radius);padding:14px 16px;border:0.5px solid var(--border);"><div class="charge-row"><span class="charge-label">Subtotal</span><span class="charge-value" id="q-subtotal">Rs.0</span></div><div class="charge-row"><span class="charge-label">GST (18%)</span><span class="charge-value" id="q-gst">Rs.0</span></div><div class="total-row"><span class="total-label">Total quote</span><span class="total-value" id="q-total">Rs.0</span></div></div><div class="field-group" style="margin-top:16px;"><label class="field-label">Notes to client (optional)</label><textarea class="field-input" id="q-notes" placeholder="Any additional information..."></textarea></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeQuoteModal()">Cancel</button><button class="btn-sm btn-blue" id="btn-submit-quote" onclick="submitQuote()">Share quote with client</button></div></div></div>
+
+<div class="modal-overlay" id="aircraft-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Add aircraft</span><button class="modal-close" onclick="closeModal('aircraft-modal')">&times;</button></div><div class="modal-body"><div class="field-group"><label class="field-label">Aircraft type</label><input type="text" class="field-input" id="ac-type" placeholder="e.g. Citation XLS"/></div><div class="field-group"><label class="field-label">Registration</label><input type="text" class="field-input" id="ac-reg" placeholder="e.g. VT-ABC"/></div><div class="field-group"><label class="field-label">Seats</label><input type="number" class="field-input" id="ac-seats" placeholder="e.g. 8" min="1" max="50"/></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('aircraft-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="saveAircraft()">Add aircraft</button></div></div></div>
+
+<div class="modal-overlay" id="employee-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Add employee</span><button class="modal-close" onclick="closeModal('employee-modal')">&times;</button></div><div class="modal-body"><div class="field-group"><label class="field-label">Full name</label><input type="text" class="field-input" id="emp-name" placeholder="Employee full name"/></div><div class="field-group"><label class="field-label">Username</label><input type="text" class="field-input" id="emp-username" placeholder="Choose a username"/></div><div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="emp-password" placeholder="Set a password"/></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('employee-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="saveEmployee()">Create account</button></div></div></div>
+
+<div class="modal-overlay" id="register-modal"><div class="modal" style="max-width:480px;"><div class="modal-header"><span class="modal-title">Register your company</span><button class="modal-close" onclick="closeModal('register-modal')">&times;</button></div><div class="modal-body"><div class="field-group"><label class="field-label">Company name</label><input type="text" class="field-input" id="reg-company" placeholder="e.g. Club One Air Pvt Ltd"/></div><div class="field-group"><label class="field-label">Your full name</label><input type="text" class="field-input" id="reg-name" placeholder="Owner / Director name"/></div><div class="field-group"><label class="field-label">Choose username</label><input type="text" class="field-input" id="reg-username" placeholder="Used to log in"/></div><div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="reg-password" placeholder="Set a password"/></div><div class="field-group"><label class="field-label">Phone number</label><input type="text" class="field-input" id="reg-phone" placeholder="10-digit mobile number"/></div><div id="reg-error" class="login-error"></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('register-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="submitRegistration()">Submit registration</button></div></div></div>
+
+<div id="page-pending" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--bg);padding:24px;"><div style="text-align:center;max-width:400px;"><div style="font-family:var(--font-display);font-size:28px;color:var(--gold);margin-bottom:12px;">Registration submitted</div><div style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:24px;">Your company registration is under review. You will be able to log in once approved.</div><button class="btn-primary" style="width:auto;padding:0 24px;" onclick="document.getElementById('page-pending').style.display='none';document.getElementById('page-login').style.display='flex';">Back to login</button></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="operator.js"></script>
+
+</body>
+</html>
