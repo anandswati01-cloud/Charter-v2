@@ -3,211 +3,321 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>SkyVayu | Operator Portal</title>
+<title>SkyVayu | Admin</title>
 <script src="../js/config.js"></script>
-<link rel="stylesheet" href="operator.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAF7F2;--bg-secondary:#F0EAE0;--bg-card:#FFF8F0;--gold:#C4860A;--text:#1C1410;--text-secondary:#6B5940;--text-tertiary:#8A7560;--border:rgba(107,89,64,0.15);--border-hover:rgba(107,89,64,0.3);--green:#4A8A14;--green-faint:rgba(59,109,17,0.1);--red:#C0392B;--red-faint:rgba(192,57,43,0.08);--amber:#C4860A;--radius:8px;--radius-lg:12px;--font-display:Georgia,serif;--font:-apple-system,sans-serif;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;}
 
+/* LOGIN */
+#page-login{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;}
+.login-box{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:40px 36px;width:100%;max-width:380px;}
+.login-logo{text-align:center;margin-bottom:24px;}.login-logo .sky{font-size:9px;letter-spacing:4px;color:var(--text-tertiary);text-transform:uppercase;}.login-logo .vayu{font-family:var(--font-display);font-size:26px;color:var(--gold);display:block;}.admin-tag{font-size:11px;color:var(--text-tertiary);text-align:center;margin-bottom:24px;letter-spacing:.05em;}
+.field-group{margin-bottom:16px;}.field-label{font-size:11px;font-weight:500;color:var(--text-tertiary);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px;}
+.field-input{width:100%;height:42px;padding:0 14px;background:rgba(0,0,0,0.03);border:0.5px solid var(--border-hover);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--font);outline:none;}.field-input:focus{border-color:var(--gold);}
+.btn-primary{width:100%;height:44px;background:var(--gold);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer;margin-top:8px;}.btn-primary:hover{background:#a87208;}
+.login-error{background:var(--red-faint);border:0.5px solid rgba(192,57,43,0.3);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:16px;display:none;}.login-error.show{display:block;}
+
+/* DASHBOARD */
+#page-dashboard{display:none;}
+.top-bar{background:var(--bg-card);border-bottom:0.5px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px;}
+.top-logo{display:flex;align-items:center;gap:10px;}.top-logo .sky{font-size:9px;letter-spacing:4px;color:var(--text-tertiary);text-transform:uppercase;}.top-logo .vayu{font-family:var(--font-display);font-size:18px;color:var(--gold);}.top-logo .tag{font-size:10px;color:var(--text-tertiary);background:var(--bg-secondary);border:0.5px solid var(--border);padding:2px 8px;border-radius:3px;margin-left:4px;}
+.top-right{display:flex;align-items:center;gap:16px;}.top-user{font-size:12px;color:var(--text-tertiary);}
+.btn-logout-sm{height:30px;padding:0 14px;background:transparent;border:0.5px solid var(--border-hover);border-radius:var(--radius);color:var(--text-secondary);font-size:12px;font-family:var(--font);cursor:pointer;}.btn-logout-sm:hover{border-color:var(--red);color:var(--red);}
+
+.tabs-bar{background:var(--bg-card);border-bottom:0.5px solid var(--border);padding:0 32px;display:flex;gap:4px;}
+.tab{padding:12px 20px;font-size:13px;font-weight:500;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:8px;}.tab:hover{color:var(--text-secondary);}.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-badge{background:rgba(196,134,10,0.15);color:var(--gold);font-size:11px;font-weight:500;padding:1px 7px;border-radius:10px;}.tab.active .tab-badge{background:var(--gold);color:#fff;}
+
+.content{padding:28px 32px;max-width:1000px;}
+
+/* CARDS */
+.op-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:16px;}
+.op-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.op-company{font-size:17px;font-weight:500;color:var(--text);}.op-meta{font-size:12px;color:var(--text-tertiary);margin-top:3px;}
+.status-badge{font-size:10px;font-weight:500;padding:3px 10px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap;}
+.status-pending{background:rgba(196,134,10,0.1);color:var(--amber);border:0.5px solid rgba(196,134,10,0.3);}
+.status-approved{background:var(--green-faint);color:var(--green);border:0.5px solid rgba(59,109,17,0.3);}
+.status-rejected{background:var(--red-faint);color:var(--red);border:0.5px solid rgba(192,57,43,0.25);}
+
+.op-details{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+.op-detail{font-size:12px;color:var(--text-secondary);}.op-detail span{display:block;font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:2px;}
+
+.doc-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);margin-bottom:14px;}
+.doc-icon{width:32px;height:32px;background:rgba(196,134,10,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.doc-name{font-size:13px;color:var(--text);font-weight:500;flex:1;}
+.doc-sub{font-size:11px;color:var(--text-tertiary);}
+.btn-view-doc{height:30px;padding:0 14px;background:var(--gold);color:#fff;border:none;border-radius:var(--radius);font-size:12px;font-weight:500;font-family:var(--font);cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;}.btn-view-doc:hover{background:#a87208;}
+
+.action-row{display:flex;gap:10px;align-items:center;padding-top:14px;border-top:0.5px solid var(--border);}
+.btn-approve{height:36px;padding:0 20px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;}.btn-approve:hover{background:#3a7010;}
+.btn-reject{height:36px;padding:0 20px;background:transparent;border:0.5px solid rgba(192,57,43,0.4);color:var(--red);border-radius:var(--radius);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;}.btn-reject:hover{background:var(--red-faint);}
+.btn-undo{height:36px;padding:0 20px;background:transparent;border:0.5px solid var(--border-hover);color:var(--text-secondary);border-radius:var(--radius);font-size:13px;font-family:var(--font);cursor:pointer;}.btn-undo:hover{border-color:var(--border);color:var(--text);}
+
+.rejection-input{flex:1;height:36px;padding:0 12px;background:rgba(0,0,0,0.03);border:0.5px solid var(--border-hover);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--font);outline:none;display:none;}.rejection-input.show{display:block;}
+.btn-confirm-reject{height:36px;padding:0 16px;background:var(--red);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;display:none;}.btn-confirm-reject.show{display:block;}
+
+.empty-state{text-align:center;padding:60px 24px;}.empty-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px;}.empty-sub{font-size:13px;color:var(--text-tertiary);}
+.loading{text-align:center;padding:40px;color:var(--text-tertiary);font-size:13px;}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg-card);border:0.5px solid var(--border-hover);border-radius:var(--radius);padding:12px 18px;font-size:13px;color:var(--text);z-index:300;transform:translateY(80px);opacity:0;transition:all .3s;}.toast.show{transform:translateY(0);opacity:1;}.toast.success{border-color:rgba(59,109,17,0.5);color:var(--green);}.toast.error{border-color:rgba(192,57,43,0.5);color:var(--red);}
+
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;}
+.stat-num{font-family:var(--font-display);font-size:32px;font-weight:300;color:var(--gold);line-height:1;}
+.stat-label{font-size:12px;color:var(--text-tertiary);margin-top:4px;}
+</style>
 </head>
 <body>
 
-<!-- ================= LOGIN ================= -->
+<!-- LOGIN -->
 <div id="page-login">
   <div class="login-box">
     <div class="login-logo"><span class="sky">Sky</span><span class="vayu">Vayu</span></div>
-    <h1 class="login-title">Operator Portal</h1>
-    <p class="login-sub">Sign in to manage your queries and quotes</p>
-    <div class="login-error" id="login-error">Invalid username or password</div>
-    <div class="field-group"><label class="field-label">Username</label><input type="text" class="field-input" id="login-username" placeholder="Enter your username" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-    <div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="login-password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
-    <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign in</button>
-    <div style="text-align:center;margin-top:16px;"><button onclick="document.getElementById('register-modal').classList.add('open')" style="background:none;border:none;color:var(--text-tertiary);font-size:12px;cursor:pointer;">New operator? <span style="color:var(--gold);text-decoration:underline;">Register your company</span></button></div>
+    <p class="admin-tag">Super Admin Panel</p>
+    <div class="login-error" id="login-error">Incorrect password</div>
+    <div class="field-group"><label class="field-label">Admin password</label><input type="password" class="field-input" id="admin-password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doAdminLogin()"/></div>
+    <button class="btn-primary" onclick="doAdminLogin()">Sign in</button>
   </div>
 </div>
 
-<!-- ================= DASHBOARD ================= -->
+<!-- DASHBOARD -->
 <div id="page-dashboard">
-  <!-- NOTIFICATION BAR -->
-  <div id="doc-notification-bar" style="display:none;"></div>
-  <!-- AOP EXPIRED BLOCK -->
-  <div id="aop-expired-banner" style="display:none;background:#fef2f2;border-bottom:0.5px solid rgba(192,57,43,0.3);padding:12px 28px;font-size:13px;color:var(--red);align-items:center;gap:12px;">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span id="aop-expired-msg"></span>
-  </div>
-  <div class="sidebar">
-    <div class="sidebar-logo"><span class="sky">Sky</span><span class="vayu">Vayu</span><div class="portal-tag">Operator Portal</div></div>
-    <div class="operator-card">
-      <div class="op-name" id="sidebar-name"></div>
-      <div class="op-role" id="sidebar-role"></div>
-      <span class="role-tag" id="sidebar-role-tag">Admin</span>
+  <div class="top-bar">
+    <div class="top-logo">
+      <div><span class="sky">Sky</span><span class="vayu">Vayu</span></div>
+      <span class="tag">Super Admin</span>
     </div>
-    <div class="nav-section">
-      <div class="nav-item active" id="nav-queries" onclick="showSection('queries')">Queries <span class="nav-badge" id="nav-badge-queries">0</span></div>
-      <div class="nav-item" id="nav-fleet" onclick="showSection('fleet')">Fleet</div>
-      <div class="nav-item" id="nav-roster" onclick="showSection('roster')">Roster</div>
+    <div class="top-right">
+      <span class="top-user">Logged in as Swati</span>
+      <button class="btn-logout-sm" onclick="doAdminLogout()">Sign out</button>
     </div>
-    <div class="nav-section" id="nav-admin-section">
-      <div class="nav-label">Administration</div>
-      <div class="nav-item" id="nav-employees" onclick="showSection('employees')">Employees</div>
-      <div class="nav-item" id="nav-revenue" onclick="showSection('revenue')">Revenue</div>
-    </div>
-    <div class="sidebar-footer"><button class="btn-logout" onclick="doLogout()">Sign out</button></div>
   </div>
 
-  <div class="main">
-    <!-- QUERIES SECTION -->
-    <div id="section-queries">
-      <div class="main-header">
-        <div class="page-title">Queries</div>
-        <div class="subtabs">
-          <div class="subtab active" data-subtab="active" onclick="showSubtab('active')">Active <span class="subtab-count" id="count-active">0</span></div>
-          <div class="subtab" data-subtab="shared" onclick="showSubtab('shared')">Quotes shared <span class="subtab-count" id="count-shared">0</span></div>
-          <div class="subtab" data-subtab="confirmed" onclick="showSubtab('confirmed')">Booking confirmed <span class="subtab-count" id="count-confirmed">0</span></div>
-        </div>
-      </div>
-      <div class="main-content">
-        <div class="stat-row">
-          <div class="stat-card"><div class="stat-num" id="stat-active">0</div><div class="stat-label">Active queries</div></div>
-          <div class="stat-card"><div class="stat-num" id="stat-shared">0</div><div class="stat-label" id="stat-shared-label">Quotes shared</div></div>
-          <div class="stat-card"><div class="stat-num" id="stat-confirmed">0</div><div class="stat-label" id="stat-confirmed-label">Confirmed bookings</div></div>
-        </div>
-        <div id="list-active"><div class="loading">Loading...</div></div>
-        <div id="list-shared" style="display:none;"><div class="loading">Loading...</div></div>
-        <div id="list-confirmed" style="display:none;"><div class="loading">Loading...</div></div>
-      </div>
-    </div>
+  <div class="tabs-bar">
+    <div class="tab active" id="tab-pending" onclick="showTab('pending')">Pending applications <span class="tab-badge" id="badge-pending">0</span></div>
+    <div class="tab" id="tab-approved" onclick="showTab('approved')">Approved operators <span class="tab-badge" id="badge-approved">0</span></div>
+    <div class="tab" id="tab-rejected" onclick="showTab('rejected')">Rejected <span class="tab-badge" id="badge-rejected">0</span></div>
+    <div class="tab" id="tab-aircraft" onclick="showTab('aircraft')">Pending aircraft <span class="tab-badge" id="badge-aircraft">0</span></div>
+    <div class="tab" id="tab-employees" onclick="showTab('employees')">Pending employees <span class="tab-badge" id="badge-employees">0</span></div>
+  </div>
 
-    <!-- FLEET SECTION -->
-    <div id="section-fleet" style="display:none;">
-      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Fleet</div></div>
-      <div class="main-content">
-        <div class="aircraft-grid" id="aircraft-grid"></div>
-        <button class="btn-add" id="btn-add-aircraft" onclick="openAircraftModal()" style="margin-top:16px;">+ Add aircraft</button>
-      </div>
+  <div class="content">
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-num" id="stat-pending">0</div><div class="stat-label">Pending operators</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-approved">0</div><div class="stat-label">Approved operators</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-rejected">0</div><div class="stat-label">Rejected</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-aircraft">0</div><div class="stat-label">Pending aircraft</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-employees">0</div><div class="stat-label">Pending employees</div></div>
     </div>
-
-    <!-- ROSTER SECTION -->
-    <div id="section-roster" style="display:none;">
-      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Roster</div></div>
-      <div class="main-content">
-        <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:12px;">Aircraft availability, next 30 days. Green = your bookings, blue = your own, grey = other employees.</div>
-        <div id="roster-grid" class="roster-wrap"><div class="loading">Loading...</div></div>
-      </div>
-    </div>
-
-    <!-- EMPLOYEES SECTION (admin only) -->
-    <div id="section-employees" style="display:none;">
-      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Employees</div></div>
-      <div class="main-content">
-        <div class="card">
-          <div class="card-header"><span class="card-title">Team members</span><button class="btn-sm btn-blue" onclick="openEmployeeModal()">+ Add employee</button></div>
-          <div class="card-body"><div id="employees-list"><div class="loading">Loading...</div></div></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- REVENUE SECTION (admin only) -->
-    <div id="section-revenue" style="display:none;">
-      <div class="main-header"><div class="page-title" style="padding-bottom:20px;">Revenue</div></div>
-      <div class="main-content" id="revenue-content"><div class="loading">Loading...</div></div>
-    </div>
+    <div id="tab-content-pending"><div class="loading">Loading...</div></div>
+    <div id="tab-content-approved" style="display:none;"><div class="loading">Loading...</div></div>
+    <div id="tab-content-rejected" style="display:none;"><div class="loading">Loading...</div></div>
+    <div id="tab-content-aircraft" style="display:none;"><div class="loading">Loading...</div></div>
+    <div id="tab-content-employees" style="display:none;"><div class="loading">Loading...</div></div>
   </div>
 </div>
-
-<!-- ================= MODALS ================= -->
-<div class="modal-overlay" id="quote-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Submit quote</span><button class="modal-close" onclick="closeQuoteModal()">&times;</button></div><div class="modal-body"><div id="quote-query-info" style="background:rgba(0,0,0,0.04);border-radius:var(--radius);padding:12px 14px;margin-bottom:20px;font-size:13px;color:var(--text-secondary);"></div><div class="field-group"><label class="field-label">Select aircraft</label><select class="select-input" id="quote-aircraft" onchange="onAircraftChange()"><option value="">Choose aircraft...</option></select><div id="quote-aircraft-help" style="font-size:11px;color:var(--text-tertiary);margin-top:4px;"></div></div><div class="charge-grid"><div class="field-group"><label class="field-label">Base charge (Rs.)</label><input type="number" class="field-input" id="q-base" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Handling fee (Rs.)</label><input type="number" class="field-input" id="q-handling" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Crew accommodation (Rs.)</label><input type="number" class="field-input" id="q-crew" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Catering (Rs.)</label><input type="number" class="field-input" id="q-catering" placeholder="0" oninput="calcQuote()"/></div></div><div style="background:var(--bg-secondary);border-radius:var(--radius);padding:14px 16px;border:0.5px solid var(--border);"><div class="charge-row"><span class="charge-label">Subtotal</span><span class="charge-value" id="q-subtotal">Rs.0</span></div><div class="charge-row"><span class="charge-label">GST (18%)</span><span class="charge-value" id="q-gst">Rs.0</span></div><div class="total-row"><span class="total-label">Total quote</span><span class="total-value" id="q-total">Rs.0</span></div></div><div class="field-group" style="margin-top:16px;"><label class="field-label">Notes to client (optional)</label><textarea class="field-input" id="q-notes" placeholder="Any additional information..."></textarea></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeQuoteModal()">Cancel</button><button class="btn-sm btn-blue" id="btn-submit-quote" onclick="submitQuote()">Share quote with client</button></div></div></div>
-
-<!-- NOTIFICATION BANNER (shown dynamically) -->
-<div id="doc-notification-bar" style="display:none;"></div>
-
-<!-- AOP EXPIRED BLOCK (shown over dashboard when AOP is expired) -->
-<div id="aop-expired-banner" style="display:none;background:var(--red-faint);border-bottom:0.5px solid rgba(192,57,43,0.3);padding:12px 28px;font-size:13px;color:var(--red);display:none;align-items:center;gap:12px;">
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-  <span id="aop-expired-msg">Your Air Operator's Permit has expired. Please upload a renewed AOP to continue accepting charters.</span>
-</div>
-
-<div class="modal-overlay" id="aircraft-modal"><div class="modal" style="max-width:600px;"><div class="modal-header"><span class="modal-title">Add aircraft</span><button class="modal-close" onclick="closeModal('aircraft-modal')">&times;</button></div><div class="modal-body">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;">
-  <div class="field-group"><label class="field-label">Aircraft type</label><input type="text" class="field-input" id="ac-type" placeholder="e.g. Citation XLS"/></div>
-  <div class="field-group"><label class="field-label">Registration (VT-XXX)</label><input type="text" class="field-input" id="ac-reg" placeholder="e.g. VT-ABC"/></div>
-  <div class="field-group"><label class="field-label">Seats</label><input type="number" class="field-input" id="ac-seats" placeholder="e.g. 8" min="1" max="50"/></div>
-</div>
-<div style="font-size:11px;font-weight:500;color:var(--text-tertiary);letter-spacing:.08em;text-transform:uppercase;margin:16px 0 12px;padding-top:12px;border-top:0.5px solid var(--border);">Required documents</div>
-<div style="font-size:12px;color:var(--text-tertiary);margin-bottom:14px;">Your aircraft will be reviewed by SkyVayu before it can be used for bookings. All 4 documents are required.</div>
-<div id="ac-doc-fields">
-  <!-- C of R -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;padding:12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);">
-    <div>
-      <div style="font-size:11px;font-weight:500;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Certificate of Registration (C of R)</div>
-      <div id="cor-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;background:rgba(0,0,0,0.02);font-size:12px;color:var(--text-tertiary);" onclick="document.getElementById('cor-file').click()">
-        <span id="cor-filename">Upload PDF/JPG/PNG</span>
-      </div>
-      <input type="file" id="cor-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAcDocSelected(this,'cor')"/>
-    </div>
-    <div class="field-group" style="margin:0;"><label class="field-label">Expiry date</label><input type="date" class="field-input" id="cor-expiry"/></div>
-  </div>
-  <!-- C of A -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;padding:12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);">
-    <div>
-      <div style="font-size:11px;font-weight:500;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Certificate of Airworthiness (C of A)</div>
-      <div id="coa-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;background:rgba(0,0,0,0.02);font-size:12px;color:var(--text-tertiary);" onclick="document.getElementById('coa-file').click()">
-        <span id="coa-filename">Upload PDF/JPG/PNG</span>
-      </div>
-      <input type="file" id="coa-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAcDocSelected(this,'coa')"/>
-    </div>
-    <div class="field-group" style="margin:0;"><label class="field-label">Expiry date</label><input type="date" class="field-input" id="coa-expiry"/></div>
-  </div>
-  <!-- ARC -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;padding:12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);">
-    <div>
-      <div style="font-size:11px;font-weight:500;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Airworthiness Review Certificate (ARC)</div>
-      <div id="arc-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;background:rgba(0,0,0,0.02);font-size:12px;color:var(--text-tertiary);" onclick="document.getElementById('arc-file').click()">
-        <span id="arc-filename">Upload PDF/JPG/PNG</span>
-      </div>
-      <input type="file" id="arc-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAcDocSelected(this,'arc')"/>
-    </div>
-    <div class="field-group" style="margin:0;"><label class="field-label">Expiry date</label><input type="date" class="field-input" id="arc-expiry"/></div>
-  </div>
-  <!-- Insurance -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;padding:12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);">
-    <div>
-      <div style="font-size:11px;font-weight:500;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Insurance Certificate</div>
-      <div id="ins-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;background:rgba(0,0,0,0.02);font-size:12px;color:var(--text-tertiary);" onclick="document.getElementById('ins-file').click()">
-        <span id="ins-filename">Upload PDF/JPG/PNG</span>
-      </div>
-      <input type="file" id="ins-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAcDocSelected(this,'ins')"/>
-    </div>
-    <div class="field-group" style="margin:0;"><label class="field-label">Expiry date</label><input type="date" class="field-input" id="ins-expiry"/></div>
-  </div>
-</div>
-<div id="ac-save-error" style="font-size:12px;color:var(--red);margin-top:10px;display:none;"></div>
-</div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('aircraft-modal')">Cancel</button><button class="btn-sm btn-blue" id="btn-save-aircraft" onclick="saveAircraft()">Submit for review</button></div></div></div>
-
-<div class="modal-overlay" id="employee-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Add employee</span><button class="modal-close" onclick="closeModal('employee-modal')">&times;</button></div><div class="modal-body"><div class="field-group"><label class="field-label">Full name</label><input type="text" class="field-input" id="emp-name" placeholder="Employee full name"/></div><div class="field-group"><label class="field-label">Company employee ID <span style="color:var(--red);">*</span></label><input type="text" class="field-input" id="emp-id" placeholder="e.g. EMP-001 or staff ID number"/></div><div class="field-group"><label class="field-label">Username</label><input type="text" class="field-input" id="emp-username" placeholder="Choose a username"/></div><div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="emp-password" placeholder="Set a password"/></div><div style="background:var(--blue-faint);border:0.5px solid var(--blue-border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-secondary);margin-bottom:4px;">This employee will need SkyVayu approval before they can log in.</div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('employee-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="saveEmployee()">Submit for approval</button></div></div></div>
-
-<div class="modal-overlay" id="register-modal"><div class="modal" style="max-width:480px;"><div class="modal-header"><span class="modal-title">Register your company</span><button class="modal-close" onclick="closeModal('register-modal')">&times;</button></div><div class="modal-body">
-<div class="field-group"><label class="field-label">Company name</label><input type="text" class="field-input" id="reg-company" placeholder="e.g. Club One Air Pvt Ltd"/></div>
-<div class="field-group"><label class="field-label">Owner / Director name</label><input type="text" class="field-input" id="reg-name" placeholder="Full name"/></div>
-<div class="field-group"><label class="field-label">Email</label><input type="email" class="field-input" id="reg-email" placeholder="company@example.com"/></div>
-<div class="field-group"><label class="field-label">Phone number</label><input type="text" class="field-input" id="reg-phone" placeholder="10-digit mobile number"/></div>
-<div class="field-group"><label class="field-label">Choose username</label><input type="text" class="field-input" id="reg-username" placeholder="Used to log in"/></div>
-<div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="reg-password" placeholder="Set a password"/></div>
-<div class="field-group">
-  <label class="field-label">Air Operator's Permit (AOP) <span style="color:var(--red);">*</span></label>
-  <div id="aop-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:18px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(0,0,0,0.02);" onclick="document.getElementById('aop-file-input').click()">
-    <div id="aop-upload-label" style="font-size:13px;color:var(--text-tertiary);">Click to upload PDF, JPG or PNG · Max 10MB</div>
-    <div id="aop-file-name" style="font-size:12px;color:var(--gold);margin-top:4px;display:none;"></div>
-  </div>
-  <input type="file" id="aop-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAopFileSelected(this)"/>
-</div>
-<div style="background:var(--blue-faint);border:0.5px solid var(--blue-border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-secondary);margin-bottom:16px;">Your application will be reviewed by the SkyVayu team. You will be notified once approved.</div>
-<div id="reg-error" class="login-error"></div>
-</div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('register-modal')">Cancel</button><button class="btn-sm btn-blue" id="reg-submit-btn" onclick="submitRegistration()">Submit application</button></div></div></div>
-
-<div id="page-pending" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--bg);padding:24px;"><div style="text-align:center;max-width:400px;"><div style="font-family:var(--font-display);font-size:28px;color:var(--gold);margin-bottom:12px;">Registration submitted</div><div style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:24px;">Your company registration is under review. You will be able to log in once approved.</div><button class="btn-primary" style="width:auto;padding:0 24px;" onclick="document.getElementById('page-pending').style.display='none';document.getElementById('page-login').style.display='flex';">Back to login</button></div></div>
 
 <div class="toast" id="toast"></div>
 
-<script src="operator.js"></script>
+<script>
 
+var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;
+var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
+var ADMIN_PASSWORD='SkyVayu@Admin2026';
+var allOperators=[];
+var allPendingAircraft=[];
+
+function sbFetch(path,opts){
+  opts=opts||{};
+  var headers={'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
+  if(opts.prefer)headers['Prefer']=opts.prefer;
+  return fetch(SUPABASE_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:headers,body:opts.body?JSON.stringify(opts.body):undefined})
+    .then(function(r){if(r.status===204)return{ok:r.ok,data:[]};return r.json().then(function(d){return{ok:r.ok,status:r.status,data:d};});});
+}
+
+function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500);}
+
+function doAdminLogin(){
+  var pw=document.getElementById('admin-password').value;
+  if(pw!==ADMIN_PASSWORD){document.getElementById('login-error').classList.add('show');return;}
+  document.getElementById('login-error').classList.remove('show');
+  document.getElementById('page-login').style.display='none';
+  document.getElementById('page-dashboard').style.display='block';
+  loadAll();
+}
+
+function doAdminLogout(){
+  document.getElementById('page-dashboard').style.display='none';
+  document.getElementById('page-login').style.display='flex';
+  document.getElementById('admin-password').value='';
+}
+
+async function loadAll(){
+  await Promise.all([loadOperators(),loadPendingAircraft(),loadPendingEmployees()]);
+}
+
+async function loadOperators(){
+  var res=await sbFetch('operators?order=created_at.desc&select=*,operator_users(id,username,full_name,role)');
+  allOperators=res.ok?res.data:[];
+  updateStats();
+  renderTab('pending');renderTab('approved');renderTab('rejected');
+}
+
+async function loadPendingAircraft(){
+  var res=await sbFetch('aircraft?doc_status=eq.pending&order=created_at.desc&select=*,operators(company_name)');
+  allPendingAircraft=res.ok?res.data:[];
+  var count=allPendingAircraft.length;
+  document.getElementById('stat-aircraft').textContent=count;
+  document.getElementById('badge-aircraft').textContent=count;
+  renderAircraftTab();
+}
+
+async function loadPendingEmployees(){
+  var res=await sbFetch('operator_users?role=eq.employee&is_approved=eq.false&order=created_at.desc&select=*,operators(company_name)');
+  var emps=res.ok?res.data:[];
+  document.getElementById('stat-employees').textContent=emps.length;
+  document.getElementById('badge-employees').textContent=emps.length;
+  var el=document.getElementById('tab-content-employees');
+  if(!emps.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No pending employees</div><div class="empty-sub">Employee accounts submitted for approval will appear here</div></div>';return;}
+  el.innerHTML=emps.map(function(e){
+    var opName=(e.operators&&e.operators.company_name)||'Unknown';
+    var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
+    return '<div class="op-card">'
+      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:rgba(196,134,10,0.1);border:0.5px solid rgba(196,134,10,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+ini+'</div><div><div class="op-company">'+(e.full_name||e.username)+'</div><div class="op-meta">'+opName+' · @'+e.username+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
+      +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+(e.employee_id||'—')+'</div><div class="op-detail"><span>Company</span>'+opName+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
+      +'<div class="action-row"><button class="btn-approve" onclick="approveEmployee(\''+e.id+'\')">✓ Approve</button><button class="btn-reject" onclick="showEmpRejectInput(\''+e.id+'\')">✗ Reject</button><input class="rejection-input" id="emp-reject-reason-'+e.id+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="emp-confirm-reject-'+e.id+'" onclick="rejectEmployee(\''+e.id+'\')">Confirm</button></div>'
+      +'</div>';
+  }).join('');
+}
+
+function showEmpRejectInput(id){document.getElementById('emp-reject-reason-'+id).classList.add('show');document.getElementById('emp-confirm-reject-'+id).classList.add('show');}
+async function approveEmployee(id){var res=await sbFetch('operator_users?id=eq.'+id,{method:'PATCH',body:{is_approved:true}});if(res.ok){showToast('Employee approved ✓','success');await loadPendingEmployees();}else showToast('Failed','error');}
+async function rejectEmployee(id){var reason=document.getElementById('emp-reject-reason-'+id).value.trim();var res=await sbFetch('operator_users?id=eq.'+id,{method:'PATCH',body:{is_active:false,approval_note:reason||null}});if(res.ok){showToast('Employee rejected','success');await loadPendingEmployees();}else showToast('Failed','error');}
+
+function updateStats(){
+  var p=allOperators.filter(function(o){return o.approval_status==='pending';}).length;
+  var a=allOperators.filter(function(o){return o.approval_status==='approved';}).length;
+  var r=allOperators.filter(function(o){return o.approval_status==='rejected';}).length;
+  document.getElementById('stat-pending').textContent=p;document.getElementById('stat-approved').textContent=a;document.getElementById('stat-rejected').textContent=r;
+  document.getElementById('badge-pending').textContent=p;document.getElementById('badge-approved').textContent=a;document.getElementById('badge-rejected').textContent=r;
+}
+
+function showTab(tab){
+  ['pending','approved','rejected','aircraft','employees'].forEach(function(t){
+    document.getElementById('tab-'+t).classList.remove('active');
+    document.getElementById('tab-content-'+t).style.display='none';
+  });
+  document.getElementById('tab-'+tab).classList.add('active');
+  document.getElementById('tab-content-'+tab).style.display='block';
+}
+
+function fmtDateTime(iso){if(!iso)return'—';return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function fmtDate(d){if(!d)return'—';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
+
+async function openDocument(docUrl){
+  if(!docUrl){showToast('No document uploaded','error');return;}
+  var marker='/storage/v1/object/operator-documents/';
+  var idx=docUrl.indexOf(marker);
+  if(idx===-1){window.open(docUrl,'_blank');return;}
+  var path=docUrl.substring(idx+marker.length);
+  var res=await fetch(SUPABASE_URL+'/storage/v1/object/sign/operator-documents/'+path,{
+    method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},
+    body:JSON.stringify({expiresIn:60})
+  });
+  if(!res.ok){showToast('Could not open document','error');return;}
+  var data=await res.json();
+  if(data.signedURL)window.open(SUPABASE_URL+'/storage/v1'+data.signedURL,'_blank');
+  else window.open(docUrl,'_blank');
+}
+
+function renderTab(status){
+  var el=document.getElementById('tab-content-'+status);
+  var ops=allOperators.filter(function(o){return o.approval_status===status;});
+  if(!ops.length){
+    var msgs={pending:'No pending applications',approved:'No approved operators yet',rejected:'No rejected applications'};
+    var subs={pending:'New registrations will appear here',approved:'Approved operators can log in',rejected:'Rejected applications appear here'};
+    el.innerHTML='<div class="empty-state"><div class="empty-title">'+msgs[status]+'</div><div class="empty-sub">'+subs[status]+'</div></div>';return;
+  }
+  el.innerHTML=ops.map(function(op){return renderOperatorCard(op);}).join('');
+}
+
+function renderOperatorCard(op){
+  var owner=(op.operator_users||[]).find(function(u){return u.role==='owner';});
+  var empCount=(op.operator_users||[]).filter(function(u){return u.role==='employee';}).length;
+  var statusClass='status-'+op.approval_status;
+  var statusLabel=op.approval_status==='pending'?'Pending review':op.approval_status==='approved'?'Approved':'Rejected';
+  var docHtml=op.aop_document_url
+    ?'<div class="doc-row"><div class="doc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div style="flex:1"><div class="doc-name">'+(op.aop_document_name||"Air Operator\'s Permit")+'</div><div class="doc-sub">AOP'+(op.aop_expiry_date?' · Expires '+fmtDate(op.aop_expiry_date):'')+'</div></div><button class="btn-view-doc" onclick="openDocument(\''+op.aop_document_url+'\')">View</button></div>'
+    :'<div class="doc-row" style="opacity:.5;"><div class="doc-name" style="color:var(--text-tertiary);">No document uploaded</div></div>';
+  var actionHtml='';
+  if(op.approval_status==='pending'){
+    actionHtml='<div class="action-row"><button class="btn-approve" onclick="approveOperator(\''+op.id+'\')">✓ Approve</button><button class="btn-reject" onclick="showRejectInput(\''+op.id+'\')">✗ Reject</button><input class="rejection-input" id="reject-reason-'+op.id+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="confirm-reject-'+op.id+'" onclick="rejectOperator(\''+op.id+'\')">Confirm</button></div>';
+  }else if(op.approval_status==='approved'){
+    actionHtml='<div class="action-row"><span style="font-size:12px;color:var(--green);">✓ Approved</span><button class="btn-undo" style="margin-left:auto;" onclick="revokeOperator(\''+op.id+'\')">Revoke</button></div>';
+  }else{
+    actionHtml='<div class="action-row">'+(op.rejection_reason?'<span style="font-size:12px;color:var(--red);">'+op.rejection_reason+'</span>':'<span style="font-size:12px;color:var(--text-tertiary);">No reason given</span>')+'<button class="btn-undo" style="margin-left:auto;" onclick="approveOperator(\''+op.id+'\')">Move to approved</button></div>';
+  }
+  return '<div class="op-card">'
+    +'<div class="op-card-top"><div><div class="op-company">'+op.company_name+'</div><div class="op-meta">Applied '+fmtDateTime(op.created_at)+(empCount?' · '+empCount+' emp':'')+'</div></div><span class="status-badge '+statusClass+'">'+statusLabel+'</span></div>'
+    +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+(op.owner_name||'—')+'</div><div class="op-detail"><span>Phone</span>'+(op.owner_phone||'—')+'</div><div class="op-detail"><span>Email</span>'+(op.owner_email||'—')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+owner.username:'—')+'</div></div>'
+    +docHtml+actionHtml+'</div>';
+}
+
+function renderAircraftTab(){
+  var el=document.getElementById('tab-content-aircraft');
+  if(!allPendingAircraft.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No pending aircraft</div><div class="empty-sub">Aircraft submitted for review will appear here</div></div>';return;}
+  el.innerHTML=allPendingAircraft.map(function(ac){return renderAircraftCard(ac);}).join('');
+}
+
+function docBtn(url,expiry){
+  if(!url)return '<span style="font-size:11px;color:var(--text-tertiary);">Not uploaded</span>';
+  return '<button class="btn-view-doc" style="font-size:11px;height:26px;padding:0 10px;" onclick="openDocument(\''+url+'\')">View</button>'
+    +(expiry?'<span style="font-size:11px;color:var(--text-tertiary);margin-left:6px;">Exp: '+fmtDate(expiry)+'</span>':'');
+}
+
+function renderAircraftCard(ac){
+  var opName=(ac.operators&&ac.operators.company_name)||'Unknown';
+  return '<div class="op-card">'
+    +'<div class="op-card-top"><div><div class="op-company">'+ac.aircraft_type+' &nbsp;·&nbsp; <span style="font-family:monospace;font-size:14px;">'+ac.registration+'</span></div><div class="op-meta">'+opName+(ac.seats?' · '+ac.seats+' seats':'')+'</div></div><span class="status-badge status-pending">Pending review</span></div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">'
+    +'<div style="padding:10px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);"><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;">C of R</div>'+docBtn(ac.cor_url,ac.cor_expiry)+'</div>'
+    +'<div style="padding:10px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);"><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;">C of A</div>'+docBtn(ac.coa_url,ac.coa_expiry)+'</div>'
+    +'<div style="padding:10px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);"><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;">ARC</div>'+docBtn(ac.arc_url,ac.arc_expiry)+'</div>'
+    +'<div style="padding:10px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);"><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;">Insurance</div>'+docBtn(ac.insurance_url,ac.insurance_expiry)+'</div>'
+    +'</div>'
+    +'<div class="action-row"><button class="btn-approve" onclick="approveAircraft(\''+ac.id+'\')">✓ Approve aircraft</button><button class="btn-reject" onclick="showAcRejectInput(\''+ac.id+'\')">✗ Reject</button><input class="rejection-input" id="ac-reject-reason-'+ac.id+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="ac-confirm-reject-'+ac.id+'" onclick="rejectAircraft(\''+ac.id+'\')">Confirm</button></div>'
+    +'</div>';
+}
+
+function showRejectInput(opId){document.getElementById('reject-reason-'+opId).classList.add('show');document.getElementById('confirm-reject-'+opId).classList.add('show');}
+function showAcRejectInput(acId){document.getElementById('ac-reject-reason-'+acId).classList.add('show');document.getElementById('ac-confirm-reject-'+acId).classList.add('show');}
+
+async function approveOperator(opId){
+  var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',body:{approval_status:'approved',rejection_reason:null}});
+  if(res.ok){showToast('Operator approved','success');await loadOperators();showTab('approved');}else showToast('Failed','error');
+}
+async function rejectOperator(opId){
+  var reason=document.getElementById('reject-reason-'+opId).value.trim();
+  var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',body:{approval_status:'rejected',rejection_reason:reason||null}});
+  if(res.ok){showToast('Operator rejected','success');await loadOperators();}else showToast('Failed','error');
+}
+async function revokeOperator(opId){
+  if(!confirm('Revoke this approval?'))return;
+  var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',body:{approval_status:'pending'}});
+  if(res.ok){showToast('Revoked','success');await loadOperators();}else showToast('Failed','error');
+}
+async function approveAircraft(acId){
+  var res=await sbFetch('aircraft?id=eq.'+acId,{method:'PATCH',body:{doc_status:'approved',is_active:true,doc_rejection_reason:null}});
+  if(res.ok){showToast('Aircraft approved','success');await loadPendingAircraft();}else showToast('Failed','error');
+}
+async function rejectAircraft(acId){
+  var reason=document.getElementById('ac-reject-reason-'+acId).value.trim();
+  var res=await sbFetch('aircraft?id=eq.'+acId,{method:'PATCH',body:{doc_status:'rejected',is_active:false,doc_rejection_reason:reason||null}});
+  if(res.ok){showToast('Aircraft rejected','success');await loadPendingAircraft();}else showToast('Failed','error');
+}
+
+document.getElementById('page-login').style.display='flex';
+</script>
 </body>
 </html>
