@@ -9,7 +9,6 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#FAF7F2;--bg-secondary:#F0EAE0;--bg-card:#FFF8F0;--gold:#C4860A;--text:#1C1410;--text-secondary:#6B5940;--text-tertiary:#8A7560;--border:rgba(107,89,64,0.15);--border-hover:rgba(107,89,64,0.3);--green:#4A8A14;--green-faint:rgba(59,109,17,0.1);--red:#C0392B;--red-faint:rgba(192,57,43,0.08);--amber:#C4860A;--radius:8px;--radius-lg:12px;--font-display:Georgia,serif;--font:-apple-system,sans-serif;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;}
-
 /* LOGIN */
 #page-login{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;}
 .login-box{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:40px 36px;width:100%;max-width:380px;}
@@ -18,20 +17,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .field-input{width:100%;height:42px;padding:0 14px;background:rgba(0,0,0,0.03);border:0.5px solid var(--border-hover);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--font);outline:none;}.field-input:focus{border-color:var(--gold);}
 .btn-primary{width:100%;height:44px;background:var(--gold);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:500;font-family:var(--font);cursor:pointer;margin-top:8px;}.btn-primary:hover{background:#a87208;}
 .login-error{background:var(--red-faint);border:0.5px solid rgba(192,57,43,0.3);border-radius:var(--radius);padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:16px;display:none;}.login-error.show{display:block;}
-
 /* DASHBOARD */
 #page-dashboard{display:none;}
 .top-bar{background:var(--bg-card);border-bottom:0.5px solid var(--border);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:56px;}
 .top-logo{display:flex;align-items:center;gap:10px;}.top-logo .sky{font-size:9px;letter-spacing:4px;color:var(--text-tertiary);text-transform:uppercase;}.top-logo .vayu{font-family:var(--font-display);font-size:18px;color:var(--gold);}.top-logo .tag{font-size:10px;color:var(--text-tertiary);background:var(--bg-secondary);border:0.5px solid var(--border);padding:2px 8px;border-radius:3px;margin-left:4px;}
 .top-right{display:flex;align-items:center;gap:16px;}.top-user{font-size:12px;color:var(--text-tertiary);}
 .btn-logout-sm{height:30px;padding:0 14px;background:transparent;border:0.5px solid var(--border-hover);border-radius:var(--radius);color:var(--text-secondary);font-size:12px;font-family:var(--font);cursor:pointer;}.btn-logout-sm:hover{border-color:var(--red);color:var(--red);}
-
 .tabs-bar{background:var(--bg-card);border-bottom:0.5px solid var(--border);padding:0 32px;display:flex;gap:4px;}
 .tab{padding:12px 20px;font-size:13px;font-weight:500;color:var(--text-tertiary);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;display:flex;align-items:center;gap:8px;}.tab:hover{color:var(--text-secondary);}.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
 .tab-badge{background:rgba(196,134,10,0.15);color:var(--gold);font-size:11px;font-weight:500;padding:1px 7px;border-radius:10px;}.tab.active .tab-badge{background:var(--gold);color:#fff;}
-
 .content{padding:28px 32px;max-width:1000px;}
-
 /* CARDS */
 .op-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px;margin-bottom:16px;}
 .op-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
@@ -40,28 +35,23 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .status-pending{background:rgba(196,134,10,0.1);color:var(--amber);border:0.5px solid rgba(196,134,10,0.3);}
 .status-approved{background:var(--green-faint);color:var(--green);border:0.5px solid rgba(59,109,17,0.3);}
 .status-rejected{background:var(--red-faint);color:var(--red);border:0.5px solid rgba(192,57,43,0.25);}
-
 .op-details{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
 .op-detail{font-size:12px;color:var(--text-secondary);}.op-detail span{display:block;font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:2px;}
-
 .doc-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);margin-bottom:14px;}
 .doc-icon{width:32px;height:32px;background:rgba(196,134,10,0.1);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .doc-name{font-size:13px;color:var(--text);font-weight:500;flex:1;}
 .doc-sub{font-size:11px;color:var(--text-tertiary);}
 .btn-view-doc{height:30px;padding:0 14px;background:var(--gold);color:#fff;border:none;border-radius:var(--radius);font-size:12px;font-weight:500;font-family:var(--font);cursor:pointer;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;}.btn-view-doc:hover{background:#a87208;}
-
 .action-row{display:flex;gap:10px;align-items:center;padding-top:14px;border-top:0.5px solid var(--border);}
 .btn-approve{height:36px;padding:0 20px;background:var(--green);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;}.btn-approve:hover{background:#3a7010;}
 .btn-reject{height:36px;padding:0 20px;background:transparent;border:0.5px solid rgba(192,57,43,0.4);color:var(--red);border-radius:var(--radius);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;}.btn-reject:hover{background:var(--red-faint);}
 .btn-undo{height:36px;padding:0 20px;background:transparent;border:0.5px solid var(--border-hover);color:var(--text-secondary);border-radius:var(--radius);font-size:13px;font-family:var(--font);cursor:pointer;}.btn-undo:hover{border-color:var(--border);color:var(--text);}
-
+.action-label{font-size:12px;color:var(--text-tertiary);margin-left:4px;}
 .rejection-input{flex:1;height:36px;padding:0 12px;background:rgba(0,0,0,0.03);border:0.5px solid var(--border-hover);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--font);outline:none;display:none;}.rejection-input.show{display:block;}
 .btn-confirm-reject{height:36px;padding:0 16px;background:var(--red);color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:500;font-family:var(--font);cursor:pointer;display:none;}.btn-confirm-reject.show{display:block;}
-
 .empty-state{text-align:center;padding:60px 24px;}.empty-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:6px;}.empty-sub{font-size:13px;color:var(--text-tertiary);}
 .loading{text-align:center;padding:40px;color:var(--text-tertiary);font-size:13px;}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--bg-card);border:0.5px solid var(--border-hover);border-radius:var(--radius);padding:12px 18px;font-size:13px;color:var(--text);z-index:300;transform:translateY(80px);opacity:0;transition:all .3s;}.toast.show{transform:translateY(0);opacity:1;}.toast.success{border-color:rgba(59,109,17,0.5);color:var(--green);}.toast.error{border-color:rgba(192,57,43,0.5);color:var(--red);}
-
 .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
 .stat-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;}
 .stat-num{font-family:var(--font-display);font-size:32px;font-weight:300;color:var(--gold);line-height:1;}
@@ -69,7 +59,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 </style>
 </head>
 <body>
-
 <!-- LOGIN -->
 <div id="page-login">
   <div class="login-box">
@@ -80,7 +69,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <button class="btn-primary" onclick="doAdminLogin()">Sign in</button>
   </div>
 </div>
-
 <!-- DASHBOARD -->
 <div id="page-dashboard">
   <div class="top-bar">
@@ -93,7 +81,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <button class="btn-logout-sm" onclick="doAdminLogout()">Sign out</button>
     </div>
   </div>
-
   <div class="tabs-bar">
     <div class="tab active" id="tab-pending" onclick="showTab('pending')">Pending applications <span class="tab-badge" id="badge-pending">0</span></div>
     <div class="tab" id="tab-approved" onclick="showTab('approved')">Approved operators <span class="tab-badge" id="badge-approved">0</span></div>
@@ -101,7 +88,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div class="tab" id="tab-aircraft" onclick="showTab('aircraft')">Pending aircraft <span class="tab-badge" id="badge-aircraft">0</span></div>
     <div class="tab" id="tab-employees" onclick="showTab('employees')">Pending employees <span class="tab-badge" id="badge-employees">0</span></div>
   </div>
-
   <div class="content">
     <div class="stats-row">
       <div class="stat-card"><div class="stat-num" id="stat-pending">0</div><div class="stat-label">Pending operators</div></div>
@@ -117,11 +103,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <div id="tab-content-employees" style="display:none;"><div class="loading">Loading...</div></div>
   </div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-
 var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;
 var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
 var ADMIN_PASSWORD='SkyVayu@Admin2026';
@@ -184,9 +167,9 @@ async function loadPendingEmployees(){
     var opName=(e.operators&&e.operators.company_name)||'Unknown';
     var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
     return '<div class="op-card">'
-      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:rgba(196,134,10,0.1);border:0.5px solid rgba(196,134,10,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+ini+'</div><div><div class="op-company">'+(e.full_name||e.username)+'</div><div class="op-meta">'+opName+' · @'+e.username+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
+      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+ini+'</div><div><div class="op-company">'+(e.full_name||e.username)+'</div><div class="op-meta">'+opName+' · @'+e.username+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
       +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+(e.employee_id||'—')+'</div><div class="op-detail"><span>Company</span>'+opName+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
-      +'<div class="action-row"><button class="btn-approve" onclick="approveEmployee(\''+e.id+'\')">✓ Approve</button><button class="btn-reject" onclick="showEmpRejectInput(\''+e.id+'\')">✗ Reject</button><input class="rejection-input" id="emp-reject-reason-'+e.id+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="emp-confirm-reject-'+e.id+'" onclick="rejectEmployee(\''+e.id+'\')">Confirm</button></div>'
+      +'<div class="action-row"><button class="btn-approve" onclick="approveEmployee(\''+e.id+'\')">&#10003; Approve</button><button class="btn-reject" onclick="showEmpRejectInput(\''+e.id+'\')">&#10007; Reject</button><input class="rejection-input" id="emp-reject-reason-'+e.id+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="emp-confirm-reject-'+e.id+'" onclick="rejectEmployee(\''+e.id+'\')">Confirm</button></div>'
       +'</div>';
   }).join('');
 }
@@ -248,18 +231,18 @@ function renderOperatorCard(op){
   var statusClass='status-'+op.approval_status;
   var statusLabel=op.approval_status==='pending'?'Pending review':op.approval_status==='approved'?'Approved':'Rejected';
   var docHtml=op.aop_document_url
-    ?'<div class="doc-row"><div class="doc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div style="flex:1"><div class="doc-name">'+(op.aop_document_name||"Air Operator\'s Permit")+'</div><div class="doc-sub">AOP'+(op.aop_expiry_date?' · Expires '+fmtDate(op.aop_expiry_date):'')+'</div></div><button class="btn-view-doc" onclick="openDocument(\''+op.aop_document_url+'\')">View</button></div>'
+    ?'<div class="doc-row"><div class="doc-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div><div style="flex:1"><div class="doc-name">'+(op.aop_document_name||"Air Operator\'s Permit")+'</div><div class="doc-sub">AOP'+(op.aop_expiry_date?' &middot; New expiry: <b style=\"color:var(--text);\">'  +fmtDate(op.aop_expiry_date)+'</b>':'')+'</div></div><button class="btn-view-doc" onclick="openDocument(\''+op.aop_document_url+'\')">View</button></div>'
     :'<div class="doc-row" style="opacity:.5;"><div class="doc-name" style="color:var(--text-tertiary);">No document uploaded</div></div>';
   var actionHtml='';
   if(op.approval_status==='pending'){
-    actionHtml='<div class="action-row"><button class="btn-approve" onclick="approveOperator(\''+op.id+'\')">✓ Approve</button><button class="btn-reject" onclick="showRejectInput(\''+op.id+'\')">✗ Reject</button><input class="rejection-input" id="reject-reason-'+op.id+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="confirm-reject-'+op.id+'" onclick="rejectOperator(\''+op.id+'\')">Confirm</button></div>';
+    actionHtml='<div class="action-row"><button class="btn-approve" onclick="approveOperator(\''+op.id+'\')">&#10003; Approve</button><button class="btn-reject" onclick="showRejectInput(\''+op.id+'\')">&#10007; Reject</button><input class="rejection-input" id="reject-reason-'+op.id+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="confirm-reject-'+op.id+'" onclick="rejectOperator(\''+op.id+'\')">Confirm</button></div>';
   }else if(op.approval_status==='approved'){
-    actionHtml='<div class="action-row"><span style="font-size:12px;color:var(--green);">✓ Approved</span><button class="btn-undo" style="margin-left:auto;" onclick="revokeOperator(\''+op.id+'\')">Revoke</button></div>';
+    actionHtml='<div class="action-row"><span style="font-size:12px;color:var(--green);">&#10003; Approved</span><button class="btn-undo" style="margin-left:auto;" onclick="revokeOperator(\''+op.id+'\')">Revoke</button></div>';
   }else{
     actionHtml='<div class="action-row">'+(op.rejection_reason?'<span style="font-size:12px;color:var(--red);">'+op.rejection_reason+'</span>':'<span style="font-size:12px;color:var(--text-tertiary);">No reason given</span>')+'<button class="btn-undo" style="margin-left:auto;" onclick="approveOperator(\''+op.id+'\')">Move to approved</button></div>';
   }
   return '<div class="op-card">'
-    +'<div class="op-card-top"><div><div class="op-company">'+op.company_name+'</div><div class="op-meta">Applied '+fmtDateTime(op.created_at)+(empCount?' · '+empCount+' emp':'')+'</div></div><span class="status-badge '+statusClass+'">'+statusLabel+'</span></div>'
+    +'<div class="op-card-top"><div><div class="op-company">'+op.company_name+'</div><div class="op-meta">Applied '+fmtDateTime(op.created_at)+(empCount?' &middot; '+empCount+' emp':'')+'</div></div><span class="status-badge '+statusClass+'">'+statusLabel+'</span></div>'
     +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+(op.owner_name||'—')+'</div><div class="op-detail"><span>Phone</span>'+(op.owner_phone||'—')+'</div><div class="op-detail"><span>Email</span>'+(op.owner_email||'—')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+owner.username:'—')+'</div></div>'
     +docHtml+actionHtml+'</div>';
 }
@@ -273,20 +256,20 @@ function renderAircraftTab(){
 function docBtn(url,expiry){
   if(!url)return '<span style="font-size:11px;color:var(--text-tertiary);">Not uploaded</span>';
   return '<button class="btn-view-doc" style="font-size:11px;height:26px;padding:0 10px;" onclick="openDocument(\''+url+'\')">View</button>'
-    +(expiry?'<span style="font-size:11px;color:var(--text-tertiary);margin-left:6px;">Exp: '+fmtDate(expiry)+'</span>':'');
+    +(expiry?'<div style="font-size:11px;margin-top:4px;">New expiry: <b style="color:var(--text);">'+fmtDate(expiry)+'</b></div>':'');
 }
 
 function renderAircraftCard(ac){
   var opName=(ac.operators&&ac.operators.company_name)||'Unknown';
   return '<div class="op-card">'
-    +'<div class="op-card-top"><div><div class="op-company">'+ac.aircraft_type+' &nbsp;·&nbsp; <span style="font-family:monospace;font-size:14px;">'+ac.registration+'</span></div><div class="op-meta">'+opName+(ac.seats?' · '+ac.seats+' seats':'')+'</div></div><span class="status-badge status-pending">Pending review</span></div>'
+    +'<div class="op-card-top"><div><div class="op-company">'+ac.aircraft_type+' &nbsp;&middot;&nbsp; <span style="font-family:monospace;font-size:14px;">'+ac.registration+'</span></div><div class="op-meta">'+opName+(ac.seats?' &middot; '+ac.seats+' seats':'')+'</div></div><span class="status-badge status-pending">Pending review</span></div>'
     +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">'
     +'<div style="padding:10px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);"><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;">C of R</div>'+docBtn(ac.cor_url,ac.cor_expiry)+'</div>'
     +'<div style="padding:10px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);"><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;">C of A</div>'+docBtn(ac.coa_url,ac.coa_expiry)+'</div>'
     +'<div style="padding:10px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);"><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;">ARC</div>'+docBtn(ac.arc_url,ac.arc_expiry)+'</div>'
     +'<div style="padding:10px 12px;background:var(--bg-secondary);border-radius:var(--radius);border:0.5px solid var(--border);"><div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;font-weight:500;margin-bottom:6px;">Insurance</div>'+docBtn(ac.insurance_url,ac.insurance_expiry)+'</div>'
     +'</div>'
-    +'<div class="action-row"><button class="btn-approve" onclick="approveAircraft(\''+ac.id+'\')">✓ Approve aircraft</button><button class="btn-reject" onclick="showAcRejectInput(\''+ac.id+'\')">✗ Reject</button><input class="rejection-input" id="ac-reject-reason-'+ac.id+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="ac-confirm-reject-'+ac.id+'" onclick="rejectAircraft(\''+ac.id+'\')">Confirm</button></div>'
+    +'<div class="action-row"><button class="btn-approve" onclick="approveAircraft(\''+ac.id+'\')">&#10003; Approve aircraft</button><button class="btn-reject" onclick="showAcRejectInput(\''+ac.id+'\')">&#10007; Reject</button><input class="rejection-input" id="ac-reject-reason-'+ac.id+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="ac-confirm-reject-'+ac.id+'" onclick="rejectAircraft(\''+ac.id+'\')">Confirm</button></div>'
     +'</div>';
 }
 
