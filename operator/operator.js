@@ -1,9 +1,13 @@
 var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
+
 var currentUser=null,currentOperator=null,currentQueryId=null,currentClaimId=null;
+
 var aircraftList=[],allOperatorUsers=[],allActiveQueries=[],allMyOperatorQuotes=[],allActiveClaims=[];
+
 var lastCharges={},refreshInterval=null,claimRefreshInterval=null,expandedEmployeeId=null;
 
 function isOwner(){return currentUser&&currentUser.role==='owner';}
+
 function nowIso(){return new Date().toISOString();}
 
 function sbFetch(path,opts){
@@ -18,6 +22,7 @@ function sbFetch(path,opts){
 }
 
 /* ============ LOGIN ============ */
+
 async function doLogin(){
   var username=document.getElementById('login-username').value.trim();
   var password=document.getElementById('login-password').value;
@@ -30,7 +35,6 @@ async function doLogin(){
     var user=userRes.data[0];
     if(!user.is_active)throw new Error('inactive');
     if((user.password_hash||'').trim()!==(password||'').trim())throw new Error('bad');
-    // Block employees who haven't been approved by SkyVayu yet
     if(user.role==='employee'&&user.is_approved===false){
       errEl.textContent='Your account is pending approval from SkyVayu. Please wait.';
       errEl.classList.add('show');btn.disabled=false;btn.textContent='Sign in';return;
@@ -80,6 +84,7 @@ function applyRoleRestrictions(){
 }
 
 /* ============ NAV ============ */
+
 function showSection(section){
   ['queries','fleet','roster','employees','revenue'].forEach(function(s){
     var el=document.getElementById('section-'+s);if(el)el.style.display='none';
@@ -104,6 +109,7 @@ function showSubtab(tab){
 }
 
 /* ============ HELPERS ============ */
+
 function fmtDate(d){if(!d)return'—';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
 function fmtDateShort(d){if(!d)return'';var parts=d.split('-');if(parts.length!==3)return d;return parts[2]+'-'+parts[1];}
 function fmtPrice(n){return'Rs.'+Number(n||0).toLocaleString('en-IN');}
@@ -116,6 +122,7 @@ function lookupUser(id){for(var i=0;i<allOperatorUsers.length;i++)if(allOperator
 function getClaimFor(queryId){for(var i=0;i<allActiveClaims.length;i++)if(allActiveClaims[i].query_id===queryId)return allActiveClaims[i];return null;}
 
 /* ============ DATA LOADING ============ */
+
 async function loadAllData(){
   if(!currentOperator)return;
   var opId=currentOperator.id;
@@ -129,15 +136,12 @@ async function loadAllData(){
   allMyOperatorQuotes=results[1].ok?results[1].data:[];
   allActiveClaims=results[2].ok?results[2].data:[];
   allOperatorUsers=results[3].ok?results[3].data:[];
-
   var quotedQueryIds=allMyOperatorQuotes.map(function(q){return q.query_id;});
   var unquoted=allActiveQueries.filter(function(q){return!quotedQueryIds.includes(q.id);});
   var sharedAll=allMyOperatorQuotes.filter(function(q){return q.status==='shared';});
   var confirmedAll=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';});
-
   var shared=isOwner()?sharedAll:sharedAll.filter(function(q){return q.submitted_by===currentUser.id;});
   var confirmed=isOwner()?confirmedAll:confirmedAll.filter(function(q){return q.submitted_by===currentUser.id;});
-
   document.getElementById('stat-active').textContent=unquoted.length;
   document.getElementById('stat-shared').textContent=shared.length;
   document.getElementById('stat-confirmed').textContent=confirmed.length;
@@ -145,13 +149,13 @@ async function loadAllData(){
   document.getElementById('count-shared').textContent=shared.length;
   document.getElementById('count-confirmed').textContent=confirmed.length;
   document.getElementById('nav-badge-queries').textContent=unquoted.length+shared.length;
-
   renderActiveList(unquoted);
   renderSharedList(shared);
   renderConfirmedList(confirmed);
 }
 
 /* ============ RENDER LISTS ============ */
+
 function renderActiveList(queries){
   var el=document.getElementById('list-active');
   if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No active queries</div><div class="empty-sub">New client queries will appear here</div></div>';return;}
@@ -178,7 +182,7 @@ function renderActiveList(queries){
       +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
       +(timer?'<div class="query-timer">Window: '+timer+' remaining</div>':'')
       +lockInfo
-      +'<div class="query-actions"><button class="btn-sm btn-blue" '+btnDisabled+' onclick="openQuoteModal(\''+q.id+'\')">'+btnTxt+'</button></div></div>';
+      +'<div class="query-actions"><button class="btn-sm btn-blue" '+btnDisabled+' onclick="openQuoteModal(''+q.id+'')">'+btnTxt+'</button></div></div>';
   }).join('');
 }
 
@@ -189,8 +193,7 @@ function renderSharedList(quotes){
     var query=q.queries||{};
     var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'-')+' → '+(query.destination||'-');
     var empBadge='';
-    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+(u.full_name||u.username)+'</span>':'';}
-    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' · '+(q.aircraft_type||'')+(q.aircraft_registration?' ('+q.aircraft_registration+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+(query.passengers||'-')+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+q.notes+'</div>':'')+'</div>';
+    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' · '+(q.aircraft_type||'')+(q.aircraft_registration?' ('+q.aircraft_registration+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+(query.passengers||'-')+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+q.notes+'</div>':'')+'</div>';
   }).join('');
 }
 
@@ -201,8 +204,7 @@ function renderConfirmedList(quotes){
     var query=q.queries||{};
     var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'-')+' → '+(query.destination||'-');
     var empBadge='';
-    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+(u.full_name||u.username)+'</span>':'';}
-    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' · '+(q.aircraft_type||'')+(q.aircraft_registration?' ('+q.aircraft_registration+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+(query.passengers||'-')+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
+    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' · '+(q.aircraft_type||'')+(q.aircraft_registration?' ('+q.aircraft_registration+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+(query.passengers||'-')+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
   }).join('');
 }
 
@@ -217,6 +219,7 @@ function updateClaimTimers(){
 }
 
 /* ============ CLAIM / LOCK ============ */
+
 async function tryClaim(queryId){
   var existing=await sbFetch('query_claims?query_id=eq.'+queryId+'&operator_id=eq.'+currentOperator.id+'&expires_at=gt.'+encodeURIComponent(nowIso()));
   if(existing.ok&&existing.data.length){
@@ -251,8 +254,8 @@ async function releaseClaim(claimId){
 }
 
 /* ============ AIRCRAFT AVAILABILITY ============ */
+
 function getBusyAircraftMap(){
-  // map: aircraftId -> { date: { by:name, route:'A→B' } }
   var map={};
   allMyOperatorQuotes.forEach(function(q){
     if(q.status!=='accepted'&&q.status!=='confirmed'&&q.status!=='booked')return;
@@ -271,8 +274,8 @@ function getBusyAircraftMap(){
 }
 
 /* ============ QUOTE MODAL ============ */
+
 async function openQuoteModal(queryId){
-  // Block if AOP expired
   if(isAopExpired()){
     showToast('Your AOP has expired. Renew it before submitting quotes.','error');
     return;
@@ -289,7 +292,6 @@ async function openQuoteModal(queryId){
   var query=res.data&&res.data[0];if(!query){releaseClaim(currentClaimId);currentClaimId=null;return;}
   var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'—')+' → '+(query.destination||'—');
   document.getElementById('quote-query-info').innerHTML='<strong style="color:var(--text);">'+route+'</strong><br>'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' &nbsp;|&nbsp; '+query.passengers+' pax';
-
   var busyMap=getBusyAircraftMap();
   var expiredAcIds=getExpiredAircraftIds();
   var flightDate=query.flight_date;
@@ -383,7 +385,8 @@ async function submitQuote(){
 }
 
 /* ============ DOCUMENT NOTIFICATIONS + BLOCKING ============ */
-var acDocFiles = {}; // {cor: File, coa: File, arc: File, ins: File}
+
+var acDocFiles = {};
 
 function daysUntil(dateStr){
   if(!dateStr) return null;
@@ -395,47 +398,46 @@ function checkDocumentStatus(){
   if(!currentOperator) return;
   var notifications = [];
   var aopExpired = false;
-
-  // Check AOP expiry
   var aopDays = daysUntil(currentOperator.aop_expiry_date);
   if(aopDays !== null){
     if(aopDays <= 0){
       aopExpired = true;
-      notifications.push({type:'error', msg:'Your Air Operator\'s Permit has expired. You cannot accept new charters until you renew and upload your AOP.'});
     } else if(aopDays <= 30){
-      notifications.push({type:'warn', msg:'Your Air Operator\'s Permit expires in '+aopDays+' day'+(aopDays===1?'':'s')+'. Please renew it before it lapses.'});
+      notifications.push({
+        type:'warn',
+        msg:'Your Air Operator\'s Permit expires in '+aopDays+' day'+(aopDays===1?'':'s')+'.',
+        btn:'Upload updated document',
+        onclick:'openAopRenewModal()'
+      });
     }
   }
-
-  // Check aircraft doc expiry
-  var expiredAcDocs = [];
-  var warningAcDocs = [];
   aircraftList.forEach(function(ac){
-    var docs = [
-      {name:'C of R', key:'cor_expiry', ac: ac},
-      {name:'C of A', key:'coa_expiry', ac: ac},
-      {name:'ARC',    key:'arc_expiry', ac: ac},
-      {name:'Insurance', key:'insurance_expiry', ac: ac}
+    var docDefs = [
+      {name:'C of R',    expKey:'cor_expiry',       urlKey:'cor_url',       nameKey:'cor_name',       docKey:'cor'},
+      {name:'C of A',    expKey:'coa_expiry',       urlKey:'coa_url',       nameKey:'coa_name',       docKey:'coa'},
+      {name:'ARC',       expKey:'arc_expiry',       urlKey:'arc_url',       nameKey:'arc_name',       docKey:'arc'},
+      {name:'Insurance', expKey:'insurance_expiry', urlKey:'insurance_url', nameKey:'insurance_name', docKey:'ins'}
     ];
-    docs.forEach(function(d){
-      var days = daysUntil(ac[d.key]);
+    docDefs.forEach(function(d){
+      var days = daysUntil(ac[d.expKey]);
       if(days === null) return;
       if(days <= 0){
-        expiredAcDocs.push(ac.registration+' '+d.name);
+        notifications.push({
+          type:'error',
+          msg:ac.registration+' — '+d.name+' has expired. This aircraft is unavailable until renewed.',
+          btn:'Upload updated document',
+          onclick:'openDocRenewModal(\''+ac.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\')'
+        });
       } else if(days <= 30){
-        warningAcDocs.push(ac.registration+' '+d.name+' ('+days+'d)');
+        notifications.push({
+          type:'warn',
+          msg:ac.registration+' — '+d.name+' expires in '+days+' day'+(days===1?'':'s')+'.',
+          btn:'Upload updated document',
+          onclick:'openDocRenewModal(\''+ac.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\')'
+        });
       }
     });
   });
-
-  if(expiredAcDocs.length){
-    notifications.push({type:'error', msg:'Expired aircraft documents: '+expiredAcDocs.join(', ')+'. Affected aircraft cannot be used until renewed.'});
-  }
-  if(warningAcDocs.length){
-    notifications.push({type:'warn', msg:'Expiring soon: '+warningAcDocs.join(', ')+'. Please renew before expiry.'});
-  }
-
-  // Render notification bar
   var bar = document.getElementById('doc-notification-bar');
   if(notifications.length){
     bar.style.display = 'block';
@@ -443,24 +445,27 @@ function checkDocumentStatus(){
       var bg = n.type==='error' ? '#fef2f2' : '#fffbeb';
       var col = n.type==='error' ? 'var(--red)' : 'var(--amber)';
       var bdr = n.type==='error' ? 'rgba(192,57,43,0.25)' : 'rgba(196,134,10,0.3)';
-      return '<div style="background:'+bg+';border-bottom:0.5px solid '+bdr+';padding:10px 28px;font-size:12px;color:'+col+';display:flex;align-items:center;gap:10px;">'
-        +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
-        +n.msg+'</div>';
+      var btnBg = n.type==='error' ? 'rgba(192,57,43,0.1)' : 'rgba(196,134,10,0.12)';
+      return '<div style="background:'+bg+';border-bottom:0.5px solid '+bdr+';padding:10px 28px;font-size:12px;color:'+col+';display:flex;align-items:center;gap:12px;">'
+        +'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
+        +'<span style="flex:1;">'+n.msg+'</span>'
+        +(n.btn?'<button onclick="'+n.onclick+'" style="height:26px;padding:0 12px;background:'+btnBg+';border:0.5px solid '+bdr+';border-radius:6px;font-size:11px;font-weight:500;color:'+col+';cursor:pointer;white-space:nowrap;font-family:var(--font);">'+n.btn+'</button>':'')
+        +'</div>';
     }).join('');
   } else {
     bar.style.display = 'none';
     bar.innerHTML = '';
   }
-
-  // Block query submission if AOP expired
   var expiredBanner = document.getElementById('aop-expired-banner');
   if(aopExpired){
     expiredBanner.style.display = 'flex';
     document.getElementById('aop-expired-msg').textContent = 'Your Air Operator\'s Permit has expired. You cannot submit quotes until you upload a renewed AOP.';
+    document.getElementById('aop-renew-btn').style.display = 'inline-flex';
   } else {
     expiredBanner.style.display = 'none';
+    document.getElementById('aop-renew-btn').style.display = 'none';
   }
-  return {aopExpired: aopExpired, expiredAcDocs: expiredAcDocs};
+  return {aopExpired: aopExpired};
 }
 
 function getExpiredAircraftIds(){
@@ -483,6 +488,7 @@ function isAopExpired(){
 }
 
 /* ============ FLEET ============ */
+
 async function loadFleet(){
   var res = await sbFetch('aircraft?operator_id=eq.'+currentOperator.id+'&order=created_at.asc');
   aircraftList = res.ok ? res.data : [];
@@ -490,46 +496,50 @@ async function loadFleet(){
   var active = aircraftList.filter(function(a){return a.is_active && a.doc_status==='approved';});
   var pending = aircraftList.filter(function(a){return a.doc_status==='pending';});
   var rejected = aircraftList.filter(function(a){return a.doc_status==='rejected';});
-
   var html = '';
-
   if(active.length){
     html += active.map(function(a){
-      var expiredDocs = [];
-      [['C of R','cor_expiry'],['C of A','coa_expiry'],['ARC','arc_expiry'],['Insurance','insurance_expiry']].forEach(function(d){
-        if(a[d[1]] && daysUntil(a[d[1]]) <= 0) expiredDocs.push(d[0]);
-      });
-      var warnDocs = [];
-      [['C of R','cor_expiry'],['C of A','coa_expiry'],['ARC','arc_expiry'],['Insurance','insurance_expiry']].forEach(function(d){
-        var days = daysUntil(a[d[1]]);
-        if(days !== null && days > 0 && days <= 30) warnDocs.push(d[0]+' ('+days+'d)');
-      });
+      var docDefs = [
+        {name:'C of R',    expKey:'cor_expiry',       docKey:'cor', urlKey:'cor_url',       nameKey:'cor_name'},
+        {name:'C of A',    expKey:'coa_expiry',       docKey:'coa', urlKey:'coa_url',       nameKey:'coa_name'},
+        {name:'ARC',       expKey:'arc_expiry',       docKey:'arc', urlKey:'arc_url',       nameKey:'arc_name'},
+        {name:'Insurance', expKey:'insurance_expiry', docKey:'ins', urlKey:'insurance_url', nameKey:'insurance_name'}
+      ];
       var removeBtn = isOwner() ? '<button class="aircraft-remove" onclick="removeAircraft(\''+a.id+'\')">&times;</button>' : '';
-      var statusHtml = '';
-      if(expiredDocs.length) statusHtml = '<div style="font-size:10px;color:var(--red);margin-top:6px;">⚠ Expired: '+expiredDocs.join(', ')+'</div>';
-      else if(warnDocs.length) statusHtml = '<div style="font-size:10px;color:var(--amber);margin-top:6px;">⚠ Expiring: '+warnDocs.join(', ')+'</div>';
-      return '<div class="aircraft-card">'+removeBtn+'<div class="aircraft-type">'+a.aircraft_type+'</div><div class="aircraft-reg">'+a.registration+'</div>'+(a.seats?'<div class="aircraft-seats">'+a.seats+' seats</div>':'')+statusHtml+'</div>';
+      var docStatusHtml = '';
+      docDefs.forEach(function(d){
+        var days = daysUntil(a[d.expKey]);
+        if(days === null) return;
+        var col = days <= 0 ? 'var(--red)' : 'var(--amber)';
+        var label = days <= 0 ? '⚠ Expired' : ('⚠ '+days+'d left');
+        docStatusHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">'
+          +'<span style="font-size:10px;color:'+col+';">'+d.name+' — '+label+'</span>'
+          +'<button onclick="openDocRenewModal(\''+a.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\') " '
+          +'style="height:22px;padding:0 8px;background:transparent;border:0.5px solid '+col+';border-radius:4px;font-size:10px;color:'+col+';cursor:pointer;font-family:var(--font);white-space:nowrap;">'
+          +'Upload updated document</button></div>';
+      });
+      return '<div class="aircraft-card">'+removeBtn
+        +'<div class="aircraft-type">'+a.aircraft_type+'</div>'
+        +'<div class="aircraft-reg">'+a.registration+'</div>'
+        +(a.seats?'<div class="aircraft-seats">'+a.seats+' seats</div>':'')
+        +docStatusHtml+'</div>';
     }).join('');
   }
-
   if(pending.length){
     html += pending.map(function(a){
       return '<div class="aircraft-card" style="opacity:.65;border-style:dashed;"><div style="position:absolute;top:8px;right:8px;font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Under review</div><div class="aircraft-type">'+a.aircraft_type+'</div><div class="aircraft-reg">'+a.registration+'</div>'+(a.seats?'<div class="aircraft-seats">'+a.seats+' seats</div>':'')+'<div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;">Documents submitted — awaiting SkyVayu approval</div></div>';
     }).join('');
   }
-
   if(rejected.length){
     html += rejected.map(function(a){
       return '<div class="aircraft-card" style="border-color:rgba(192,57,43,0.3);"><div class="aircraft-type">'+a.aircraft_type+'</div><div class="aircraft-reg">'+a.registration+'</div><div style="font-size:11px;color:var(--red);margin-top:6px;">Documents rejected'+(a.doc_rejection_reason?' — '+a.doc_rejection_reason:'')+'</div><button class="btn-sm btn-outline-sm" style="margin-top:8px;font-size:11px;height:28px;" onclick="resubmitAircraft(\''+a.id+'\')">Re-upload documents</button></div>';
     }).join('');
   }
-
   if(!html){
     grid.innerHTML = '<div style="grid-column:span 2;"><div class="empty-state"><div class="empty-title">No aircraft added</div><div class="empty-sub">'+(isOwner()?'Add your fleet to start submitting quotes':'Ask your admin to add aircraft')+'</div></div></div>';
   } else {
     grid.innerHTML = html;
   }
-
   checkDocumentStatus();
 }
 
@@ -580,9 +590,7 @@ async function saveAircraft(){
   var seats= parseInt(document.getElementById('ac-seats').value)||null;
   var errEl = document.getElementById('ac-save-error');
   errEl.style.display='none';
-
   if(!type||!reg){errEl.textContent='Please enter aircraft type and registration.';errEl.style.display='block';return;}
-
   var docKeys = ['cor','coa','arc','ins'];
   var missing = docKeys.filter(function(k){return !acDocFiles[k];});
   if(missing.length){
@@ -591,15 +599,11 @@ async function saveAircraft(){
     errEl.style.display='block';return;
   }
   var missingExpiry = docKeys.filter(function(k){
-    var key = k==='ins'?'ins':'arc'===k?'arc':k;
     return !document.getElementById(k+'-expiry').value;
   });
   if(missingExpiry.length){errEl.textContent='Please enter expiry dates for all documents.';errEl.style.display='block';return;}
-
   var btn = document.getElementById('btn-save-aircraft');
   btn.disabled=true;btn.textContent='Uploading...';
-
-  // Create aircraft record first (inactive, pending)
   var acRes = await sbFetch('aircraft',{method:'POST',prefer:'return=representation',body:{
     operator_id:currentOperator.id, aircraft_type:type, registration:reg, seats:seats,
     is_active:false, doc_status:'pending'
@@ -609,8 +613,6 @@ async function saveAircraft(){
     btn.disabled=false;btn.textContent='Submit for review';return;
   }
   var acId = acRes.data[0].id;
-
-  // Upload all 4 docs
   var uploads = {};
   for(var i=0;i<docKeys.length;i++){
     var k = docKeys[i];
@@ -622,15 +624,12 @@ async function saveAircraft(){
     }
     uploads[k] = result;
   }
-
-  // Save URLs + expiry dates
   await sbFetch('aircraft?id=eq.'+acId,{method:'PATCH',body:{
     cor_url:   uploads.cor.url, cor_name:  uploads.cor.name,  cor_expiry:  document.getElementById('cor-expiry').value,
     coa_url:   uploads.coa.url, coa_name:  uploads.coa.name,  coa_expiry:  document.getElementById('coa-expiry').value,
     arc_url:   uploads.arc.url, arc_name:  uploads.arc.name,  arc_expiry:  document.getElementById('arc-expiry').value,
     insurance_url:  uploads.ins.url, insurance_name: uploads.ins.name, insurance_expiry: document.getElementById('ins-expiry').value
   }});
-
   btn.disabled=false;btn.textContent='Submit for review';
   closeModal('aircraft-modal');
   acDocFiles={};
@@ -645,12 +644,148 @@ async function removeAircraft(id){
 }
 
 function resubmitAircraft(id){
-  // For now open the add modal — in future could pre-fill
-  openAircraftModal();
-  showToast('Please re-upload your documents and submit again','success');
+  var ac = aircraftList.find(function(a){return a.id===id;});
+  if(!ac) return;
+  var docDefs = [
+    {name:'C of R',    expKey:'cor_expiry',       docKey:'cor', urlKey:'cor_url',       nameKey:'cor_name'},
+    {name:'C of A',    expKey:'coa_expiry',       docKey:'coa', urlKey:'coa_url',       nameKey:'coa_name'},
+    {name:'ARC',       expKey:'arc_expiry',       docKey:'arc', urlKey:'arc_url',       nameKey:'arc_name'},
+    {name:'Insurance', expKey:'insurance_expiry', docKey:'ins', urlKey:'insurance_url', nameKey:'insurance_name'}
+  ];
+  var first = docDefs[0];
+  openDocRenewModal(id, first.docKey, first.name, first.expKey, first.urlKey, first.nameKey);
+}
+
+/* ============ AOP RENEW MODAL ============ */
+
+var selectedAopRenewFile = null;
+
+function openAopRenewModal(){
+  selectedAopRenewFile = null;
+  document.getElementById('aop-renew-file-input').value = '';
+  document.getElementById('aop-renew-filename').textContent = 'Upload PDF/JPG/PNG';
+  document.getElementById('aop-renew-filename').style.color = '';
+  document.getElementById('aop-renew-expiry').value = '';
+  document.getElementById('aop-renew-error').style.display = 'none';
+  document.getElementById('aop-renew-modal').classList.add('open');
+}
+
+function onAopRenewFileSelected(input){
+  var file = input.files[0];
+  if(!file) return;
+  if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
+  selectedAopRenewFile = file;
+  document.getElementById('aop-renew-filename').textContent = '✓ '+file.name;
+  document.getElementById('aop-renew-filename').style.color = 'var(--gold)';
+  document.getElementById('aop-renew-upload-area').style.borderColor = 'var(--gold)';
+}
+
+async function submitAopRenewal(){
+  var expiry = document.getElementById('aop-renew-expiry').value;
+  var errEl = document.getElementById('aop-renew-error');
+  errEl.style.display = 'none';
+  if(!selectedAopRenewFile){errEl.textContent='Please upload the renewed AOP document.';errEl.style.display='block';return;}
+  if(!expiry){errEl.textContent='Please enter the new expiry date.';errEl.style.display='block';return;}
+  if(currentOperator.aop_expiry_date && expiry <= currentOperator.aop_expiry_date){
+    errEl.textContent='New expiry date must be later than the current expiry ('+fmtDate(currentOperator.aop_expiry_date)+')';
+    errEl.style.display='block';return;
+  }
+  var btn = document.getElementById('btn-submit-aop-renew');
+  btn.disabled=true;btn.textContent='Uploading...';
+  var uploadResult = await uploadAopDocument(currentOperator.id, selectedAopRenewFile);
+  if(!uploadResult){
+    errEl.textContent='Upload failed. Please try again.';errEl.style.display='block';
+    btn.disabled=false;btn.textContent='Submit for approval';return;
+  }
+  var docUrl = SUPABASE_URL+'/storage/v1/object/operator-documents/'+uploadResult.path;
+  var res = await sbFetch('operators?id=eq.'+currentOperator.id,{method:'PATCH',body:{
+    aop_document_url: docUrl,
+    aop_document_name: uploadResult.name,
+    aop_expiry_date: expiry,
+    approval_status: 'pending'
+  }});
+  if(!res.ok){
+    errEl.textContent='Failed to save. Please try again.';errEl.style.display='block';
+    btn.disabled=false;btn.textContent='Submit for approval';return;
+  }
+  currentOperator.aop_expiry_date = expiry;
+  currentOperator.aop_document_url = docUrl;
+  currentOperator.approval_status = 'pending';
+  btn.disabled=false;btn.textContent='Submit for approval';
+  closeModal('aop-renew-modal');
+  selectedAopRenewFile = null;
+  showToast('AOP submitted for SkyVayu approval','success');
+  checkDocumentStatus();
+}
+
+/* ============ AIRCRAFT DOC RENEW MODAL ============ */
+
+var docRenewState = {};
+var selectedDocRenewFile = null;
+
+function openDocRenewModal(acId, docKey, docName, expKey, urlKey, nameKey){
+  selectedDocRenewFile = null;
+  docRenewState = {acId:acId, docKey:docKey, docName:docName, expKey:expKey, urlKey:urlKey, nameKey:nameKey};
+  var ac = aircraftList.find(function(a){return a.id===acId;});
+  document.getElementById('doc-renew-title').textContent = 'Upload updated '+docName;
+  document.getElementById('doc-renew-aircraft-info').textContent = ac ? ac.aircraft_type+' · '+ac.registration : '';
+  document.getElementById('doc-renew-current-expiry').textContent = ac && ac[expKey] ? fmtDate(ac[expKey]) : '—';
+  document.getElementById('doc-renew-file-input').value = '';
+  document.getElementById('doc-renew-filename').textContent = 'Upload PDF/JPG/PNG';
+  document.getElementById('doc-renew-filename').style.color = '';
+  document.getElementById('doc-renew-upload-area').style.borderColor = '';
+  document.getElementById('doc-renew-expiry').value = '';
+  document.getElementById('doc-renew-error').style.display = 'none';
+  document.getElementById('doc-renew-modal').classList.add('open');
+}
+
+function onDocRenewFileSelected(input){
+  var file = input.files[0];
+  if(!file) return;
+  if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
+  selectedDocRenewFile = file;
+  document.getElementById('doc-renew-filename').textContent = '✓ '+file.name;
+  document.getElementById('doc-renew-filename').style.color = 'var(--gold)';
+  document.getElementById('doc-renew-upload-area').style.borderColor = 'var(--gold)';
+}
+
+async function submitDocRenewal(){
+  var expiry = document.getElementById('doc-renew-expiry').value;
+  var errEl = document.getElementById('doc-renew-error');
+  errEl.style.display = 'none';
+  if(!selectedDocRenewFile){errEl.textContent='Please upload the updated document.';errEl.style.display='block';return;}
+  if(!expiry){errEl.textContent='Please enter the new expiry date.';errEl.style.display='block';return;}
+  var ac = aircraftList.find(function(a){return a.id===docRenewState.acId;});
+  var oldExpiry = ac && ac[docRenewState.expKey];
+  if(oldExpiry && expiry <= oldExpiry){
+    errEl.textContent='New expiry must be later than current expiry ('+fmtDate(oldExpiry)+')';
+    errEl.style.display='block';return;
+  }
+  var btn = document.getElementById('btn-submit-doc-renew');
+  btn.disabled=true;btn.textContent='Uploading...';
+  var result = await uploadAcDoc(currentOperator.id, docRenewState.acId, docRenewState.docKey, selectedDocRenewFile);
+  if(!result){
+    errEl.textContent='Upload failed. Please try again.';errEl.style.display='block';
+    btn.disabled=false;btn.textContent='Submit for approval';return;
+  }
+  var patch = {doc_status:'pending', is_active:false};
+  patch[docRenewState.urlKey] = result.url;
+  patch[docRenewState.nameKey] = result.name;
+  patch[docRenewState.expKey] = expiry;
+  var res = await sbFetch('aircraft?id=eq.'+docRenewState.acId,{method:'PATCH',body:patch});
+  if(!res.ok){
+    errEl.textContent='Failed to save. Please try again.';errEl.style.display='block';
+    btn.disabled=false;btn.textContent='Submit for approval';return;
+  }
+  btn.disabled=false;btn.textContent='Submit for approval';
+  closeModal('doc-renew-modal');
+  selectedDocRenewFile = null;
+  showToast(docRenewState.docName+' submitted for SkyVayu approval','success');
+  await loadFleet();
 }
 
 /* ============ ROSTER (calendar grid) ============ */
+
 async function loadRoster(){
   if(!aircraftList.length)await loadFleet();
   var container=document.getElementById('roster-grid');
@@ -661,7 +796,6 @@ async function loadRoster(){
   var busyMap=getBusyAircraftMap();
   function toIso(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function dayName(d){return['SUN','MON','TUE','WED','THU','FRI','SAT'][d.getDay()];}
-
   var cols='160px '+dates.map(function(){return'76px';}).join(' ');
   var html='<div class="roster-grid" style="grid-template-columns:'+cols+';">';
   html+='<div class="roster-hdr-left">Aircraft</div>';
@@ -677,10 +811,8 @@ async function loadRoster(){
       var booking=busyMap[ac.id]&&busyMap[ac.id][iso];
       var cellContent='';
       if(booking){
-        // determine if this is current user's booking (for employee view)
         var isMine=false;
         if(!isOwner()){
-          // find the quote to check ownership
           var mine=allMyOperatorQuotes.find(function(q){return q.aircraft_id===ac.id&&q.queries&&(q.queries.flight_date===iso||q.queries.return_date===iso)&&q.submitted_by===currentUser.id;});
           isMine=!!mine;
         }
@@ -697,13 +829,12 @@ async function loadRoster(){
 }
 
 /* ============ EMPLOYEES (admin only) ============ */
+
 async function loadEmployees(){
   if(!isOwner())return;
   var el=document.getElementById('employees-list');
   var emps=allOperatorUsers.filter(function(u){return u.role==='employee';});
   if(!emps.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No employees added</div><div class="empty-sub">Create accounts for your sales team</div></div>';return;}
-
-  // Aggregate stats per employee
   var stats={};
   emps.forEach(function(e){stats[e.id]={shared:0,confirmed:0,revenue:0,activity:[]};});
   allMyOperatorQuotes.forEach(function(q){
@@ -715,7 +846,6 @@ async function loadEmployees(){
       stats[q.submitted_by].revenue+=Number(q.price||0);
     }
   });
-
   var rows=emps.map(function(e){
     var s=stats[e.id];
     var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
@@ -774,33 +904,29 @@ async function saveEmployee(){
 }
 
 /* ============ REVENUE (admin only) ============ */
+
 function loadRevenue(){
   if(!isOwner())return;
   var container=document.getElementById('revenue-content');
   var confirmed=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';});
   if(!confirmed.length){container.innerHTML='<div class="empty-state"><div class="empty-title">No revenue yet</div><div class="empty-sub">Confirmed bookings will appear here</div></div>';return;}
-
   var total=confirmed.reduce(function(a,q){return a+Number(q.price||0);},0);
   var now=new Date();
   var thisMonth=now.getMonth(),thisYear=now.getFullYear();
   var lastDate=new Date(thisYear,thisMonth-1,1);
   var lastMonth=lastDate.getMonth(),lastYear=lastDate.getFullYear();
-
   var thisMonthRev=0,lastMonthRev=0;
   confirmed.forEach(function(q){
     var d=q.queries&&q.queries.flight_date?new Date(q.queries.flight_date):new Date(q.created_at);
     if(d.getMonth()===thisMonth&&d.getFullYear()===thisYear)thisMonthRev+=Number(q.price||0);
     else if(d.getMonth()===lastMonth&&d.getFullYear()===lastYear)lastMonthRev+=Number(q.price||0);
   });
-
   var delta='';
   if(lastMonthRev>0){
     var pct=((thisMonthRev-lastMonthRev)/lastMonthRev*100);
     var cls=pct>=0?'up':'down';
     delta='<div class="rev-delta '+cls+'">'+(pct>=0?'▲ ':'▼ ')+Math.abs(pct).toFixed(1)+'% vs last month</div>';
   }
-
-  // By employee
   var byEmp={};
   confirmed.forEach(function(q){
     var id=q.submitted_by||'unknown';
@@ -813,8 +939,6 @@ function loadRevenue(){
   var empRows=Object.keys(byEmp).map(function(k){return byEmp[k];}).sort(function(a,b){return b.rev-a.rev;}).map(function(r){
     return'<tr><td><b>'+r.name+'</b></td><td>'+r.count+'</td><td>'+fmtPrice(Math.round(r.rev/r.count))+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
   }).join('');
-
-  // By aircraft
   var byAc={};
   confirmed.forEach(function(q){
     var id=q.aircraft_id||'unknown';
@@ -825,7 +949,6 @@ function loadRevenue(){
   var acRows=Object.keys(byAc).map(function(k){return byAc[k];}).sort(function(a,b){return b.rev-a.rev;}).map(function(r){
     return'<tr><td><b>'+r.name+'</b> <span style="color:var(--text-tertiary);font-size:11px;font-family:monospace;">'+r.reg+'</span></td><td>'+r.count+'</td><td>'+fmtPrice(Math.round(r.rev/r.count))+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
   }).join('');
-
   container.innerHTML=
     '<div class="rev-hero"><div class="rev-hero-label">Total revenue (confirmed)</div><div class="rev-hero-num">'+fmtPrice(total)+'</div><div class="rev-hero-meta">'+confirmed.length+' confirmed bookings</div></div>'
     +'<div class="rev-grid"><div class="rev-month-card"><div class="rev-month-label">This month</div><div class="rev-month-num">'+fmtPrice(thisMonthRev)+'</div>'+delta+'</div>'
@@ -835,12 +958,13 @@ function loadRevenue(){
 }
 
 /* ============ REGISTRATION ============ */
+
 var selectedAopFile = null;
 
 function onAopFileSelected(input){
   var file = input.files[0];
   if(!file) return;
-  if(file.size > 10 * 1024 * 1024){
+  if(file.size > 10*1024*1024){
     alert('File is too large. Maximum size is 10MB.');
     input.value = ''; return;
   }
@@ -877,23 +1001,19 @@ async function submitRegistration(){
   var password = document.getElementById('reg-password').value;
   var errEl    = document.getElementById('reg-error');
   errEl.classList.remove('show');
-
   if(!company||!name||!email||!phone||!username||!password){
     errEl.textContent='Please fill in all fields';errEl.classList.add('show');return;
   }
   if(!selectedAopFile){
     errEl.textContent='Please upload your Air Operator\'s Permit';errEl.classList.add('show');return;
   }
-
   var btn = document.getElementById('reg-submit-btn');
   btn.disabled = true; btn.textContent = 'Submitting...';
-
   var check = await sbFetch('operator_users?username=eq.'+encodeURIComponent(username));
   if(check.ok&&check.data&&check.data.length){
     errEl.textContent='Username already taken';errEl.classList.add('show');
     btn.disabled=false;btn.textContent='Submit application';return;
   }
-
   var opRes = await sbFetch('operators',{method:'POST',prefer:'return=representation',body:{
     company_name:company,owner_name:name,owner_phone:phone,owner_email:email,approval_status:'pending'
   }});
@@ -902,19 +1022,16 @@ async function submitRegistration(){
     btn.disabled=false;btn.textContent='Submit application';return;
   }
   var opId = opRes.data[0].id;
-
   btn.textContent = 'Uploading document...';
   var uploadResult = await uploadAopDocument(opId, selectedAopFile);
   if(!uploadResult){
     errEl.textContent='Document upload failed. Please try again.';errEl.classList.add('show');
     btn.disabled=false;btn.textContent='Submit application';return;
   }
-
   var docUrl = SUPABASE_URL + '/storage/v1/object/operator-documents/' + uploadResult.path;
   await sbFetch('operators?id=eq.'+opId,{method:'PATCH',body:{
     aop_document_url:docUrl, aop_document_name:uploadResult.name
   }});
-
   var userRes = await sbFetch('operator_users',{method:'POST',body:{
     operator_id:opId,full_name:name,username:username,
     password_hash:password,role:'owner',phone:phone,is_active:true
@@ -923,7 +1040,6 @@ async function submitRegistration(){
     errEl.textContent='Failed to create account.';errEl.classList.add('show');
     btn.disabled=false;btn.textContent='Submit application';return;
   }
-
   selectedAopFile = null;
   ['reg-company','reg-name','reg-email','reg-phone','reg-username','reg-password'].forEach(function(id){
     document.getElementById(id).value='';
@@ -939,6 +1055,9 @@ async function submitRegistration(){
 }
 
 /* ============ INIT ============ */
+
 document.querySelectorAll('.modal-overlay').forEach(function(el){el.addEventListener('click',function(e){if(e.target===el){if(el.id==='quote-modal')closeQuoteModal();else el.classList.remove('open');}});});
+
 window.addEventListener('beforeunload',function(){if(currentClaimId){navigator.sendBeacon(SUPABASE_URL+'/rest/v1/query_claims?id=eq.'+currentClaimId,new Blob([JSON.stringify({})],{type:'application/json'}));}});
+
 document.getElementById('page-login').style.display='flex';
