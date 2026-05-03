@@ -55,6 +55,7 @@ function flagUrl(iso) { return 'https://flagcdn.com/w20/' + iso + '.png'; }
 
 function renderCountryItems(list) {
   var container = document.getElementById('country-dd-items');
+  if (!container) return;
   container.innerHTML = list.map(function(c) {
     var sel = (c.dial === selectedCountry.dial && c.code === selectedCountry.code) ? ' selected' : '';
     return '<div class="country-dd-item' + sel + '" onmousedown="selectCountry(\'' + c.code + '\')">'
@@ -67,20 +68,24 @@ function renderCountryItems(list) {
 
 function toggleCountryDD() {
   var list = document.getElementById('country-dd-list');
+  if (!list) return;
   if (list.classList.contains('open')) {
     list.classList.remove('open');
   } else {
     renderCountryItems(COUNTRIES);
     list.classList.add('open');
-    setTimeout(function() { document.getElementById('country-dd-search').focus(); }, 50);
+    setTimeout(function() {
+      var search = document.getElementById('country-dd-search');
+      if (search) search.focus();
+    }, 50);
   }
 }
 
 function filterCountries(q) {
   var filtered = COUNTRIES.filter(function(c) {
-    return c.name.toLowerCase().includes(q.toLowerCase()) ||
-           c.code.toLowerCase().includes(q.toLowerCase()) ||
-           c.dial.includes(q);
+    return c.name.toLowerCase().indexOf(q.toLowerCase()) !== -1 ||
+           c.code.toLowerCase().indexOf(q.toLowerCase()) !== -1 ||
+           c.dial.indexOf(q) !== -1;
   });
   renderCountryItems(filtered);
 }
@@ -89,79 +94,110 @@ function selectCountry(code) {
   var c = COUNTRIES.find(function(x) { return x.code === code; });
   if (!c) return;
   selectedCountry = c;
-  document.getElementById('country-dd-flag').src = flagUrl(c.iso);
-  document.getElementById('country-dd-flag').alt = c.code;
-  document.getElementById('country-dd-code').textContent = c.dial;
-  document.getElementById('country-code').value = c.dial;
-  document.getElementById('country-dd-list').classList.remove('open');
-  document.getElementById('country-dd-search').value = '';
+  var flagEl = document.getElementById('country-dd-flag');
+  var codeEl = document.getElementById('country-dd-code');
+  var hiddenEl = document.getElementById('country-code');
+  var listEl = document.getElementById('country-dd-list');
+  var searchEl = document.getElementById('country-dd-search');
+  if (flagEl) { flagEl.src = flagUrl(c.iso); flagEl.alt = c.code; }
+  if (codeEl) codeEl.textContent = c.dial;
+  if (hiddenEl) hiddenEl.value = c.dial;
+  if (listEl) listEl.classList.remove('open');
+  if (searchEl) searchEl.value = '';
 }
 
 document.addEventListener('click', function(e) {
   var dd = document.getElementById('country-dd');
-  if (dd && !dd.contains(e.target)) {
-    document.getElementById('country-dd-list').classList.remove('open');
+  var list = document.getElementById('country-dd-list');
+  if (dd && list && !dd.contains(e.target)) {
+    list.classList.remove('open');
   }
 });
 
 function sendOTP() {
-  var phone = document.getElementById('otp-phone').value.trim();
-  var code  = document.getElementById('country-code').value;
+  var phoneEl = document.getElementById('otp-phone');
+  var codeEl  = document.getElementById('country-code');
+  if (!phoneEl || !codeEl) return;
+  var phone = phoneEl.value.trim();
+  var code  = codeEl.value;
   if (!phone || !/^\d{6,15}$/.test(phone)) {
     showErr('otp-phone', 'err-otp-phone');
     return;
   }
-  otpPhone = code + phone;
+  otpPhone     = code + phone;
   otpGenerated = Math.floor(100000 + Math.random() * 900000).toString();
+
+  /* Demo bar — shows generated OTP for testing */
   var demoBar = document.getElementById('otp-demo-bar');
   if (!demoBar) {
     demoBar = document.createElement('div');
     demoBar.id = 'otp-demo-bar';
     demoBar.style.cssText = 'margin-top:10px;padding:10px 14px;background:rgba(232,216,160,0.1);border:0.5px solid rgba(232,216,160,0.3);border-radius:8px;font-size:13px;color:#E8D8A0;';
-    demoBar.innerHTML = '🔑 <strong>DEMO OTP:</strong> <span id="otp-demo-code"></span>';
-    document.getElementById('otp-entry-wrap').insertAdjacentElement('beforebegin', demoBar);
+    demoBar.innerHTML = '<strong>DEMO OTP:</strong> <span id="otp-demo-code"></span>';
+    var entryWrap = document.getElementById('otp-entry-wrap');
+    if (entryWrap) entryWrap.insertAdjacentElement('beforebegin', demoBar);
   }
-  document.getElementById('otp-demo-code').textContent = otpGenerated;
-  document.getElementById('btn-send-otp').disabled = true;
-  document.getElementById('btn-send-otp').textContent = 'Sent!';
-  document.getElementById('otp-entry-wrap').style.display = 'block';
-  document.getElementById('otp-d1').focus();
+  var demoCode = document.getElementById('otp-demo-code');
+  if (demoCode) demoCode.textContent = otpGenerated;
+
+  var sendBtn = document.getElementById('btn-send-otp');
+  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Sent!'; }
+
+  var entryWrap = document.getElementById('otp-entry-wrap');
+  if (entryWrap) entryWrap.style.display = 'block';
+
+  var d1 = document.getElementById('otp-d1');
+  if (d1) d1.focus();
+
+  /* Start 30s resend countdown */
+  if (otpResendTimer) clearInterval(otpResendTimer);
   var secs = 30;
   var resendEl = document.querySelector('.otp-resend');
-  resendEl.innerHTML = 'Resend in ' + secs + 's · <a onclick="changePhone()">Change number</a>';
-  otpResendTimer = setInterval(function() {
-    secs--;
-    if (secs <= 0) {
-      clearInterval(otpResendTimer);
-      resendEl.innerHTML = 'Didn\'t receive it? <a onclick="resendOTP()">Resend OTP</a> · <a onclick="changePhone()">Change number</a>';
-    } else {
-      resendEl.innerHTML = 'Resend in ' + secs + 's · <a onclick="changePhone()">Change number</a>';
-    }
-  }, 1000);
+  if (resendEl) {
+    resendEl.innerHTML = 'Resend in ' + secs + 's · <a onclick="changePhone()">Change number</a>';
+    otpResendTimer = setInterval(function() {
+      secs--;
+      if (secs <= 0) {
+        clearInterval(otpResendTimer);
+        otpResendTimer = null;
+        resendEl.innerHTML = 'Didn\'t receive it? <a onclick="resendOTP()">Resend OTP</a> · <a onclick="changePhone()">Change number</a>';
+      } else {
+        resendEl.innerHTML = 'Resend in ' + secs + 's · <a onclick="changePhone()">Change number</a>';
+      }
+    }, 1000);
+  }
 }
 
 function verifyOTP() {
-  var entered = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6']
-    .map(function(id) { return document.getElementById(id).value; })
-    .join('');
+  var ids = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'];
+  var allPresent = ids.every(function(id) { return !!document.getElementById(id); });
+  if (!allPresent) return;
+  var entered = ids.map(function(id) { return document.getElementById(id).value; }).join('');
   if (entered.length < 6) return;
+  if (!otpGenerated) return;
+
   if (entered === otpGenerated) {
     otpVerified = true;
-    document.getElementById('otp-phone-wrap').style.display = 'none';
-    document.getElementById('otp-entry-wrap').style.display = 'none';
-    document.getElementById('otp-verified-text').textContent = otpPhone + ' verified';
-    document.getElementById('otp-verified').classList.add('show');
-    if (otpResendTimer) clearInterval(otpResendTimer);
+    var phoneWrap = document.getElementById('otp-phone-wrap');
+    var entryWrap = document.getElementById('otp-entry-wrap');
+    var verifiedText = document.getElementById('otp-verified-text');
+    var verifiedEl = document.getElementById('otp-verified');
+    if (phoneWrap) phoneWrap.style.display = 'none';
+    if (entryWrap) entryWrap.style.display = 'none';
+    if (verifiedText) verifiedText.textContent = otpPhone + ' verified';
+    if (verifiedEl) verifiedEl.classList.add('show');
+    if (otpResendTimer) { clearInterval(otpResendTimer); otpResendTimer = null; }
     var demoBar = document.getElementById('otp-demo-bar');
     if (demoBar) demoBar.remove();
   } else {
-    document.getElementById('err-otp-code').classList.add('visible');
-    ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'].forEach(function(id) {
+    var errEl = document.getElementById('err-otp-code');
+    if (errEl) errEl.classList.add('visible');
+    ids.forEach(function(id) {
       var el = document.getElementById(id);
-      el.value = '';
-      el.classList.add('error');
+      if (el) { el.value = ''; el.classList.add('error'); }
     });
-    document.getElementById('otp-d1').focus();
+    var d1 = document.getElementById('otp-d1');
+    if (d1) d1.focus();
     setTimeout(function() {
       document.querySelectorAll('.otp-digit').forEach(function(el) { el.classList.remove('error'); });
     }, 800);
@@ -169,36 +205,54 @@ function verifyOTP() {
 }
 
 function resendOTP() {
-  ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'].forEach(function(id) { document.getElementById(id).value = ''; });
-  document.getElementById('err-otp-code').classList.remove('visible');
-  document.getElementById('btn-send-otp').disabled = false;
-  document.getElementById('btn-send-otp').textContent = 'Send OTP';
+  ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  var errEl = document.getElementById('err-otp-code');
+  if (errEl) errEl.classList.remove('visible');
+  var sendBtn = document.getElementById('btn-send-otp');
+  if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Send OTP'; }
   sendOTP();
 }
 
 function changePhone() {
-  if (otpResendTimer) clearInterval(otpResendTimer);
-  otpVerified = false;
+  if (otpResendTimer) { clearInterval(otpResendTimer); otpResendTimer = null; }
+  otpVerified  = false;
   otpGenerated = '';
-  document.getElementById('otp-phone').value = '';
-  document.getElementById('otp-entry-wrap').style.display = 'none';
-  document.getElementById('otp-phone-wrap').style.display = 'block';
-  document.getElementById('btn-send-otp').disabled = false;
-  document.getElementById('btn-send-otp').textContent = 'Send OTP';
-  document.getElementById('err-otp-code').classList.remove('visible');
-  document.getElementById('otp-verified').classList.remove('show');
-  var demoBar = document.getElementById('otp-demo-bar');
-  if (demoBar) demoBar.remove();
+  var phoneEl   = document.getElementById('otp-phone');
+  var phoneWrap = document.getElementById('otp-phone-wrap');
+  var entryWrap = document.getElementById('otp-entry-wrap');
+  var errEl     = document.getElementById('err-otp-code');
+  var verifiedEl = document.getElementById('otp-verified');
+  var sendBtn   = document.getElementById('btn-send-otp');
+  var demoBar   = document.getElementById('otp-demo-bar');
+  if (phoneEl)   phoneEl.value   = '';
+  if (entryWrap) entryWrap.style.display = 'none';
+  if (phoneWrap) phoneWrap.style.display = 'block';
+  if (sendBtn)   { sendBtn.disabled = false; sendBtn.textContent = 'Send OTP'; }
+  if (errEl)     errEl.classList.remove('visible');
+  if (verifiedEl) verifiedEl.classList.remove('show');
+  if (demoBar)   demoBar.remove();
 }
 
 function otpNext(el, nextId) {
   el.value = el.value.replace(/[^0-9]/g, '').charAt(0);
-  if (el.value && nextId) document.getElementById(nextId).focus();
+  if (el.value && nextId) {
+    var next = document.getElementById(nextId);
+    if (next) next.focus();
+  }
   var allFilled = ['otp-d1','otp-d2','otp-d3','otp-d4','otp-d5','otp-d6']
-    .every(function(id) { return document.getElementById(id).value.length === 1; });
+    .every(function(id) {
+      var el = document.getElementById(id);
+      return el && el.value.length === 1;
+    });
   if (allFilled) verifyOTP();
 }
 
 function otpBack(e, el, prevId) {
-  if (e.key === 'Backspace' && !el.value && prevId) document.getElementById(prevId).focus();
+  if (e.key === 'Backspace' && !el.value && prevId) {
+    var prev = document.getElementById(prevId);
+    if (prev) prev.focus();
+  }
 }

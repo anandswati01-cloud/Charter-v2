@@ -116,7 +116,14 @@ function sbFetch(path,opts){
   var headers={'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
   if(opts.prefer)headers['Prefer']=opts.prefer;
   return fetch(SUPABASE_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:headers,body:opts.body?JSON.stringify(opts.body):undefined})
-    .then(function(r){if(r.status===204)return{ok:r.ok,data:[]};return r.json().then(function(d){return{ok:r.ok,status:r.status,data:d};});});
+    .then(function(r){
+      if(r.status===204||r.headers.get('content-length')==='0')return{ok:r.ok,status:r.status,data:[]};
+      return r.json().then(function(d){return{ok:r.ok,status:r.status,data:d};}).catch(function(){return{ok:r.ok,status:r.status,data:[]};});
+    })
+    .catch(function(e){
+      console.error('Admin sbFetch error:',path,e);
+      return{ok:false,status:0,data:[]};
+    });
 }
 
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500);}
@@ -175,8 +182,18 @@ async function loadPendingEmployees(){
 }
 
 function showEmpRejectInput(id){document.getElementById('emp-reject-reason-'+id).classList.add('show');document.getElementById('emp-confirm-reject-'+id).classList.add('show');}
-async function approveEmployee(id){var res=await sbFetch('operator_users?id=eq.'+id,{method:'PATCH',body:{is_approved:true}});if(res.ok){showToast('Employee approved ✓','success');await loadPendingEmployees();}else showToast('Failed','error');}
-async function rejectEmployee(id){var reason=document.getElementById('emp-reject-reason-'+id).value.trim();var res=await sbFetch('operator_users?id=eq.'+id,{method:'PATCH',body:{is_active:false,approval_note:reason||null}});if(res.ok){showToast('Employee rejected','success');await loadPendingEmployees();}else showToast('Failed','error');}
+async function approveEmployee(id){
+  var res=await sbFetch('operator_users?id=eq.'+id,{method:'PATCH',prefer:'return=minimal',body:{is_approved:true,is_active:true}});
+  if(res.ok){showToast('Employee approved','success');await loadPendingEmployees();}
+  else showToast('Failed to approve employee. Please try again.','error');
+}
+async function rejectEmployee(id){
+  var reasonEl=document.getElementById('emp-reject-reason-'+id);
+  var reason=reasonEl?reasonEl.value.trim():'';
+  var res=await sbFetch('operator_users?id=eq.'+id,{method:'PATCH',prefer:'return=minimal',body:{is_active:false,approval_note:reason||null}});
+  if(res.ok){showToast('Employee rejected','success');await loadPendingEmployees();}
+  else showToast('Failed to reject employee. Please try again.','error');
+}
 
 function updateStats(){
   var p=allOperators.filter(function(o){return o.approval_status==='pending';}).length;
@@ -277,27 +294,34 @@ function showRejectInput(opId){document.getElementById('reject-reason-'+opId).cl
 function showAcRejectInput(acId){document.getElementById('ac-reject-reason-'+acId).classList.add('show');document.getElementById('ac-confirm-reject-'+acId).classList.add('show');}
 
 async function approveOperator(opId){
-  var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',body:{approval_status:'approved',rejection_reason:null}});
-  if(res.ok){showToast('Operator approved','success');await loadOperators();showTab('approved');}else showToast('Failed','error');
+  var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',prefer:'return=minimal',body:{approval_status:'approved',rejection_reason:null}});
+  if(res.ok){showToast('Operator approved','success');await loadOperators();showTab('approved');}
+  else showToast('Failed to approve operator. Please try again.','error');
 }
 async function rejectOperator(opId){
-  var reason=document.getElementById('reject-reason-'+opId).value.trim();
-  var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',body:{approval_status:'rejected',rejection_reason:reason||null}});
-  if(res.ok){showToast('Operator rejected','success');await loadOperators();}else showToast('Failed','error');
+  var reasonEl=document.getElementById('reject-reason-'+opId);
+  var reason=reasonEl?reasonEl.value.trim():'';
+  var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',prefer:'return=minimal',body:{approval_status:'rejected',rejection_reason:reason||null}});
+  if(res.ok){showToast('Operator rejected','success');await loadOperators();}
+  else showToast('Failed to reject operator. Please try again.','error');
 }
 async function revokeOperator(opId){
   if(!confirm('Revoke this approval?'))return;
-  var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',body:{approval_status:'pending'}});
-  if(res.ok){showToast('Revoked','success');await loadOperators();}else showToast('Failed','error');
+  var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',prefer:'return=minimal',body:{approval_status:'pending'}});
+  if(res.ok){showToast('Approval revoked','success');await loadOperators();}
+  else showToast('Failed to revoke approval. Please try again.','error');
 }
 async function approveAircraft(acId){
-  var res=await sbFetch('aircraft?id=eq.'+acId,{method:'PATCH',body:{doc_status:'approved',is_active:true,doc_rejection_reason:null}});
-  if(res.ok){showToast('Aircraft approved','success');await loadPendingAircraft();}else showToast('Failed','error');
+  var res=await sbFetch('aircraft?id=eq.'+acId,{method:'PATCH',prefer:'return=minimal',body:{doc_status:'approved',is_active:true,doc_rejection_reason:null}});
+  if(res.ok){showToast('Aircraft approved','success');await loadPendingAircraft();}
+  else showToast('Failed to approve aircraft. Please try again.','error');
 }
 async function rejectAircraft(acId){
-  var reason=document.getElementById('ac-reject-reason-'+acId).value.trim();
-  var res=await sbFetch('aircraft?id=eq.'+acId,{method:'PATCH',body:{doc_status:'rejected',is_active:false,doc_rejection_reason:reason||null}});
-  if(res.ok){showToast('Aircraft rejected','success');await loadPendingAircraft();}else showToast('Failed','error');
+  var reasonEl=document.getElementById('ac-reject-reason-'+acId);
+  var reason=reasonEl?reasonEl.value.trim():'';
+  var res=await sbFetch('aircraft?id=eq.'+acId,{method:'PATCH',prefer:'return=minimal',body:{doc_status:'rejected',is_active:false,doc_rejection_reason:reason||null}});
+  if(res.ok){showToast('Aircraft rejected','success');await loadPendingAircraft();}
+  else showToast('Failed to reject aircraft. Please try again.','error');
 }
 
 document.getElementById('page-login').style.display='flex';

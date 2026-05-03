@@ -22,7 +22,7 @@ var AIRPORTS = [
   {city:"Diu",name:"Diu Airport",icao:"VADU",country:"India"},
   {city:"Gaya",name:"Gaya Airport",icao:"VEGY",country:"India"},
   {city:"Goa",name:"Manohar Intl Airport",icao:"VAGO",country:"India"},
-  {city:"Gorakhpur",name:"Gorakhpur Airport",icao:"VIGG",country:"India"},
+  {city:"Gorakhpur",name:"Gorakhpur Airport",icao:"VEGK",country:"India"},
   {city:"Guwahati",name:"Lokpriya Gopinath Bordoloi Intl",icao:"VEGT",country:"India"},
   {city:"Gwalior",name:"Gwalior Airport",icao:"VIGR",country:"India"},
   {city:"Hubli",name:"Hubli Airport",icao:"VOHB",country:"India"},
@@ -130,18 +130,23 @@ var acActive = {};
 function acInput(input, dropId) {
   var q    = input.value.trim().toLowerCase();
   var drop = document.getElementById(dropId);
+  if (!drop) return;
   acActive[dropId] = -1;
   if (q.length < 1) { drop.classList.remove('open'); return; }
   var results = AIRPORTS.filter(function(a) {
-    return a.city.toLowerCase().includes(q) ||
-           a.icao.toLowerCase().includes(q) ||
-           a.name.toLowerCase().includes(q) ||
-           a.country.toLowerCase().includes(q);
+    return a.city.toLowerCase().indexOf(q)    !== -1 ||
+           a.icao.toLowerCase().indexOf(q)    !== -1 ||
+           a.name.toLowerCase().indexOf(q)    !== -1 ||
+           a.country.toLowerCase().indexOf(q) !== -1;
   }).slice(0, 10);
   if (!results.length) { drop.classList.remove('open'); return; }
   drop.innerHTML = results.map(function(a, i) {
-    return '<div class="ac-item" data-idx="' + i + '" data-city="' + a.city + '" data-icao="' + a.icao + '" onmousedown="acSelect(\'' + dropId + '\',\'' + a.city + '\',\'' + a.icao + '\')">'
-      + '<div class="ac-city">' + a.city + '<span>' + a.name + ' &middot; ' + a.country + '</span></div>'
+    var safeCity    = a.city.replace(/'/g, '&#39;');
+    var safeIcao    = a.icao.replace(/'/g, '&#39;');
+    var safeName    = a.name.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    var safeCountry = a.country.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return '<div class="ac-item" data-idx="' + i + '" data-city="' + safeCity + '" data-icao="' + safeIcao + '" onmousedown="acSelect(\'' + dropId + '\',\'' + safeCity + '\',\'' + safeIcao + '\')">'
+      + '<div class="ac-city">' + a.city + '<span>' + safeName + ' &middot; ' + safeCountry + '</span></div>'
       + '<div class="ac-icao">' + a.icao + '</div>'
       + '</div>';
   }).join('');
@@ -149,28 +154,33 @@ function acInput(input, dropId) {
 }
 
 function acSelect(dropId, city, icao) {
-  var drop    = document.getElementById(dropId);
-  var inputId = dropId === 'ac-dep'  ? 'departure'
-              : dropId === 'ac-dest' ? 'destination'
-              : dropId.replace('ac-sdep-', 'sec-dep-').replace('ac-sdest-', 'sec-dest-');
-  if (dropId.startsWith('ac-sdep-')) {
-    var n = dropId.replace('ac-sdep-', '');
-    inputId = 'sec-dep-' + n;
-  } else if (dropId.startsWith('ac-sdest-')) {
-    var n = dropId.replace('ac-sdest-', '');
-    inputId = 'sec-dest-' + n;
+  var drop = document.getElementById(dropId);
+  if (!drop) return;
+  var inputId;
+  if (dropId === 'ac-dep') {
+    inputId = 'departure';
+  } else if (dropId === 'ac-dest') {
+    inputId = 'destination';
+  } else if (dropId.indexOf('ac-sdep-') === 0) {
+    inputId = 'sec-dep-' + dropId.replace('ac-sdep-', '');
+  } else if (dropId.indexOf('ac-sdest-') === 0) {
+    inputId = 'sec-dest-' + dropId.replace('ac-sdest-', '');
   }
-  var el = document.getElementById(inputId);
+  var el = inputId ? document.getElementById(inputId) : null;
   if (el) el.value = city + ' (' + icao + ')';
   drop.classList.remove('open');
 }
 
 function acBlur(dropId) {
-  setTimeout(function() { document.getElementById(dropId).classList.remove('open'); }, 150);
+  setTimeout(function() {
+    var drop = document.getElementById(dropId);
+    if (drop) drop.classList.remove('open');
+  }, 150);
 }
 
 function acKey(e, dropId) {
   var drop  = document.getElementById(dropId);
+  if (!drop) return;
   var items = drop.querySelectorAll('.ac-item');
   if (!items.length) return;
   if (e.key === 'ArrowDown') {

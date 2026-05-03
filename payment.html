@@ -32,9 +32,9 @@
   <div class="card">
     <p style="font-size:12px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">We need these to send your booking confirmation and keep you updated on your flight.</p>
     <div class="field-group"><label class="field-label">Full name</label><input type="text" id="client-name" placeholder="e.g. Rahul Sharma" oninput="clearErr(this)"/><span class="error-msg" id="err-client-name">Please enter your full name</span></div>
-    <div class="grid-2">
-      <div class="field-group"><label class="field-label">Email address</label><input type="text" id="client-email" placeholder="you@email.com" oninput="clearErr(this)"/><span class="error-msg" id="err-client-email">Please enter a valid email address</span></div>
-      <div class="field-group"><label class="field-label">Phone number</label><input type="text" id="client-phone" placeholder="+91 98765 43210" oninput="clearErr(this)"/><span class="error-msg" id="err-client-phone">Please enter your phone number</span></div>
+      <div class="grid-2">
+      <div class="field-group"><label class="field-label">Email address</label><input type="email" id="client-email" placeholder="you@email.com" autocomplete="email" oninput="clearErr(this)"/><span class="error-msg" id="err-client-email">Please enter a valid email address</span></div>
+      <div class="field-group"><label class="field-label">Phone number</label><input type="tel" id="client-phone" placeholder="+91 98765 43210" autocomplete="tel" oninput="clearErr(this)"/><span class="error-msg" id="err-client-phone">Please enter a valid phone number</span></div>
     </div>
   </div>
   <div class="section-label">Payment method</div>

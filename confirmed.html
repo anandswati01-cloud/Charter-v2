@@ -47,23 +47,30 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   var raw = sessionStorage.getItem('sv_confirmation');
-  if (!raw) return;
+  if (!raw) {
+    /* No confirmation data — user likely landed here directly */
+    window.location.href = 'booking.html';
+    return;
+  }
   try {
     var c = JSON.parse(raw);
-    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val || '—'; }
+    function setText(id, val) { var el = document.getElementById(id); if (el) el.textContent = val || '\u2014'; }
     setText('conf-ref',            c.ref);
-    setText('conf-notice',         'Confirmation will be sent to ' + c.client_email);
+    setText('conf-notice',         c.client_email ? 'Confirmation will be sent to ' + c.client_email : '');
     setText('conf-route',          c.route);
     setText('conf-date',           c.date);
     setText('conf-op',             c.op_name);
     setText('conf-aircraft',       c.aircraft);
     setText('conf-pax',            c.pax);
     setText('conf-client-name',    c.client_name);
-    setText('conf-client-contact', c.client_email + ' · ' + c.client_phone);
+    setText('conf-client-contact', (c.client_email || '') + (c.client_email && c.client_phone ? ' \u00b7 ' : '') + (c.client_phone || ''));
     setText('conf-total',          c.total);
-    setText('conf-op-tl',          c.op_name + ' confirmed your booking');
+    setText('conf-op-tl',          c.op_name ? c.op_name + ' confirmed your booking' : 'Awaiting operator confirmation');
     setText('conf-dep',            c.date);
-  } catch(e) { console.error('Could not load confirmation data', e); }
+  } catch (e) {
+    console.error('Could not load confirmation data', e);
+    window.location.href = 'booking.html';
+  }
 });
 </script>
 </body>

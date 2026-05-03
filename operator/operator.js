@@ -18,6 +18,10 @@ function sbFetch(path,opts){
     .then(function(r){
       if(r.status===204||r.headers.get('content-length')==='0')return{ok:r.ok,status:r.status,data:[]};
       return r.json().then(function(d){return{ok:r.ok,status:r.status,data:d};}).catch(function(){return{ok:r.ok,status:r.status,data:[]};});
+    })
+    .catch(function(e){
+      console.error('sbFetch network error:', path, e);
+      return{ok:false,status:0,data:[],error:e};
     });
 }
 
@@ -31,21 +35,39 @@ async function doLogin(){
   var btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='Signing in...';
   try{
     var userRes=await sbFetch('operator_users?username=eq.'+encodeURIComponent(username));
-    if(!userRes.ok||!userRes.data||!userRes.data.length)throw new Error('bad');
+    if(!userRes.ok||!userRes.data||!userRes.data.length){
+      errEl.textContent='Invalid username or password';errEl.classList.add('show');return;
+    }
     var user=userRes.data[0];
-    if(!user.is_active)throw new Error('inactive');
-    if((user.password_hash||'').trim()!==(password||'').trim())throw new Error('bad');
+    if(!user.is_active){
+      errEl.textContent='This account has been deactivated. Please contact your administrator.';
+      errEl.classList.add('show');return;
+    }
+    if((user.password_hash||'').trim()!==(password||'').trim()){
+      errEl.textContent='Invalid username or password';errEl.classList.add('show');return;
+    }
     if(user.role==='employee'&&user.is_approved===false){
       errEl.textContent='Your account is pending approval from SkyVayu. Please wait.';
-      errEl.classList.add('show');btn.disabled=false;btn.textContent='Sign in';return;
+      errEl.classList.add('show');return;
     }
     var opRes=await sbFetch('operators?id=eq.'+user.operator_id);
-    if(!opRes.ok||!opRes.data||!opRes.data.length)throw new Error('no op');
+    if(!opRes.ok||!opRes.data||!opRes.data.length){
+      errEl.textContent='Could not load operator account. Please contact support.';
+      errEl.classList.add('show');return;
+    }
     var op=opRes.data[0];
-    if(op.approval_status==='pending'){document.getElementById('page-login').style.display='none';document.getElementById('page-pending').style.display='flex';btn.disabled=false;btn.textContent='Sign in';return;}
-    if(op.approval_status==='rejected'){errEl.textContent='Your registration was not approved.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Sign in';return;}
+    if(op.approval_status==='pending'){
+      document.getElementById('page-login').style.display='none';
+      document.getElementById('page-pending').style.display='flex';
+      return;
+    }
+    if(op.approval_status==='rejected'){
+      errEl.textContent='Your registration was not approved. Please contact SkyVayu.';
+      errEl.classList.add('show');return;
+    }
     currentUser=user;currentOperator=op;
-    sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}});
+    /* Fire-and-forget last_login update — don't block on it */
+    sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
     document.getElementById('page-dashboard').classList.add('active');
     document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
@@ -57,8 +79,13 @@ async function doLogin(){
     await loadAllData();
     refreshInterval=setInterval(loadAllData,5000);
     claimRefreshInterval=setInterval(updateClaimTimers,1000);
-  }catch(e){errEl.textContent='Invalid username or password';errEl.classList.add('show');}
-  btn.disabled=false;btn.textContent='Sign in';
+  }catch(e){
+    console.error('Login error:', e);
+    errEl.textContent='An error occurred. Please try again.';
+    errEl.classList.add('show');
+  }finally{
+    btn.disabled=false;btn.textContent='Sign in';
+  }
 }
 
 function doLogout(){
@@ -287,9 +314,15 @@ async function openQuoteModal(queryId){
     return;
   }
   currentQueryId=queryId;
-  currentClaimId=claimRes.claim.id;
+  currentClaimId=claimRes.claim&&claimRes.claim.id?claimRes.claim.id:null;
   var res=await sbFetch('queries?id=eq.'+queryId);
-  var query=res.data&&res.data[0];if(!query){releaseClaim(currentClaimId);currentClaimId=null;return;}
+  var query=res.data&&res.data[0];
+  if(!query){
+    if(currentClaimId)releaseClaim(currentClaimId);
+    currentClaimId=null;currentQueryId=null;
+    showToast('Query not found. Please refresh.','error');
+    return;
+  }
   var route=query.trip_type==='multi'?'Multiple sectors':(query.departure||'—')+' → '+(query.destination||'—');
   document.getElementById('quote-query-info').innerHTML='<strong style="color:var(--text);">'+route+'</strong><br>'+fmtDate(query.flight_date)+(query.flight_time?' at '+query.flight_time:'')+' &nbsp;|&nbsp; '+query.passengers+' pax';
   var busyMap=getBusyAircraftMap();
@@ -364,10 +397,17 @@ async function submitQuote(){
   }});
   if(!qRes.ok){
     if(qRes.status===409){showToast('Your team already submitted a quote for this query.','error');}
-    else{showToast('Failed to submit quote','error');}
+    else{showToast('Failed to submit quote. Please try again.','error');}
     btn.disabled=false;btn.textContent='Share quote with client';
     if(currentClaimId)releaseClaim(currentClaimId);
     currentClaimId=null;
+    closeModal('quote-modal');
+    loadAllData();
+    return;
+  }
+  if(!qRes.data||!qRes.data[0]){
+    showToast('Quote saved but could not retrieve ID. Please refresh.','error');
+    btn.disabled=false;btn.textContent='Share quote with client';
     closeModal('quote-modal');
     loadAllData();
     return;
@@ -608,11 +648,12 @@ async function saveAircraft(){
     operator_id:currentOperator.id, aircraft_type:type, registration:reg, seats:seats,
     is_active:false, doc_status:'pending'
   }});
-  if(!acRes.ok||!acRes.data||!acRes.data.length){
+  if(!acRes.ok||!acRes.data||!acRes.data.length||!acRes.data[0]){
     errEl.textContent='Failed to save aircraft. Try again.';errEl.style.display='block';
     btn.disabled=false;btn.textContent='Submit for review';return;
   }
   var acId = acRes.data[0].id;
+  if(!acId){errEl.textContent='Failed to get aircraft ID. Try again.';errEl.style.display='block';btn.disabled=false;btn.textContent='Submit for review';return;}
   var uploads = {};
   for(var i=0;i<docKeys.length;i++){
     var k = docKeys[i];
@@ -937,7 +978,8 @@ function loadRevenue(){
     byEmp[id].rev+=Number(q.price||0);
   });
   var empRows=Object.keys(byEmp).map(function(k){return byEmp[k];}).sort(function(a,b){return b.rev-a.rev;}).map(function(r){
-    return'<tr><td><b>'+r.name+'</b></td><td>'+r.count+'</td><td>'+fmtPrice(Math.round(r.rev/r.count))+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
+    var avg=r.count>0?Math.round(r.rev/r.count):0;
+    return'<tr><td><b>'+r.name+'</b></td><td>'+r.count+'</td><td>'+fmtPrice(avg)+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
   }).join('');
   var byAc={};
   confirmed.forEach(function(q){
@@ -947,7 +989,8 @@ function loadRevenue(){
     byAc[id].rev+=Number(q.price||0);
   });
   var acRows=Object.keys(byAc).map(function(k){return byAc[k];}).sort(function(a,b){return b.rev-a.rev;}).map(function(r){
-    return'<tr><td><b>'+r.name+'</b> <span style="color:var(--text-tertiary);font-size:11px;font-family:monospace;">'+r.reg+'</span></td><td>'+r.count+'</td><td>'+fmtPrice(Math.round(r.rev/r.count))+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
+    var avg=r.count>0?Math.round(r.rev/r.count):0;
+    return'<tr><td><b>'+r.name+'</b> <span style="color:var(--text-tertiary);font-size:11px;font-family:monospace;">'+r.reg+'</span></td><td>'+r.count+'</td><td>'+fmtPrice(avg)+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
   }).join('');
   container.innerHTML=
     '<div class="rev-hero"><div class="rev-hero-label">Total revenue (confirmed)</div><div class="rev-hero-num">'+fmtPrice(total)+'</div><div class="rev-hero-meta">'+confirmed.length+' confirmed bookings</div></div>'
@@ -1017,11 +1060,12 @@ async function submitRegistration(){
   var opRes = await sbFetch('operators',{method:'POST',prefer:'return=representation',body:{
     company_name:company,owner_name:name,owner_phone:phone,owner_email:email,approval_status:'pending'
   }});
-  if(!opRes.ok||!opRes.data||!opRes.data.length){
+  if(!opRes.ok||!opRes.data||!opRes.data.length||!opRes.data[0]){
     errEl.textContent='Registration failed. Please try again.';errEl.classList.add('show');
     btn.disabled=false;btn.textContent='Submit application';return;
   }
   var opId = opRes.data[0].id;
+  if(!opId){errEl.textContent='Registration failed — could not create account. Please try again.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Submit application';return;}
   btn.textContent = 'Uploading document...';
   var uploadResult = await uploadAopDocument(opId, selectedAopFile);
   if(!uploadResult){
@@ -1058,6 +1102,16 @@ async function submitRegistration(){
 
 document.querySelectorAll('.modal-overlay').forEach(function(el){el.addEventListener('click',function(e){if(e.target===el){if(el.id==='quote-modal')closeQuoteModal();else el.classList.remove('open');}});});
 
-window.addEventListener('beforeunload',function(){if(currentClaimId){navigator.sendBeacon(SUPABASE_URL+'/rest/v1/query_claims?id=eq.'+currentClaimId,new Blob([JSON.stringify({})],{type:'application/json'}));}});
+window.addEventListener('beforeunload',function(){
+  if(currentClaimId){
+    /* sendBeacon only supports POST, not DELETE.
+       Use a PATCH to set expires_at to now so the claim expires immediately. */
+    var payload=JSON.stringify({expires_at:new Date().toISOString()});
+    navigator.sendBeacon(
+      SUPABASE_URL+'/rest/v1/query_claims?id=eq.'+currentClaimId,
+      new Blob([payload],{type:'application/json'})
+    );
+  }
+});
 
 document.getElementById('page-login').style.display='flex';
