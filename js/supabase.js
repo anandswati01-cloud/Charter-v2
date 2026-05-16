@@ -206,3 +206,27 @@ function subscribeToQuotes(queryId) {
     showToast('Live updates unavailable. Quotes will still appear via polling.', 'info');
   }
 }
+
+
+/* ── SkyVayu — Email Helper ── */
+/* Calls the send-email Edge Function for all automated emails */
+async function sendEmail(type, payload) {
+    try {
+          var res = await fetch(
+                  'https://bkumggqijgxyfotpbcni.supabase.co/functions/v1/send-email',
+            {
+                      method: 'POST',
+                      headers: {
+                                  'Content-Type': 'application/json',
+                                  'Authorization': 'Bearer ' + SKYVAYU_CONFIG.supabaseKey
+                      },
+                      body: JSON.stringify(Object.assign({ type: type }, payload))
+            }
+                );
+          var data = await res.json();
+          if (!res.ok) console.warn('sendEmail error:', type, data);
+          return data;
+    } catch (e) {
+          console.warn('sendEmail failed:', type, e);
+    }
+}
