@@ -1104,6 +1104,7 @@ async function submitRegistration(){
   document.getElementById('aop-upload-label').style.display='block';
   document.getElementById('aop-upload-area').style.borderColor='';
   btn.disabled=false;btn.textContent='Submit application';
+  sendEmail('registration_received',{operator_id:opId});
   closeModal('register-modal');
   document.getElementById('page-login').style.display='none';
   document.getElementById('page-pending').style.display='flex';
