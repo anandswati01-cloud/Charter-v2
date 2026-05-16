@@ -326,6 +326,7 @@ async function openQuoteModal(queryId){
   }
   currentQueryId=queryId;
   currentClaimId=claimRes.claim&&claimRes.claim.id?claimRes.claim.id:null;
+  sendEmail('new_query_assigned',{query_id:queryId,operator_id:currentOperator.id});
   var res=await sbFetch('queries?id=eq.'+queryId);
   var query=res.data&&res.data[0];
   if(!query){
