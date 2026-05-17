@@ -194,7 +194,7 @@ async function loadPendingEmployees(){
 function showEmpRejectInput(id){document.getElementById('emp-reject-reason-'+id).classList.add('show');document.getElementById('emp-confirm-reject-'+id).classList.add('show');}
 async function approveEmployee(id){
   var res=await sbFetch('operator_users?id=eq.'+id,{method:'PATCH',prefer:'return=minimal',body:{is_approved:true,is_active:true}});
-  if(res.ok){showToast('Employee approved','success');await loadPendingEmployees();}
+  if(res.ok){showToast('Employee approved','success');sendEmail('employee_welcome',{user_id:id});await loadPendingEmployees();}
   else showToast('Failed to approve employee. Please try again.','error');
 }
 async function rejectEmployee(id){
@@ -305,14 +305,14 @@ function showAcRejectInput(acId){document.getElementById('ac-reject-reason-'+acI
 
 async function approveOperator(opId){
   var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',prefer:'return=minimal',body:{approval_status:'approved',rejection_reason:null}});
-  if(res.ok){showToast('Operator approved','success');await loadOperators();showTab('approved');}
+  if(res.ok){showToast('Operator approved','success');sendEmail('operator_approved',{operator_id:opId});await loadOperators();showTab('approved');}
   else showToast('Failed to approve operator. Please try again.','error');
 }
 async function rejectOperator(opId){
   var reasonEl=document.getElementById('reject-reason-'+opId);
   var reason=reasonEl?reasonEl.value.trim():'';
   var res=await sbFetch('operators?id=eq.'+opId,{method:'PATCH',prefer:'return=minimal',body:{approval_status:'rejected',rejection_reason:reason||null}});
-  if(res.ok){showToast('Operator rejected','success');await loadOperators();}
+  if(res.ok){showToast('Operator rejected','success');sendEmail('operator_rejected',{operator_id:opId});await loadOperators();}
   else showToast('Failed to reject operator. Please try again.','error');
 }
 async function revokeOperator(opId){
