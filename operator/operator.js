@@ -462,6 +462,7 @@ function checkDocumentStatus(){
         btn:'Upload updated document',
         onclick:'openAopRenewModal()'
       });
+      sendEmail('doc_expiry_reminder',{operator_id:currentOperator.id,doc_name:'AOP Permit',expiry_date:String(currentOperator.aop_expiry_date)});
     }
   }
   aircraftList.forEach(function(ac){
@@ -488,6 +489,7 @@ function checkDocumentStatus(){
           btn:'Upload updated document',
           onclick:'openDocRenewModal(\''+ac.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\')'
         });
+        sendEmail('doc_expiry_reminder',{operator_id:currentOperator.id,doc_name:d.name,expiry_date:String(ac[d.expKey])});
       }
     });
   });
