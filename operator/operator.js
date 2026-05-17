@@ -431,6 +431,7 @@ async function submitQuote(){
   currentClaimId=null;
   document.getElementById('quote-modal').classList.remove('open');
   btn.disabled=false;btn.textContent='Share quote with client';
+  sendEmail('quote_submitted',{quote_id:qId});
   showToast('Quote shared with client','success');
   await loadAllData();
   showSubtab('shared');
