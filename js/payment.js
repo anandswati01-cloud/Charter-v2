@@ -174,6 +174,7 @@ async function confirmBooking() {
   _confirmInProgress = false;
 
   if (!saved) return;
+  sendEmail('booking_confirmed',{booking_id:saved.id,booking_ref:ref});
 
   sessionStorage.setItem('sv_confirmation', JSON.stringify({
     ref:          ref,
