@@ -83,7 +83,9 @@ async function saveQueryToSupabase(queryData) {
       return null;
     }
     var data = JSON.parse(text);
-    return (Array.isArray(data) && data[0]) ? data[0] : null;
+    var saved = (Array.isArray(data) && data[0]) ? data[0] : null;
+    if (saved) sendEmail('new_query_assigned', { query_id: saved.id });
+    return saved;
   } catch (e) {
     if (e.name === 'AbortError') {
       showToast('Request timed out. Please check your connection and try again.', 'error');
