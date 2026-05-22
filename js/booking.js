@@ -235,6 +235,8 @@ async function goToResults() {
     setSearchLoading(false);
     if (!saved) return;
 
+    sendEmail('new_query_assigned', { query_id: saved.id });
+
     sessionStorage.setItem('sv_query_id', saved.id);
     sessionStorage.setItem('sv_query', JSON.stringify(Object.assign({}, queryPayload, {
       rs_type:  'Multiple sectors',
@@ -296,6 +298,8 @@ async function goToResults() {
   var saved = await saveQueryToSupabase(queryPayload);
   setSearchLoading(false);
   if (!saved) return;
+
+  sendEmail('new_query_assigned', { query_id: saved.id });
 
   sessionStorage.setItem('sv_query_id', saved.id);
   sessionStorage.setItem('sv_query', JSON.stringify(Object.assign({}, queryPayload, {
