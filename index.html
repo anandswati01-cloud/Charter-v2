@@ -1241,11 +1241,11 @@ function getQuotes() {
     row.innerHTML = `
       <div class="input-group">
         <div class="input-label sector-label">Sector ${n} — From</div>
-        <input class="input-field" type="text" placeholder="Departure city or airport">
+                <div class="ac-wrap"><input class="input-field" id="sec-dep-${n}" type="text" placeholder="Departure city or airport" oninput="acInput(this,'ac-sdep-${n}')" onkeydown="acKey(event,'ac-sdep-${n}')" onblur="acBlur('ac-sdep-${n}')"><div class="ac-dropdown" id="ac-sdep-${n}"></div></div>
       </div>
       <div class="input-group">
         <div class="input-label sector-label">Sector ${n} — To</div>
-        <input class="input-field" type="text" placeholder="Destination city or airport">
+                <div class="ac-wrap"><input class="input-field" id="sec-dest-${n}" type="text" placeholder="Destination city or airport" oninput="acInput(this,'ac-sdest-${n}')" onkeydown="acKey(event,'ac-sdest-${n}')" onblur="acBlur('ac-sdest-${n}')"><div class="ac-dropdown" id="ac-sdest-${n}"></div></div>
       </div>
       <div class="input-group">
         <div class="input-label sector-label">Date &amp; Time</div>
