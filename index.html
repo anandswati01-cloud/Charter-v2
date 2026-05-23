@@ -37,9 +37,9 @@
     html { scroll-behavior: smooth; }
  
     body {
-      background: var(--navy);
-      color: var(--white);
-      font-family: var(--font-body);
+      background: #0c1324;
+      color: #ffffff;
+      font-family: 'DM Sans', sans-serif;
       overflow-x: hidden;
     }
  
@@ -51,7 +51,7 @@
       background: rgba(2, 6, 23, 0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--white-10);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
       height: 72px;
       display: flex;
       align-items: center;
@@ -60,10 +60,10 @@
     }
  
     .nav-logo {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-style: italic;
       font-size: 26px;
-      color: var(--gold);
+      color: #fbbf24;
       letter-spacing: -0.5px;
     }
  
@@ -75,35 +75,35 @@
     }
  
     .nav-links a {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
       transition: color 0.2s;
     }
  
-    .nav-links a:hover { color: var(--gold); }
+    .nav-links a:hover { color: #fbbf24; }
  
     .nav-links .active {
-      color: var(--gold);
-      border-bottom: 2px solid var(--gold);
+      color: #fbbf24;
+      border-bottom: 2px solid #fbbf24;
       padding-bottom: 3px;
     }
  
     .nav-cta {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--navy);
-      background: var(--gold);
+      color: #0c1324;
+      background: #fbbf24;
       padding: 10px 20px;
       border-radius: 2px;
       transition: background 0.2s;
     }
  
-    .nav-cta:hover { background: var(--gold-light); }
+    .nav-cta:hover { background: #fcd34d; }
  
     /* ── HERO ── */
     .hero {
@@ -127,7 +127,7 @@
     .hero-overlay {
       position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, rgba(12,19,36,0.4) 0%, rgba(12,19,36,0.7) 60%, var(--navy) 100%);
+      background: linear-gradient(to bottom, rgba(12,19,36,0.4) 0%, rgba(12,19,36,0.7) 60%, #0c1324 100%);
     }
  
     .hero-content {
@@ -138,11 +138,11 @@
     }
  
     .hero-eyebrow {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: #fbbf24;
       margin-bottom: 24px;
       display: flex;
       align-items: center;
@@ -154,11 +154,11 @@
       display: block;
       width: 32px;
       height: 1px;
-      background: var(--gold);
+      background: #fbbf24;
     }
  
     .hero-h1 {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: clamp(52px, 7vw, 88px);
       font-weight: 400;
       line-height: 1.05;
@@ -168,19 +168,19 @@
  
     .hero-h1 em {
       font-style: italic;
-      color: var(--gold);
+      color: #fbbf24;
     }
  
     .hero-sub {
       font-size: 17px;
       line-height: 1.7;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
       max-width: 520px;
       margin-bottom: 48px;
     }
  
     .hero-sub strong {
-      color: var(--white);
+      color: #ffffff;
       font-weight: 500;
     }
  
@@ -202,7 +202,7 @@
     .trust-icon {
       width: 40px;
       height: 40px;
-      border: 1px solid var(--white-30);
+      border: 1px solid rgba(255,255,255,0.3);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -212,19 +212,19 @@
     }
  
     .trust-num {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 28px;
       font-weight: 600;
-      color: var(--gold);
+      color: #fbbf24;
       line-height: 1;
     }
  
     .trust-label {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 10px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
       margin-top: 2px;
     }
  
@@ -236,7 +236,7 @@
  
     .booking-card {
       background: rgba(255,255,255,0.04);
-      border: 1px solid var(--white-10);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 4px;
       padding: 40px 48px;
       backdrop-filter: blur(8px);
@@ -248,18 +248,18 @@
     }
  
     .booking-card-title {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 32px;
       font-weight: 400;
       margin-bottom: 6px;
     }
  
     .booking-card-sub {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: #fbbf24;
     }
  
     .trip-selector {
@@ -269,7 +269,7 @@
     }
  
     .trip-btn {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 1.2px;
       text-transform: uppercase;
@@ -277,15 +277,15 @@
       border-radius: 2px;
       cursor: pointer;
       transition: all 0.2s;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
       background: transparent;
-      border: 1px solid var(--white-10);
+      border: 1px solid rgba(255,255,255,0.1);
     }
  
     .trip-btn.active, .trip-btn:hover {
-      background: var(--gold);
-      color: var(--navy);
-      border-color: var(--gold);
+      background: #fbbf24;
+      color: #0c1324;
+      border-color: #fbbf24;
     }
  
     .inputs-grid {
@@ -302,35 +302,35 @@
     }
  
     .input-label {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 10px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
     }
  
     .input-field {
-      background: var(--white-10);
-      border: 1px solid var(--white-10);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 2px;
       padding: 12px 16px;
-      color: var(--white);
-      font-family: var(--font-body);
+      color: #ffffff;
+      font-family: 'DM Sans', sans-serif;
       font-size: 15px;
       outline: none;
       transition: border-color 0.2s;
       width: 100%;
     }
  
-    .input-field::placeholder { color: var(--white-30); }
-    .input-field:focus { border-color: var(--gold); }
+    .input-field::placeholder { color: rgba(255,255,255,0.3); }
+    .input-field:focus { border-color: #fbbf24; }
  
     .pax-control {
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--white-10);
-      border: 1px solid var(--white-10);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 2px;
       padding: 12px 16px;
       height: 48px;
@@ -338,7 +338,7 @@
  
     .pax-num {
       font-size: 15px;
-      color: var(--white);
+      color: #ffffff;
       min-width: 20px;
       text-align: center;
     }
@@ -346,13 +346,13 @@
     .pax-btn {
       width: 24px;
       height: 24px;
-      border: 1px solid var(--white-30);
+      border: 1px solid rgba(255,255,255,0.3);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      color: var(--white);
+      color: #ffffff;
       font-size: 16px;
       line-height: 1;
       transition: all 0.2s;
@@ -360,7 +360,7 @@
       background: transparent;
     }
  
-    .pax-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .pax-btn:hover { border-color: #fbbf24; color: #fbbf24; }
  
     .special-row {
       display: flex;
@@ -377,22 +377,22 @@
     }
  
     .req-chip {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 10px;
       letter-spacing: 1px;
       text-transform: uppercase;
       padding: 7px 14px;
-      border: 1px solid var(--white-10);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 2px;
       cursor: pointer;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
       transition: all 0.2s;
       background: transparent;
     }
  
     .req-chip:hover, .req-chip.active {
-      border-color: var(--gold);
-      color: var(--gold);
+      border-color: #fbbf24;
+      color: #fbbf24;
       background: rgba(251,191,36,0.08);
     }
  
@@ -400,9 +400,9 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      background: var(--gold);
-      color: var(--navy);
-      font-family: var(--font-mono);
+      background: #fbbf24;
+      color: #0c1324;
+      font-family: 'DM Mono', monospace;
       font-size: 12px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
@@ -415,7 +415,7 @@
       font-weight: 500;
     }
  
-    .cta-btn:hover { background: var(--gold-light); }
+    .cta-btn:hover { background: #fcd34d; }
  
     .cta-arrow {
       font-size: 18px;
@@ -432,16 +432,16 @@
     }
  
     .section-eyebrow {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 3px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: #fbbf24;
       margin-bottom: 16px;
     }
  
     .section-title {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: clamp(36px, 4vw, 52px);
       font-weight: 400;
       line-height: 1.1;
@@ -457,7 +457,7 @@
     .step {
       position: relative;
       padding: 36px;
-      border: 1px solid var(--white-10);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 4px;
       background: rgba(255,255,255,0.02);
       transition: border-color 0.3s;
@@ -466,7 +466,7 @@
     .step:hover { border-color: rgba(251,191,36,0.4); }
  
     .step-num {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 64px;
       font-weight: 600;
       color: rgba(251,191,36,0.12);
@@ -475,7 +475,7 @@
     }
  
     .step-title {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 22px;
       font-weight: 400;
       margin-bottom: 12px;
@@ -484,13 +484,13 @@
     .step-desc {
       font-size: 14px;
       line-height: 1.7;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
     }
  
     /* ── WHY SKYVAYU ── */
     .why-section {
       padding: 100px 48px;
-      background: var(--navy-mid);
+      background: #0f1a30;
     }
  
     .why-inner {
@@ -507,7 +507,7 @@
  
     .bento-card {
       padding: 40px;
-      border: 1px solid var(--white-10);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 4px;
       background: rgba(255,255,255,0.02);
       transition: all 0.3s;
@@ -521,7 +521,7 @@
     .bento-icon {
       width: 48px;
       height: 48px;
-      border: 1px solid var(--white-10);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 4px;
       display: flex;
       align-items: center;
@@ -531,7 +531,7 @@
     }
  
     .bento-title {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 22px;
       font-weight: 400;
       margin-bottom: 12px;
@@ -540,7 +540,7 @@
     .bento-desc {
       font-size: 14px;
       line-height: 1.7;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
     }
  
     /* ── POPULAR ROUTES ── */
@@ -558,12 +558,12 @@
     }
  
     .view-all {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 11px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--gold);
-      border-bottom: 1px solid var(--gold);
+      color: #fbbf24;
+      border-bottom: 1px solid #fbbf24;
       padding-bottom: 2px;
       cursor: pointer;
     }
@@ -601,12 +601,12 @@
       position: absolute;
       top: 16px;
       left: 16px;
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 9px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      background: var(--gold);
-      color: var(--navy);
+      background: #fbbf24;
+      color: #0c1324;
       padding: 4px 10px;
       border-radius: 2px;
       font-weight: 500;
@@ -624,18 +624,18 @@
     }
  
     .route-name {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: 22px;
       font-weight: 400;
     }
  
     .route-book {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 10px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--gold);
-      border: 1px solid var(--gold);
+      color: #fbbf24;
+      border: 1px solid #fbbf24;
       padding: 7px 14px;
       border-radius: 2px;
       transition: all 0.2s;
@@ -644,8 +644,8 @@
     }
  
     .route-book:hover {
-      background: var(--gold);
-      color: var(--navy);
+      background: #fbbf24;
+      color: #0c1324;
     }
  
     /* ── FINAL CTA ── */
@@ -677,7 +677,7 @@
     }
  
     .final-cta-title {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-size: clamp(44px, 6vw, 72px);
       font-weight: 400;
       margin-bottom: 20px;
@@ -686,7 +686,7 @@
  
     .final-cta-sub {
       font-size: 17px;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
       margin-bottom: 48px;
       max-width: 520px;
       margin-left: auto;
@@ -696,8 +696,8 @@
  
     /* ── FOOTER ── */
     .footer {
-      background: var(--navy-mid);
-      border-top: 1px solid var(--white-10);
+      background: #0f1a30;
+      border-top: 1px solid rgba(255,255,255,0.1);
       padding: 64px 48px 32px;
     }
  
@@ -712,16 +712,16 @@
     }
  
     .footer-logo {
-      font-family: var(--font-display);
+      font-family: 'Cormorant Garamond', Georgia, serif;
       font-style: italic;
       font-size: 28px;
-      color: var(--gold);
+      color: #fbbf24;
       margin-bottom: 16px;
     }
  
     .footer-tagline {
       font-size: 14px;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
       line-height: 1.7;
       margin-bottom: 24px;
     }
@@ -734,7 +734,7 @@
     .social-btn {
       width: 36px;
       height: 36px;
-      border: 1px solid var(--white-10);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -744,14 +744,14 @@
       transition: border-color 0.2s;
     }
  
-    .social-btn:hover { border-color: var(--gold); }
+    .social-btn:hover { border-color: #fbbf24; }
  
     .footer-heading {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--gold);
+      color: #fbbf24;
       margin-bottom: 20px;
     }
  
@@ -764,12 +764,12 @@
  
     .footer-links a {
       font-size: 14px;
-      color: var(--white-60);
+      color: rgba(255,255,255,0.6);
       transition: color 0.2s;
       cursor: pointer;
     }
  
-    .footer-links a:hover { color: var(--white); }
+    .footer-links a:hover { color: #ffffff; }
  
     .newsletter-input-row {
       display: flex;
@@ -779,22 +779,22 @@
  
     .newsletter-input {
       flex: 1;
-      background: var(--white-10);
-      border: 1px solid var(--white-10);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.1);
       border-radius: 2px;
       padding: 10px 14px;
-      color: var(--white);
-      font-family: var(--font-body);
+      color: #ffffff;
+      font-family: 'DM Sans', sans-serif;
       font-size: 14px;
       outline: none;
     }
  
-    .newsletter-input::placeholder { color: var(--white-30); }
-    .newsletter-input:focus { border-color: var(--gold); }
+    .newsletter-input::placeholder { color: rgba(255,255,255,0.3); }
+    .newsletter-input:focus { border-color: #fbbf24; }
  
     .newsletter-submit {
-      background: var(--gold);
-      color: var(--navy);
+      background: #fbbf24;
+      color: #0c1324;
       border: none;
       padding: 10px 16px;
       border-radius: 2px;
@@ -803,10 +803,10 @@
       transition: background 0.2s;
     }
  
-    .newsletter-submit:hover { background: var(--gold-light); }
+    .newsletter-submit:hover { background: #fcd34d; }
  
     .footer-bottom {
-      border-top: 1px solid var(--white-10);
+      border-top: 1px solid rgba(255,255,255,0.1);
       padding-top: 24px;
       display: flex;
       justify-content: space-between;
@@ -817,15 +817,15 @@
  
     .footer-copy {
       font-size: 12px;
-      color: var(--white-30);
+      color: rgba(255,255,255,0.3);
     }
  
     .footer-ops {
-      font-family: var(--font-mono);
+      font-family: 'DM Mono', monospace;
       font-size: 10px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--white-30);
+      color: rgba(255,255,255,0.3);
     }
  
     /* ── ANIMATIONS ── */
@@ -916,11 +916,11 @@
       </div>
       <div class="grid-2">
         <div class="field-group"><label class="field-label">Departure date</label><input type="date" id="flight-date" oninput="clearErr(this)"/><span class="error-msg" id="err-flight-date">Please select a departure date</span></div>
-        <div class="field-group"><label class="field-label">Departure time <span style="font-weight:400;color:var(--text-tertiary);">(optional)</span></label><input type="time" id="flight-time"/></div>
+        <div class="field-group"><label class="field-label">Departure time <span style="font-weight:400;color:#888888;">(optional)</span></label><input type="time" id="flight-time"/></div>
       </div>
       <div class="grid-2" id="return-row">
         <div class="field-group"><label class="field-label">Return date</label><input type="date" id="return-date" oninput="clearErr(this)"/><span class="error-msg" id="err-return-date">Please select a return date</span></div>
-        <div class="field-group"><label class="field-label">Return time <span style="font-weight:400;color:var(--text-tertiary);">(optional)</span></label><input type="time" id="return-time"/></div>
+        <div class="field-group"><label class="field-label">Return time <span style="font-weight:400;color:#888888;">(optional)</span></label><input type="time" id="return-time"/></div>
       </div>
       <div class="field-group"><label class="field-label">Number of passengers</label><input type="number" id="passengers" min="1" max="50" placeholder="e.g. 4" oninput="clearErr(this)"/><span class="error-msg" id="err-passengers">Please enter number of passengers</span></div>
     </div>
@@ -971,7 +971,7 @@
 </section>
 
   <!-- HOW IT WORKS -->
-  <section style="padding: 0 0 0 0; background: var(--navy);">
+  <section style="padding: 0 0 0 0; background: #0c1324;">
     <div class="section">
       <div class="section-eyebrow">The Process</div>
       <h2 class="section-title">Fly private in 3 simple steps</h2>
@@ -1026,7 +1026,7 @@
   </section>
 
   <!-- POPULAR ROUTES -->
-  <section style="background: var(--navy);">
+  <section style="background: #0c1324;">
     <div class="routes-section">
       <div class="routes-header">
         <div>
