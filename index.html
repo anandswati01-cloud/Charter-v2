@@ -439,6 +439,14 @@
                 overflow-y: auto;
         }
         .ac-dropdown.open { display: block; }
+        .error-msg {
+                display: none;
+                color: #e05f5f;
+                font-size: 11.5px;
+                margin-top: 4px;
+                font-family: var(--font-sans, sans-serif);
+        }
+        .error-msg.visible { display: block; }
         .ac-item {
                 display: flex;
                 align-items: center;
@@ -973,11 +981,13 @@
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">From</div>
-<div class="ac-wrap"><input class="input-field" type="text" id="departure" placeholder="Departure city or airport" autocomplete="off" oninput="acInput(this,'ac-dep')" onkeydown="acKey(event,'ac-dep')" onfocus="acInput(this,'ac-dep')" onblur="acBlur('ac-dep')"><div class="ac-dropdown" id="ac-dep"></div></div>
+<div class="ac-wrap"><input class="input-field" type="text" id="departure" placeholder="Departure city or airport" autocomplete="off" oninput="acInput(this,'ac-dep');clearErr(this)" onkeydown="acKey(event,'ac-dep')" onfocus="acInput(this,'ac-dep')" onblur="acBlur('ac-dep')"><div class="ac-dropdown" id="ac-dep"></div></div>
+              <span class="error-msg" id="err-departure">Please enter a departure city</span>
             </div>
             <div class="input-group" style="margin-top:12px;">
               <div class="input-label">Departure Date &amp; Time</div>
-              <input class="input-field" type="datetime-local">
+              <input class="input-field" type="datetime-local" id="flightDateTime" oninput="clearErr(this)">
+              <span class="error-msg" id="err-flight-date">Please select a departure date &amp; time</span>
             </div>
           </div>
 
@@ -985,11 +995,13 @@
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">To</div>
-              <div class="ac-wrap"><input class="input-field" type="text" id="destination" placeholder="Destination city or airport" autocomplete="off" oninput="acInput(this,'ac-dest')" onkeydown="acKey(event,'ac-dest')" onfocus="acInput(this,'ac-dest')" onblur="acBlur('ac-dest')"><div class="ac-dropdown" id="ac-dest"></div></div>
+              <div class="ac-wrap"><input class="input-field" type="text" id="destination" placeholder="Destination city or airport" autocomplete="off" oninput="acInput(this,'ac-dest');clearErr(this)" onkeydown="acKey(event,'ac-dest')" onfocus="acInput(this,'ac-dest')" onblur="acBlur('ac-dest')"><div class="ac-dropdown" id="ac-dest"></div></div>
+              <span class="error-msg" id="err-destination">Please enter a destination city</span>
             </div>
             <div class="input-group" id="return-row" style="display:none; margin-top:12px;">
               <div class="input-label">Return Date &amp; Time</div>
-              <input class="input-field" type="datetime-local" id="returnDateTime">
+              <input class="input-field" type="datetime-local" id="returnDateTime" oninput="clearErr(this)">
+              <span class="error-msg" id="err-return-date">Please select a return date &amp; time</span>
             </div>
           </div>
 
@@ -1271,7 +1283,19 @@ function getQuotes() {
       labels[1].textContent = 'Sector ' + (i + 1) + ' — To';
     });
   }
-  </script>
+  
+  function clearErr(el) {
+    const errId = 'err-' + el.id;
+    const errEl = document.getElementById(errId);
+    if (errEl) errEl.classList.remove('visible');
+  }
+
+  function showErr(id, msg) {
+    const errEl = document.getElementById(id);
+    if (errEl) { errEl.textContent = msg || errEl.textContent; errEl.classList.add('visible'); }
+  }
+
+</script>
   <script src="js/airports.js"></script>
 
 </body>
