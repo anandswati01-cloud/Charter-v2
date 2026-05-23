@@ -424,7 +424,21 @@
 
     .cta-btn:hover .cta-arrow { transform: translateX(4px); }
 
-    /* ── HOW IT WORKS ── */
+    
+/* ── BOOKING GRID V2 (stacked date under each aerodrome) ── */
+.inputs-grid-v2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: start;
+}
+.input-col {
+  display: flex;
+  flex-direction: column;
+}
+
+        /* ── HOW IT WORKS ── */
     .section {
       padding: 100px 48px;
       max-width: 1280px;
@@ -910,38 +924,45 @@
         <button class="trip-btn" onclick="selectTrip(this)">Multiple Sectors</button>
       </div>
 
-      <div class="inputs-grid">
-        <div class="input-group">
-          <div class="input-label">From</div>
-          <input class="input-field" type="text" placeholder="Departure city or airport">
-        </div>
-        <div class="input-group">
-          <div class="input-label">To</div>
-          <input class="input-field" type="text" placeholder="Destination city or airport">
-        </div>
-        <div class="input-group">
-          <div class="input-label">Date &amp; Time</div>
-          <input class="input-field" type="datetime-local">
-        </div>
-        <div class="input-group">
-          <div class="input-label">Passengers</div>
-          <div class="pax-control">
-            <button class="pax-btn" onclick="changePax(-1)">−</button>
-            <span class="pax-num" id="paxNum">2</span>
-            <button class="pax-btn" onclick="changePax(1)">+</button>
+      <div class="inputs-grid-v2">
+          <!-- COL 1: From + Departure Date -->
+          <div class="input-col">
+            <div class="input-group">
+              <div class="input-label">From</div>
+              <input class="input-field" type="text" placeholder="Departure city or airport">
+            </div>
+            <div class="input-group" style="margin-top:12px;">
+              <div class="input-label">Departure Date &amp; Time</div>
+              <input class="input-field" type="datetime-local">
+            </div>
           </div>
-        </div>
-      
-        <!-- RETURN ROW (shown for Round Trip only) -->
-        <div class="inputs-grid" id="return-row" style="display:none; margin-top:-8px;">
-          <div class="input-group">
-            <div class="input-label">Return Date &amp; Time</div>
-            <input class="input-field" type="datetime-local" id="returnDateTime">
+
+          <!-- COL 2: To + Return Date (return hidden by default) -->
+          <div class="input-col">
+            <div class="input-group">
+              <div class="input-label">To</div>
+              <input class="input-field" type="text" placeholder="Destination city or airport">
+            </div>
+            <div class="input-group" id="return-row" style="display:none; margin-top:12px;">
+              <div class="input-label">Return Date &amp; Time</div>
+              <input class="input-field" type="datetime-local" id="returnDateTime">
+            </div>
           </div>
-        </div>
+
+          <!-- COL 3: Passengers -->
+          <div class="input-col">
+            <div class="input-group">
+              <div class="input-label">Passengers</div>
+              <div class="pax-control">
+                <button class="pax-btn" onclick="changePax(-1)">&#8722;</button>
+                <span class="pax-num" id="paxNum">2</span>
+                <button class="pax-btn" onclick="changePax(1)">+</button>
+              </div>
+            </div>
+          </div>
         </div>
 
-      <div class="special-row">
+        <div class="special-row">
         <div>
           <div class="input-label" style="margin-bottom:10px">Special Requirements</div>
           <div class="special-reqs">
