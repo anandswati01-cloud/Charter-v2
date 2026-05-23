@@ -931,7 +931,15 @@
             <button class="pax-btn" onclick="changePax(1)">+</button>
           </div>
         </div>
-      </div>
+      
+        <!-- RETURN ROW (shown for Round Trip only) -->
+        <div class="inputs-grid" id="return-row" style="display:none; margin-top:-8px;">
+          <div class="input-group">
+            <div class="input-label">Return Date &amp; Time</div>
+            <input class="input-field" type="datetime-local" id="returnDateTime">
+          </div>
+        </div>
+        </div>
 
       <div class="special-row">
         <div>
@@ -1113,9 +1121,14 @@
     }
 
     function selectTrip(btn) {
-      document.querySelectorAll('.trip-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    document.querySelectorAll('.trip-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const tripType = btn.textContent.trim();
+    const returnRow = document.getElementById('return-row');
+    if (returnRow) {
+      returnRow.style.display = tripType === 'Round Trip' ? 'grid' : 'none';
     }
+  }
 
     function toggleChip(chip) {
       chip.classList.toggle('active');
