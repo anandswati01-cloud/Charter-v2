@@ -1399,6 +1399,7 @@ function getQuotes() {
           <input type="text" class="otp-digit" maxlength="1" id="modal-otp-d5" oninput="otpModalNext(this,'modal-otp-d6')" onkeydown="otpModalBack(event,this,'modal-otp-d4')"/>
           <input type="text" class="otp-digit" maxlength="1" id="modal-otp-d6" oninput="otpModalNext(this,'')" onkeydown="otpModalBack(event,this,'modal-otp-d5')"/>
         </div>
+        <p id="modal-otp-info" style="color:#f59e0b;font-size:12px;text-align:center;margin:0 0 8px;font-weight:600;"></p>
         <button class="btn-verify-otp" onclick="verifyModalOTP()">Verify</button>
       </div>
       <div class="otp-resend">Didn't receive it? <a onclick="resendModalOTP()">Resend OTP</a> &middot; <a onclick="changeModalPhone()">Change number</a></div>
@@ -1475,34 +1476,21 @@ function clearModalPhoneErr(){
 
 function sendModalOTP(){
   var phone=document.getElementById('modal-otp-phone').value.trim();
-  var code=document.getElementById('modal-country-code').value||'+91';
   var errEl=document.getElementById('modal-err-phone');
   if(!phone||phone.replace(/[^0-9]/g,'').length<6){
-    errEl.textContent='Please enter a valid mobile number';
-    errEl.style.display='block';
+    errEl.style.display='block';errEl.textContent='Please enter a valid mobile number';
     return;
   }
-  _modalOtpPhone=code+phone;
+  errEl.style.display='none';
   var otp=String(Math.floor(100000+Math.random()*900000));
-  _modalOtpGenerated=otp;
-  var btn=document.getElementById('modal-btn-send-otp');
-  btn.disabled=true;btn.textContent='Sending...';
-  fetch(SKYVAYU_CONFIG.supabaseUrl+'/functions/v1/send-otp',{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+SKYVAYU_CONFIG.supabaseKey},
-    body:JSON.stringify({phone:_modalOtpPhone,otp:otp})
-  }).then(function(){
-    btn.textContent='Resend';btn.disabled=false;
-    document.getElementById('modal-otp-phone-wrap').style.display='none';
-    document.getElementById('modal-otp-entry-wrap').style.display='block';
-    setTimeout(function(){var d=document.getElementById('modal-otp-d1');if(d)d.focus();},100);
-  }).catch(function(){
-    btn.textContent='Send OTP';btn.disabled=false;
-    errEl.textContent='Failed to send OTP. Please try again.';
-    errEl.style.display='block';
-  });
+  window._generatedOtp=otp;
+  window._modalPhone=phone;
+  document.getElementById('modal-otp-entry-wrap').style.display='block';
+  document.getElementById('modal-phone-wrap').style.display='none';
+  var info=document.getElementById('modal-otp-info');
+  if(info)info.textContent='[TEST MODE] Your OTP: '+otp;
+  document.getElementById('modal-otp-d1').focus();
 }
-
 function verifyModalOTP(){
   var digits=['modal-otp-d1','modal-otp-d2','modal-otp-d3','modal-otp-d4','modal-otp-d5','modal-otp-d6'];
   var entered='';
@@ -1510,16 +1498,19 @@ function verifyModalOTP(){
     var el=document.getElementById(digits[i]);
     entered+=el?el.value:'';
   }
-  if(entered.length<6||!_modalOtpGenerated)return;
-  if(entered===_modalOtpGenerated){
-    document.getElementById('modal-otp-entry-wrap').style.display='none';
-    document.getElementById('modal-otp-verified').style.display='flex';
+  if(entered.length<6){return;}
+  var errEl=document.getElementById('modal-err-otp');
+  var btn=document.getElementById('btn-verify-otp');
+  if(entered===window._generatedOtp){
+    if(errEl)errEl.style.display='none';
+    btn.textContent='Verified!';btn.style.background='#22c55e';
     setTimeout(function(){
       closeOtpModal();
-      if(window._pendingQuoteUrl)window.location.href=window._pendingQuoteUrl;
+      window.location.href=window._pendingQuoteUrl;
     },1200);
-  }else{
-    document.getElementById('modal-err-otp').style.display='block';
+  } else {
+    if(errEl){errEl.style.display='block';errEl.textContent='Incorrect OTP. Please try again.';}
+    btn.textContent='Verify OTP';btn.disabled=false;
   }
 }
 
