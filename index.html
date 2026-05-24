@@ -1422,7 +1422,7 @@ function toggleModalCountryDD(){
 function filterModalCountries(q){
   if(typeof COUNTRIES==='undefined')return;
   var filtered=COUNTRIES.filter(function(c){
-    return c.name.toLowerCase().indexOf(q.toLowerCase())>=0||c.dial_code.indexOf(q)>=0;
+    return c.name.toLowerCase().indexOf(q.toLowerCase())>=0||c.dial.indexOf(q)>=0;
   });
   renderModalCountryItems(filtered);
 }
@@ -1434,10 +1434,10 @@ function renderModalCountryItems(list){
   for(var i=0;i<list.length;i++){
     var x=list[i];
     html+='<div class="country-dd-item" onmousedown="selectModalCountry(' +
-      JSON.stringify(x.dial_code)+','+JSON.stringify(x.code.toLowerCase())+
+      JSON.stringify(x.dial)+','+JSON.stringify(x.iso)+
       ')" style="display:flex;align-items:center;padding:8px 12px;cursor:pointer;font-size:13px;">' +
-      '<img src="https://flagcdn.com/w20/'+x.code.toLowerCase()+'.png" style="width:18px;margin-right:8px;"/>'+
-      x.name+' <span style="color:#aaa;margin-left:4px;">'+x.dial_code+'</span></div>';
+      '<img src="https://flagcdn.com/w20/'+x.iso+'.png" style="width:18px;margin-right:8px;"/>'+
+      x.name+' <span style="color:#aaa;margin-left:4px;">'+x.dial+'</span></div>';
   }
   c.innerHTML=html;
 }
