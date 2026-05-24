@@ -1030,12 +1030,12 @@
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">From</div>
-<div class="ac-wrap"><input class="input-field" type="text" id="departure" placeholder="Departure city or airport" autocomplete="off" oninput="acInput(this,'ac-dep');clearErr(this)" onkeydown="acKey(event,'ac-dep')" onfocus="acInput(this,'ac-dep')" onblur="acBlur('ac-dep')"><div class="ac-dropdown" id="ac-dep"></div></div>
+<div class="ac-wrap"><input class="input-field" type="text" id="departure" tabindex="1" placeholder="Departure city or airport" autocomplete="off" oninput="acInput(this,'ac-dep');clearErr(this)" onkeydown="acKey(event,'ac-dep')" onfocus="acInput(this,'ac-dep')" onblur="acBlur('ac-dep')"><div class="ac-dropdown" id="ac-dep"></div></div>
               <span class="error-msg" id="err-departure">Please enter a departure city</span>
             </div>
             <div class="input-group" style="margin-top:12px;">
               <div class="input-label">Departure Date &amp; Time</div>
-              <input class="input-field" type="datetime-local" id="flightDateTime" oninput="clearErr(this)">
+              <input class="input-field" type="datetime-local" id="flightDateTime" tabindex="3" oninput="clearErr(this)">
               <span class="error-msg" id="err-flight-date">Please select a departure date &amp; time</span>
             </div>
           </div>
@@ -1044,12 +1044,12 @@
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">To</div>
-              <div class="ac-wrap"><input class="input-field" type="text" id="destination" placeholder="Destination city or airport" autocomplete="off" oninput="acInput(this,'ac-dest');clearErr(this)" onkeydown="acKey(event,'ac-dest')" onfocus="acInput(this,'ac-dest')" onblur="acBlur('ac-dest')"><div class="ac-dropdown" id="ac-dest"></div></div>
+              <div class="ac-wrap"><input class="input-field" type="text" id="destination" tabindex="2" placeholder="Destination city or airport" autocomplete="off" oninput="acInput(this,'ac-dest');clearErr(this)" onkeydown="acKey(event,'ac-dest')" onfocus="acInput(this,'ac-dest')" onblur="acBlur('ac-dest')"><div class="ac-dropdown" id="ac-dest"></div></div>
               <span class="error-msg" id="err-destination">Please enter a destination city</span>
             </div>
             <div class="input-group" id="return-row" style="display:none; margin-top:12px;">
               <div class="input-label">Return Date &amp; Time</div>
-              <input class="input-field" type="datetime-local" id="returnDateTime" oninput="clearErr(this)">
+              <input class="input-field" type="datetime-local" id="returnDateTime" tabindex="4" oninput="clearErr(this)">
               <span class="error-msg" id="err-return-date">Please select a return date &amp; time</span>
             </div>
           </div>
@@ -1323,17 +1323,17 @@ function getQuotes() {
     row.innerHTML = `
       <div class="input-group">
         <div class="input-label sector-label">Sector ${n} — From</div>
-                <div class="ac-wrap"><input class="input-field" id="sec-dep-${n}" type="text" placeholder="Departure city or airport" oninput="acInput(this,'ac-sdep-${n}')" onkeydown="acKey(event,'ac-sdep-${n}')" onblur="acBlur('ac-sdep-${n}')"><div class="ac-dropdown" id="ac-sdep-${n}"></div></div>
+                <div class="ac-wrap"><input class="input-field" id="sec-dep-${n}" type="text" tabindex="${10 + (n-1)*3 + 1}" placeholder="Departure city or airport" oninput="acInput(this,'ac-sdep-${n}')" onkeydown="acKey(event,'ac-sdep-${n}')" onblur="acBlur('ac-sdep-${n}')"><div class="ac-dropdown" id="ac-sdep-${n}"></div></div>
       </div>
         <span class="error-msg" id="err-sec-dep-${n}"></span>
       <div class="input-group">
         <div class="input-label sector-label">Sector ${n} — To</div>
-                <div class="ac-wrap"><input class="input-field" id="sec-dest-${n}" type="text" placeholder="Destination city or airport" oninput="acInput(this,'ac-sdest-${n}')" onkeydown="acKey(event,'ac-sdest-${n}')" onblur="acBlur('ac-sdest-${n}')"><div class="ac-dropdown" id="ac-sdest-${n}"></div></div>
+                <div class="ac-wrap"><input class="input-field" id="sec-dest-${n}" type="text" tabindex="${10 + (n-1)*3 + 2}" placeholder="Destination city or airport" oninput="acInput(this,'ac-sdest-${n}')" onkeydown="acKey(event,'ac-sdest-${n}')" onblur="acBlur('ac-sdest-${n}')"><div class="ac-dropdown" id="ac-sdest-${n}"></div></div>
       </div>
         <span class="error-msg" id="err-sec-dest-${n}"></span>
       <div class="input-group">
         <div class="input-label sector-label">Date &amp; Time</div>
-        <input class="input-field" type="datetime-local" id="sec-date-${n}">
+        <input class="input-field" type="datetime-local" id="sec-date-${n}" tabindex="${10 + (n-1)*3 + 3}">
         <span class="error-msg" id="err-sec-date-${n}"></span>
       </div>
       <button class="remove-sector-btn" onclick="removeSector(${n})" title="Remove sector">&times;</button>
