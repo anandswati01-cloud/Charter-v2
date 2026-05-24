@@ -1500,17 +1500,17 @@ function verifyModalOTP(){
   }
   if(entered.length<6){return;}
   var errEl=document.getElementById('modal-err-otp');
-  var btn=document.getElementById('btn-verify-otp');
+  var btn=document.querySelector('.btn-verify-otp');
   if(entered===window._generatedOtp){
     if(errEl)errEl.style.display='none';
-    btn.textContent='Verified!';btn.style.background='#22c55e';
+    if(btn){btn.textContent='Verified!';btn.style.background='#22c55e';}
     setTimeout(function(){
       closeOtpModal();
       window.location.href=window._pendingQuoteUrl;
     },1200);
   } else {
     if(errEl){errEl.style.display='block';errEl.textContent='Incorrect OTP. Please try again.';}
-    btn.textContent='Verify OTP';btn.disabled=false;
+    if(btn){btn.textContent='Verify';btn.disabled=false;}
   }
 }
 
