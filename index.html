@@ -1404,6 +1404,7 @@ function openOtpModal(){
   var digits=['modal-otp-d1','modal-otp-d2','modal-otp-d3','modal-otp-d4','modal-otp-d5','modal-otp-d6'];
   for(var i=0;i<digits.length;i++){var e=document.getElementById(digits[i]);if(e)e.value='';}
   _modalOtpGenerated=null;
+  document.getElementById('modal-country-dd-list').classList.remove('open');
   var items=document.getElementById('modal-country-dd-items');
   if(items&&!items.children.length&&typeof COUNTRIES!=='undefined')renderModalCountryItems(COUNTRIES);
   m.onclick=function(ev){if(ev.target===m)closeOtpModal();};
