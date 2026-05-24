@@ -1389,94 +1389,142 @@ function getQuotes() {
 </div>
 <script src="js/otp.js"></script>
 <script>
-  var _modalOtpGenerated=null,_modalOtpPhone='';
-  function openOtpModal(){
-    var m=document.getElementById('otp-modal');if(!m)return;
-    m.style.display='flex';
-    document.getElementById('modal-otp-phone-wrap').style.display='';
+var _modalOtpGenerated=null,_modalOtpPhone='';
+
+function openOtpModal(){
+  var m=document.getElementById('otp-modal');
+  if(!m)return;
+  m.style.display='flex';
+  document.getElementById('modal-otp-phone-wrap').style.display='block';
+  document.getElementById('modal-otp-entry-wrap').style.display='none';
+  document.getElementById('modal-otp-verified').style.display='none';
+  document.getElementById('modal-otp-phone').value='';
+  document.getElementById('modal-err-phone').style.display='none';
+  document.getElementById('modal-err-otp').style.display='none';
+  var digits=['modal-otp-d1','modal-otp-d2','modal-otp-d3','modal-otp-d4','modal-otp-d5','modal-otp-d6'];
+  for(var i=0;i<digits.length;i++){var e=document.getElementById(digits[i]);if(e)e.value='';}
+  _modalOtpGenerated=null;
+  var items=document.getElementById('modal-country-dd-items');
+  if(items&&!items.children.length&&typeof COUNTRIES!=='undefined')renderModalCountryItems(COUNTRIES);
+  m.onclick=function(ev){if(ev.target===m)closeOtpModal();};
+  setTimeout(function(){var p=document.getElementById('modal-otp-phone');if(p)p.focus();},100);
+}
+
+function closeOtpModal(){
+  var m=document.getElementById('otp-modal');
+  if(m)m.style.display='none';
+}
+
+function toggleModalCountryDD(){
+  document.getElementById('modal-country-dd-list').classList.toggle('open');
+}
+
+function filterModalCountries(q){
+  if(typeof COUNTRIES==='undefined')return;
+  var filtered=COUNTRIES.filter(function(c){
+    return c.name.toLowerCase().indexOf(q.toLowerCase())>=0||c.dial_code.indexOf(q)>=0;
+  });
+  renderModalCountryItems(filtered);
+}
+
+function renderModalCountryItems(list){
+  var c=document.getElementById('modal-country-dd-items');
+  if(!c)return;
+  var html='';
+  for(var i=0;i<list.length;i++){
+    var x=list[i];
+    html+='<div class="country-dd-item" onmousedown="selectModalCountry(' +
+      JSON.stringify(x.dial_code)+','+JSON.stringify(x.code.toLowerCase())+
+      ')" style="display:flex;align-items:center;padding:8px 12px;cursor:pointer;font-size:13px;">' +
+      '<img src="https://flagcdn.com/w20/'+x.code.toLowerCase()+'.png" style="width:18px;margin-right:8px;"/>'+
+      x.name+' <span style="color:#aaa;margin-left:4px;">'+x.dial_code+'</span></div>';
+  }
+  c.innerHTML=html;
+}
+
+function selectModalCountry(code,iso){
+  document.getElementById('modal-country-code').value=code;
+  document.getElementById('modal-country-dd-code').textContent=code;
+  document.getElementById('modal-country-dd-flag').src='https://flagcdn.com/w20/'+iso+'.png';
+  document.getElementById('modal-country-dd-list').classList.remove('open');
+}
+
+function clearModalPhoneErr(){
+  document.getElementById('modal-err-phone').style.display='none';
+}
+
+function sendModalOTP(){
+  var phone=document.getElementById('modal-otp-phone').value.trim();
+  var code=document.getElementById('modal-country-code').value||'+91';
+  var errEl=document.getElementById('modal-err-phone');
+  if(!phone||phone.replace(/[^0-9]/g,'').length<6){
+    errEl.textContent='Please enter a valid mobile number';
+    errEl.style.display='block';
+    return;
+  }
+  _modalOtpPhone=code+phone;
+  var otp=String(Math.floor(100000+Math.random()*900000));
+  _modalOtpGenerated=otp;
+  var btn=document.getElementById('modal-btn-send-otp');
+  btn.disabled=true;btn.textContent='Sending...';
+  fetch(SKYVAYU_CONFIG.supabaseUrl+'/functions/v1/send-otp',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+SKYVAYU_CONFIG.supabaseKey},
+    body:JSON.stringify({phone:_modalOtpPhone,otp:otp})
+  }).then(function(){
+    btn.textContent='Resend';btn.disabled=false;
+    document.getElementById('modal-otp-phone-wrap').style.display='none';
+    document.getElementById('modal-otp-entry-wrap').style.display='block';
+    setTimeout(function(){var d=document.getElementById('modal-otp-d1');if(d)d.focus();},100);
+  }).catch(function(){
+    btn.textContent='Send OTP';btn.disabled=false;
+    errEl.textContent='Failed to send OTP. Please try again.';
+    errEl.style.display='block';
+  });
+}
+
+function verifyModalOTP(){
+  var digits=['modal-otp-d1','modal-otp-d2','modal-otp-d3','modal-otp-d4','modal-otp-d5','modal-otp-d6'];
+  var entered='';
+  for(var i=0;i<digits.length;i++){
+    var el=document.getElementById(digits[i]);
+    entered+=el?el.value:'';
+  }
+  if(entered.length<6||!_modalOtpGenerated)return;
+  if(entered===_modalOtpGenerated){
     document.getElementById('modal-otp-entry-wrap').style.display='none';
-    document.getElementById('modal-otp-verified').style.display='none';
-    document.getElementById('modal-otp-phone').value='';
-    document.getElementById('modal-err-phone').style.display='none';
-    document.getElementById('modal-err-otp').style.display='none';
-    ['modal-otp-d1','modal-otp-d2','modal-otp-d3','modal-otp-d4','modal-otp-d5','modal-otp-d6'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
-    _modalOtpGenerated=null;
-    var items=document.getElementById('modal-country-dd-items');
-    if(items&&!items.children.length&&typeof COUNTRIES!=='undefined')renderModalCountryItems(COUNTRIES);
-    m.onclick=function(e){if(e.target===m)closeOtpModal();};
-    setTimeout(function(){var p=document.getElementById('modal-otp-phone');if(p)p.focus();},100);
+    document.getElementById('modal-otp-verified').style.display='flex';
+    setTimeout(function(){
+      closeOtpModal();
+      if(window._pendingQuoteUrl)window.location.href=window._pendingQuoteUrl;
+    },1200);
+  }else{
+    document.getElementById('modal-err-otp').style.display='block';
   }
-  function closeOtpModal(){var m=document.getElementById('otp-modal');if(m)m.style.display='none';}
-  function toggleModalCountryDD(){document.getElementById('modal-country-dd-list').classList.toggle('open');}
-  function filterModalCountries(q){
-    if(typeof COUNTRIES==='undefined')return;
-    renderModalCountryItems(COUNTRIES.filter(function(c){return c.name.toLowerCase().includes(q.toLowerCase())||c.dial_code.includes(q);}));
+}
+
+function resendModalOTP(){
+  document.getElementById('modal-otp-entry-wrap').style.display='none';
+  document.getElementById('modal-otp-phone-wrap').style.display='block';
+  _modalOtpGenerated=null;
+}
+
+function changeModalPhone(){resendModalOTP();}
+
+function otpModalNext(el,nextId){
+  if(el.value.length===1&&nextId){
+    var n=document.getElementById(nextId);
+    if(n)n.focus();
   }
-  function renderModalCountryItems(list){
-    var c=document.getElementById('modal-country-dd-items');if(!c)return;
-    c.innerHTML=list.map(function(x){
-      return '<div class="country-dd-item" onmousedown="selectModalCountry(''+x.dial_code+'',''+x.code.toLowerCase()+'')" style="display:flex;align-items:center;padding:8px 12px;cursor:pointer;font-size:13px;">'
-        +'<img src="https://flagcdn.com/w20/'+x.code.toLowerCase()+'.png" style="width:18px;margin-right:8px;"/>'+x.name+' <span style="color:#aaa;margin-left:4px;">'+x.dial_code+'</span></div>';
-    }).join('');
+  if(!nextId&&el.value.length===1)verifyModalOTP();
+}
+
+function otpModalBack(e,el,prevId){
+  if(e.key==='Backspace'&&!el.value&&prevId){
+    var p=document.getElementById(prevId);
+    if(p){p.value='';p.focus();}
   }
-  function selectModalCountry(code,iso){
-    document.getElementById('modal-country-code').value=code;
-    document.getElementById('modal-country-dd-code').textContent=code;
-    document.getElementById('modal-country-dd-flag').src='https://flagcdn.com/w20/'+iso+'.png';
-    document.getElementById('modal-country-dd-list').classList.remove('open');
-  }
-  function clearModalPhoneErr(){document.getElementById('modal-err-phone').style.display='none';}
-  function sendModalOTP(){
-    var phone=document.getElementById('modal-otp-phone').value.trim();
-    var code=document.getElementById('modal-country-code').value||'+91';
-    if(!phone||!/^\d{6,15}$/.test(phone)){
-      document.getElementById('modal-err-phone').style.display='block';return;
-    }
-    _modalOtpPhone=code+phone;
-    var otp=String(Math.floor(100000+Math.random()*900000));
-    _modalOtpGenerated=otp;
-    var btn=document.getElementById('modal-btn-send-otp');
-    btn.disabled=true;btn.textContent='Sending...';
-    fetch(SKYVAYU_CONFIG.supabaseUrl+'/functions/v1/send-otp',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SKYVAYU_CONFIG.supabaseKey},
-      body:JSON.stringify({phone:_modalOtpPhone,otp:otp})
-    }).then(function(){
-      btn.textContent='Resend';btn.disabled=false;
-      document.getElementById('modal-otp-phone-wrap').style.display='none';
-      document.getElementById('modal-otp-entry-wrap').style.display='';
-      setTimeout(function(){var d=document.getElementById('modal-otp-d1');if(d)d.focus();},100);
-    }).catch(function(){
-      btn.textContent='Send OTP';btn.disabled=false;
-      var e=document.getElementById('modal-err-phone');
-      e.textContent='Failed to send OTP. Please try again.';e.style.display='block';
-    });
-  }
-  function verifyModalOTP(){
-    var entered=['modal-otp-d1','modal-otp-d2','modal-otp-d3','modal-otp-d4','modal-otp-d5','modal-otp-d6']
-      .map(function(id){return(document.getElementById(id)||{value:''}).value;}).join('');
-    if(entered.length<6||!_modalOtpGenerated)return;
-    if(entered===_modalOtpGenerated){
-      document.getElementById('modal-otp-entry-wrap').style.display='none';
-      document.getElementById('modal-otp-verified').style.display='flex';
-      setTimeout(function(){closeOtpModal();if(window._pendingQuoteUrl)window.location.href=window._pendingQuoteUrl;},1200);
-    } else {
-      document.getElementById('modal-err-otp').style.display='block';
-    }
-  }
-  function resendModalOTP(){
-    document.getElementById('modal-otp-entry-wrap').style.display='none';
-    document.getElementById('modal-otp-phone-wrap').style.display='';
-    _modalOtpGenerated=null;
-  }
-  function changeModalPhone(){resendModalOTP();}
-  function otpModalNext(el,nextId){
-    if(el.value.length===1&&nextId){var n=document.getElementById(nextId);if(n)n.focus();}
-    if(!nextId&&el.value.length===1)verifyModalOTP();
-  }
-  function otpModalBack(e,el,prevId){
-    if(e.key==='Backspace'&&!el.value&&prevId){var p=document.getElementById(prevId);if(p){p.value='';p.focus();}}
-  }
+}
 </script>
 </body>
 </html>
