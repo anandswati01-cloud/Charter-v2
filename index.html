@@ -1229,17 +1229,49 @@
     }
 
 function getQuotes() {
-        const fromEl = document.getElementById('departure');
-        const toEl   = document.getElementById('destination');
-        const from   = fromEl ? fromEl.value.trim() : '';
-        const to     = toEl   ? toEl.value.trim()   : '';
-        if (!from || !to) {
-                  alert('Please enter departure and destination airports.');
-                  return;
-        }
-        const params = new URLSearchParams({ from, to, pax });
-        window.location.href = '/booking?' + params.toString();
-}
+    // clear all errors first
+    ['err-departure','err-destination','err-flight-date','err-return-date'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('visible');
+    });
+
+    const fromEl = document.getElementById('departure');
+    const toEl   = document.getElementById('destination');
+    const dateEl = document.getElementById('flightDateTime');
+    const returnEl = document.getElementById('returnDateTime');
+    const tripMode = document.querySelector('.trip-btn.active')?.textContent.trim() || 'One Way';
+
+    const from = fromEl ? fromEl.value.trim() : '';
+    const to   = toEl   ? toEl.value.trim()   : '';
+    const date = dateEl ? dateEl.value : '';
+    const returnDate = returnEl ? returnEl.value : '';
+
+    let valid = true;
+
+    if (!from) {
+      showErr('err-departure', 'Please enter a departure city');
+      valid = false;
+    }
+    if (!to) {
+      showErr('err-destination', 'Please enter a destination city');
+      valid = false;
+    }
+    if (!date) {
+      showErr('err-flight-date', 'Please select a departure date & time');
+      valid = false;
+    }
+    if (tripMode === 'Round Trip' && !returnDate) {
+      showErr('err-return-date', 'Please select a return date & time');
+      valid = false;
+    }
+
+    if (!valid) return;
+
+    const pax = document.getElementById('paxNum') ? document.getElementById('paxNum').textContent : '2';
+    const params = new URLSearchParams({ from, to, date, pax, trip: tripMode });
+    if (tripMode === 'Round Trip' && returnDate) params.set('returnDate', returnDate);
+    window.location.href = 'booking.html?' + params.toString();
+  }
   
   let sectorCount = 0;
 
