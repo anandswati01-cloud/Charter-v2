@@ -1486,9 +1486,9 @@ function sendModalOTP(){
   window._generatedOtp=otp;
   window._modalPhone=phone;
   document.getElementById('modal-otp-entry-wrap').style.display='block';
-  document.getElementById('modal-phone-wrap').style.display='none';
+  document.getElementById('modal-otp-phone-wrap').style.display='none';
   var info=document.getElementById('modal-otp-info');
-  if(info)info.textContent='[TEST MODE] Your OTP: '+otp;
+  if(info){info.style.display='block';info.textContent='[TEST MODE] Your OTP: '+otp;}
   document.getElementById('modal-otp-d1').focus();
 }
 function verifyModalOTP(){
