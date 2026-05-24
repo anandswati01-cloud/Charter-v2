@@ -1323,17 +1323,17 @@ function getQuotes() {
     row.innerHTML = `
       <div class="input-group">
         <div class="input-label sector-label">Sector ${n} — From</div>
-                <div class="ac-wrap"><input class="input-field" id="sec-dep-${n}" type="text" tabindex="${10 + (n-1)*3 + 1}" placeholder="Departure city or airport" oninput="acInput(this,'ac-sdep-${n}')" onkeydown="acKey(event,'ac-sdep-${n}')" onblur="acBlur('ac-sdep-${n}')"><div class="ac-dropdown" id="ac-sdep-${n}"></div></div>
-      </div>
+                <div class="ac-wrap"><input class="input-field" id="sec-dep-${n}" type="text" tabindex="${10 + (n-1)*3 + 1}" placeholder="Departure city or airport" oninput="clearErr(this);acInput(this,'ac-sdep-${n}')" onkeydown="acKey(event,'ac-sdep-${n}')" onblur="acBlur('ac-sdep-${n}')"><div class="ac-dropdown" id="ac-sdep-${n}"></div></div>
         <span class="error-msg" id="err-sec-dep-${n}"></span>
+      </div>
       <div class="input-group">
         <div class="input-label sector-label">Sector ${n} — To</div>
-                <div class="ac-wrap"><input class="input-field" id="sec-dest-${n}" type="text" tabindex="${10 + (n-1)*3 + 2}" placeholder="Destination city or airport" oninput="acInput(this,'ac-sdest-${n}')" onkeydown="acKey(event,'ac-sdest-${n}')" onblur="acBlur('ac-sdest-${n}')"><div class="ac-dropdown" id="ac-sdest-${n}"></div></div>
-      </div>
+                <div class="ac-wrap"><input class="input-field" id="sec-dest-${n}" type="text" tabindex="${10 + (n-1)*3 + 2}" placeholder="Destination city or airport" oninput="clearErr(this);acInput(this,'ac-sdest-${n}')" onkeydown="acKey(event,'ac-sdest-${n}')" onblur="acBlur('ac-sdest-${n}')"><div class="ac-dropdown" id="ac-sdest-${n}"></div></div>
         <span class="error-msg" id="err-sec-dest-${n}"></span>
+      </div>
       <div class="input-group">
         <div class="input-label sector-label">Date &amp; Time</div>
-        <input class="input-field" type="datetime-local" id="sec-date-${n}" tabindex="${10 + (n-1)*3 + 3}">
+        <input class="input-field" type="datetime-local" id="sec-date-${n}" tabindex="${10 + (n-1)*3 + 3}" oninput="clearErr(this)">
         <span class="error-msg" id="err-sec-date-${n}"></span>
       </div>
       <button class="remove-sector-btn" onclick="removeSector(${n})" title="Remove sector">&times;</button>
