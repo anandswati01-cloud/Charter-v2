@@ -440,13 +440,15 @@
         }
         .ac-dropdown.open { display: block; }
         .error-msg {
-                display: none;
+                display: block;
+                visibility: hidden;
+                min-height: 18px;
                 color: #e05f5f;
                 font-size: 11.5px;
                 margin-top: 4px;
                 font-family: var(--font-sans, sans-serif);
         }
-        .error-msg.visible { display: block; }
+        .error-msg.visible { visibility: visible; }
         .otp-modal-box {
           background: #0d1a2b;
           border: 1px solid rgba(255,255,255,0.1);
