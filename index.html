@@ -477,6 +477,25 @@
         .otp-modal-phone-input:focus { border-color: var(--gold, #c9a84c); }
         .otp-modal-digits-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
         .otp-modal-verified { display: flex; align-items: center; gap: 8px; color: #97C459; font-size: 14px; font-weight: 500; margin: 12px 0; }
+        /* country dropdown */
+        .country-dd { position:relative; display:flex; align-items:center; gap:6px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:8px 10px; cursor:pointer; min-width:90px; }
+        .country-dd img { width:18px; }
+        .country-dd span { font-size:13px; color:#fff; }
+        .country-dd-list { display:none; position:absolute; top:calc(100% + 4px); left:0; min-width:240px; background:#0d1a2b; border:1px solid rgba(255,255,255,0.12); border-radius:8px; z-index:100; max-height:240px; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.5); }
+        .country-dd-list.open { display:block; }
+        .country-dd-search-wrap { padding:8px; }
+        .country-dd-search { width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); border-radius:6px; padding:6px 10px; color:#fff; font-size:13px; outline:none; box-sizing:border-box; }
+        .country-dd-item:hover { background:rgba(255,255,255,0.06); }
+        /* OTP digit boxes */
+        .otp-digits { display:flex; gap:8px; }
+        .otp-digit { width:40px; height:48px; text-align:center; font-size:20px; font-weight:600; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.15); border-radius:8px; color:#fff; outline:none; transition:border-color 0.2s; }
+        .otp-digit:focus { border-color:var(--gold,#c9a84c); }
+        /* OTP send/verify buttons */
+        .btn-send-otp, .btn-verify-otp { background:var(--gold,#c9a84c); color:#0c1324; border:none; border-radius:8px; padding:10px 16px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; transition:opacity 0.2s; }
+        .btn-send-otp:hover, .btn-verify-otp:hover { opacity:0.85; }
+        .btn-send-otp:disabled { opacity:0.5; cursor:not-allowed; }
+        .otp-resend { font-size:12px; color:#aaa; margin-top:8px; }
+        .otp-resend a { color:var(--gold,#c9a84c); cursor:pointer; text-decoration:underline; }
         .ac-item {
                 display: flex;
                 align-items: center;
