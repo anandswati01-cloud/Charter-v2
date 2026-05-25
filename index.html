@@ -1309,7 +1309,7 @@ function getQuotes() {
     var pax=document.getElementById('paxNum')?document.getElementById('paxNum').textContent:'2';
     var params=new URLSearchParams({from:from,to:to,date:date,pax:pax,trip:tripMode});
     if(tripMode==='Round Trip'&&returnDate)params.set('returnDate',returnDate);
-    window._pendingQuoteUrl='booking.html?'+params.toString();
+    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value});});}window._pendingQuery={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,sectors:sectors,status:'open'};
     openOtpModal();
   }
   
@@ -1525,7 +1525,7 @@ function verifyModalOTP(){
     if(btn){btn.textContent='Verified!';btn.style.background='#22c55e';}
     setTimeout(function(){
       closeOtpModal();
-      window.location.href=window._pendingQuoteUrl;
+      if(window._pendingQuery){var q=window._pendingQuery;q.client_phone=window._modalPhone||'';if(btn)btn.textContent='Saving...';saveQueryToSupabase(q).then(function(saved){var dt=q.flight_date+(q.flight_time?' '+q.flight_time:'');var rdStr=q.return_date?(q.return_date+(q.return_time?' '+q.return_time:'')):'';var route=q.trip_type==='Round Trip'?(q.departure+' ⇄ '+q.destination):(q.trip_type==='Multiple Sectors'?q.departure+' → ...':q.departure+' → '+q.destination);sessionStorage.setItem('sv_query_id',saved.id);sessionStorage.setItem('sv_query',JSON.stringify({rs_type:q.trip_type,rs_route:route,rs_date:dt,rs_pax:q.passengers+' Passenger'+(q.passengers!==1?'s':'')}));window.location.href='results.html';}).catch(function(err){console.error('saveQuery failed',err);if(btn){btn.textContent='Verify';btn.disabled=false;}});}else{window.location.href='results.html';}
     },1200);
   } else {
     if(errEl){errEl.style.display='block';errEl.textContent='Incorrect OTP. Please try again.';}
