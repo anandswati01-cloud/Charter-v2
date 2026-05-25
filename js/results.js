@@ -20,7 +20,17 @@ document.addEventListener('DOMContentLoaded', function() {
     var rsDate  = document.getElementById('rs-date');
     var rsPax   = document.getElementById('rs-pax');
     var rsType  = document.getElementById('rs-type');
-    if (rsRoute) rsRoute.textContent = q.rs_route || '\u2014';
+    if (rsRoute) rsRoute.textContent = q.rs_route || '—';
+    (function(){
+      var rv = q.rs_route || '';
+      var fc = document.getElementById('rs-from-code');
+      var tc = document.getElementById('rs-to-code');
+      if (rv && fc && tc) {
+        var pts = rv.split(/\s*[\u2192\u2014\-|]\s*/);
+        if (pts.length >= 2) { fc.textContent = pts[0].trim(); tc.textContent = pts[1].trim(); }
+        else { fc.textContent = rv; }
+      }
+    })();
     if (rsDate)  rsDate.textContent  = q.rs_date  || '\u2014';
     if (rsPax)   rsPax.textContent   = q.rs_pax   || '\u2014';
     if (rsType)  rsType.textContent  = q.rs_type  || '\u2014';
@@ -100,8 +110,14 @@ function startQuotePolling(queryId) {
 
 function startTimer() {
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-  queryStartTime = Date.now();
-  injectedIds    = {};
+    var _tkey = 'sv_timer_start_' + queryId;
+  var _stored = sessionStorage.getItem(_tkey);
+  if (_stored) {
+    queryStartTime = parseInt(_stored, 10);
+  } else {
+    queryStartTime = Date.now();
+    sessionStorage.setItem(_tkey, queryStartTime);
+  } injectedIds    = {};
 
   var listReceived  = document.getElementById('list-received');
   var expiredBanner = document.getElementById('expired-banner');
