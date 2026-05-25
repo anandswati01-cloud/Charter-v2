@@ -9,25 +9,38 @@
   *{box-sizing:border-box;margin:0;padding:0;}
   body{background:#131315;min-height:100vh;font-family:'Manrope','Segoe UI',sans-serif;color:#e4e2e4;overflow-x:hidden;}
   button{font-family:inherit;}
+
+  /* NAV */
   .sq-nav{background:rgba(2,6,23,0.85);backdrop-filter:blur(8px);height:80px;position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 32px;box-shadow:0 20px 40px rgba(0,0,0,0.25);border-bottom:1px solid rgba(143,144,151,0.08);}
   .sq-nav-brand{color:#fbbf24;font-family:'Georgia',serif;font-size:24px;font-style:italic;letter-spacing:-1.2px;font-weight:400;text-decoration:none;}
   .sq-nav-links{display:flex;gap:48px;align-items:center;}
   .sq-nav-link{color:#cbd5e1;font-size:12px;font-weight:400;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;text-decoration:none;}
   .sq-nav-link.active{color:#fbbf24;font-weight:700;border-bottom:2px solid #fbbf24;padding-bottom:4px;}
+
+  /* LAYOUT */
   .sq-main{padding:116px 64px 48px;display:grid;grid-template-columns:repeat(12,1fr);gap:16px;max-width:1280px;margin:0 auto;}
   .sq-sidebar{grid-column:1/span 4;display:flex;flex-direction:column;gap:16px;}
   .sq-feed{grid-column:5/span 8;display:flex;flex-direction:column;gap:16px;}
+
+  /* ROUTE CARD */
   .sq-card{background:rgba(31,31,33,0.6);border-radius:8px;border:1px solid rgba(143,144,151,0.1);backdrop-filter:blur(10px);padding:16px;}
-  .sq-route-row{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px;}
-  .sq-city-code{color:#e4e2e4;font-family:'Georgia',serif;font-size:24px;font-weight:500;line-height:32px;}
-  .sq-city-name{color:#c5c6cd;font-size:12px;font-weight:700;letter-spacing:1.2px;line-height:16px;}
-  .sq-meta-grid{border-top:1px solid rgba(68,71,77,0.2);padding-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-  .sq-meta-label{color:#c5c6cd;font-size:12px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;line-height:16px;}
-  .sq-meta-value{color:#e4e2e4;font-size:14px;font-weight:600;line-height:20px;}
-  .sq-live-card{background:rgba(31,31,33,0.6);border-radius:8px;border:1px solid rgba(143,144,151,0.1);backdrop-filter:blur(10px);padding:16px;position:relative;}
-  .sq-live-title{color:#c5c6cd;font-size:16px;font-weight:400;text-transform:uppercase;line-height:24px;letter-spacing:0.5px;}
-  .sq-live-timer{color:#17b0d6;font-family:'Georgia',serif;font-size:24px;font-weight:500;line-height:32px;margin-top:4px;transition:opacity 0.3s;}
-  .sq-progress-wrap{position:relative;height:6px;margin-bottom:16px;margin-top:12px;}
+  .sq-route-row{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:16px;}
+  .sq-route-left{display:flex;flex-direction:column;align-items:flex-start;}
+  .sq-route-right{display:flex;flex-direction:column;align-items:flex-end;}
+  .sq-route-center{display:flex;align-items:center;padding-top:6px;}
+  .sq-city-code{color:#e4e2e4;font-family:'Georgia',serif;font-size:28px;font-weight:500;line-height:1.1;letter-spacing:-0.5px;}
+  .sq-city-name{color:#8f9097;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-top:4px;}
+  .sq-meta-grid{border-top:1px solid rgba(68,71,77,0.25);padding-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .sq-meta-left{display:flex;flex-direction:column;align-items:flex-start;}
+  .sq-meta-right{display:flex;flex-direction:column;align-items:flex-end;}
+  .sq-meta-label{color:#8f9097;font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;line-height:1;margin-bottom:5px;}
+  .sq-meta-value{color:#e4e2e4;font-size:13px;font-weight:600;line-height:1.3;}
+
+  /* LIVE CARD */
+  .sq-live-card{background:rgba(31,31,33,0.6);border-radius:8px;border:1px solid rgba(143,144,151,0.1);backdrop-filter:blur(10px);padding:16px;}
+  .sq-live-title{color:#c5c6cd;font-size:14px;font-weight:400;text-transform:uppercase;line-height:24px;letter-spacing:0.5px;}
+  .sq-live-timer{color:#17b0d6;font-family:'Georgia',serif;font-size:22px;font-weight:500;line-height:32px;margin-top:2px;}
+  .sq-progress-wrap{position:relative;height:6px;margin:12px 0 16px;}
   .sq-progress-track{background:rgba(23,176,214,0.2);border-radius:40px;width:100%;height:6px;position:absolute;}
   .sq-progress-fill{background:#17b0d6;border-radius:40px;height:6px;position:absolute;transition:width 1s linear;}
   .sq-stats-bar{background:#1b1b1d;border-radius:2px;padding:8px;display:flex;justify-content:space-between;margin-bottom:16px;}
@@ -35,6 +48,8 @@
   .sq-stat-num{color:#e4e2e4;font-size:16px;font-weight:700;line-height:24px;text-align:center;}
   .sq-stat-num.highlight{color:#17b0d6;}
   .sq-stat-label{color:#c5c6cd;font-size:10px;font-weight:400;text-transform:uppercase;line-height:15px;text-align:center;}
+
+  /* NOTIF FEED */
   .sq-notif-list{display:flex;flex-direction:column;gap:16px;position:relative;}
   .sq-vert-line{position:absolute;left:11px;top:24px;bottom:8px;width:1px;background:rgba(68,71,77,0.3);}
   .sq-notif-row{display:flex;gap:16px;align-items:flex-start;}
@@ -42,13 +57,40 @@
   .sq-notif-dot.active{background:#17b0d6;}
   .sq-notif-label{color:#e4e2e4;font-size:14px;font-weight:600;line-height:20px;}
   .sq-notif-time{color:#c5c6cd;font-size:12px;font-weight:700;letter-spacing:1.2px;line-height:16px;}
-  .sq-feed-header{display:flex;justify-content:space-between;align-items:flex-end;}
+
+  /* FEED HEADER */
+  .sq-feed-header{display:flex;justify-content:space-between;align-items:flex-end;position:relative;}
   .sq-feed-title{color:#e4e2e4;font-family:'Georgia',serif;font-size:32px;font-weight:600;line-height:40px;}
   .sq-feed-sub{color:#c5c6cd;font-size:16px;font-weight:400;line-height:24px;margin-top:2px;}
-  .sq-filter-btn{background:#2a2a2c;border-radius:4px;padding:8px 16px;display:flex;gap:8px;align-items:center;cursor:pointer;border:1px solid rgba(143,144,151,0.1);}
+
+  /* FILTER BUTTON & DROPDOWN */
+  .sq-filter-wrap{position:relative;}
+  .sq-filter-btn{background:#2a2a2c;border-radius:4px;padding:8px 16px;display:flex;gap:8px;align-items:center;cursor:pointer;border:1px solid rgba(143,144,151,0.15);transition:border-color 0.2s;}
+  .sq-filter-btn:hover,.sq-filter-btn.open{border-color:rgba(23,176,214,0.4);}
   .sq-filter-text{color:#c5c6cd;font-size:12px;font-weight:700;letter-spacing:1.2px;}
+  .sq-filter-panel{display:none;position:absolute;top:calc(100% + 8px);right:0;width:280px;background:#1e1e20;border:1px solid rgba(143,144,151,0.15);border-radius:8px;padding:16px;z-index:200;box-shadow:0 16px 40px rgba(0,0,0,0.5);}
+  .sq-filter-panel.open{display:block;}
+  .sq-filter-section{margin-bottom:16px;}
+  .sq-filter-section:last-child{margin-bottom:0;}
+  .sq-filter-label{color:#8f9097;font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:8px;}
+  .sq-filter-row{display:flex;gap:6px;flex-wrap:wrap;}
+  .sq-filter-chip{background:#2a2a2c;border:1px solid rgba(143,144,151,0.15);border-radius:4px;padding:5px 10px;color:#c5c6cd;font-size:11px;font-weight:600;letter-spacing:0.5px;cursor:pointer;transition:all 0.15s;}
+  .sq-filter-chip:hover{border-color:rgba(23,176,214,0.4);color:#17b0d6;}
+  .sq-filter-chip.active{background:rgba(23,176,214,0.12);border-color:#17b0d6;color:#17b0d6;}
+  .sq-filter-input{width:100%;background:#131315;border:1px solid rgba(143,144,151,0.15);border-radius:4px;padding:7px 10px;color:#e4e2e4;font-size:12px;font-family:'Manrope',sans-serif;outline:none;transition:border-color 0.2s;}
+  .sq-filter-input:focus{border-color:rgba(23,176,214,0.5);}
+  .sq-filter-input::placeholder{color:#555;}
+  .sq-filter-divider{height:1px;background:rgba(68,71,77,0.3);margin:12px 0;}
+  .sq-filter-actions{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+  .sq-filter-clear{color:#8f9097;font-size:11px;font-weight:600;cursor:pointer;letter-spacing:0.5px;background:none;border:none;padding:0;}
+  .sq-filter-clear:hover{color:#e4e2e4;}
+  .sq-filter-apply{background:#17b0d6;border:none;border-radius:4px;padding:6px 16px;color:#342800;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;}
+  .sq-filter-apply:hover{background:#15a0c2;}
+
+  /* QUOTE CARDS */
   .quote-card{background:rgba(31,31,33,0.6);border-radius:8px;border:1px solid rgba(143,144,151,0.1);backdrop-filter:blur(10px);overflow:hidden;cursor:pointer;transition:border 0.2s,background 0.2s;}
   .quote-card:hover{border-color:rgba(143,144,151,0.25);}
+  .quote-card.filtered-out{display:none;}
   .qc-image-wrap{height:240px;position:relative;overflow:hidden;}
   .qc-image-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
   .qc-image-placeholder{width:100%;height:100%;position:absolute;top:0;left:0;background:linear-gradient(135deg,#1a2535 0%,#0e1520 40%,#131315 100%);display:flex;align-items:center;justify-content:center;}
@@ -77,6 +119,8 @@
   .qc-select-btn{background:#17b0d6;border-radius:4px;padding:12px 32px;color:#342800;font-size:14px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;cursor:pointer;border:none;transition:background 0.2s,transform 0.1s;box-shadow:0 0 20px rgba(23,176,214,0.2);}
   .qc-select-btn:hover{background:#15a0c2;}
   .qc-select-btn:active{transform:scale(0.98);}
+
+  /* EXPIRED / EMPTY / LABEL */
   .sq-expired{background:rgba(186,117,23,0.1);border:0.5px solid rgba(186,117,23,0.3);border-radius:8px;padding:14px 18px;}
   .sq-expired p:first-child{font-size:13px;font-weight:500;color:#EF9F27;margin-bottom:3px;}
   .sq-expired p:last-child{font-size:12px;color:#c5c6cd;}
@@ -85,6 +129,10 @@
   .sq-empty h3{font-size:15px;font-weight:500;color:#e4e2e4;margin-bottom:6px;}
   .sq-empty p{font-size:13px;color:#c5c6cd;line-height:1.6;}
   .sq-label{color:#c5c6cd;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:12px;}
+
+  /* NO RESULTS */
+  .sq-no-results{text-align:center;padding:32px 20px;color:#8f9097;font-size:13px;display:none;}
+
   @keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
   @media(max-width:900px){
     .sq-main{grid-template-columns:1fr;padding:100px 16px 32px;}
@@ -97,6 +145,7 @@
 </head>
 <body>
 
+<!-- NAV -->
 <nav class="sq-nav">
   <a class="sq-nav-brand" href="index.html">SkyVayu</a>
   <div class="sq-nav-links">
@@ -106,36 +155,43 @@
   </div>
 </nav>
 
+<!-- MAIN GRID -->
 <div class="sq-main">
 
+  <!-- SIDEBAR -->
   <aside class="sq-sidebar">
 
+    <!-- Route Summary Card -->
     <div class="sq-card">
       <div class="sq-route-row">
-        <div>
+        <div class="sq-route-left">
           <div class="sq-city-code" id="rs-from-code">—</div>
           <div class="sq-city-name" id="rs-from-city">—</div>
         </div>
-        <svg width="21" height="19" viewBox="0 0 21 19" fill="none"><path d="M2 18.15V16.15H20V18.15H2ZM3.75 13.15L0 6.9L2.4 6.25L5.2 8.6L8.7 7.675L3.525 0.775L6.425 0L13.9 6.275L18.15 5.125C18.6833 4.975 19.1875 5.0375 19.6625 5.3125C20.1375 5.5875 20.45 5.99167 20.6 6.525C20.75 7.05833 20.6875 7.5625 20.4125 8.0375C20.1375 8.5125 19.7333 8.825 19.2 8.975L3.75 13.15Z" fill="#8F9097"/></svg>
-        <div style="text-align:right;">
-          <div class="sq-city-code" id="rs-to-code" style="text-align:right;">—</div>
-          <div class="sq-city-name" id="rs-to-city" style="text-align:right;">—</div>
+        <div class="sq-route-center">
+          <svg width="21" height="19" viewBox="0 0 21 19" fill="none"><path d="M2 18.15V16.15H20V18.15H2ZM3.75 13.15L0 6.9L2.4 6.25L5.2 8.6L8.7 7.675L3.525 0.775L6.425 0L13.9 6.275L18.15 5.125C18.6833 4.975 19.1875 5.0375 19.6625 5.3125C20.1375 5.5875 20.45 5.99167 20.6 6.525C20.75 7.05833 20.6875 7.5625 20.4125 8.0375C20.1375 8.5125 19.7333 8.825 19.2 8.975L3.75 13.15Z" fill="#8F9097"/></svg>
+        </div>
+        <div class="sq-route-right">
+          <div class="sq-city-code" id="rs-to-code">—</div>
+          <div class="sq-city-name" id="rs-to-city">—</div>
         </div>
       </div>
       <div class="sq-meta-grid">
-        <div>
+        <div class="sq-meta-left">
           <div class="sq-meta-label">Departure</div>
           <div class="sq-meta-value" id="rs-date">—</div>
         </div>
-        <div style="text-align:right;">
-          <div class="sq-meta-label" style="text-align:right;">Passengers</div>
-          <div class="sq-meta-value" id="rs-pax" style="text-align:right;">—</div>
+        <div class="sq-meta-right">
+          <div class="sq-meta-label">Passengers</div>
+          <div class="sq-meta-value" id="rs-pax">—</div>
         </div>
       </div>
+      <!-- Hidden IDs used by results.js -->
       <span id="rs-route" style="display:none;">—</span>
       <span id="rs-type" style="display:none;">—</span>
     </div>
 
+    <!-- Live Quotations Card -->
     <div class="sq-live-card" id="timer-block">
       <div style="margin-bottom:8px;">
         <div class="sq-live-title">Live Quotations Arriving</div>
@@ -193,6 +249,7 @@
 
   </aside>
 
+  <!-- MAIN FEED -->
   <div class="sq-feed">
 
     <div class="sq-feed-header">
@@ -200,22 +257,65 @@
         <div class="sq-feed-title">Available Aircraft</div>
         <div class="sq-feed-sub">Real-time inventory from verified operators.</div>
       </div>
-      <div class="sq-filter-btn">
-        <svg width="14" height="9" viewBox="0 0 14 9" fill="none"><path d="M5.25 9V7.5H8.25V9H5.25ZM2.25 5.25V3.75H11.25V5.25H2.25ZM0 1.5V0H13.5V1.5H0Z" fill="#C5C6CD"/></svg>
-        <span class="sq-filter-text">Filter</span>
+      <div class="sq-filter-wrap">
+        <div class="sq-filter-btn" id="sq-filter-btn" onclick="toggleFilterPanel()">
+          <svg width="14" height="9" viewBox="0 0 14 9" fill="none"><path d="M5.25 9V7.5H8.25V9H5.25ZM2.25 5.25V3.75H11.25V5.25H2.25ZM0 1.5V0H13.5V1.5H0Z" fill="#C5C6CD"/></svg>
+          <span class="sq-filter-text">Filter</span>
+        </div>
+        <div class="sq-filter-panel" id="sq-filter-panel">
+          <!-- Sort by Price -->
+          <div class="sq-filter-section">
+            <div class="sq-filter-label">Sort by Price</div>
+            <div class="sq-filter-row">
+              <div class="sq-filter-chip" data-filter="sort-price" data-value="asc" onclick="selectChip(this)">Low → High</div>
+              <div class="sq-filter-chip" data-filter="sort-price" data-value="desc" onclick="selectChip(this)">High → Low</div>
+            </div>
+          </div>
+          <div class="sq-filter-divider"></div>
+          <!-- Sort by Seats -->
+          <div class="sq-filter-section">
+            <div class="sq-filter-label">Sort by Seats</div>
+            <div class="sq-filter-row">
+              <div class="sq-filter-chip" data-filter="sort-seats" data-value="desc" onclick="selectChip(this)">Most → Least</div>
+              <div class="sq-filter-chip" data-filter="sort-seats" data-value="asc" onclick="selectChip(this)">Least → Most</div>
+            </div>
+          </div>
+          <div class="sq-filter-divider"></div>
+          <!-- Filter by Aircraft -->
+          <div class="sq-filter-section">
+            <div class="sq-filter-label">Aircraft Type</div>
+            <input class="sq-filter-input" id="filter-aircraft" type="text" placeholder="e.g. Global 6000, G650…" oninput="applyFilters()"/>
+          </div>
+          <div class="sq-filter-divider"></div>
+          <!-- Filter by Operator -->
+          <div class="sq-filter-section">
+            <div class="sq-filter-label">Operator Name</div>
+            <input class="sq-filter-input" id="filter-operator" type="text" placeholder="e.g. SkyVayu Air…" oninput="applyFilters()"/>
+          </div>
+          <div class="sq-filter-actions">
+            <button class="sq-filter-clear" onclick="clearFilters()">Clear all</button>
+            <button class="sq-filter-apply" onclick="toggleFilterPanel()">Done</button>
+          </div>
+        </div>
       </div>
     </div>
 
+    <!-- No results from filter -->
+    <div id="sq-no-results" class="sq-no-results">No quotes match your current filters.</div>
+
+    <!-- Expired banner -->
     <div id="expired-banner" class="sq-expired" style="display:none;">
       <p>Quoting window closed</p>
       <p>No new quotes will be added. Select one below to proceed.</p>
     </div>
 
+    <!-- Received quotes -->
     <div id="section-received" style="display:none;">
       <div class="sq-label" id="label-received">Quotes received — 0</div>
       <div id="list-received" style="display:flex;flex-direction:column;gap:16px;"></div>
     </div>
 
+    <!-- Empty state -->
     <div id="state-empty" class="sq-empty">
       <div class="sq-empty-icon">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#17b0d6" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -228,17 +328,25 @@
 </div>
 
 <script>
+/* ── Route display helper ── */
 (function(){
   function syncRoute(){
     var r=document.getElementById('rs-route');
     var fc=document.getElementById('rs-from-code');
     var tc=document.getElementById('rs-to-code');
+    var fn=document.getElementById('rs-from-city');
+    var tn=document.getElementById('rs-to-city');
     if(!r||!fc) return;
     var v=r.textContent.trim();
-    if(v&&v!=='—'){
-      var p=v.split(/[→-]/);
-      if(p.length>=2){fc.textContent=p[0].trim();tc.textContent=p[1].trim();}
-      else{fc.textContent=v;}
+    if(v&&v!=='—'&&v!=='-'&&v!==''){
+      // Try splitting on arrow or dash
+      var p=v.split(/s*[→—-|]s*/);
+      if(p.length>=2){
+        fc.textContent=p[0].trim().toUpperCase();
+        tc.textContent=p[1].trim().toUpperCase();
+      } else {
+        fc.textContent=v;
+      }
     }
   }
   var obs=new MutationObserver(syncRoute);
@@ -248,6 +356,122 @@
     syncRoute();
   });
 })();
+
+/* ── Filter panel ── */
+function toggleFilterPanel(){
+  var btn=document.getElementById('sq-filter-btn');
+  var panel=document.getElementById('sq-filter-panel');
+  var open=panel.classList.toggle('open');
+  btn.classList.toggle('open',open);
+}
+
+// Close filter panel when clicking outside
+document.addEventListener('click',function(e){
+  var wrap=document.querySelector('.sq-filter-wrap');
+  if(wrap && !wrap.contains(e.target)){
+    document.getElementById('sq-filter-panel').classList.remove('open');
+    document.getElementById('sq-filter-btn').classList.remove('open');
+  }
+});
+
+// Active sort state
+var _sortPrice=null; // 'asc'|'desc'|null
+var _sortSeats=null; // 'asc'|'desc'|null
+
+function selectChip(chip){
+  var filterGroup=chip.dataset.filter;
+  var val=chip.dataset.value;
+  // Toggle off if already active
+  if(chip.classList.contains('active')){
+    chip.classList.remove('active');
+    if(filterGroup==='sort-price') _sortPrice=null;
+    if(filterGroup==='sort-seats') _sortSeats=null;
+  } else {
+    // Deactivate siblings in same group
+    document.querySelectorAll('[data-filter="'+filterGroup+'"]').forEach(function(c){ c.classList.remove('active'); });
+    chip.classList.add('active');
+    if(filterGroup==='sort-price') _sortPrice=val;
+    if(filterGroup==='sort-seats') _sortSeats=val;
+  }
+  applyFilters();
+}
+
+function applyFilters(){
+  var listEl=document.getElementById('list-received');
+  if(!listEl) return;
+  var cards=Array.from(listEl.querySelectorAll('.quote-card'));
+  if(!cards.length) return;
+
+  var aircraftQuery=(document.getElementById('filter-aircraft')||{}).value||'';
+  var operatorQuery=(document.getElementById('filter-operator')||{}).value||'';
+  aircraftQuery=aircraftQuery.trim().toLowerCase();
+  operatorQuery=operatorQuery.trim().toLowerCase();
+
+  // Filter visibility
+  var visible=[];
+  cards.forEach(function(card){
+    var aircraft=(card.dataset.aircraft||'').toLowerCase();
+    var opName=(card.dataset.opName||'').toLowerCase();
+    var show=true;
+    if(aircraftQuery && !aircraft.includes(aircraftQuery)) show=false;
+    if(operatorQuery && !opName.includes(operatorQuery)) show=false;
+    card.classList.toggle('filtered-out',!show);
+    if(show) visible.push(card);
+  });
+
+  // Sort visible cards
+  if(_sortPrice){
+    visible.sort(function(a,b){
+      var pa=parseFloat(a.dataset.rawPrice)||0;
+      var pb=parseFloat(b.dataset.rawPrice)||0;
+      return _sortPrice==='asc'?pa-pb:pb-pa;
+    });
+  } else if(_sortSeats){
+    visible.sort(function(a,b){
+      var sa=parseInt(a.dataset.rawSeats)||0;
+      var sb=parseInt(b.dataset.rawSeats)||0;
+      return _sortSeats==='asc'?sa-sb:sb-sa;
+    });
+  }
+
+  // Re-append in sorted order (filtered-out cards stay in DOM but hidden)
+  visible.forEach(function(card){ listEl.appendChild(card); });
+
+  // Show "no results" if all hidden
+  var noRes=document.getElementById('sq-no-results');
+  if(noRes) noRes.style.display=(visible.length===0 && cards.length>0)?'block':'none';
+}
+
+function clearFilters(){
+  _sortPrice=null;
+  _sortSeats=null;
+  document.querySelectorAll('.sq-filter-chip').forEach(function(c){ c.classList.remove('active'); });
+  var ai=document.getElementById('filter-aircraft');
+  var oi=document.getElementById('filter-operator');
+  if(ai) ai.value='';
+  if(oi) oi.value='';
+  applyFilters();
+}
+
+// Patch injectQuote to stamp raw data attributes for sorting
+// (runs after results.js so we patch AppendChild on list-received)
+document.addEventListener('DOMContentLoaded',function(){
+  var listEl=document.getElementById('list-received');
+  if(!listEl) return;
+  var orig=listEl.appendChild.bind(listEl);
+  listEl.appendChild=function(card){
+    // results.js stores operator_name in dataset.opName and price/seats in innerHTML
+    // We need to parse out raw numeric values for sorting
+    // results.js sets: card.dataset.opName, card.dataset.aircraft, card.dataset.total
+    // We'll also store raw numeric price + seats from the card's text
+    var priceText=card.dataset.total||'';
+    var rawPrice=parseFloat(priceText.replace(/[^0-9.]/g,''))||0;
+    card.dataset.rawPrice=rawPrice;
+    var seatsMatch=(card.innerHTML.match(/([0-9]+)\s*seat/i)||[])[1]||'0';
+    card.dataset.rawSeats=parseInt(seatsMatch)||0;
+    return orig(card);
+  };
+});
 </script>
 
 <script src="js/config.js"></script>
