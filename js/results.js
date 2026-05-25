@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
   var raw = sessionStorage.getItem('sv_query');
   if (!raw) {
     showToast('No active search found. Please search again.', 'error');
-    setTimeout(function() { window.location.href = 'booking.html'; }, 2500);
+    setTimeout(function() { window.location.href = 'index.html'; }, 2500);
     return;
   }
 
