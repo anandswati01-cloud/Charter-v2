@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var rsPax   = document.getElementById('rs-pax');
     var rsType  = document.getElementById('rs-type');
     if (rsRoute) rsRoute.textContent = q.rs_route || '—';
-    (function(){
+        (function(){
       var rv = q.rs_route || '';
       var fc = document.getElementById('rs-from-code');
       var tc = document.getElementById('rs-to-code');
