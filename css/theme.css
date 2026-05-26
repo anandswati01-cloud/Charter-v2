@@ -126,25 +126,6 @@ input::placeholder, .field-input::placeholder,
 /* Stats bar */
 .stats-bar { background: var(--bg-stats) !important; }
 
-/* ── Override index.html hardcoded nav bg ── */
-[data-theme="light"] .nav {
-  background: rgba(255,255,255,0.97) !important;
-  border-bottom-color: #E2E2E2 !important;
-}
-
-/* ── Override index.html's own CSS variables for light mode ── */
-[data-theme="light"] {
-  --navy:       #EFEFEF;
-  --navy-mid:   #E8E8E8;
-  --navy-light: #E0E0E0;
-  --white:      #1a1a1a;
-  --white-60:   rgba(26,26,26,0.6);
-  --white-30:   rgba(26,26,26,0.3);
-  --white-10:   rgba(26,26,26,0.1);
-  --gold:       #c4860a;
-  --gold-light: #a87208;
-}
-
 /* ── Light mode overrides ── */
 
 /* Nav */
