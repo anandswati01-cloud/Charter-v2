@@ -297,7 +297,7 @@ nav{
           <div class="meta-value" id="meta-pax">2 Adults, One Way</div>
         </div>
       </div>
-      <div id="meta-reqs" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(68,71,77,0.25);display:flex;gap:8px;flex-wrap:wrap;"></div>
+      <div id="meta-reqs" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(68,71,77,0.25);gap:8px;flex-wrap:wrap;"></div>
     </div>
 
     <!-- Live status card -->
@@ -448,7 +448,9 @@ var selectedQuoteId = null;
 var selectedQuote = null;
 var quotesMap = {};
 var totalSeconds = 60 * 60; // 60 minutes
-var elapsed = 0;
+// Calculate elapsed from when query was submitted, persists across refreshes
+var queryStart = parseInt(sessionStorage.getItem('sv_query_start') || Date.now().toString());
+var elapsed = Math.floor((Date.now() - queryStart) / 1000);
 
 // ── Populate sidebar from session ──
 // sv_query stores: rs_type, rs_route ("Mumbai (VABB) → Delhi (VIDP)" or "X ⇄ Y"), rs_date, rs_pax
@@ -473,9 +475,9 @@ function populateSidebar() {
 
   // Special requirements chips
   var reqs = [];
-  if (queryData.rs_medivac) reqs.push('Medivac');
-  if (queryData.rs_pets) reqs.push('Pets');
-  if (queryData.rs_infants) reqs.push('Infants');
+  if (queryData.rs_medivac === true || queryData.rs_medivac === 'true') reqs.push('Medivac');
+  if (queryData.rs_pets === true || queryData.rs_pets === 'true') reqs.push('Pets');
+  if (queryData.rs_infants === true || queryData.rs_infants === 'true') reqs.push('Infants');
   var reqEl = document.getElementById('meta-reqs');
   if (reqs.length) {
     reqEl.style.display = 'flex';

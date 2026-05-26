@@ -1526,13 +1526,15 @@ function verifyModalOTP(){
     setTimeout(function(){
       closeOtpModal();
       if(window._pendingQuery){var q=window._pendingQuery;q.client_phone=window._modalPhone||'';if(btn)btn.textContent='Saving...';saveQueryToSupabase(q).then(function(saved){
-  sendEmail('new_query_assigned',{query_id:saved.id});
   var fmtDate=function(d,t){if(!d)return'—';var parts=d.split('-');var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];var dateStr=parts[2]+' '+months[parseInt(parts[1])-1]+' '+parts[0];return dateStr+(t?', '+t:'');};
   var dt=fmtDate(q.flight_date,q.flight_time);
   var route=q.trip_type==='Round Trip'?(q.departure+' ⇄ '+q.destination):(q.trip_type==='Multiple Sectors'?q.departure+' → ...':q.departure+' → '+q.destination);
   sessionStorage.setItem('sv_query_id',saved.id);
+  sessionStorage.setItem('sv_query_start', Date.now().toString());
   sessionStorage.setItem('sv_query',JSON.stringify({rs_type:q.trip_type,rs_route:route,rs_date:dt,rs_pax:String(q.passengers),rs_medivac:q.medivac,rs_pets:q.pets,rs_infants:q.infants}));
-  window.location.href='results.html';
+  sendEmail('new_query_assigned',{query_id:saved.id}).finally(function(){
+    window.location.href='results.html';
+  });
 }).catch(function(err){console.error('saveQuery failed',err);if(btn){btn.textContent='Verify';btn.disabled=false;}});}else{window.location.href='results.html';}
     },1200);
   } else {
