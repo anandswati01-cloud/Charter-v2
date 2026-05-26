@@ -24,10 +24,10 @@
 
   /* ROUTE CARD */
   .sq-card{background:rgba(31,31,33,0.6);border-radius:8px;border:1px solid rgba(143,144,151,0.1);backdrop-filter:blur(10px);padding:16px;}
-  .sq-route-row{display:flex;align-items:flex-start;justify-content:space-between;padding-bottom:16px;}
-  .sq-route-left{display:flex;flex-direction:column;align-items:flex-start;}
-  .sq-route-right{display:flex;flex-direction:column;align-items:flex-end;}
-  .sq-route-center{display:flex;align-items:center;padding-top:6px;}
+  .sq-route-row{display:flex;align-items:flex-start;padding-bottom:16px;}
+  .sq-route-left{flex:1;display:flex;flex-direction:column;align-items:flex-start;}
+  .sq-route-right{flex:1;display:flex;flex-direction:column;align-items:flex-end;}
+  .sq-route-center{flex-shrink:0;display:flex;align-items:center;justify-content:center;width:40px;padding-top:6px;}
   .sq-city-code{color:#e4e2e4;font-family:'Georgia',serif;font-size:28px;font-weight:500;line-height:1.1;letter-spacing:-0.5px;}
   .sq-city-name{color:#8f9097;font-size:11px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-top:4px;}
   .sq-meta-grid{border-top:1px solid rgba(68,71,77,0.25);padding-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;}
