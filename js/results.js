@@ -1,4 +1,4 @@
-if (rsType) rsType.textContent
+/* ── SkyVayu — Results Page ── */
 
 var timerInterval  = null;
 var pollingInterval = null;
