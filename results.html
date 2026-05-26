@@ -449,9 +449,12 @@ var selectedQuoteId = null;
 var selectedQuote = null;
 var quotesMap = {};
 var totalSeconds = 60 * 60; // 60 minutes
-// Calculate elapsed from when query was submitted, persists across refreshes
-var queryStart = parseInt(sessionStorage.getItem('sv_query_start') || Date.now().toString());
-var elapsed = Math.floor((Date.now() - queryStart) / 1000);
+// Always read start time from sessionStorage — survives refresh, tab switch, minimise
+// Only initialise start time once — never overwrite it so timer survives refresh
+if (!sessionStorage.getItem('sv_query_start')) {
+  sessionStorage.setItem('sv_query_start', Date.now().toString());
+}
+var queryStart = parseInt(sessionStorage.getItem('sv_query_start'));
 
 // ── Populate sidebar from session ──
 // sv_query stores: rs_type, rs_route ("Mumbai (VABB) → Delhi (VIDP)" or "X ⇄ Y"), rs_date, rs_pax
@@ -491,17 +494,15 @@ function populateSidebar() {
   }
 }
 
-// ── Timer — counts down from 60 min showing MM:SS ──
+// ── Timer — always calculated from wall clock, survives tab switching/minimising ──
 function startTimer() {
   updateTimer();
-  setInterval(function() {
-    elapsed++;
-    updateTimer();
-  }, 1000);
+  setInterval(updateTimer, 500); // poll every 500ms so it catches up instantly on restore
 }
 
 function updateTimer() {
-  var remaining = Math.max(0, totalSeconds - elapsed);
+  var nowElapsed = Math.floor((Date.now() - queryStart) / 1000);
+  var remaining = Math.max(0, totalSeconds - nowElapsed);
   var mins = Math.floor(remaining / 60);
   var secs = remaining % 60;
   var el = document.getElementById('live-timer');
