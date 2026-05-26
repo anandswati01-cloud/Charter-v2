@@ -27,31 +27,31 @@
   --toggle-color:  #c5c6cd;
 }
 
-/* LIGHT */
+/* LIGHT — warm cream/beige */
 [data-theme="light"] {
-  --bg:            #F5F0E8;
-  --bg-dark:       #EDE8DF;
-  --bg-card:       rgba(255,255,255,0.9);
+  --bg:            #FAF7F2;
+  --bg-dark:       #F0EAE0;
+  --bg-card:       rgba(255,255,255,0.95);
   --bg-card-solid: #FFFFFF;
-  --bg-input:      rgba(0,0,0,0.04);
-  --bg-nav:        rgba(255,252,245,0.95);
+  --bg-input:      rgba(28,20,16,0.04);
+  --bg-nav:        rgba(250,247,242,0.97);
   --bg-stats:      #F0EAE0;
-  --border:        rgba(0,0,0,0.1);
-  --border-hover:  rgba(0,0,0,0.2);
-  --border-gold:   rgba(196,134,10,0.25);
-  --border-cyan:   rgba(14,138,171,0.4);
+  --border:        rgba(107,89,64,0.15);
+  --border-hover:  rgba(107,89,64,0.3);
+  --border-gold:   rgba(196,134,10,0.3);
+  --border-cyan:   rgba(14,138,171,0.35);
   --text:          #1C1410;
-  --text-dim:      #5a5047;
+  --text-dim:      #4a3828;
   --text-muted:    #8a7560;
   --text-label:    #6b5940;
   --gold:          #c4860a;
   --gold-dark:     #a87208;
   --cyan:          #0e8aab;
-  --green:         #0d7a5f;
+  --green:         #2e7d52;
   --red:           #c0392b;
-  --shadow:        0 4px 24px rgba(0,0,0,0.1);
-  --toggle-bg:     rgba(0,0,0,0.06);
-  --toggle-color:  #5a5047;
+  --shadow:        0 4px 16px rgba(0,0,0,0.08);
+  --toggle-bg:     rgba(107,89,64,0.08);
+  --toggle-color:  #6b5940;
 }
 
 /* ── Theme toggle button (used only on index.html) ── */
@@ -68,8 +68,6 @@
   justify-content: center;
   transition: border-color .2s, background .2s, color .2s;
   flex-shrink: 0;
-  position: absolute;
-  right: 40px;
 }
 #theme-toggle:hover {
   border-color: var(--gold);
@@ -128,55 +126,172 @@ input::placeholder, .field-input::placeholder,
 /* Stats bar */
 .stats-bar { background: var(--bg-stats) !important; }
 
-/* Light mode specific: make backgrounds more solid */
+/* ── Light mode overrides ── */
+
+/* Nav */
+[data-theme="light"] nav {
+  background: var(--bg-nav) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+/* All page backgrounds */
+[data-theme="light"] body,
+[data-theme="light"] .hero,
+[data-theme="light"] .page,
+[data-theme="light"] .page-wrap {
+  background: var(--bg) !important;
+}
+
+/* Section backgrounds */
+[data-theme="light"] .section-how,
+[data-theme="light"] .section-why,
+[data-theme="light"] .section-routes,
+[data-theme="light"] .section-cta,
+[data-theme="light"] .booking-section,
+[data-theme="light"] footer {
+  background: var(--bg-dark) !important;
+}
+
+/* Cards — solid white */
+[data-theme="light"] .bento-card,
+[data-theme="light"] .step,
+[data-theme="light"] .route-card,
 [data-theme="light"] .quote-card,
 [data-theme="light"] .live-card,
 [data-theme="light"] .route-card,
 [data-theme="light"] .summary-card,
 [data-theme="light"] .traveller-card,
-[data-theme="light"] .flight-card {
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-
-[data-theme="light"] nav {
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08) !important;
-}
-
-[data-theme="light"] .hero,
-[data-theme="light"] .page {
-  background: var(--bg) !important;
-}
-
-[data-theme="light"] .section-how,
-[data-theme="light"] .section-why,
-[data-theme="light"] .section-routes,
-[data-theme="light"] .section-cta {
-  background: var(--bg-dark) !important;
-}
-
-[data-theme="light"] .bento-card {
-  background: var(--bg-card-solid) !important;
-}
-
-[data-theme="light"] .step {
+[data-theme="light"] .flight-card,
+[data-theme="light"] .accordion,
+[data-theme="light"] .timeline-item,
+[data-theme="light"] .support-card,
+[data-theme="light"] .booking-card,
+[data-theme="light"] .card,
+[data-theme="light"] .filter-dropdown {
   background: var(--bg-card-solid) !important;
   border-color: var(--border) !important;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
 }
 
-[data-theme="light"] .route-card {
-  background: var(--bg-card-solid) !important;
-}
-
+/* Accordion specific */
 [data-theme="light"] .accordion-header,
 [data-theme="light"] .accordion-body {
   background: var(--bg-card-solid) !important;
 }
 
+/* Stats bar */
+[data-theme="light"] .stats-bar {
+  background: var(--bg-dark) !important;
+}
+
+/* Inputs */
+[data-theme="light"] input,
+[data-theme="light"] .field-input,
+[data-theme="light"] .b-input,
+[data-theme="light"] .b-input-date,
+[data-theme="light"] .filter-select {
+  background: var(--bg-input) !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
 [data-theme="light"] .filter-select option {
-  background: var(--bg-card-solid);
+  background: #fff;
   color: var(--text);
 }
 
+/* Trust bar */
+[data-theme="light"] .trust-bar {
+  background: var(--bg-dark) !important;
+  border-color: var(--border-gold) !important;
+}
+
+/* Trust items */
+[data-theme="light"] .trust-item {
+  background: #fff !important;
+}
+
+/* Hero text */
+[data-theme="light"] .hero-title,
+[data-theme="light"] .hero-h1 {
+  color: var(--text) !important;
+}
+
+[data-theme="light"] .hero-sub {
+  color: var(--text-dim) !important;
+}
+
+/* Nav links */
+[data-theme="light"] .nav-links a {
+  color: var(--text-dim) !important;
+}
+
+[data-theme="light"] .nav-links a.active,
+[data-theme="light"] .nav-links a:hover {
+  color: var(--gold) !important;
+}
+
+/* Footer */
+[data-theme="light"] footer {
+  background: #EDE8DF !important;
+  border-top-color: var(--border) !important;
+}
+
+[data-theme="light"] .footer-logo,
+[data-theme="light"] .sky-vayu,
+[data-theme="light"] .nav-logo {
+  color: var(--gold) !important;
+}
+
+/* Route card images — reduce overlay */
+[data-theme="light"] .route-img-gradient,
+[data-theme="light"] .img-gradient {
+  background: linear-gradient(0deg, rgba(240,234,224,0.95) 0%, rgba(240,234,224,0) 60%) !important;
+}
+
+/* Confirmed page bg image */
 [data-theme="light"] .bg-image {
-  opacity: 0.06 !important;
+  opacity: 0.04 !important;
+}
+
+/* Progress bar track */
+[data-theme="light"] .progress-wrap {
+  background: rgba(196,134,10,0.15) !important;
+}
+
+/* Booking card trip pills */
+[data-theme="light"] .trip-pill {
+  border-color: var(--border) !important;
+  color: var(--text-dim) !important;
+}
+
+[data-theme="light"] .trip-pill.active {
+  background: var(--gold) !important;
+  color: #1C1410 !important;
+  border-color: var(--gold) !important;
+}
+
+/* Req cards */
+[data-theme="light"] .req-card {
+  background: rgba(28,20,16,0.03) !important;
+  border-color: var(--border) !important;
+}
+
+/* Sidebar */
+[data-theme="light"] .sidebar {
+  background: var(--bg) !important;
+}
+
+/* Filter dropdown */
+[data-theme="light"] .filter-dropdown {
+  background: #fff !important;
+}
+
+/* Notif dots */
+[data-theme="light"] .notif-dot {
+  background: #e8e0d5 !important;
+}
+[data-theme="light"] .notif-dot.active {
+  background: var(--cyan) !important;
 }
