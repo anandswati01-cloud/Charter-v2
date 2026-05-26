@@ -443,7 +443,9 @@ nav{
 <script>
 var SUPABASE_URL = SKYVAYU_CONFIG.supabaseUrl;
 var SUPABASE_KEY = SKYVAYU_CONFIG.supabaseKey;
-var queryId = sessionStorage.getItem('sv_query_id');
+// Support ?query_id= in URL as fallback (useful when navigating back from operator portal)
+var urlParams = new URLSearchParams(window.location.search);
+var queryId = urlParams.get('query_id') || sessionStorage.getItem('sv_query_id');
 var queryData = JSON.parse(sessionStorage.getItem('sv_query') || '{}');
 var selectedQuoteId = null;
 var selectedQuote = null;
