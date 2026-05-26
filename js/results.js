@@ -1,10 +1,11 @@
 /* ── SkyVayu — Results Page ── */
 
-var timerInterval  = null;
+var timerInterval = null;
 var pollingInterval = null;
 var queryStartTime = null;
 var TIMER_DURATION = 60 * 60;
-var injectedIds    = {};
+var injectedIds = {};
+var currentQueryId = null;
 
 document.addEventListener('DOMContentLoaded', function() {
   var raw = sessionStorage.getItem('sv_query');
@@ -16,47 +17,69 @@ document.addEventListener('DOMContentLoaded', function() {
 
   try {
     var q = JSON.parse(raw);
+
+    // Populate route codes
     var rsRoute = document.getElementById('rs-route');
-    var rsDate  = document.getElementById('rs-date');
-    var rsPax   = document.getElementById('rs-pax');
-    var rsType  = document.getElementById('rs-type');
+    var rsFromCode = document.getElementById('rs-from-code');
+    var rsToCode = document.getElementById('rs-to-code');
+    var rsFromName = document.getElementById('rs-from-name');
+    var rsToName = document.getElementById('rs-to-name');
+
     if (rsRoute) rsRoute.textContent = q.rs_route || '—';
-        (function(){
+
+    (function() {
       var rv = q.rs_route || '';
-      var fc = document.getElementById('rs-from-code');
-      var tc = document.getElementById('rs-to-code');
-      if (rv && fc && tc) {
+      if (rv) {
         var pts = rv.split(/\s*[\u2192\u2014\-|]\s*/);
-        if (pts.length >= 2) { fc.textContent = pts[0].trim(); tc.textContent = pts[1].trim(); }
-        else { fc.textContent = rv; }
+        var fromCode = pts.length >= 2 ? pts[0].trim() : rv;
+        var toCode = pts.length >= 2 ? pts[1].trim() : '';
+        if (rsFromCode) rsFromCode.textContent = fromCode;
+        if (rsToCode) rsToCode.textContent = toCode;
+        // Try to resolve city names from airports list
+        if (typeof AIRPORTS !== 'undefined') {
+          var fromAp = AIRPORTS.find(function(a) { return a.code === fromCode; });
+          var toAp = AIRPORTS.find(function(a) { return a.code === toCode; });
+          if (rsFromName && fromAp) rsFromName.textContent = fromAp.city || fromAp.name || '';
+          if (rsToName && toAp) rsToName.textContent = toAp.city || toAp.name || '';
+        }
       }
     })();
-    if (rsDate)  rsDate.textContent  = q.rs_date  || '\u2014';
-    if (rsPax)   rsPax.textContent   = q.rs_pax   || '\u2014';
-    if (rsType)  rsType.textContent  = q.rs_type  || '\u2014';
-        (function() {
-                var chips = [];
-                if (q.medivac) chips.push('\u271a Medivac');
-                if (q.pets)    chips.push('\ud83d\udc3e Pets');
-                if (q.vip)     chips.push('\u2605 VIP Passenger');
-                if (q.infants) chips.push('\ud83d\udc76 Infants');
-                var rsSpecialRow = document.getElementById('rs-special-row');
-                var rsSpecial    = document.getElementById('rs-special');
-                if (rsSpecialRow && rsSpecial) {
-                          if (chips.length > 0) {
-                                      rsSpecial.textContent = chips.join(', ');
-                                      rsSpecialRow.style.display = 'block';
-                          } else {
-                                      rsSpecialRow.style.display = 'none';
-                          }
-                }
-        })();
 
+    // Populate details
+    var rsDate = document.getElementById('rs-date');
+    var rsPax = document.getElementById('rs-pax');
+    var rsType = document.getElementById('rs-type');
+    if (rsDate) rsDate.textContent = q.rs_date || '\u2014';
+    if (rsPax) rsPax.textContent = q.rs_pax || '\u2014';
+    if (rsType) rsType.textContent = q.rs_type || '\u2014';
+
+    // Populate special requirements as chips
+    (function() {
+      var chips = [];
+      if (q.medivac) chips.push('\u271a Medivac');
+      if (q.pets) chips.push('\ud83d\udc3e Pets');
+      if (q.vip) chips.push('\u2605 VIP Passenger');
+      if (q.infants) chips.push('\ud83d\udc76 Infants');
+      var rsSpecialRow = document.getElementById('rs-special-row');
+      var rsSpecial = document.getElementById('rs-special');
+      if (rsSpecialRow && rsSpecial) {
+        if (chips.length > 0) {
+          rsSpecial.innerHTML = chips.map(function(c) {
+            return '<span class="chip">' + c + '</span>';
+          }).join('');
+          rsSpecialRow.style.display = 'block';
+        } else {
+          rsSpecialRow.style.display = 'none';
+        }
+      }
+    })();
+
+    // Multi-sector breakdown
     if (q.trip_type === 'multi' && Array.isArray(q.sectors) && q.sectors.length) {
       var dHtml = '<div id="multi-detail" style="margin-bottom:16px;"><div class="section-label">Sector breakdown</div>';
       q.sectors.forEach(function(r, i) {
         var fromSafe = String(r.from || '\u2014').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-        var toSafe   = String(r.to   || '\u2014').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        var toSafe = String(r.to || '\u2014').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         var dateSafe = String(r.date || '\u2014').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         var timeSafe = String(r.time || '\u2014').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         dHtml += '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius);margin-bottom:6px;font-size:13px;">'
@@ -66,8 +89,9 @@ document.addEventListener('DOMContentLoaded', function() {
           + '</div>';
       });
       dHtml += '</div>';
-      var summary = document.querySelector('.trip-summary');
-      if (summary) summary.insertAdjacentHTML('afterend', dHtml);
+      var resultsMain = document.querySelector('.results-main');
+      var mainHeader = document.querySelector('.results-main-header');
+      if (mainHeader) mainHeader.insertAdjacentHTML('afterend', dHtml);
     }
   } catch (e) {
     console.error('Could not load query data', e);
@@ -86,7 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function startQuotePolling(queryId) {
-  /* Clear any stale polling interval */
   if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; }
 
   async function pollOnce() {
@@ -108,12 +131,12 @@ function startQuotePolling(queryId) {
       if (!Array.isArray(quotes)) return;
       quotes.forEach(function(q) {
         injectQuote({
-          id:            q.id,
+          id: q.id,
           operator_name: q.operator_name,
           aircraft_type: q.aircraft_type,
-          seats:         q.seats_available,
-          price:         q.price,
-          notes:         q.notes
+          seats: q.seats_available,
+          price: q.price,
+          notes: q.notes
         });
       });
     } catch (e) {
@@ -127,38 +150,39 @@ function startQuotePolling(queryId) {
 
 function startTimer() {
   if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    var _tkey = 'sv_timer_start_' + queryId;
+  var _tkey = 'sv_timer_start_' + currentQueryId;
   var _stored = sessionStorage.getItem(_tkey);
   if (_stored) {
     queryStartTime = parseInt(_stored, 10);
   } else {
     queryStartTime = Date.now();
     sessionStorage.setItem(_tkey, queryStartTime);
-  } injectedIds    = {};
+  }
+  injectedIds = {};
 
-  var listReceived  = document.getElementById('list-received');
+  var listReceived = document.getElementById('list-received');
   var expiredBanner = document.getElementById('expired-banner');
-  var timerBlock    = document.getElementById('timer-block');
-  var timerDisplay  = document.getElementById('timer-display');
-  var timerBar      = document.getElementById('timer-bar');
+  var timerBlock = document.getElementById('timer-block');
+  var timerDisplay = document.getElementById('timer-display');
+  var timerBar = document.getElementById('timer-bar');
 
-  if (listReceived)  listReceived.innerHTML = '';
+  if (listReceived) listReceived.innerHTML = '';
   if (expiredBanner) expiredBanner.style.display = 'none';
-  if (timerBlock)    timerBlock.style.display     = 'block';
+  if (timerBlock) timerBlock.style.display = 'block';
   if (timerDisplay) {
     timerDisplay.classList.remove('timer-urgent');
-    timerDisplay.style.color  = 'var(--gold)';
-    timerDisplay.textContent  = '60:00';
+    timerDisplay.style.color = 'var(--gold)';
+    timerDisplay.textContent = '60:00';
   }
   if (timerBar) {
-    timerBar.style.width      = '100%';
+    timerBar.style.width = '100%';
     timerBar.style.background = '#185FA5';
   }
 
   updateResultsDisplay();
 
   timerInterval = setInterval(function() {
-    var elapsed   = Math.floor((Date.now() - queryStartTime) / 1000);
+    var elapsed = Math.floor((Date.now() - queryStartTime) / 1000);
     var remaining = TIMER_DURATION - elapsed;
 
     if (remaining <= 0) {
@@ -168,7 +192,7 @@ function startTimer() {
       if (timerDisplay) { timerDisplay.textContent = '00:00'; timerDisplay.classList.add('timer-urgent'); }
       if (timerBar) { timerBar.style.width = '0%'; timerBar.style.background = '#E24B4A'; }
       if (expiredBanner) expiredBanner.style.display = 'block';
-      if (timerBlock)    timerBlock.style.display     = 'none';
+      if (timerBlock) timerBlock.style.display = 'none';
       return;
     }
 
@@ -182,16 +206,16 @@ function startTimer() {
     if (timerBar) timerBar.style.width = pct + '%';
 
     if (remaining <= 300) {
-      if (timerBar)    timerBar.style.background = '#E24B4A';
+      if (timerBar) timerBar.style.background = '#E24B4A';
       if (timerDisplay) timerDisplay.classList.add('timer-urgent');
     } else if (remaining <= 1200) {
-      if (timerBar)    timerBar.style.background  = '#EF9F27';
+      if (timerBar) timerBar.style.background = '#EF9F27';
       if (timerDisplay) {
         timerDisplay.style.color = '#EF9F27';
         timerDisplay.classList.remove('timer-urgent');
       }
     } else {
-      if (timerBar)    timerBar.style.background  = '#185FA5';
+      if (timerBar) timerBar.style.background = '#185FA5';
       if (timerDisplay) {
         timerDisplay.style.color = 'var(--gold)';
         timerDisplay.classList.remove('timer-urgent');
@@ -201,16 +225,16 @@ function startTimer() {
 }
 
 function updateResultsDisplay() {
-  var listEl    = document.getElementById('list-received');
-  var received  = listEl ? listEl.querySelectorAll('.quote-card').length : 0;
-  var emptyEl   = document.getElementById('state-empty');
+  var listEl = document.getElementById('list-received');
+  var received = listEl ? listEl.querySelectorAll('.quote-card').length : 0;
+  var emptyEl = document.getElementById('state-empty');
   var sectionEl = document.getElementById('section-received');
-  var labelEl   = document.getElementById('label-received');
+  var labelEl = document.getElementById('label-received');
   var opCountEl = document.getElementById('timer-op-count');
-  if (emptyEl)   emptyEl.style.display      = received === 0 ? 'block' : 'none';
-  if (sectionEl) sectionEl.style.display    = received > 0 ? 'block' : 'none';
-  if (labelEl)   labelEl.textContent        = 'Quotes received \u2014 ' + received;
-  if (opCountEl) opCountEl.textContent      = received > 0 ? received : '\u2014';
+  if (emptyEl) emptyEl.style.display = received === 0 ? 'block' : 'none';
+  if (sectionEl) sectionEl.style.display = received > 0 ? 'block' : 'none';
+  if (labelEl) labelEl.textContent = 'Quotes received \u2014 ' + received;
+  if (opCountEl) opCountEl.textContent = received > 0 ? received : '\u2014';
 }
 
 function fmtPrice(p) {
@@ -235,29 +259,27 @@ function injectQuote(q) {
   var existing = document.getElementById('qcard-' + q.id);
   if (existing) existing.remove();
 
-  var price       = Number(q.price) || 0;
-  var priceStr    = price ? fmtPrice(price) : '\u2014';
-  var charterAmt  = price ? Math.round(price * 0.9) : 0;
+  var price = Number(q.price) || 0;
+  var priceStr = price ? fmtPrice(price) : '\u2014';
+  var charterAmt = price ? Math.round(price * 0.9) : 0;
   var platformAmt = price ? Math.round(price * 0.1) : 0;
-  var charterFee  = price ? fmtPrice(charterAmt)  : '\u2014';
+  var charterFee = price ? fmtPrice(charterAmt) : '\u2014';
   var platformFee = price ? fmtPrice(platformAmt) : '\u2014';
 
-  /* Escape all operator-supplied strings before injecting into HTML */
-  var opName    = escapeHtml(q.operator_name);
-  var acType    = escapeHtml(q.aircraft_type);
+  var opName = escapeHtml(q.operator_name);
+  var acType = escapeHtml(q.aircraft_type);
   var notesHtml = q.notes
     ? '<p style="font-size:12px;color:var(--text-secondary);margin-top:4px;">' + escapeHtml(q.notes) + '</p>'
     : '';
 
-  /* Pass numeric values through data attributes instead of inline strings to avoid injection */
   var card = document.createElement('div');
   card.className = 'quote-card';
   card.id = 'qcard-' + q.id;
-  card.dataset.opName    = q.operator_name || '';
-  card.dataset.aircraft  = q.aircraft_type || '';
-  card.dataset.total     = priceStr;
-  card.dataset.charter   = charterFee;
-  card.dataset.platform  = platformFee;
+  card.dataset.opName = q.operator_name || '';
+  card.dataset.aircraft = q.aircraft_type || '';
+  card.dataset.total = priceStr;
+  card.dataset.charter = charterFee;
+  card.dataset.platform = platformFee;
 
   card.innerHTML =
     '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">'
@@ -265,26 +287,42 @@ function injectQuote(q) {
     + '<p class="op-meta">' + acType + (q.seats ? ' \u00b7 ' + escapeHtml(String(q.seats)) + ' seats' : '') + '</p></div>'
     + '<span class="badge badge-success">Quote received</span></div>'
     + '<div style="display:flex;justify-content:space-between;align-items:flex-end;">'
-    + '<div><span style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;">Total</span>'
-    + '<div style="font-family:var(--font-display);font-size:26px;font-weight:400;color:var(--gold);">' + priceStr + '</div>'
+    + '<div><span style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.08em;">All-inclusive price</span>'
+    + '<div style="font-family:var(--font-display);font-size:26px;font-weight:400;color:var(--gold);">\u20b9' + priceStr.replace('\u20b9','') + '</div>'
     + notesHtml
     + '</div>'
     + '<button class="btn-select" onclick="selectOpFromCard(this)">Select \u2192</button>'
     + '</div>';
+
+  // Add quote to activity feed
+  addActivity('New quote received from ' + (q.operator_name || 'operator'), 'success');
 
   var listEl = document.getElementById('list-received');
   if (listEl) listEl.appendChild(card);
   updateResultsDisplay();
 }
 
+function addActivity(text, type) {
+  var feed = document.getElementById('activity-list');
+  if (!feed) return;
+  var item = document.createElement('div');
+  item.className = 'activity-item activity-item--' + (type || 'pending');
+  var now = new Date();
+  var timeStr = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+  item.innerHTML = '<div class="activity-dot"></div><div class="activity-text">' + escapeHtml(text) + '</div><div class="activity-time">' + timeStr + '</div>';
+  feed.insertBefore(item, feed.firstChild);
+  // Keep max 5 items
+  while (feed.children.length > 5) feed.removeChild(feed.lastChild);
+}
+
 function selectOpFromCard(btn) {
   var card = btn.closest('.quote-card');
   if (!card) return;
   selectOp(
-    card.dataset.opName   || '',
+    card.dataset.opName || '',
     card.dataset.aircraft || '',
-    card.dataset.total    || '\u2014',
-    card.dataset.charter  || '\u2014',
+    card.dataset.total || '\u2014',
+    card.dataset.charter || '\u2014',
     card.dataset.platform || '\u2014'
   );
 }
@@ -296,14 +334,14 @@ function selectOp(name, aircraft, total, charter, platform) {
     try { queryData = JSON.parse(raw); } catch (e) { queryData = {}; }
   }
   sessionStorage.setItem('sv_selected_op', JSON.stringify({
-    name:     name,
+    name: name,
     aircraft: aircraft,
-    total:    total,
-    charter:  charter,
+    total: total,
+    charter: charter,
     platform: platform,
-    route:    queryData.rs_route || '\u2014',
-    date:     queryData.rs_date  || '\u2014',
-    pax:      queryData.rs_pax   || '\u2014'
+    route: queryData.rs_route || '\u2014',
+    date: queryData.rs_date || '\u2014',
+    pax: queryData.rs_pax || '\u2014'
   }));
   window.location.href = 'payment.html';
 }
