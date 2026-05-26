@@ -1,4 +1,4 @@
-/* ── SkyVayu — Results Page ── */
+if (rsType) rsType.textContent
 
 var timerInterval  = null;
 var pollingInterval = null;
@@ -34,6 +34,23 @@ document.addEventListener('DOMContentLoaded', function() {
     if (rsDate)  rsDate.textContent  = q.rs_date  || '\u2014';
     if (rsPax)   rsPax.textContent   = q.rs_pax   || '\u2014';
     if (rsType)  rsType.textContent  = q.rs_type  || '\u2014';
+        (function() {
+                var chips = [];
+                if (q.medivac) chips.push('\u271a Medivac');
+                if (q.pets)    chips.push('\ud83d\udc3e Pets');
+                if (q.vip)     chips.push('\u2605 VIP Passenger');
+                if (q.infants) chips.push('\ud83d\udc76 Infants');
+                var rsSpecialRow = document.getElementById('rs-special-row');
+                var rsSpecial    = document.getElementById('rs-special');
+                if (rsSpecialRow && rsSpecial) {
+                          if (chips.length > 0) {
+                                      rsSpecial.textContent = chips.join(', ');
+                                      rsSpecialRow.style.display = 'block';
+                          } else {
+                                      rsSpecialRow.style.display = 'none';
+                          }
+                }
+        })();
 
     if (q.trip_type === 'multi' && Array.isArray(q.sectors) && q.sectors.length) {
       var dHtml = '<div id="multi-detail" style="margin-bottom:16px;"><div class="section-label">Sector breakdown</div>';
