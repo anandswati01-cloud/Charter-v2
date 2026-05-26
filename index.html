@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SkyVayu — Private Charter Flights. Direct. Transparent. Fast.</title>
+  <title>SkyVayu â Private Charter Flights. Direct. Transparent. Fast.</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -42,7 +42,7 @@
       overflow-x: hidden;
     }
 
-    /* ── NAV ── */
+    /* ââ NAV ââ */
     .nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -104,7 +104,7 @@
 
     .nav-cta:hover { background: var(--gold-light); }
 
-    /* ── HERO ── */
+    /* ââ HERO ââ */
     .hero {
       position: relative;
       min-height: 100vh;
@@ -183,7 +183,7 @@
       font-weight: 500;
     }
 
-    /* ── TRUST BAR ── */
+    /* ââ TRUST BAR ââ */
     .trust-bar {
       position: relative;
       z-index: 2;
@@ -227,7 +227,7 @@
       margin-top: 2px;
     }
 
-    /* ── BOOKING CARD ── */
+    /* ââ BOOKING CARD ââ */
     .booking-section {
       padding: 0 48px 100px;
       position: relative;
@@ -424,7 +424,7 @@
     .cta-btn:hover .cta-arrow { transform: translateX(4px); }
 
 
-        /* ── AIRPORT AUTOCOMPLETE ── */
+        /* ââ AIRPORT AUTOCOMPLETE ââ */
         .ac-wrap { position: relative; }
         .ac-dropdown {
                 position: absolute;
@@ -518,7 +518,7 @@
         }
         .ac-city span { font-size: 11px; color: var(--white-60); margin-top: 2px; }
         .ac-icao { font-family: var(--font-mono); font-size: 11px; color: var(--gold); letter-spacing: 1.5px; }
-/* ── BOOKING GRID V2 (stacked date under each aerodrome) ── */
+/* ââ BOOKING GRID V2 (stacked date under each aerodrome) ââ */
 .inputs-grid-v2 {
   display: grid;
   grid-template-columns: 1fr 1fr auto;
@@ -532,7 +532,7 @@
 }
 
         
-/* ── MULTI-SECTOR PANEL ── */
+/* ââ MULTI-SECTOR PANEL ââ */
 .multi-sector-wrap { display: none; margin-bottom: 24px; }
 .sector-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 16px; margin-bottom: 12px; align-items: end; }
 .sector-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
@@ -541,7 +541,7 @@
 .add-sector-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; padding: 9px 18px; border: 1px dashed var(--white-30); border-radius: 2px; background: transparent; color: var(--white-60); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
 .add-sector-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-        /* ── HOW IT WORKS ── */
+        /* ââ HOW IT WORKS ââ */
     .section {
       padding: 100px 48px;
       max-width: 1280px;
@@ -604,7 +604,7 @@
       color: var(--white-60);
     }
 
-    /* ── WHY SKYVAYU ── */
+    /* ââ WHY SKYVAYU ââ */
     .why-section {
       padding: 100px 48px;
       background: var(--navy-mid);
@@ -660,7 +660,7 @@
       color: var(--white-60);
     }
 
-    /* ── POPULAR ROUTES ── */
+    /* ââ POPULAR ROUTES ââ */
     .routes-section {
       padding: 100px 48px;
       max-width: 1280px;
@@ -765,7 +765,7 @@
       color: var(--navy);
     }
 
-    /* ── FINAL CTA ── */
+    /* ââ FINAL CTA ââ */
     .final-cta {
       position: relative;
       padding: 120px 48px;
@@ -811,7 +811,7 @@
       line-height: 1.7;
     }
 
-    /* ── FOOTER ── */
+    /* ââ FOOTER ââ */
     .footer {
       background: var(--navy-mid);
       border-top: 1px solid var(--white-10);
@@ -945,7 +945,7 @@
       color: var(--white-30);
     }
 
-    /* ── ANIMATIONS ── */
+    /* ââ ANIMATIONS ââ */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(24px); }
       to { opacity: 1; transform: translateY(0); }
@@ -956,7 +956,155 @@
     .hero-sub { animation: fadeUp 0.6s 0.2s ease both; }
     .trust-bar { animation: fadeUp 0.6s 0.3s ease both; }
     .booking-section { animation: fadeUp 0.6s 0.4s ease both; }
-  </style>
+  
+    /* ── LIGHT THEME (day mode) ── */
+    [data-theme="light"] {
+      --navy: #f0f2f7;
+      --navy-mid: #e8ecf4;
+      --navy-light: #dde2ee;
+      --gold: #b8902a;
+      --gold-light: #c9a84c;
+    }
+
+    [data-theme="light"] body {
+      background: #f0f2f7;
+      color: #0d1a2b;
+    }
+
+    [data-theme="light"] .nav {
+      background: rgba(240,242,247,0.92);
+      border-bottom: 1px solid rgba(13,26,43,0.12);
+    }
+
+    [data-theme="light"] .nav-links a { color: rgba(13,26,43,0.6); }
+    [data-theme="light"] .nav-links a:hover { color: var(--gold); }
+    [data-theme="light"] .nav-links .active { color: var(--gold); }
+    [data-theme="light"] .nav-logo { color: var(--gold); }
+    [data-theme="light"] .nav-cta {
+      background: var(--gold);
+      color: #0d1a2b;
+    }
+
+    [data-theme="light"] .hero-bg {
+      filter: brightness(0.55) saturate(0.8);
+    }
+    [data-theme="light"] .hero-overlay {
+      background: linear-gradient(to bottom, rgba(13,26,43,0.5) 0%, rgba(13,26,43,0.72) 100%);
+    }
+
+    [data-theme="light"] .trust-bar {
+      background: rgba(13,26,43,0.72);
+    }
+
+    [data-theme="light"] .section-eyebrow { color: #2a6b8a; }
+    [data-theme="light"] .section-title { color: #0d1a2b; }
+    [data-theme="light"] .section-sub { color: rgba(13,26,43,0.65); }
+
+    [data-theme="light"] .book-panel,
+    [data-theme="light"] .step-card,
+    [data-theme="light"] .aircraft-card,
+    [data-theme="light"] .route-card,
+    [data-theme="light"] .accordion-item,
+    [data-theme="light"] .results-panel,
+    [data-theme="light"] .detail-card,
+    [data-theme="light"] .quote-card,
+    [data-theme="light"] .modal-box,
+    [data-theme="light"] .otp-box {
+      background: #ffffff;
+      border-color: rgba(13,26,43,0.1);
+      color: #0d1a2b;
+    }
+
+    [data-theme="light"] .book-panel h2,
+    [data-theme="light"] .book-panel label,
+    [data-theme="light"] .detail-card h2,
+    [data-theme="light"] .detail-card label,
+    [data-theme="light"] .accordion-header,
+    [data-theme="light"] .modal-box h2,
+    [data-theme="light"] .modal-box p {
+      color: #0d1a2b;
+    }
+
+    [data-theme="light"] .step-label,
+    [data-theme="light"] .step-desc,
+    [data-theme="light"] .aircraft-name,
+    [data-theme="light"] .aircraft-cap,
+    [data-theme="light"] .route-from,
+    [data-theme="light"] .route-to,
+    [data-theme="light"] .route-time,
+    [data-theme="light"] .detail-label,
+    [data-theme="light"] .detail-value,
+    [data-theme="light"] .quote-airline,
+    [data-theme="light"] .quote-detail {
+      color: rgba(13,26,43,0.75);
+    }
+
+    [data-theme="light"] input,
+    [data-theme="light"] select,
+    [data-theme="light"] textarea {
+      background: #f5f7fa !important;
+      color: #0d1a2b !important;
+      border-color: rgba(13,26,43,0.2) !important;
+    }
+    [data-theme="light"] input::placeholder { color: rgba(13,26,43,0.4); }
+
+    [data-theme="light"] .divider,
+    [data-theme="light"] hr { border-color: rgba(13,26,43,0.1); }
+
+    [data-theme="light"] .overlay,
+    [data-theme="light"] .modal-overlay { background: rgba(13,26,43,0.55); }
+
+    [data-theme="light"] .otp-input {
+      background: #f5f7fa;
+      color: #0d1a2b;
+      border-color: rgba(13,26,43,0.2);
+    }
+
+    [data-theme="light"] .autocomplete-dropdown {
+      background: #ffffff;
+      border-color: rgba(13,26,43,0.12);
+    }
+    [data-theme="light"] .dropdown-item { color: #0d1a2b; }
+    [data-theme="light"] .dropdown-item:hover { background: #f0f2f7; }
+
+    [data-theme="light"] .progress-bar-fill { background: var(--gold); }
+    [data-theme="light"] .error-msg { color: #b91c1c; }
+
+    /* ── THEME TOGGLE BUTTON ── */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--white-10);
+      border: 1px solid var(--white-10);
+      cursor: pointer;
+      transition: background 0.25s, border-color 0.25s, transform 0.2s;
+      margin-left: 12px;
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover {
+      background: var(--white-30);
+      transform: scale(1.08);
+    }
+    .theme-toggle .icon-sun { display: none; font-size: 17px; }
+    .theme-toggle .icon-moon { display: block; font-size: 17px; }
+    [data-theme="light"] .theme-toggle .icon-sun { display: block; }
+    [data-theme="light"] .theme-toggle .icon-moon { display: none; }
+    [data-theme="light"] .theme-toggle {
+      background: rgba(13,26,43,0.08);
+      border-color: rgba(13,26,43,0.12);
+    }
+    [data-theme="light"] .theme-toggle:hover {
+      background: rgba(13,26,43,0.14);
+    }
+
+    </style>
+  <script>
+    (function(){var t=localStorage.getItem('skyvayu-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');})();
+  </script>
 </head>
 <body>
 
@@ -969,6 +1117,10 @@
       <li><a href="#">About Us</a></li>
     </ul>
     <a href="#book" class="nav-cta">Get Quotes</a>
+    <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle day/night mode">
+      <span class="icon-moon">🌙</span>
+      <span class="icon-sun">☀️</span>
+    </button>
   </nav>
 
   <!-- HERO -->
@@ -977,7 +1129,7 @@
     <div class="hero-overlay"></div>
 
     <div class="hero-content">
-      <div class="hero-eyebrow">DGCA Licensed Operators · India's Charter Marketplace</div>
+      <div class="hero-eyebrow">DGCA Licensed Operators Â· India's Charter Marketplace</div>
       <h1 class="hero-h1">
         Private Charter Flights.<br>
         <em>Direct. Transparent. Fast.</em>
@@ -990,21 +1142,21 @@
 
     <div class="trust-bar">
       <div class="trust-item">
-        <div class="trust-icon">✈</div>
+        <div class="trust-icon">â</div>
         <div>
           <div class="trust-num">115+</div>
           <div class="trust-label">Airports Covered</div>
         </div>
       </div>
       <div class="trust-item">
-        <div class="trust-icon">⏱</div>
+        <div class="trust-icon">â±</div>
         <div>
           <div class="trust-num">60 Min</div>
           <div class="trust-label">Avg. Quote Time</div>
         </div>
       </div>
       <div class="trust-item">
-        <div class="trust-icon">🔒</div>
+        <div class="trust-icon">ð</div>
         <div>
           <div class="trust-num">100%</div>
           <div class="trust-label">Secured Payments</div>
@@ -1080,15 +1232,15 @@
         <div>
           <div class="input-label" style="margin-bottom:10px">Special Requirements</div>
           <div class="special-reqs">
-            <button class="req-chip" onclick="toggleChip(this)">✚ Medivac</button>
-            <button class="req-chip" onclick="toggleChip(this)">🐾 Pets</button>
-            <button class="req-chip" onclick="toggleChip(this)">★ VIP Passenger</button>
-            <button class="req-chip" onclick="toggleChip(this)">👶 Infants</button>
+            <button class="req-chip" onclick="toggleChip(this)">â Medivac</button>
+            <button class="req-chip" onclick="toggleChip(this)">ð¾ Pets</button>
+            <button class="req-chip" onclick="toggleChip(this)">â VIP Passenger</button>
+            <button class="req-chip" onclick="toggleChip(this)">ð¶ Infants</button>
           </div>
         </div>
         <button class="cta-btn" onclick="getQuotes()">
           Get Instant Quotes
-          <span class="cta-arrow">→</span>
+          <span class="cta-arrow">â</span>
         </button>
       </div>
     </div>
@@ -1108,7 +1260,7 @@
         <div class="step">
           <div class="step-num">02</div>
           <div class="step-title">Get quotes</div>
-          <p class="step-desc">Receive competitive quotes from multiple DGCA-licensed operators within 60 minutes — directly, with no middlemen.</p>
+          <p class="step-desc">Receive competitive quotes from multiple DGCA-licensed operators within 60 minutes â directly, with no middlemen.</p>
         </div>
         <div class="step">
           <div class="step-num">03</div>
@@ -1126,24 +1278,24 @@
       <h2 class="section-title">Built for those who value their time</h2>
       <div class="bento-grid">
         <div class="bento-card">
-          <div class="bento-icon">✓</div>
+          <div class="bento-icon">â</div>
           <div class="bento-title">Verified operators only</div>
           <p class="bento-desc">Every operator on SkyVayu is DGCA licensed and manually verified before activation. Zero compromise on safety.</p>
         </div>
         <div class="bento-card">
-          <div class="bento-icon">⚡</div>
+          <div class="bento-icon">â¡</div>
           <div class="bento-title">Live competitive quotes</div>
           <p class="bento-desc">Operators compete in real time. You always get the best market rate, not a fixed inflated price from a broker.</p>
         </div>
         <div class="bento-card">
-          <div class="bento-icon">🌏</div>
+          <div class="bento-icon">ð</div>
           <div class="bento-title">Domestic and international</div>
-          <p class="bento-desc">From Leh to Lakshadweep or Mumbai to Dubai — one platform for all your charter needs across 115+ airports.</p>
+          <p class="bento-desc">From Leh to Lakshadweep or Mumbai to Dubai â one platform for all your charter needs across 115+ airports.</p>
         </div>
         <div class="bento-card">
-          <div class="bento-icon">₹</div>
+          <div class="bento-icon">â¹</div>
           <div class="bento-title">No hidden charges</div>
-          <p class="bento-desc">No surprises at checkout. What you see is what you pay — GST inclusive, fully transparent pricing on every quote.</p>
+          <p class="bento-desc">No surprises at checkout. What you see is what you pay â GST inclusive, fully transparent pricing on every quote.</p>
         </div>
       </div>
     </div>
@@ -1165,7 +1317,7 @@
           <div class="route-gradient"></div>
           <div class="route-badge">Most Popular</div>
           <div class="route-info">
-            <div class="route-name">Mumbai → Delhi</div>
+            <div class="route-name">Mumbai â Delhi</div>
             <button class="route-book">Book Now</button>
           </div>
         </div>
@@ -1173,7 +1325,7 @@
           <img class="route-img" src="https://images.unsplash.com/photo-1587474260584-136574528ed5?w=800&q=80" alt="Delhi to Goa">
           <div class="route-gradient"></div>
           <div class="route-info">
-            <div class="route-name">Delhi → Goa</div>
+            <div class="route-name">Delhi â Goa</div>
             <button class="route-book">Book Now</button>
           </div>
         </div>
@@ -1181,7 +1333,7 @@
           <img class="route-img" src="https://images.unsplash.com/photo-1512632578888-169bbbc64f33?w=800&q=80" alt="Mumbai to Dubai">
           <div class="route-gradient"></div>
           <div class="route-info">
-            <div class="route-name">Mumbai → Dubai</div>
+            <div class="route-name">Mumbai â Dubai</div>
             <button class="route-book">Book Now</button>
           </div>
         </div>
@@ -1198,7 +1350,7 @@
       <p class="final-cta-sub">Experience the pinnacle of aviation logistics. Get your verified quotes in under an hour.</p>
       <button class="cta-btn" style="margin: 0 auto;" onclick="document.getElementById('book').scrollIntoView({behavior:'smooth'})">
         Get Instant Quotes
-        <span class="cta-arrow">→</span>
+        <span class="cta-arrow">â</span>
       </button>
     </div>
   </section>
@@ -1211,7 +1363,7 @@
         <p class="footer-tagline">Elevating the standards of private aviation through technical precision and elite service.</p>
         <div class="footer-socials">
           <div class="social-btn">in</div>
-          <div class="social-btn">𝕏</div>
+          <div class="social-btn">ð</div>
           <div class="social-btn">ig</div>
         </div>
       </div>
@@ -1237,13 +1389,13 @@
         <p class="footer-tagline">Receive curated aviation insights and empty leg alerts.</p>
         <div class="newsletter-input-row">
           <input class="newsletter-input" type="email" placeholder="Email address">
-          <button class="newsletter-submit">→</button>
+          <button class="newsletter-submit">â</button>
         </div>
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="footer-copy">© 2025 SkyVayu Aviation. The Celestial Navigator.</div>
-      <div class="footer-ops">Global Ops: Mumbai · Delhi · Dubai</div>
+      <div class="footer-copy">Â© 2025 SkyVayu Aviation. The Celestial Navigator.</div>
+      <div class="footer-ops">Global Ops: Mumbai Â· Delhi Â· Dubai</div>
     </div>
   </footer>
 
@@ -1324,12 +1476,12 @@ function getQuotes() {
     row.id = 'sector-' + n;
     row.innerHTML = `
       <div class="input-group">
-        <div class="input-label sector-label">Sector ${n} — From</div>
+        <div class="input-label sector-label">Sector ${n} â From</div>
                 <div class="ac-wrap"><input class="input-field" id="sec-dep-${n}" type="text" tabindex="${10 + (n-1)*3 + 1}" placeholder="Departure city or airport" oninput="clearErr(this);acInput(this,'ac-sdep-${n}')" onkeydown="acKey(event,'ac-sdep-${n}')" onblur="acBlur('ac-sdep-${n}')"><div class="ac-dropdown" id="ac-sdep-${n}"></div></div>
         <span class="error-msg" id="err-sec-dep-${n}"></span>
       </div>
       <div class="input-group">
-        <div class="input-label sector-label">Sector ${n} — To</div>
+        <div class="input-label sector-label">Sector ${n} â To</div>
                 <div class="ac-wrap"><input class="input-field" id="sec-dest-${n}" type="text" tabindex="${10 + (n-1)*3 + 2}" placeholder="Destination city or airport" oninput="clearErr(this);acInput(this,'ac-sdest-${n}')" onkeydown="acKey(event,'ac-sdest-${n}')" onblur="acBlur('ac-sdest-${n}')"><div class="ac-dropdown" id="ac-sdest-${n}"></div></div>
         <span class="error-msg" id="err-sec-dest-${n}"></span>
       </div>
@@ -1354,8 +1506,8 @@ function getQuotes() {
     const rows = document.querySelectorAll('.sector-row');
     rows.forEach((row, i) => {
       const labels = row.querySelectorAll('.sector-label');
-      labels[0].textContent = 'Sector ' + (i + 1) + ' — From';
-      labels[1].textContent = 'Sector ' + (i + 1) + ' — To';
+      labels[0].textContent = 'Sector ' + (i + 1) + ' â From';
+      labels[1].textContent = 'Sector ' + (i + 1) + ' â To';
     });
   }
   
@@ -1526,9 +1678,9 @@ function verifyModalOTP(){
     setTimeout(function(){
       closeOtpModal();
       if(window._pendingQuery){var q=window._pendingQuery;q.client_phone=window._modalPhone||'';if(btn)btn.textContent='Saving...';saveQueryToSupabase(q).then(function(saved){
-  var fmtDate=function(d,t){if(!d)return'—';var parts=d.split('-');var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];var dateStr=parts[2]+' '+months[parseInt(parts[1])-1]+' '+parts[0];return dateStr+(t?', '+t:'');};
+  var fmtDate=function(d,t){if(!d)return'â';var parts=d.split('-');var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];var dateStr=parts[2]+' '+months[parseInt(parts[1])-1]+' '+parts[0];return dateStr+(t?', '+t:'');};
   var dt=fmtDate(q.flight_date,q.flight_time);
-  var route=q.trip_type==='Round Trip'?(q.departure+' ⇄ '+q.destination):(q.trip_type==='Multiple Sectors'?q.departure+' → ...':q.departure+' → '+q.destination);
+  var route=q.trip_type==='Round Trip'?(q.departure+' â '+q.destination):(q.trip_type==='Multiple Sectors'?q.departure+' â ...':q.departure+' â '+q.destination);
   sessionStorage.setItem('sv_query_id',saved.id);
   sessionStorage.setItem('sv_query_start', Date.now().toString());
   sessionStorage.setItem('sv_query',JSON.stringify({rs_type:q.trip_type,rs_route:route,rs_date:dt,rs_pax:String(q.passengers),rs_medivac:q.medivac,rs_pets:q.pets,rs_infants:q.infants,rs_vip:q.vip}));
@@ -1566,5 +1718,18 @@ function otpModalBack(e,el,prevId){
   }
 }
 </script>
+
+  <script>
+    function toggleTheme() {
+      var html = document.documentElement;
+      if (html.getAttribute('data-theme') === 'light') {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('skyvayu-theme', 'dark');
+      } else {
+        html.setAttribute('data-theme', 'light');
+        localStorage.setItem('skyvayu-theme', 'light');
+      }
+    }
+  </script>
 </body>
 </html>
