@@ -1,835 +1,699 @@
-import { useState, useEffect, useRef } from "react";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Live Quotes — SkyVayu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0e0e10;
+  --card:rgba(31,31,33,0.6);
+  --border:rgba(143,144,151,0.12);
+  --border-hover:rgba(143,144,151,0.25);
+  --cyan:#17b0d6;
+  --cyan-faint:rgba(23,176,214,0.08);
+  --cyan-border:rgba(23,176,214,0.4);
+  --green:#10b981;
+  --gold:#fbbf24;
+  --text:#e4e2e4;
+  --text-dim:#c5c6cd;
+  --text-muted:#8f9097;
+  --dark:#1b1b1d;
+  --font:'Manrope',sans-serif;
+  --font-serif:'Georgia','Times New Roman',serif;
+  --font-mono:'Courier New',monospace;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;}
 
-const PlaneIcon = () => (
-  <svg width="21" height="19" viewBox="0 0 21 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M2 18.15V16.15H20V18.15H2ZM3.75 13.15L0 6.9L2.4 6.25L5.2 8.6L8.7 7.675L3.525 0.775L6.425 0L13.9 6.275L18.15 5.125C18.6833 4.975 19.1875 5.0375 19.6625 5.3125C20.1375 5.5875 20.45 5.99167 20.6 6.525C20.75 7.05833 20.6875 7.5625 20.4125 8.0375C20.1375 8.5125 19.7333 8.825 19.2 8.975L3.75 13.15Z" fill="#8F9097"/>
-  </svg>
-);
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:rgba(2,6,23,0.9);backdrop-filter:blur(8px);
+  height:72px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 40px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.3);
+  border-bottom:1px solid rgba(143,144,151,0.08);
+}
+.nav-logo{font-family:var(--font-serif);font-style:italic;font-size:22px;letter-spacing:-1px;color:var(--gold);text-decoration:none;}
+.nav-links{display:flex;gap:40px;align-items:center;}
+.nav-links a{font-family:var(--font-mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;text-decoration:none;color:#94a3b8;transition:color .15s;}
+.nav-links a.active{color:var(--gold);border-bottom:2px solid var(--gold);padding-bottom:3px;font-weight:700;}
+.nav-links a:hover:not(.active){color:var(--text);}
 
-const CheckIcon = () => (
-  <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-    <path d="M3.325 7.01458L0 3.68958L0.83125 2.85833L3.325 5.35208L8.67708 0L9.50833 0.83125L3.325 7.01458Z" fill="#342800"/>
-  </svg>
-);
+/* ── PAGE LAYOUT ── */
+.page{
+  padding-top:88px;
+  display:flex;
+  gap:0;
+  min-height:100vh;
+}
 
-const ShieldIcon = ({ color = "#C5C6CD" }) => (
-  <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-    <path d="M4.05417 7.90417L7.35 4.60833L6.51875 3.77708L4.05417 6.24167L2.82917 5.01667L1.99792 5.84792L4.05417 7.90417ZM4.66667 11.6667C3.31528 11.3264 2.19965 10.551 1.31979 9.34062C0.439931 8.13021 0 6.78611 0 5.30833V1.75L4.66667 0L9.33333 1.75V5.30833C9.33333 6.78611 8.8934 8.13021 8.01354 9.34062C7.13368 10.551 6.01806 11.3264 4.66667 11.6667ZM4.66667 10.4417C5.67778 10.1208 6.51389 9.47917 7.175 8.51667C7.83611 7.55417 8.16667 6.48472 8.16667 5.30833V2.55208L4.66667 1.23958L1.16667 2.55208V5.30833C1.16667 6.48472 1.49722 7.55417 2.15833 8.51667C2.81944 9.47917 3.65556 10.4417 4.66667 10.4417Z" fill={color}/>
-  </svg>
-);
+/* ── SIDEBAR ── */
+.sidebar{
+  width:340px;
+  min-width:340px;
+  padding:24px 20px 24px 32px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  position:sticky;
+  top:72px;
+  height:calc(100vh - 72px);
+  overflow-y:auto;
+}
 
-const UploadIcon = () => (
-  <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-    <path d="M4.08333 7V2.24583L2.56667 3.7625L1.75 2.91667L4.66667 0L7.58333 2.91667L6.76667 3.7625L5.25 2.24583V7H4.08333ZM1.16667 9.33333C0.845833 9.33333 0.571181 9.2191 0.342708 8.99063C0.114236 8.76215 0 8.4875 0 8.16667V6.41667H1.16667V8.16667H8.16667V6.41667H9.33333V8.16667C9.33333 8.4875 9.2191 8.76215 8.99063 8.99063C8.76215 9.2191 8.4875 9.33333 8.16667 9.33333H1.16667Z" fill={color = "#C5C6CD"}/>
-  </svg>
-);
+/* ── ROUTE CARD ── */
+.route-card{
+  background:rgba(28,28,30,0.8);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:20px;
+}
+.route-row{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;}
+.city-code{font-family:var(--font-serif);font-size:28px;font-weight:500;color:var(--text);line-height:1;}
+.city-name{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:1.2px;color:var(--text-dim);text-transform:uppercase;margin-top:4px;}
+.route-meta{border-top:1px solid rgba(68,71,77,0.25);padding-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.meta-label{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);}
+.meta-value{font-size:13px;font-weight:600;color:var(--text);margin-top:4px;line-height:1.4;}
+.meta-right{text-align:right;}
 
-const FilterIcon = () => (
-  <svg width="14" height="9" viewBox="0 0 14 9" fill="none">
-    <path d="M5.25 9V7.5H8.25V9H5.25ZM2.25 5.25V3.75H11.25V5.25H2.25ZM0 1.5V0H13.5V1.5H0Z" fill="#C5C6CD"/>
-  </svg>
-);
+/* ── LIVE STATUS CARD ── */
+.live-card{
+  background:rgba(28,28,30,0.8);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:20px;
+}
+.live-label{font-family:var(--font-mono);font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--text-dim);}
+.live-timer{font-family:var(--font-serif);font-size:26px;font-weight:500;color:var(--cyan);line-height:1.2;margin-top:6px;}
 
-const BadgeIcon = () => (
-  <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
-    <path d="M3.8 10.5L2.85 8.9L1.05 8.5L1.225 6.65L0 5.25L1.225 3.85L1.05 2L2.85 1.6L3.8 0L5.5 0.725L7.2 0L8.15 1.6L9.95 2L9.775 3.85L11 5.25L9.775 6.65L9.95 8.5L8.15 8.9L7.2 10.5L5.5 9.775L3.8 10.5ZM4.225 9.225L5.5 8.675L6.8 9.225L7.5 8.025L8.875 7.7L8.75 6.3L9.675 5.25L8.75 4.175L8.875 2.775L7.5 2.475L6.775 1.275L5.5 1.825L4.2 1.275L3.5 2.475L2.125 2.775L2.25 4.175L1.325 5.25L2.25 6.3L2.125 7.725L3.5 8.025L4.225 9.225ZM4.975 7.025L7.8 4.2L7.1 3.475L4.975 5.6L3.9 4.55L3.2 5.25L4.975 7.025Z" fill="white"/>
-  </svg>
-);
+/* progress */
+.progress-wrap{margin:14px 0 16px;height:4px;background:rgba(23,176,214,0.15);border-radius:4px;position:relative;}
+.progress-fill{height:4px;background:var(--cyan);border-radius:4px;width:0%;transition:width 1s linear;position:absolute;top:0;left:0;}
 
-const SeatIcon = () => (
-  <svg width="16" height="17" viewBox="0 0 16 17" fill="none">
-    <path d="M4.58333 3.33333C4.125 3.33333 3.73264 3.17014 3.40625 2.84375C3.07986 2.51736 2.91667 2.125 2.91667 1.66667C2.91667 1.20833 3.07986 0.815972 3.40625 0.489583C3.73264 0.163194 4.125 0 4.58333 0C5.04167 0 5.43403 0.163194 5.76042 0.489583C6.08681 0.815972 6.25 1.20833 6.25 1.66667C6.25 2.125 6.08681 2.51736 5.76042 2.84375C5.43403 3.17014 5.04167 3.33333 4.58333 3.33333ZM9.16667 15H3.79167C3.33333 15 2.91319 14.8368 2.53125 14.5104C2.14931 14.184 1.90972 13.7917 1.8125 13.3333L0 4.16667H1.70833L3.54167 13.3333H9.16667V15ZM13.75 16.6667L11.3333 12.5H5.54167C5.13889 12.5 4.78819 12.3785 4.48958 12.1354C4.19097 11.8924 4 11.5694 3.91667 11.1667L3 6.70833C2.84722 6.04167 3.00347 5.45139 3.46875 4.9375C3.93403 4.42361 4.5 4.16667 5.16667 4.16667C5.65278 4.16667 6.09375 4.3125 6.48958 4.60417C6.88542 4.89583 7.13889 5.29167 7.25 5.79167L8.16667 10H10.875C11.1667 10 11.4375 10.0764 11.6875 10.2292C11.9375 10.3819 12.1389 10.5833 12.2917 10.8333L15.2083 15.8333L13.75 16.6667Z" fill="#17B0D6"/>
-  </svg>
-);
+/* stats */
+.stats-bar{background:var(--dark);border-radius:4px;padding:10px 12px;display:flex;justify-content:space-between;margin-bottom:16px;}
+.stat-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.stat-num{font-size:15px;font-weight:700;color:var(--text);text-align:center;}
+.stat-num.cyan{color:var(--cyan);}
+.stat-label{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);}
 
-const WifiIcon = () => (
-  <svg width="20" height="15" viewBox="0 0 20 15" fill="none">
-    <path d="M10 14.1667C9.41667 14.1667 8.92361 13.9653 8.52083 13.5625C8.11806 13.1597 7.91667 12.6667 7.91667 12.0833C7.91667 11.5 8.11806 11.0069 8.52083 10.6042C8.92361 10.2014 9.41667 10 10 10C10.5833 10 11.0764 10.2014 11.4792 10.6042C11.8819 11.0069 12.0833 11.5 12.0833 12.0833C12.0833 12.6667 11.8819 13.1597 11.4792 13.5625C11.0764 13.9653 10.5833 14.1667 10 14.1667ZM5.29167 9.45833L3.54167 7.66667C4.36111 6.84722 5.32292 6.19792 6.42708 5.71875C7.53125 5.23958 8.72222 5 10 5C11.2778 5 12.4688 5.24306 13.5729 5.72917C14.6771 6.21528 15.6389 6.875 16.4583 7.70833L14.7083 9.45833C14.0972 8.84722 13.3889 8.36806 12.5833 8.02083C11.7778 7.67361 10.9167 7.5 10 7.5C9.08333 7.5 8.22222 7.67361 7.41667 8.02083C6.61111 8.36806 5.90278 8.84722 5.29167 9.45833ZM1.75 5.91667L0 4.16667C1.27778 2.86111 2.77083 1.84028 4.47917 1.10417C6.1875 0.368056 8.02778 0 10 0C11.9722 0 13.8125 0.368056 15.5208 1.10417C17.2292 1.84028 18.7222 2.86111 20 4.16667L18.25 5.91667C17.1806 4.84722 15.941 4.01042 14.5312 3.40625C13.1215 2.80208 11.6111 2.5 10 2.5C8.38889 2.5 6.87847 2.80208 5.46875 3.40625C4.05903 4.01042 2.81944 4.84722 1.75 5.91667Z" fill="#17B0D6"/>
-  </svg>
-);
+/* notifications */
+.notif-list{display:flex;flex-direction:column;gap:14px;position:relative;}
+.vert-line{position:absolute;left:11px;top:12px;bottom:4px;width:1px;background:rgba(68,71,77,0.35);}
+.notif-row{display:flex;gap:14px;align-items:flex-start;position:relative;z-index:1;}
+.notif-dot{width:24px;height:24px;border-radius:50%;background:#2a2a2c;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.notif-dot.active{background:var(--cyan);}
+.notif-label{font-size:13px;font-weight:600;color:var(--text);line-height:1.3;}
+.notif-time{font-family:var(--font-mono);font-size:10px;letter-spacing:.8px;color:var(--text-dim);margin-top:2px;}
 
-const FoodIcon = () => (
-  <svg width="13" height="17" viewBox="0 0 13 17" fill="none">
-    <path d="M2.5 16.6667V9.04167C1.79167 8.84722 1.19792 8.45833 0.71875 7.875C0.239583 7.29167 0 6.61111 0 5.83333V0H1.66667V5.83333H2.5V0H4.16667V5.83333H5V0H6.66667V5.83333C6.66667 6.61111 6.42708 7.29167 5.94792 7.875C5.46875 8.45833 4.875 8.84722 4.16667 9.04167V16.6667H2.5ZM10.8333 16.6667V10H8.33333V4.16667C8.33333 3.01389 8.73958 2.03125 9.55208 1.21875C10.3646 0.40625 11.3472 0 12.5 0V16.6667H10.8333Z" fill="#17B0D6"/>
-  </svg>
-);
+/* ── MAIN FEED ── */
+.feed{
+  flex:1;
+  padding:24px 40px 48px 28px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  max-width:760px;
+}
+.feed-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:4px;}
+.feed-title{font-family:var(--font-serif);font-size:30px;font-weight:600;color:var(--text);line-height:1.2;}
+.feed-sub{font-size:14px;color:var(--text-dim);margin-top:4px;}
+.filter-btn{
+  background:#222224;border-radius:4px;padding:8px 14px;
+  display:flex;gap:8px;align-items:center;cursor:pointer;
+  border:1px solid var(--border);transition:border-color .15s;
+  white-space:nowrap;
+}
+.filter-btn:hover{border-color:var(--border-hover);}
+.filter-text{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:1px;color:var(--text-dim);}
 
-const BedIcon = () => (
-  <svg width="17" height="12" viewBox="0 0 17 12" fill="none">
-    <path d="M0 11.6667V6.66667C0 6.29167 0.0763889 5.95139 0.229167 5.64583C0.381944 5.34028 0.583333 5.06944 0.833333 4.83333V2.5C0.833333 1.80556 1.07639 1.21528 1.5625 0.729167C2.04861 0.243056 2.63889 0 3.33333 0H6.66667C6.98611 0 7.28472 0.0590278 7.5625 0.177083C7.84028 0.295139 8.09722 0.458333 8.33333 0.666667C8.56944 0.458333 8.82639 0.295139 9.10417 0.177083C9.38194 0.0590278 9.68056 0 10 0H13.3333C14.0278 0 14.6181 0.243056 15.1042 0.729167C15.5903 1.21528 15.8333 1.80556 15.8333 2.5V4.83333C16.0833 5.06944 16.2847 5.34028 16.4375 5.64583C16.5903 5.95139 16.6667 6.29167 16.6667 6.66667V11.6667H15V10H1.66667V11.6667H0ZM9.16667 4.16667H14.1667V2.5C14.1667 2.26389 14.0868 2.06597 13.9271 1.90625C13.7674 1.74653 13.5694 1.66667 13.3333 1.66667H10C9.76389 1.66667 9.56597 1.74653 9.40625 1.90625C9.24653 2.06597 9.16667 2.26389 9.16667 2.5V4.16667ZM2.5 4.16667H7.5V2.5C7.5 2.26389 7.42014 2.06597 7.26042 1.90625C7.10069 1.74653 6.90278 1.66667 6.66667 1.66667H3.33333C3.09722 1.66667 2.89931 1.74653 2.73958 1.90625C2.57986 2.06597 2.5 2.26389 2.5 2.5V4.16667ZM1.66667 8.33333H15V6.66667C15 6.43056 14.9201 6.23264 14.7604 6.07292C14.6007 5.91319 14.4028 5.83333 14.1667 5.83333H2.5C2.26389 5.83333 2.06597 5.91319 1.90625 6.07292C1.74653 6.23264 1.66667 6.43056 1.66667 6.66667V8.33333Z" fill="#17B0D6"/>
-  </svg>
-);
+/* ── QUOTE CARDS ── */
+.quote-card{
+  background:rgba(24,24,26,0.7);
+  border-radius:8px;
+  border:1px solid var(--border);
+  backdrop-filter:blur(10px);
+  overflow:hidden;cursor:pointer;
+  transition:border-color .2s,background .2s;
+}
+.quote-card:hover{border-color:var(--border-hover);}
+.quote-card.selected{background:var(--cyan-faint);border-color:var(--cyan-border);}
 
-const GlobeIcon = () => (
-  <svg width="17" height="17" viewBox="0 0 17 17" fill="none">
-    <path d="M8.34375 16.6667C7.19792 16.6667 6.11806 16.4479 5.10417 16.0104C4.09028 15.5729 3.20486 14.9757 2.44792 14.2188C1.69097 13.4618 1.09375 12.5764 0.65625 11.5625C0.21875 10.5486 0 9.46875 0 8.32292C0 7.17708 0.21875 6.10069 0.65625 5.09375C1.09375 4.08681 1.69097 3.20486 2.44792 2.44792C3.20486 1.69097 4.09028 1.09375 5.10417 0.65625C6.11806 0.21875 7.19792 0 8.34375 0C9.48958 0 10.566 0.21875 11.5729 0.65625C12.5799 1.09375 13.4618 1.69097 14.2188 2.44792C14.9757 3.20486 15.5729 4.08681 16.0104 5.09375C16.4479 6.10069 16.6667 7.17708 16.6667 8.32292C16.6667 9.46875 16.4479 10.5486 16.0104 11.5625C15.5729 12.5764 14.9757 13.4618 14.2188 14.2188C13.4618 14.9757 12.5799 15.5729 11.5729 16.0104C10.566 16.4479 9.48958 16.6667 8.34375 16.6667ZM8.33333 14.9583C8.69444 14.4583 9.00694 13.9375 9.27083 13.3958C9.53472 12.8542 9.75 12.2778 9.91667 11.6667H6.75C6.91667 12.2778 7.13194 12.8542 7.39583 13.3958C7.65972 13.9375 7.97222 14.4583 8.33333 14.9583Z" fill="#17B0D6"/>
-  </svg>
-);
+.img-wrap{height:220px;position:relative;overflow:hidden;}
+.img-wrap img{width:100%;height:100%;object-fit:cover;display:block;}
+.img-bg-fallback{
+  width:100%;height:100%;
+  background:linear-gradient(160deg,#1a2535 0%,#0e1520 50%,#0a0a0d 100%);
+  display:flex;align-items:center;justify-content:center;
+}
+.img-gradient{position:absolute;inset:0;background:linear-gradient(0deg,rgba(14,14,16,.95) 0%,rgba(14,14,16,0) 55%);}
 
-const AwardIcon = () => (
-  <svg width="14" height="18" viewBox="0 0 14 18" fill="none">
-    <path d="M4.72917 9.75L5.45833 7.375L3.54167 5.83333H5.91667L6.66667 3.5L7.41667 5.83333H9.79167L7.85417 7.375L8.58333 9.75L6.66667 8.27083L4.72917 9.75ZM1.66667 17.5V11.0625C1.13889 10.4792 0.729167 9.8125 0.4375 9.0625C0.145833 8.3125 0 7.51389 0 6.66667C0 4.80556 0.645833 3.22917 1.9375 1.9375C3.22917 0.645833 4.80556 0 6.66667 0C8.52778 0 10.1042 0.645833 11.3958 1.9375C12.6875 3.22917 13.3333 4.80556 13.3333 6.66667C13.3333 7.51389 13.1875 8.3125 12.8958 9.0625C12.6042 9.8125 12.1944 10.4792 11.6667 11.0625V17.5L6.66667 15.8333L1.66667 17.5Z" fill="#17B0D6"/>
-  </svg>
-);
+.badge{
+  position:absolute;top:14px;left:14px;z-index:2;
+  border-radius:20px;padding:5px 12px;
+  display:flex;gap:6px;align-items:center;
+}
+.badge-green{background:var(--green);}
+.badge-cyan{background:var(--cyan);}
+.badge-text{font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;}
+.badge-text-dark{font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#342800;}
 
-const BarIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
-    <path d="M2.5 15V13.3333H6.66667V9.16667L0 1.66667V0H15V1.66667L8.33333 9.16667V13.3333H12.5V15H2.5ZM3.70833 3.33333H11.2917L12.7917 1.66667H2.20833L3.70833 3.33333ZM7.5 7.58333L9.8125 5H5.1875L7.5 7.58333Z" fill="#17B0D6"/>
-  </svg>
-);
+.card-body{padding:24px 28px;display:flex;flex-direction:column;gap:14px;}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.aircraft-name{font-family:var(--font-mono);font-size:13px;font-weight:400;letter-spacing:1.8px;text-transform:uppercase;color:var(--cyan);line-height:1.4;}
+.operator-name{font-family:var(--font-serif);font-size:26px;font-weight:600;color:var(--text);line-height:1.2;margin-top:2px;}
+.price-col{text-align:right;}
+.price-label{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text-dim);}
+.price-value{font-family:var(--font-serif);font-size:22px;font-weight:400;color:var(--cyan);line-height:1.3;margin-top:2px;}
 
-const ShieldGreenIcon = () => (
-  <svg width="12" height="15" viewBox="0 0 12 15" fill="none">
-    <path d="M5.2125 10.1625L9.45 5.925L8.38125 4.85625L5.2125 8.025L3.6375 6.45L2.56875 7.51875L5.2125 10.1625ZM6 15C4.2625 14.5625 2.82812 13.5656 1.69687 12.0094C0.565625 10.4531 0 8.725 0 6.825V2.25L6 0L12 2.25V6.825C12 8.725 11.4344 10.4531 10.3031 12.0094C9.17188 13.5656 7.7375 14.5625 6 15Z" fill="#10B981"/>
-  </svg>
-);
+.amenities{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding-bottom:4px;}
+.amenity{display:flex;gap:8px;align-items:center;}
+.amenity-text{font-size:13px;color:var(--text-dim);line-height:1.3;}
 
-const LightningIcon = () => (
-  <svg width="8" height="10" viewBox="0 0 8 10" fill="none">
-    <path d="M3.275 8.1L5.8625 5H3.8625L4.225 2.1625L1.9125 5.5H3.65L3.275 8.1ZM2 10L2.5 6.5H0L4.5 0H5.5L5 4H8L3 10H2Z" fill="#342800"/>
-  </svg>
-);
+.card-footer{border-top:1px solid rgba(68,71,77,0.2);padding-top:14px;display:flex;justify-content:space-between;align-items:center;}
+.safety-row{display:flex;gap:7px;align-items:center;}
+.safety-text{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;}
+.safety-green{color:var(--green);}
+.safety-gold{color:var(--gold);}
 
-// Bombardier image as base64 placeholder (dark grey gradient)
-const BombardierBg = () => (
-  <div style={{
-    width: "100%", height: "100%", position: "absolute", top: 0, left: 0,
-    background: "linear-gradient(135deg, #1a2535 0%, #0e1520 40%, #131315 100%)",
-    display: "flex", alignItems: "center", justifyContent: "center"
-  }}>
-    <div style={{ opacity: 0.12, fontSize: 80, color: "#fff", fontFamily: "serif", letterSpacing: -4 }}>✈</div>
+.btn-select{
+  background:var(--cyan);border-radius:4px;padding:11px 28px;
+  color:#342800;font-family:var(--font-mono);font-size:12px;font-weight:700;
+  letter-spacing:1.4px;text-transform:uppercase;cursor:pointer;border:none;
+  transition:background .15s,transform .1s;
+  box-shadow:0 0 16px rgba(23,176,214,0.25);
+}
+.btn-select:hover{background:#13a0c4;}
+.btn-select:active{transform:scale(0.97);}
+
+/* ── CONFIRM BAR ── */
+.confirm-bar{
+  background:var(--cyan-faint);border:1px solid var(--cyan-border);
+  border-radius:8px;padding:16px 20px;
+  display:none;align-items:center;justify-content:space-between;gap:16px;
+}
+.confirm-bar.show{display:flex;}
+.confirm-title{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--cyan);}
+.confirm-sub{font-size:12px;color:var(--text-dim);margin-top:3px;}
+.btn-confirm{
+  background:var(--cyan);border-radius:4px;padding:10px 20px;
+  color:#342800;font-family:var(--font-mono);font-size:11px;font-weight:700;
+  letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;
+  white-space:nowrap;transition:background .15s;
+}
+.btn-confirm:hover{background:#13a0c4;}
+
+/* ── LOADING ── */
+.loading-state{text-align:center;padding:60px 24px;color:var(--text-dim);font-size:14px;}
+.spinner{display:inline-block;width:22px;height:22px;border:2px solid rgba(23,176,214,0.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px;}
+
+/* ── FILTER DROPDOWN ── */
+.filter-dropdown{
+  background:#1e1e20;border:1px solid var(--border);
+  border-radius:8px;padding:4px 0;
+  position:absolute;right:0;top:8px;
+  width:260px;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5);
+}
+.filter-section{padding:12px 16px;}
+.filter-section-title{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;}
+.filter-select-wrap{position:relative;}
+.filter-select{
+  width:100%;height:38px;padding:0 32px 0 12px;
+  background:rgba(255,255,255,0.05);border:1px solid var(--border);
+  border-radius:6px;color:var(--text);font-family:var(--font);font-size:13px;
+  outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;
+  transition:border-color .15s;
+}
+.filter-select:hover,.filter-select:focus{border-color:var(--cyan);}
+.filter-select option{background:#1e1e20;color:var(--text);}
+.select-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;}
+.filter-divider{height:1px;background:rgba(68,71,77,0.25);margin:0 16px;}
+.filter-reset{
+  width:100%;padding:12px 16px;background:transparent;border:none;
+  font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;color:rgba(192,57,43,0.7);cursor:pointer;text-align:left;
+  transition:color .15s;
+}
+.filter-reset:hover{color:#e06060;}
+
+@keyframes spin{to{transform:rotate(360deg);}}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.quote-card{animation:slideIn .25s ease;}
+
+@media(max-width:900px){
+  .page{flex-direction:column;}
+  .sidebar{width:100%;min-width:0;position:static;height:auto;padding:16px;}
+  .feed{padding:16px;}
+  .amenities{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">SkyVayu</a>
+  <div class="nav-links">
+    <a href="index.html" class="active">Home</a>
+    <a href="index.html#section-routes">Routes</a>
+    <a href="index.html#section-why">About Us</a>
   </div>
-);
+</nav>
 
-const GulfstreamBg = () => (
-  <div style={{
-    width: "100%", height: "100%", position: "absolute", top: 0, left: 0,
-    background: "linear-gradient(135deg, #0d1e2e 0%, #0a1218 40%, #131315 100%)",
-    display: "flex", alignItems: "center", justifyContent: "center"
-  }}>
-    <div style={{ opacity: 0.12, fontSize: 80, color: "#fff", fontFamily: "serif", letterSpacing: -4 }}>✈</div>
-  </div>
-);
+<div class="page">
 
-const NOTIFICATION_ITEMS = [
-  { icon: "new", label: "New quote received", time: "Just now", active: true },
-  { icon: "reviewed", label: "SkyVayu reviewed", time: "12 mins ago", active: false },
-  { icon: "submitted", label: "Request submitted", time: "25 mins ago", active: false, dim: true },
-];
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
 
-export default function SkyVayuDashboard() {
-  const [minutes, setMinutes] = useState(55);
-  const [seconds, setSeconds] = useState(0);
-  const [notified, setNotified] = useState(8);
-  const [reviewing, setReviewing] = useState(3);
-  const [received, setReceived] = useState(4);
-  const [selectedCard, setSelectedCard] = useState(null);
-  const [hoverCard, setHoverCard] = useState(null);
-  const [notifications, setNotifications] = useState(NOTIFICATION_ITEMS);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setSeconds(s => {
-        if (s === 0) {
-          setMinutes(m => (m > 0 ? m - 1 : 0));
-          return 59;
-        }
-        return s - 1;
-      });
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const timeString = `${minutes} min ${seconds.toString().padStart(2, "0")} sec remaining`;
-  const progress = ((55 * 60 - (minutes * 60 + seconds)) / (55 * 60)) * 100;
-
-  const styles = {
-    root: {
-      background: "#131315",
-      minHeight: "100vh",
-      fontFamily: "'Manrope', 'Segoe UI', sans-serif",
-      position: "relative",
-      overflow: "hidden",
-    },
-    nav: {
-      background: "rgba(2,6,23,0.85)",
-      backdropFilter: "blur(8px)",
-      height: 80,
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 100,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0 32px",
-      boxShadow: "0 20px 40px rgba(0,0,0,0.25)",
-      borderBottom: "1px solid rgba(143,144,151,0.08)",
-    },
-    navBrand: {
-      color: "#fbbf24",
-      fontFamily: "'Georgia', serif",
-      fontSize: 24,
-      fontStyle: "italic",
-      letterSpacing: "-1.2px",
-      fontWeight: 400,
-    },
-    navLinks: {
-      display: "flex",
-      gap: 48,
-      alignItems: "center",
-    },
-    navLinkActive: {
-      color: "#fbbf24",
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: "1.2px",
-      textTransform: "uppercase",
-      borderBottom: "2px solid #fbbf24",
-      paddingBottom: 4,
-      cursor: "pointer",
-    },
-    navLink: {
-      color: "#cbd5e1",
-      fontSize: 12,
-      fontWeight: 400,
-      letterSpacing: "1.2px",
-      textTransform: "uppercase",
-      cursor: "pointer",
-    },
-    main: {
-      paddingTop: 100,
-      display: "grid",
-      gridTemplateColumns: "repeat(12, 1fr)",
-      gap: 16,
-      padding: "116px 64px 48px",
-      maxWidth: 1280,
-      margin: "0 auto",
-    },
-    sidebar: {
-      gridColumn: "1 / span 4",
-      display: "flex",
-      flexDirection: "column",
-      gap: 16,
-    },
-    card: {
-      background: "rgba(31,31,33,0.6)",
-      borderRadius: 8,
-      border: "1px solid rgba(143,144,151,0.1)",
-      backdropFilter: "blur(10px)",
-      padding: 16,
-    },
-    routeRow: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingBottom: 8,
-    },
-    cityCode: {
-      color: "#e4e2e4",
-      fontFamily: "'Georgia', serif",
-      fontSize: 24,
-      fontWeight: 500,
-      lineHeight: "32px",
-    },
-    cityName: {
-      color: "#c5c6cd",
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: "1.2px",
-      lineHeight: "16px",
-    },
-    metaGrid: {
-      borderTop: "1px solid rgba(68,71,77,0.2)",
-      paddingTop: 16,
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: 8,
-    },
-    metaLabel: {
-      color: "#c5c6cd",
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: "1.2px",
-      textTransform: "uppercase",
-      lineHeight: "16px",
-    },
-    metaValue: {
-      color: "#e4e2e4",
-      fontSize: 14,
-      fontWeight: 600,
-      lineHeight: "20px",
-    },
-    liveCard: {
-      background: "rgba(31,31,33,0.6)",
-      borderRadius: 8,
-      backdropFilter: "blur(10px)",
-      padding: 16,
-      position: "relative",
-      minHeight: 367,
-    },
-    liveTitle: {
-      color: "#c5c6cd",
-      fontSize: 16,
-      fontWeight: 400,
-      textTransform: "uppercase",
-      lineHeight: "24px",
-      letterSpacing: "0.5px",
-    },
-    liveTimer: {
-      color: "#17b0d6",
-      fontFamily: "'Georgia', serif",
-      fontSize: 24,
-      fontWeight: 500,
-      lineHeight: "32px",
-      marginTop: 4,
-      transition: "opacity 0.3s",
-    },
-    statsBar: {
-      background: "#1b1b1d",
-      borderRadius: 2,
-      padding: 8,
-      display: "flex",
-      justifyContent: "space-between",
-      marginTop: 16,
-      marginBottom: 16,
-    },
-    statItem: {
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: 0,
-    },
-    statNum: {
-      color: "#e4e2e4",
-      fontSize: 16,
-      fontWeight: 700,
-      lineHeight: "24px",
-      textAlign: "center",
-    },
-    statNumHighlight: {
-      color: "#17b0d6",
-      fontSize: 16,
-      fontWeight: 700,
-      lineHeight: "24px",
-      textAlign: "center",
-    },
-    statLabel: {
-      color: "#c5c6cd",
-      fontSize: 10,
-      fontWeight: 400,
-      textTransform: "uppercase",
-      lineHeight: "15px",
-      textAlign: "center",
-    },
-    progressWrap: {
-      position: "relative",
-      height: 6,
-      marginBottom: 16,
-    },
-    progressTrack: {
-      background: "rgba(23,176,214,0.2)",
-      borderRadius: 40,
-      width: "100%",
-      height: 6,
-      position: "absolute",
-    },
-    progressFill: {
-      background: "#17b0d6",
-      borderRadius: 40,
-      height: 6,
-      position: "absolute",
-      transition: "width 1s linear",
-    },
-    notifList: {
-      display: "flex",
-      flexDirection: "column",
-      gap: 16,
-      position: "relative",
-      paddingLeft: 0,
-    },
-    vertLine: {
-      position: "absolute",
-      left: 11,
-      top: 24,
-      bottom: 8,
-      width: 1,
-      background: "rgba(68,71,77,0.3)",
-    },
-    notifRow: {
-      display: "flex",
-      gap: 16,
-      alignItems: "flex-start",
-    },
-    notifDot: (active) => ({
-      width: 24,
-      height: 24,
-      borderRadius: 12,
-      background: active ? "#17b0d6" : "#343536",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexShrink: 0,
-    }),
-    notifLabel: {
-      color: "#e4e2e4",
-      fontSize: 14,
-      fontWeight: 600,
-      lineHeight: "20px",
-    },
-    notifTime: {
-      color: "#c5c6cd",
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: "1.2px",
-      lineHeight: "16px",
-    },
-    feed: {
-      gridColumn: "5 / span 8",
-      display: "flex",
-      flexDirection: "column",
-      gap: 16,
-    },
-    feedHeader: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "flex-end",
-    },
-    feedTitle: {
-      color: "#e4e2e4",
-      fontFamily: "'Georgia', serif",
-      fontSize: 32,
-      fontWeight: 600,
-      lineHeight: "40px",
-    },
-    feedSub: {
-      color: "#c5c6cd",
-      fontSize: 16,
-      fontWeight: 400,
-      lineHeight: "24px",
-      marginTop: 2,
-    },
-    filterBtn: {
-      background: "#2a2a2c",
-      borderRadius: 4,
-      padding: "8px 16px",
-      display: "flex",
-      gap: 8,
-      alignItems: "center",
-      cursor: "pointer",
-      border: "1px solid rgba(143,144,151,0.1)",
-    },
-    filterText: {
-      color: "#c5c6cd",
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: "1.2px",
-    },
-    quoteCard: (hover, selected) => ({
-      background: selected ? "rgba(23,176,214,0.05)" : "rgba(31,31,33,0.6)",
-      borderRadius: 8,
-      border: selected
-        ? "1px solid rgba(23,176,214,0.4)"
-        : hover
-        ? "1px solid rgba(143,144,151,0.2)"
-        : "1px solid rgba(143,144,151,0.1)",
-      backdropFilter: "blur(10px)",
-      overflow: "hidden",
-      cursor: "pointer",
-      transition: "border 0.2s, background 0.2s",
-    }),
-    imageWrap: {
-      height: 240,
-      position: "relative",
-      overflow: "hidden",
-    },
-    gradient: {
-      position: "absolute",
-      inset: 0,
-      background: "linear-gradient(0deg, rgba(14,14,16,1) 0%, rgba(14,14,16,0) 50%)",
-      zIndex: 1,
-    },
-    badgeGreen: {
-      background: "#10b981",
-      borderRadius: 12,
-      padding: "4px 12px",
-      display: "flex",
-      gap: 4,
-      alignItems: "center",
-      position: "absolute",
-      top: 16,
-      left: 16,
-      zIndex: 2,
-    },
-    badgeBlue: {
-      background: "#17b0d6",
-      borderRadius: 12,
-      padding: "4px 12px",
-      display: "flex",
-      gap: 4,
-      alignItems: "center",
-      position: "absolute",
-      top: 16,
-      left: 16,
-      zIndex: 2,
-    },
-    badgeText: {
-      color: "#fff",
-      fontSize: 10,
-      fontWeight: 700,
-      letterSpacing: "1px",
-      textTransform: "uppercase",
-    },
-    badgeTextDark: {
-      color: "#342800",
-      fontSize: 10,
-      fontWeight: 700,
-      letterSpacing: "1px",
-      textTransform: "uppercase",
-    },
-    cardBody: {
-      padding: 32,
-      display: "flex",
-      flexDirection: "column",
-      gap: 16,
-    },
-    cardTopRow: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "flex-start",
-    },
-    aircraftName: {
-      color: "#17b0d6",
-      fontSize: 16,
-      fontWeight: 400,
-      letterSpacing: "1.6px",
-      textTransform: "uppercase",
-      lineHeight: "24px",
-    },
-    operatorName: {
-      color: "#e4e2e4",
-      fontFamily: "'Georgia', serif",
-      fontSize: 32,
-      fontWeight: 600,
-      lineHeight: "40px",
-    },
-    priceLabel: {
-      color: "#c5c6cd",
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: "1.2px",
-      textAlign: "right",
-    },
-    priceValue: {
-      color: "#17b0d6",
-      fontFamily: "'Georgia', serif",
-      fontSize: 16,
-      fontWeight: 400,
-      lineHeight: "24px",
-      textAlign: "right",
-    },
-    amenitiesGrid: {
-      display: "grid",
-      gridTemplateColumns: "repeat(4, 1fr)",
-      gap: 16,
-      paddingBottom: 16,
-    },
-    amenityItem: {
-      display: "flex",
-      gap: 8,
-      alignItems: "center",
-    },
-    amenityText: {
-      color: "#c5c6cd",
-      fontSize: 14,
-      fontWeight: 400,
-      lineHeight: "20px",
-    },
-    cardFooter: {
-      borderTop: "1px solid rgba(68,71,77,0.2)",
-      paddingTop: 16,
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    safetyRow: {
-      display: "flex",
-      gap: 8,
-      alignItems: "center",
-    },
-    safetyText: {
-      color: "#10b981",
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: "-0.6px",
-      textTransform: "uppercase",
-    },
-    safetyTextGold: {
-      color: "#fbbf24",
-      fontSize: 12,
-      fontWeight: 700,
-      letterSpacing: "-0.6px",
-      textTransform: "uppercase",
-    },
-    selectBtn: {
-      background: "#17b0d6",
-      borderRadius: 4,
-      padding: "12px 32px",
-      color: "#342800",
-      fontSize: 14,
-      fontWeight: 700,
-      letterSpacing: "1.4px",
-      textTransform: "uppercase",
-      cursor: "pointer",
-      border: "none",
-      transition: "background 0.2s, transform 0.1s",
-      boxShadow: "0 0 20px rgba(233,195,73,0.2)",
-    },
-  };
-
-  return (
-    <div style={styles.root}>
-      {/* Nav */}
-      <nav style={styles.nav}>
-        <div style={styles.navBrand}>SkyVayu</div>
-        <div style={styles.navLinks}>
-          <span style={styles.navLinkActive}>Home</span>
-          <span style={styles.navLink}>Routes</span>
-          <span style={styles.navLink}>About Us</span>
+    <!-- Route card -->
+    <div class="route-card">
+      <div class="route-row">
+        <div>
+          <div class="city-code" id="dep-code">BOM</div>
+          <div class="city-name" id="dep-name">Mumbai</div>
         </div>
-      </nav>
+        <svg width="21" height="19" viewBox="0 0 21 19" fill="none">
+          <path d="M2 18.15V16.15H20V18.15H2ZM3.75 13.15L0 6.9L2.4 6.25L5.2 8.6L8.7 7.675L3.525 0.775L6.425 0L13.9 6.275L18.15 5.125C18.6833 4.975 19.1875 5.0375 19.6625 5.3125C20.1375 5.5875 20.45 5.99167 20.6 6.525C20.75 7.05833 20.6875 7.5625 20.4125 8.0375C20.1375 8.5125 19.7333 8.825 19.2 8.975L3.75 13.15Z" fill="#8F9097"/>
+        </svg>
+        <div style="text-align:right;">
+          <div class="city-code" id="dest-code">DXB</div>
+          <div class="city-name" id="dest-name" style="text-align:right;">Dubai</div>
+        </div>
+      </div>
+      <div class="route-meta">
+        <div>
+          <div class="meta-label">Departure</div>
+          <div class="meta-value" id="meta-date">Oct 24, 10:30 AM</div>
+        </div>
+        <div class="meta-right">
+          <div class="meta-label">Passengers</div>
+          <div class="meta-value" id="meta-pax">2 Adults, One Way</div>
+        </div>
+      </div>
+      <div id="meta-reqs" style="display:none;margin-top:12px;padding-top:12px;border-top:1px solid rgba(68,71,77,0.25);display:flex;gap:8px;flex-wrap:wrap;"></div>
+    </div>
 
-      {/* Main grid */}
-      <div style={styles.main}>
-        {/* Sidebar */}
-        <aside style={styles.sidebar}>
-          {/* Route summary */}
-          <div style={styles.card}>
-            <div style={styles.routeRow}>
-              <div>
-                <div style={styles.cityCode}>BOM</div>
-                <div style={styles.cityName}>Mumbai</div>
-              </div>
-              <PlaneIcon />
-              <div style={{ textAlign: "right" }}>
-                <div style={{ ...styles.cityCode, textAlign: "right" }}>DXB</div>
-                <div style={{ ...styles.cityName, textAlign: "right" }}>Dubai</div>
-              </div>
-            </div>
-            <div style={styles.metaGrid}>
-              <div>
-                <div style={styles.metaLabel}>Departure</div>
-                <div style={styles.metaValue}>Oct 24, 10:30 AM</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ ...styles.metaLabel, textAlign: "right" }}>Passengers</div>
-                <div style={{ ...styles.metaValue, textAlign: "right" }}>2 Adults, One Way</div>
-              </div>
-            </div>
-          </div>
+    <!-- Live status card -->
+    <div class="live-card">
+      <div class="live-label">Live Quotations Arriving</div>
+      <div class="live-timer" id="live-timer">55 min remaining</div>
 
-          {/* Live status */}
-          <div style={styles.liveCard}>
-            <div style={{ marginBottom: 8 }}>
-              <div style={styles.liveTitle}>Live Quotations Arriving</div>
-              <div style={styles.liveTimer}>{timeString}</div>
-            </div>
+      <div class="progress-wrap">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
 
-            {/* Progress bar */}
-            <div style={styles.progressWrap}>
-              <div style={styles.progressTrack} />
-              <div style={{ ...styles.progressFill, width: `${Math.min(progress, 100)}%` }} />
-            </div>
-
-            {/* Stats bar */}
-            <div style={styles.statsBar}>
-              <div style={styles.statItem}>
-                <div style={styles.statNum}>{notified}</div>
-                <div style={styles.statLabel}>Notified</div>
-              </div>
-              <div style={styles.statItem}>
-                <div style={styles.statNum}>{reviewing}</div>
-                <div style={styles.statLabel}>Reviewing</div>
-              </div>
-              <div style={styles.statItem}>
-                <div style={styles.statNumHighlight}>{received}</div>
-                <div style={styles.statLabel}>Received</div>
-              </div>
-            </div>
-
-            {/* Notifications */}
-            <div style={styles.notifList}>
-              <div style={styles.vertLine} />
-              {notifications.map((n, i) => (
-                <div key={i} style={{ ...styles.notifRow, opacity: n.dim ? 0.6 : 1 }}>
-                  <div style={styles.notifDot(n.active)}>
-                    {n.icon === "new" && <CheckIcon />}
-                    {n.icon === "reviewed" && <ShieldIcon />}
-                    {n.icon === "submitted" && (
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M4.08333 7V2.24583L2.56667 3.7625L1.75 2.91667L4.66667 0L7.58333 2.91667L6.76667 3.7625L5.25 2.24583V7H4.08333ZM1.16667 9.33333C0.845833 9.33333 0.571181 9.2191 0.342708 8.99063C0.114236 8.76215 0 8.4875 0 8.16667V6.41667H1.16667V8.16667H8.16667V6.41667H9.33333V8.16667C9.33333 8.4875 9.2191 8.76215 8.99063 8.99063C8.76215 9.2191 8.4875 9.33333 8.16667 9.33333H1.16667Z" fill="#C5C6CD"/>
-                      </svg>
-                    )}
-                  </div>
-                  <div>
-                    <div style={styles.notifLabel}>{n.label}</div>
-                    <div style={styles.notifTime}>{n.time}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </aside>
-
-        {/* Main feed */}
-        <div style={styles.feed}>
-          <div style={styles.feedHeader}>
-            <div>
-              <div style={styles.feedTitle}>Available Aircraft</div>
-              <div style={styles.feedSub}>Real-time inventory from verified operators.</div>
-            </div>
-            <div style={styles.filterBtn}>
-              <FilterIcon />
-              <span style={styles.filterText}>Filter</span>
-            </div>
-          </div>
-
-          {/* Quote Card 1 — Bombardier */}
-          <div
-            style={styles.quoteCard(hoverCard === 1, selectedCard === 1)}
-            onMouseEnter={() => setHoverCard(1)}
-            onMouseLeave={() => setHoverCard(null)}
-            onClick={() => setSelectedCard(selectedCard === 1 ? null : 1)}
-          >
-            <div style={styles.imageWrap}>
-              <BombardierBg />
-              <div style={styles.gradient} />
-              <div style={styles.badgeGreen}>
-                <BadgeIcon />
-                <span style={styles.badgeText}>Best Price</span>
-              </div>
-            </div>
-            <div style={styles.cardBody}>
-              <div style={styles.cardTopRow}>
-                <div>
-                  <div style={styles.aircraftName}>Bombardier Global 6000</div>
-                  <div style={styles.operatorName}>SkyVayu Air Pvt Ltd</div>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={styles.priceLabel}>All-inclusive price</div>
-                  <div style={styles.priceValue}>₹12,80,000</div>
-                </div>
-              </div>
-              <div style={styles.amenitiesGrid}>
-                <div style={styles.amenityItem}><SeatIcon /><span style={styles.amenityText}>14 Seats</span></div>
-                <div style={styles.amenityItem}><WifiIcon /><span style={styles.amenityText}>WiFi High-speed</span></div>
-                <div style={styles.amenityItem}><FoodIcon /><span style={styles.amenityText}>Gourmet Catering</span></div>
-                <div style={styles.amenityItem}><BedIcon /><span style={styles.amenityText}>Berthable</span></div>
-              </div>
-              <div style={styles.cardFooter}>
-                <div style={styles.safetyRow}>
-                  <ShieldGreenIcon />
-                  <span style={styles.safetyText}>Safety Rated Platinum</span>
-                </div>
-                <button
-                  style={styles.selectBtn}
-                  onClick={(e) => { e.stopPropagation(); setSelectedCard(1); }}
-                  onMouseEnter={e => e.target.style.background = "#15a0c2"}
-                  onMouseLeave={e => e.target.style.background = "#17b0d6"}
-                >
-                  SELECT →
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Quote Card 2 — Gulfstream */}
-          <div
-            style={styles.quoteCard(hoverCard === 2, selectedCard === 2)}
-            onMouseEnter={() => setHoverCard(2)}
-            onMouseLeave={() => setHoverCard(null)}
-            onClick={() => setSelectedCard(selectedCard === 2 ? null : 2)}
-          >
-            <div style={styles.imageWrap}>
-              <GulfstreamBg />
-              <div style={styles.gradient} />
-              <div style={styles.badgeBlue}>
-                <LightningIcon />
-                <span style={styles.badgeTextDark}>Fastest Response</span>
-              </div>
-            </div>
-            <div style={styles.cardBody}>
-              <div style={styles.cardTopRow}>
-                <div>
-                  <div style={styles.aircraftName}>Gulfstream G 650 ER</div>
-                  <div style={styles.operatorName}>SkyVayu Air Pvt Ltd</div>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <div style={styles.priceLabel}>All-inclusive price</div>
-                  <div style={styles.priceValue}>₹15,40,000</div>
-                </div>
-              </div>
-              <div style={styles.amenitiesGrid}>
-                <div style={styles.amenityItem}><SeatIcon /><span style={styles.amenityText}>16 Seats</span></div>
-                <div style={styles.amenityItem}><GlobeIcon /><span style={styles.amenityText}>Ultra Long Range</span></div>
-                <div style={styles.amenityItem}><AwardIcon /><span style={styles.amenityText}>VIP-friendly</span></div>
-                <div style={styles.amenityItem}><BarIcon /><span style={styles.amenityText}>Full Bar</span></div>
-              </div>
-              <div style={styles.cardFooter}>
-                <div style={styles.safetyRow}>
-                  <ShieldGreenIcon />
-                  <span style={styles.safetyTextGold}>Safety Rated Gold</span>
-                </div>
-                <button
-                  style={styles.selectBtn}
-                  onClick={(e) => { e.stopPropagation(); setSelectedCard(2); }}
-                  onMouseEnter={e => e.target.style.background = "#15a0c2"}
-                  onMouseLeave={e => e.target.style.background = "#17b0d6"}
-                >
-                  SELECT →
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {selectedCard && (
-            <div style={{
-              background: "rgba(23,176,214,0.08)",
-              border: "1px solid rgba(23,176,214,0.3)",
-              borderRadius: 8,
-              padding: "16px 24px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              animation: "fadeIn 0.3s ease",
-            }}>
-              <div>
-                <div style={{ color: "#17b0d6", fontSize: 14, fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase" }}>
-                  {selectedCard === 1 ? "Bombardier Global 6000 selected" : "Gulfstream G 650 ER selected"}
-                </div>
-                <div style={{ color: "#c5c6cd", fontSize: 13, marginTop: 2 }}>
-                  {selectedCard === 1 ? "₹12,80,000 — SAFETY RATED PLATINUM" : "₹15,40,000 — SAFETY RATED GOLD"}
-                </div>
-              </div>
-              <button
-                style={{ ...styles.selectBtn, padding: "10px 24px", fontSize: 12 }}
-                onClick={() => {}}
-                onMouseEnter={e => e.target.style.background = "#15a0c2"}
-                onMouseLeave={e => e.target.style.background = "#17b0d6"}
-              >
-                Confirm Booking →
-              </button>
-            </div>
-          )}
+      <div class="stats-bar">
+        <div class="stat-item">
+          <div class="stat-num" id="stat-notified">—</div>
+          <div class="stat-label">Notified</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num" id="stat-reviewing">—</div>
+          <div class="stat-label">Reviewing</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num cyan" id="stat-received">0</div>
+          <div class="stat-label">Received</div>
         </div>
       </div>
 
-      <style>{`
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        * { box-sizing: border-box; }
-        button:active { transform: scale(0.98) !important; }
-      `}</style>
+      <div class="notif-list">
+        <div class="vert-line"></div>
+        <div class="notif-row">
+          <div class="notif-dot active">
+            <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M3.325 7.01L0 3.69L0.831 2.858L3.325 5.352L8.677 0L9.508 0.831L3.325 7.01Z" fill="#342800"/></svg>
+          </div>
+          <div>
+            <div class="notif-label">New quote received</div>
+            <div class="notif-time">Just now</div>
+          </div>
+        </div>
+        <div class="notif-row">
+          <div class="notif-dot">
+            <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M4.054 7.904L7.35 4.608L6.519 3.777L4.054 6.242L2.829 5.017L1.998 5.848L4.054 7.904ZM4.667 11.667C3.315 11.326 2.2 10.551 1.32 9.341C.44 8.13 0 6.786 0 5.308V1.75L4.667 0L9.333 1.75V5.308C9.333 6.786 8.893 8.13 8.014 9.341C7.134 10.551 6.018 11.326 4.667 11.667Z" fill="#C5C6CD"/></svg>
+          </div>
+          <div>
+            <div class="notif-label">SkyVayu reviewed</div>
+            <div class="notif-time">12 mins ago</div>
+          </div>
+        </div>
+        <div class="notif-row" style="opacity:.5;">
+          <div class="notif-dot">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M4.083 7V2.246L2.567 3.763L1.75 2.917L4.667 0L7.583 2.917L6.767 3.763L5.25 2.246V7H4.083ZM1.167 9.333C.846 9.333.571 9.219.343 8.991.114 8.762 0 8.488 0 8.167V6.417H1.167V8.167H8.167V6.417H9.333V8.167C9.333 8.488 9.219 8.762 8.991 8.991C8.762 9.219 8.488 9.333 8.167 9.333H1.167Z" fill="#C5C6CD"/></svg>
+          </div>
+          <div>
+            <div class="notif-label">Request submitted</div>
+            <div class="notif-time">25 mins ago</div>
+          </div>
+        </div>
+      </div>
     </div>
-  );
+
+  </aside>
+
+  <!-- MAIN FEED -->
+  <div class="feed">
+    <div class="feed-header" style="position:relative;">
+      <div>
+        <div class="feed-title">Available Aircraft</div>
+        <div class="feed-sub">Real-time inventory from verified operators.</div>
+      </div>
+      <div style="position:relative;">
+        <div class="filter-btn" onclick="toggleFilters()">
+          <svg width="14" height="9" viewBox="0 0 14 9" fill="none"><path d="M5.25 9V7.5H8.25V9H5.25ZM2.25 5.25V3.75H11.25V5.25H2.25ZM0 1.5V0H13.5V1.5H0Z" fill="#C5C6CD"/></svg>
+          <span class="filter-text">Filter</span>
+        </div>
+        <!-- FILTER DROPDOWN -->
+        <div id="filter-panel" style="display:none;position:absolute;right:0;top:44px;z-index:200;">
+      <div class="filter-dropdown">
+        <div class="filter-section">
+          <div class="filter-section-title">Sort by</div>
+          <div class="filter-select-wrap">
+            <select class="filter-select" onchange="setSort(this.value)">
+              <option value="price">Lowest price first</option>
+              <option value="seats">Most seats first</option>
+            </select>
+            <svg class="select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1L6 6L11 1" stroke="#C5C6CD" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-section">
+          <div class="filter-section-title">Minimum seats</div>
+          <div class="filter-select-wrap">
+            <select class="filter-select" onchange="setMinSeats(parseInt(this.value))">
+              <option value="0">Any number of seats</option>
+              <option value="4">4 or more seats</option>
+              <option value="8">8 or more seats</option>
+              <option value="12">12 or more seats</option>
+              <option value="16">16 or more seats</option>
+            </select>
+            <svg class="select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1L6 6L11 1" stroke="#C5C6CD" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="filter-divider"></div>
+        <div class="filter-section">
+          <div class="filter-section-title">Maximum price</div>
+          <div class="filter-select-wrap">
+            <select class="filter-select" onchange="setMaxPrice(parseInt(this.value))">
+              <option value="0">Any price</option>
+              <option value="500000">Under ₹5 lakh</option>
+              <option value="1000000">Under ₹10 lakh</option>
+              <option value="2000000">Under ₹20 lakh</option>
+              <option value="5000000">Under ₹50 lakh</option>
+            </select>
+            <svg class="select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1L6 6L11 1" stroke="#C5C6CD" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="filter-divider"></div>
+        <button class="filter-reset" onclick="resetFilters()">Reset filters</button>
+      </div>
+    </div>
+      </div>
+    </div>
+
+    <div id="quotes-container">
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <div>Waiting for quotes from operators...</div>
+        <div style="font-size:12px;margin-top:8px;opacity:.6;">Operators have 60 minutes to respond</div>
+      </div>
+    </div>
+
+    <div class="confirm-bar" id="confirm-bar">
+      <div>
+        <div class="confirm-title" id="confirm-title">—</div>
+        <div class="confirm-sub" id="confirm-sub">—</div>
+      </div>
+      <button class="btn-confirm" onclick="goToPayment()">Confirm Booking →</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/supabase.js"></script>
+<script>
+var SUPABASE_URL = SKYVAYU_CONFIG.supabaseUrl;
+var SUPABASE_KEY = SKYVAYU_CONFIG.supabaseKey;
+var queryId = sessionStorage.getItem('sv_query_id');
+var queryData = JSON.parse(sessionStorage.getItem('sv_query') || '{}');
+var selectedQuoteId = null;
+var selectedQuote = null;
+var quotesMap = {};
+var totalSeconds = 60 * 60; // 60 minutes
+var elapsed = 0;
+
+// ── Populate sidebar from session ──
+// sv_query stores: rs_type, rs_route ("Mumbai (VABB) → Delhi (VIDP)" or "X ⇄ Y"), rs_date, rs_pax
+function populateSidebar() {
+  var route = queryData.rs_route || '';
+  var parts = route.split(/→|⇄/).map(function(s){ return s.trim(); });
+  var dep = parts[0] || '';
+  var dest = parts[1] || '';
+
+  function getCode(s) { var m = s.match(/\(([^)]+)\)/); return m ? m[1] : s.substring(0,3).toUpperCase(); }
+  function getName(s) { return s.replace(/\s*\([^)]+\)/, '').trim(); }
+
+  document.getElementById('dep-code').textContent = dep ? getCode(dep) : 'DEP';
+  document.getElementById('dep-name').textContent = dep ? getName(dep) : '—';
+  document.getElementById('dest-code').textContent = dest ? getCode(dest) : 'ARR';
+  document.getElementById('dest-name').textContent = dest ? getName(dest) : '—';
+
+  document.getElementById('meta-date').textContent = queryData.rs_date || '—';
+  var pax = queryData.rs_pax || '—';
+  var tripType = queryData.rs_type || 'One Way';
+  document.getElementById('meta-pax').textContent = pax + ' Passenger' + (parseInt(pax) !== 1 ? 's' : '') + ', ' + tripType;
+
+  // Special requirements chips
+  var reqs = [];
+  if (queryData.rs_medivac) reqs.push('Medivac');
+  if (queryData.rs_pets) reqs.push('Pets');
+  if (queryData.rs_infants) reqs.push('Infants');
+  var reqEl = document.getElementById('meta-reqs');
+  if (reqs.length) {
+    reqEl.style.display = 'flex';
+    reqEl.innerHTML = reqs.map(function(r) {
+      return '<span style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#342800;background:var(--cyan);border-radius:20px;padding:3px 10px;">' + r + '</span>';
+    }).join('');
+  } else {
+    reqEl.style.display = 'none';
+  }
 }
+
+// ── Timer — counts down from 60 min showing MM:SS ──
+function startTimer() {
+  updateTimer();
+  setInterval(function() {
+    elapsed++;
+    updateTimer();
+  }, 1000);
+}
+
+function updateTimer() {
+  var remaining = Math.max(0, totalSeconds - elapsed);
+  var mins = Math.floor(remaining / 60);
+  var secs = remaining % 60;
+  var el = document.getElementById('live-timer');
+  if (remaining > 0) {
+    el.textContent = mins + ' min ' + String(secs).padStart(2, '0') + ' sec remaining';
+  } else {
+    el.textContent = 'Quotation window closed';
+  }
+  var pct = Math.min((elapsed / totalSeconds) * 100, 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ── Load quotes from Supabase ──
+async function loadQuotes() {
+  if (!queryId) return;
+  try {
+    var res = await fetch(SUPABASE_URL + '/rest/v1/quotes?query_id=eq.' + queryId + '&order=price.asc', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    var quotes = await res.json();
+    if (!Array.isArray(quotes)) return;
+
+    document.getElementById('stat-received').textContent = quotes.length;
+
+    var opRes = await fetch(SUPABASE_URL + '/rest/v1/operators?approval_status=eq.approved&select=id', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    var ops = await opRes.json();
+    var total = Array.isArray(ops) ? ops.length : 0;
+    document.getElementById('stat-notified').textContent = total;
+    document.getElementById('stat-reviewing').textContent = Math.max(0, total - quotes.length);
+
+    allQuotes = quotes;
+    applyFilters();
+  } catch(e) {
+    console.error('loadQuotes error:', e);
+  }
+}
+
+// ── Aircraft images — use real ones if available ──
+var aircraftImages = [
+  'bombardier.png',
+  'gulfstream.png'
+];
+
+function renderQuotes(quotes) {
+  var container = document.getElementById('quotes-container');
+  if (!quotes.length) {
+    container.innerHTML = '<div class="loading-state"><div class="spinner"></div><div>Waiting for quotes from operators...</div><div style="font-size:12px;margin-top:8px;opacity:.6;">Operators have 60 minutes to respond</div></div>';
+    return;
+  }
+
+  var html = '';
+  quotes.forEach(function(q, i) {
+    quotesMap[q.id] = q;
+    var isSelected = selectedQuoteId === q.id;
+
+    var badge = i === 0
+      ? '<div class="badge badge-green"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M3.8 10.5L2.85 8.9L1.05 8.5L1.225 6.65L0 5.25L1.225 3.85L1.05 2L2.85 1.6L3.8 0L5.5.725 7.2 0 8.15 1.6 9.95 2 9.775 3.85 11 5.25 9.775 6.65 9.95 8.5 8.15 8.9 7.2 10.5 5.5 9.775Z" fill="white"/></svg><span class="badge-text">Best Price</span></div>'
+      : '<div class="badge badge-cyan"><svg width="8" height="10" viewBox="0 0 8 10" fill="none"><path d="M3.275 8.1L5.863 5H3.863L4.225 2.163L1.913 5.5H3.65L3.275 8.1ZM2 10L2.5 6.5H0L4.5 0H5.5L5 4H8L3 10Z" fill="#342800"/></svg><span class="badge-text-dark">Fastest Response</span></div>';
+
+    var imgHtml = (i < aircraftImages.length)
+      ? '<img src="' + aircraftImages[i] + '" alt="aircraft" onerror="this.style.display=\'none\';this.parentNode.querySelector(\'.img-bg-fallback\').style.display=\'flex\'">'
+        + '<div class="img-bg-fallback" style="display:none;position:absolute;inset:0;"><span style="opacity:.08;font-size:80px;color:#fff;">✈</span></div>'
+      : '<div class="img-bg-fallback"><span style="opacity:.08;font-size:80px;color:#fff;">✈</span></div>';
+
+    var price = q.price ? '₹' + Number(q.price).toLocaleString('en-IN') : '—';
+    var seats = q.seats_available ? q.seats_available + ' Seats' : '—';
+    var safetyClass = i === 0 ? 'safety-green' : 'safety-gold';
+    var safetyText = i === 0 ? 'Safety Rated Platinum' : 'Safety Rated Gold';
+
+    html += '<div class="quote-card' + (isSelected ? ' selected' : '') + '" id="qcard-' + q.id + '" onclick="selectQuote(\'' + q.id + '\')">';
+    html += '<div class="img-wrap">' + imgHtml + '<div class="img-gradient"></div>' + badge + '</div>';
+    html += '<div class="card-body">';
+    html += '<div class="card-top">';
+    html += '<div><div class="aircraft-name">' + esc(q.aircraft_type || 'Aircraft') + '</div><div class="operator-name">' + esc(q.operator_name || 'Operator') + '</div></div>';
+    html += '<div class="price-col"><div class="price-label">All-inclusive price</div><div class="price-value">' + price + '</div></div>';
+    html += '</div>';
+    html += '<div class="amenities">';
+    html += amenity('<path d="M4.583 3.333C4.125 3.333 3.733 3.17 3.406 2.844C3.08 2.517 2.917 2.125 2.917 1.667C2.917 1.208 3.08.816 3.406.49C3.733.163 4.125 0 4.583 0C5.042 0 5.434.163 5.76.49 6.087.816 6.25 1.208 6.25 1.667 6.25 2.125 6.087 2.517 5.76 2.844 5.434 3.17 5.042 3.333 4.583 3.333ZM9.167 15H3.792C3.333 15 2.913 14.837 2.531 14.51 2.149 14.184 1.91 13.792 1.813 13.333L0 4.167H1.708L3.542 13.333H9.167V15ZM13.75 16.667L11.333 12.5H5.542C5.139 12.5 4.788 12.378 4.49 12.135 4.191 11.892 4 11.569 3.917 11.167L3 6.708C2.847 6.042 3.003 5.451 3.469 4.938 3.934 4.424 4.5 4.167 5.167 4.167 5.653 4.167 6.094 4.313 6.49 4.604 6.885 4.896 7.139 5.292 7.25 5.792L8.167 10H10.875C11.167 10 11.438 10.076 11.688 10.229 11.938 10.382 12.139 10.583 12.292 10.833L15.208 15.833Z" fill="#17B0D6"', '16', '17', seats);
+    html += amenity('<path d="M10 14.167C9.417 14.167 8.924 13.965 8.521 13.563 8.118 13.16 7.917 12.667 7.917 12.083 7.917 11.5 8.118 11.007 8.521 10.604 8.924 10.201 9.417 10 10 10 10.583 10 11.076 10.201 11.479 10.604 11.882 11.007 12.083 11.5 12.083 12.083 12.083 12.667 11.882 13.16 11.479 13.563 11.076 13.965 10.583 14.167 10 14.167ZM1.75 5.917L0 4.167C1.278 2.861 2.771 1.84 4.479 1.104 6.188.368 8.028 0 10 0 11.972 0 13.813.368 15.521 1.104 17.229 1.84 18.722 2.861 20 4.167L18.25 5.917C17.181 4.847 15.941 4.01 14.531 3.406 13.122 2.802 11.611 2.5 10 2.5 8.389 2.5 6.878 2.802 5.469 3.406 4.059 4.01 2.819 4.847 1.75 5.917Z" fill="#17B0D6"', '20', '15', 'WiFi');
+    html += amenity('<path d="M2.5 16.667V9.042C1.792 8.847 1.198 8.458.719 7.875.24 7.292 0 6.611 0 5.833V0H1.667V5.833H2.5V0H4.167V5.833H5V0H6.667V5.833C6.667 6.611 6.427 7.292 5.948 7.875 5.469 8.458 4.875 8.847 4.167 9.042V16.667ZM10.833 16.667V10H8.333V4.167C8.333 3.014 8.74 2.031 9.552 1.219 10.365.406 11.347 0 12.5 0V16.667Z" fill="#17B0D6"', '13', '17', 'Catering');
+    html += amenity('<path d="M0 11.667V6.667C0 6.292.076 5.951.229 5.646.382 5.34.583 5.069.833 4.833V2.5C.833 1.806 1.076 1.215 1.563.729 2.049.243 2.639 0 3.333 0H6.667C6.986 0 7.285.059 7.563.177 7.84.295 8.097.458 8.333.667 8.569.458 8.826.295 9.104.177 9.382.059 9.681 0 10 0H13.333C14.028 0 14.618.243 15.104.729 15.59 1.215 15.833 1.806 15.833 2.5V4.833C16.083 5.069 16.285 5.34 16.438 5.646 16.59 5.951 16.667 6.292 16.667 6.667V11.667H15V10H1.667V11.667Z" fill="#17B0D6"', '17', '12', q.notes ? esc(q.notes.split(' ')[0]) : 'Premium');
+    html += '</div>';
+    html += '<div class="card-footer">';
+    html += '<div class="safety-row"><svg width="12" height="15" viewBox="0 0 12 15" fill="none"><path d="M5.213 10.163L9.45 5.925 8.381 4.856 5.213 8.025 3.638 6.45 2.569 7.519ZM6 15C4.263 14.563 2.828 13.566 1.697 12.009.566 10.453 0 8.725 0 6.825V2.25L6 0 12 2.25V6.825C12 8.725 11.434 10.453 10.303 12.009 9.172 13.566 7.738 14.563 6 15Z" fill="#10B981"/></svg><span class="safety-text ' + safetyClass + '">' + safetyText + '</span></div>';
+    html += '<button class="btn-select" onclick="event.stopPropagation();selectQuote(\'' + q.id + '\')">SELECT →</button>';
+    html += '</div></div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function amenity(pathD, w, h, label) {
+  return '<div class="amenity"><svg width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" fill="none"><path ' + pathD + '/></svg><span class="amenity-text">' + label + '</span></div>';
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function selectQuote(id) {
+  selectedQuoteId = id;
+  selectedQuote = quotesMap[id];
+  document.querySelectorAll('.quote-card').forEach(function(el){ el.classList.remove('selected'); });
+  var card = document.getElementById('qcard-' + id);
+  if (card) card.classList.add('selected');
+  if (selectedQuote) {
+    var price = selectedQuote.price ? '₹' + Number(selectedQuote.price).toLocaleString('en-IN') : '—';
+    document.getElementById('confirm-title').textContent = esc(selectedQuote.aircraft_type || 'Aircraft') + ' selected';
+    document.getElementById('confirm-sub').textContent = price + ' — ' + esc(selectedQuote.operator_name || 'Operator');
+    document.getElementById('confirm-bar').classList.add('show');
+  }
+}
+
+// ── Filters ──
+var filterSort = 'price';
+var filterMinSeats = 0;
+var filterMaxPrice = 0;
+var allQuotes = [];
+
+function toggleFilters() {
+  var panel = document.getElementById('filter-panel');
+  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+}
+
+function setSort(val) {
+  filterSort = val;
+  applyFilters();
+}
+
+function setMinSeats(val) {
+  filterMinSeats = val;
+  applyFilters();
+}
+
+function setMaxPrice(val) {
+  filterMaxPrice = val;
+  applyFilters();
+}
+
+function resetFilters() {
+  filterSort = 'price';
+  filterMinSeats = 0;
+  filterMaxPrice = 0;
+  document.querySelectorAll('.filter-select').forEach(function(s){ s.selectedIndex = 0; });
+  applyFilters();
+  document.getElementById('filter-panel').style.display = 'none';
+}
+
+function applyFilters() {
+  var filtered = allQuotes.slice();
+  if (filterMinSeats > 0) {
+    filtered = filtered.filter(function(q){ return (q.seats_available || 0) >= filterMinSeats; });
+  }
+  if (filterMaxPrice > 0) {
+    filtered = filtered.filter(function(q){ return (q.price || 0) <= filterMaxPrice; });
+  }
+  if (filterSort === 'price') {
+    filtered.sort(function(a,b){ return (a.price||0) - (b.price||0); });
+  } else if (filterSort === 'seats') {
+    filtered.sort(function(a,b){ return (b.seats_available||0) - (a.seats_available||0); });
+  }
+  renderQuotes(filtered);
+}
+
+function goToPayment() {
+  if (!selectedQuote) return;
+  sessionStorage.setItem('sv_selected_quote', JSON.stringify(selectedQuote));
+  window.location.href = 'payment.html';
+}
+
+// Close filter dropdown on outside click
+document.addEventListener('click', function(e) {
+  var panel = document.getElementById('filter-panel');
+  if (!panel) return;
+  var wrap = panel.closest('[style*="position:relative"]') || panel.parentElement;
+  if (panel.style.display !== 'none' && !wrap.contains(e.target)) {
+    panel.style.display = 'none';
+  }
+});
+
+// ── Boot ──
+populateSidebar();
+startTimer();
+loadQuotes();
+setInterval(loadQuotes, 10000);
+
+// Realtime
+if (queryId) {
+  try {
+    var ws = new WebSocket(SUPABASE_URL.replace('https://','wss://') + '/realtime/v1/websocket?apikey=' + SUPABASE_KEY + '&vsn=1.0.0');
+    ws.onopen = function(){ ws.send(JSON.stringify({topic:'realtime:public:quotes:query_id=eq.'+queryId,event:'phx_join',payload:{},ref:'1'})); };
+    ws.onmessage = function(e){ try{ var m=JSON.parse(e.data); if(m.event==='INSERT') loadQuotes(); }catch(x){} };
+  } catch(e){}
+}
+</script>
+</body>
+</html>

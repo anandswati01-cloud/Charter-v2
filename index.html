@@ -1525,7 +1525,15 @@ function verifyModalOTP(){
     if(btn){btn.textContent='Verified!';btn.style.background='#22c55e';}
     setTimeout(function(){
       closeOtpModal();
-      if(window._pendingQuery){var q=window._pendingQuery;q.client_phone=window._modalPhone||'';if(btn)btn.textContent='Saving...';saveQueryToSupabase(q).then(function(saved){var dt=q.flight_date+(q.flight_time?' '+q.flight_time:'');var rdStr=q.return_date?(q.return_date+(q.return_time?' '+q.return_time:'')):'';var route=q.trip_type==='Round Trip'?(q.departure+' ⇄ '+q.destination):(q.trip_type==='Multiple Sectors'?q.departure+' → ...':q.departure+' → '+q.destination);sessionStorage.setItem('sv_query_id',saved.id);sessionStorage.setItem('sv_query',JSON.stringify({rs_type:q.trip_type,rs_route:route,rs_date:dt,rs_pax:q.passengers+' Passenger'+(q.passengers!==1?'s':'')}));window.location.href='results.html';}).catch(function(err){console.error('saveQuery failed',err);if(btn){btn.textContent='Verify';btn.disabled=false;}});}else{window.location.href='results.html';}
+      if(window._pendingQuery){var q=window._pendingQuery;q.client_phone=window._modalPhone||'';if(btn)btn.textContent='Saving...';saveQueryToSupabase(q).then(function(saved){
+  sendEmail('new_query_assigned',{query_id:saved.id});
+  var fmtDate=function(d,t){if(!d)return'—';var parts=d.split('-');var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];var dateStr=parts[2]+' '+months[parseInt(parts[1])-1]+' '+parts[0];return dateStr+(t?', '+t:'');};
+  var dt=fmtDate(q.flight_date,q.flight_time);
+  var route=q.trip_type==='Round Trip'?(q.departure+' ⇄ '+q.destination):(q.trip_type==='Multiple Sectors'?q.departure+' → ...':q.departure+' → '+q.destination);
+  sessionStorage.setItem('sv_query_id',saved.id);
+  sessionStorage.setItem('sv_query',JSON.stringify({rs_type:q.trip_type,rs_route:route,rs_date:dt,rs_pax:String(q.passengers),rs_medivac:q.medivac,rs_pets:q.pets,rs_infants:q.infants}));
+  window.location.href='results.html';
+}).catch(function(err){console.error('saveQuery failed',err);if(btn){btn.textContent='Verify';btn.disabled=false;}});}else{window.location.href='results.html';}
     },1200);
   } else {
     if(errEl){errEl.style.display='block';errEl.textContent='Incorrect OTP. Please try again.';}
