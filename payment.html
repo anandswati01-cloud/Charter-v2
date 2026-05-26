@@ -230,7 +230,7 @@ nav{
   <!-- RIGHT COLUMN — SUMMARY -->
   <div class="summary-card">
     <div class="aircraft-img">
-      <img src="luxury-aircraft.png" alt="Aircraft" onerror="this.style.display='none';document.querySelector('.aircraft-img-fallback').style.display='flex'"/>
+      <img src="aircraft.png" alt="Aircraft" onerror="this.style.display='none';document.querySelector('.aircraft-img-fallback').style.display='flex'"/>
       <div class="aircraft-img-fallback" style="display:none;position:absolute;inset:0;"><span style="opacity:.08;font-size:80px;color:#fff;">✈</span></div>
       <div class="img-gradient"></div>
       <div class="verified-aircraft-badge">Verified Aircraft</div>
@@ -283,7 +283,7 @@ nav{
         <span class="total-value" id="pay-total">—</span>
       </div>
 
-      <button class="btn-pay" id="pay-btn" onclick="confirmBooking()">Confirm &amp; Pay</button>
+      <button class="btn-pay" id="pay-btn" onclick="goToPayment2()">Confirm &amp; Pay</button>
       <div class="security-note">Secure 256-bit encrypted transaction</div>
     </div>
   </div>

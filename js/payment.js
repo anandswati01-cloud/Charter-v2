@@ -180,6 +180,35 @@ function parseAmount(str) {
   return isNaN(n) ? null : n;
 }
 
+// ── Step 1 → Step 2 ──
+function goToPayment2() {
+  // If still in edit mode, save first
+  if (_editMode) setEditMode(false);
+
+  var clientName  = (document.getElementById('client-name')  || {}).value || '';
+  var clientEmail = (document.getElementById('client-email') || {}).value || '';
+  var clientPhone = (document.getElementById('client-phone') || {}).value || '';
+
+  clientName = clientName.trim();
+  clientEmail = clientEmail.trim();
+  clientPhone = clientPhone.trim();
+
+  clearAllErrors();
+  var valid = true;
+  if (!clientName) { showErr('client-name','err-client-name'); valid = false; }
+  if (!clientEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clientEmail)) { showErr('client-email','err-client-email'); valid = false; }
+  if (!clientPhone || !/^[\d\s+\-()+]{7,20}$/.test(clientPhone)) { showErr('client-phone','err-client-phone'); valid = false; }
+  if (!valid) { setEditMode(true); return; }
+
+  // Save traveller details to sessionStorage for payment2
+  sessionStorage.setItem('sv_traveller', JSON.stringify({
+    name:  clientName,
+    email: clientEmail,
+    phone: clientPhone
+  }));
+  window.location.href = 'payment2.html';
+}
+
 var _confirmInProgress = false;
 
 async function confirmBooking() {
