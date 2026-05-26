@@ -364,7 +364,7 @@ nav{
     <div class="feed-header" style="position:relative;">
       <div>
         <div class="feed-title">Available Aircraft</div>
-        <div class="feed-sub">Real-time inventory from verified operators.</div>
+        <div class="feed-sub">Real-time inventory from verified operators. &nbsp;<span id="debug-query-id" style="font-family:monospace;font-size:10px;opacity:.4;"></span></div>
       </div>
       <div style="position:relative;">
         <div class="filter-btn" onclick="toggleFilters()">
@@ -519,7 +519,12 @@ function updateTimer() {
 
 // ── Load quotes from Supabase ──
 async function loadQuotes() {
-  if (!queryId) return;
+  if (!queryId) {
+    console.warn('results.html: no queryId in sessionStorage or URL');
+    document.getElementById('quotes-container').innerHTML = '<div class="loading-state"><div style="color:#e06060;font-size:13px;">No booking found. Please <a href="index.html" style="color:#17b0d6;">submit a new booking</a>.</div></div>';
+    return;
+  }
+  console.log('results.html: loading quotes for query', queryId);
   try {
     var res = await fetch(SUPABASE_URL + '/rest/v1/quotes?query_id=eq.' + queryId + '&order=price.asc', {
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
@@ -690,8 +695,11 @@ document.addEventListener('click', function(e) {
 // ── Boot ──
 populateSidebar();
 startTimer();
+// Show query ID for debugging
+var debugEl = document.getElementById('debug-query-id');
+if (debugEl && queryId) debugEl.textContent = 'ID: ' + queryId.substring(0,8) + '…';
 loadQuotes();
-setInterval(loadQuotes, 10000);
+setInterval(loadQuotes, 5000); // poll every 5s instead of 10s
 
 // Realtime
 if (queryId) {
