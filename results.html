@@ -479,6 +479,7 @@ function populateSidebar() {
   if (queryData.rs_medivac === true || queryData.rs_medivac === 'true') reqs.push('Medivac');
   if (queryData.rs_pets === true || queryData.rs_pets === 'true') reqs.push('Pets');
   if (queryData.rs_infants === true || queryData.rs_infants === 'true') reqs.push('Infants');
+  if (queryData.rs_vip === true || queryData.rs_vip === 'true') reqs.push('VIP Passenger');
   var reqEl = document.getElementById('meta-reqs');
   if (reqs.length) {
     reqEl.style.display = 'flex';
