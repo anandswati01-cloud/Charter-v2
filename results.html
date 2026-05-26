@@ -513,7 +513,7 @@ function updateTimer() {
   } else {
     el.textContent = 'Quotation window closed';
   }
-  var pct = Math.min((elapsed / totalSeconds) * 100, 100);
+  var pct = Math.min((nowElapsed / totalSeconds) * 100, 100);
   document.getElementById('progress-fill').style.width = pct + '%';
 }
 
