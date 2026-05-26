@@ -27,31 +27,31 @@
   --toggle-color:  #c5c6cd;
 }
 
-/* LIGHT — warm cream/beige */
+/* LIGHT — clean light grey (Claude design) */
 [data-theme="light"] {
-  --bg:            #FAF7F2;
-  --bg-dark:       #F0EAE0;
-  --bg-card:       rgba(255,255,255,0.95);
+  --bg:            #EFEFEF;
+  --bg-dark:       #E8E8E8;
+  --bg-card:       rgba(255,255,255,0.98);
   --bg-card-solid: #FFFFFF;
-  --bg-input:      rgba(28,20,16,0.04);
-  --bg-nav:        rgba(250,247,242,0.97);
-  --bg-stats:      #F0EAE0;
-  --border:        rgba(107,89,64,0.15);
-  --border-hover:  rgba(107,89,64,0.3);
-  --border-gold:   rgba(196,134,10,0.3);
-  --border-cyan:   rgba(14,138,171,0.35);
-  --text:          #1C1410;
-  --text-dim:      #4a3828;
-  --text-muted:    #8a7560;
-  --text-label:    #6b5940;
+  --bg-input:      #FFFFFF;
+  --bg-nav:        rgba(255,255,255,0.98);
+  --bg-stats:      #F5F5F5;
+  --border:        #E2E2E2;
+  --border-hover:  #C8C8C8;
+  --border-gold:   rgba(196,134,10,0.25);
+  --border-cyan:   rgba(45,125,122,0.35);
+  --text:          #1a1a1a;
+  --text-dim:      #4a4a4a;
+  --text-muted:    #888888;
+  --text-label:    #666666;
   --gold:          #c4860a;
   --gold-dark:     #a87208;
-  --cyan:          #0e8aab;
-  --green:         #2e7d52;
+  --cyan:          #2d7d7a;
+  --green:         #2d7d5a;
   --red:           #c0392b;
-  --shadow:        0 4px 16px rgba(0,0,0,0.08);
-  --toggle-bg:     rgba(107,89,64,0.08);
-  --toggle-color:  #6b5940;
+  --shadow:        0 2px 12px rgba(0,0,0,0.08);
+  --toggle-bg:     rgba(0,0,0,0.06);
+  --toggle-color:  #4a4a4a;
 }
 
 /* ── Theme toggle button (used only on index.html) ── */
@@ -131,19 +131,28 @@ input::placeholder, .field-input::placeholder,
 /* Nav */
 [data-theme="light"] nav {
   background: var(--bg-nav) !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+  box-shadow: 0 1px 0 var(--border) !important;
   border-bottom-color: var(--border) !important;
+}
+
+[data-theme="light"] .nav-links a {
+  color: var(--text-dim) !important;
+}
+[data-theme="light"] .nav-links a.active,
+[data-theme="light"] .nav-links a:hover {
+  color: var(--gold) !important;
 }
 
 /* All page backgrounds */
 [data-theme="light"] body,
 [data-theme="light"] .hero,
 [data-theme="light"] .page,
-[data-theme="light"] .page-wrap {
+[data-theme="light"] .page-wrap,
+[data-theme="light"] .main {
   background: var(--bg) !important;
 }
 
-/* Section backgrounds */
+/* Section backgrounds alternate slightly */
 [data-theme="light"] .section-how,
 [data-theme="light"] .section-why,
 [data-theme="light"] .section-routes,
@@ -153,13 +162,12 @@ input::placeholder, .field-input::placeholder,
   background: var(--bg-dark) !important;
 }
 
-/* Cards — solid white */
+/* Cards — solid white with light shadow */
 [data-theme="light"] .bento-card,
 [data-theme="light"] .step,
 [data-theme="light"] .route-card,
 [data-theme="light"] .quote-card,
 [data-theme="light"] .live-card,
-[data-theme="light"] .route-card,
 [data-theme="light"] .summary-card,
 [data-theme="light"] .traveller-card,
 [data-theme="light"] .flight-card,
@@ -168,11 +176,88 @@ input::placeholder, .field-input::placeholder,
 [data-theme="light"] .support-card,
 [data-theme="light"] .booking-card,
 [data-theme="light"] .card,
-[data-theme="light"] .filter-dropdown {
-  background: var(--bg-card-solid) !important;
+[data-theme="light"] .filter-dropdown,
+[data-theme="light"] .trust-item {
+  background: #FFFFFF !important;
   border-color: var(--border) !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.06) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px var(--border) !important;
 }
+
+/* CTA buttons use teal in light mode */
+[data-theme="light"] .btn-select,
+[data-theme="light"] .btn-pay,
+[data-theme="light"] .btn-confirm,
+[data-theme="light"] .btn-cta,
+[data-theme="light"] .btn-cta-primary,
+[data-theme="light"] .button-primary-cta {
+  background: var(--cyan) !important;
+  color: #FFFFFF !important;
+}
+
+[data-theme="light"] .btn-select:hover,
+[data-theme="light"] .btn-pay:hover,
+[data-theme="light"] .btn-cta:hover {
+  background: #246462 !important;
+}
+
+/* Quote card image gradient for light */
+[data-theme="light"] .img-gradient,
+[data-theme="light"] .route-img-gradient {
+  background: linear-gradient(0deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 60%) !important;
+}
+
+/* Badge keep colours */
+[data-theme="light"] .badge-green { background: #2d7d5a !important; }
+[data-theme="light"] .badge-cyan  { background: #2d7d7a !important; }
+
+/* Quote card hover in light */
+[data-theme="light"] .quote-card:hover {
+  border-color: var(--cyan) !important;
+  box-shadow: 0 4px 16px rgba(45,125,122,0.12), 0 0 0 1px var(--cyan) !important;
+}
+[data-theme="light"] .quote-card.selected {
+  background: rgba(45,125,122,0.05) !important;
+  border-color: var(--cyan) !important;
+}
+
+/* Aircraft name in cyan */
+[data-theme="light"] .aircraft-name { color: var(--cyan) !important; }
+[data-theme="light"] .price-value   { color: var(--cyan) !important; }
+[data-theme="light"] .live-timer    { color: var(--cyan) !important; }
+[data-theme="light"] .total-value   { color: var(--cyan) !important; }
+[data-theme="light"] .operator-name { color: var(--text) !important; }
+
+/* Safety text */
+[data-theme="light"] .safety-green { color: #2d7d5a !important; }
+[data-theme="light"] .safety-gold  { color: var(--gold) !important; }
+
+/* Filter button */
+[data-theme="light"] .filter-btn {
+  background: #FFFFFF !important;
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+/* Accordion open state */
+[data-theme="light"] .accordion-header.open {
+  background: #F8F8F8 !important;
+  border-bottom-color: var(--border-cyan) !important;
+}
+
+/* Progress bar */
+[data-theme="light"] .progress-wrap {
+  background: rgba(45,125,122,0.15) !important;
+}
+[data-theme="light"] .progress-fill {
+  background: var(--cyan) !important;
+}
+
+/* Section heading tags */
+[data-theme="light"] .section-tag { color: var(--gold) !important; }
+
+/* Hero title on light */
+[data-theme="light"] .hero-title em,
+[data-theme="light"] .hero-h1 em { color: var(--gold) !important; }
 
 /* Accordion specific */
 [data-theme="light"] .accordion-header,
