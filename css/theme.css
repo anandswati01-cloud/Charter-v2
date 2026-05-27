@@ -118,3 +118,69 @@
 [data-theme="light"] .nav-links a:hover { color: #c4942e !important; }
 [data-theme="light"] .nav-logo,
 [data-theme="light"] .logo { color: #c4942e !important; }
+
+/* Autocomplete dropdown */
+[data-theme="light"] .ac-dropdown {
+  background: #ffffff !important;
+  border-color: rgba(13,27,42,0.15) !important;
+  box-shadow: 0 4px 16px rgba(13,27,42,0.08) !important;
+}
+[data-theme="light"] .ac-item {
+  color: #0d1b2a !important;
+}
+[data-theme="light"] .ac-item:hover,
+[data-theme="light"] .ac-item.selected {
+  background: rgba(13,124,143,0.08) !important;
+  color: #0d1b2a !important;
+}
+
+/* OTP modal */
+[data-theme="light"] .otp-modal-box {
+  background: #ffffff !important;
+  border-color: rgba(13,27,42,0.12) !important;
+  box-shadow: 0 20px 60px rgba(13,27,42,0.15) !important;
+}
+[data-theme="light"] .otp-modal-title { color: #0d1b2a !important; }
+[data-theme="light"] .otp-modal-sub   { color: rgba(13,27,42,0.55) !important; }
+[data-theme="light"] .otp-modal-close { color: rgba(13,27,42,0.45) !important; }
+[data-theme="light"] .otp-modal-close:hover { color: #0d1b2a !important; }
+[data-theme="light"] .otp-modal-phone-input {
+  background: #f4f6f9 !important;
+  border-color: rgba(13,27,42,0.15) !important;
+  color: #0d1b2a !important;
+}
+[data-theme="light"] .otp-modal-phone-input::placeholder { color: rgba(13,27,42,0.35) !important; }
+[data-theme="light"] .country-dd {
+  background: #f4f6f9 !important;
+  border-color: rgba(13,27,42,0.15) !important;
+  color: #0d1b2a !important;
+}
+[data-theme="light"] .country-dd-list {
+  background: #ffffff !important;
+  border-color: rgba(13,27,42,0.12) !important;
+}
+[data-theme="light"] .country-dd-search {
+  background: #f4f6f9 !important;
+  border-color: rgba(13,27,42,0.12) !important;
+  color: #0d1b2a !important;
+}
+[data-theme="light"] .country-dd-item { color: rgba(13,27,42,0.75) !important; }
+[data-theme="light"] .country-dd-item:hover { background: rgba(13,124,143,0.08) !important; }
+[data-theme="light"] .otp-digit {
+  background: #f4f6f9 !important;
+  border-color: rgba(13,27,42,0.15) !important;
+  color: #0d1b2a !important;
+}
+[data-theme="light"] #otp-modal { background: rgba(13,27,42,0.5) !important; }
+
+/* Filter button on results page */
+[data-theme="light"] .filter-btn {
+  background: #ffffff !important;
+  border-color: rgba(13,27,42,0.15) !important;
+  color: #0d1b2a !important;
+}
+[data-theme="light"] .filter-text { color: rgba(13,27,42,0.65) !important; }
+
+/* Notif dots */
+[data-theme="light"] .notif-dot { background: #dde2ea !important; }
+[data-theme="light"] .notif-dot.active { background: #0d7c8f !important; }
