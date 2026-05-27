@@ -96,12 +96,12 @@
 [data-theme="light"] .btn-pay,
 [data-theme="light"] .btn-cta,
 [data-theme="light"] .btn-cta-primary,
-[data-theme="light"] .btn-primary { background: #0d7c8f !important; color: #fff !important; }
-[data-theme="light"] .btn-book-now { background: #0d7c8f !important; color: #fff !important; }
+[data-theme="light"] .btn-primary { background: #c4942e !important; color: #fff !important; }
+[data-theme="light"] .btn-book-now { background: #c4942e !important; color: #fff !important; }
 
 /* Progress */
-[data-theme="light"] .progress-wrap { background: rgba(13,124,143,0.12) !important; }
-[data-theme="light"] .progress-fill { background: #0d7c8f !important; }
+[data-theme="light"] .progress-wrap { background: rgba(196,148,46,0.12) !important; }
+[data-theme="light"] .progress-fill { background: #c4942e !important; }
 
 /* Image gradients */
 [data-theme="light"] .img-gradient,
@@ -130,7 +130,7 @@
 }
 [data-theme="light"] .ac-item:hover,
 [data-theme="light"] .ac-item.selected {
-  background: rgba(13,124,143,0.08) !important;
+  background: rgba(196,148,46,0.08) !important;
   color: #0d1b2a !important;
 }
 
@@ -165,13 +165,25 @@
   color: #0d1b2a !important;
 }
 [data-theme="light"] .country-dd-item { color: rgba(13,27,42,0.75) !important; }
-[data-theme="light"] .country-dd-item:hover { background: rgba(13,124,143,0.08) !important; }
+[data-theme="light"] .country-dd-item:hover { background: rgba(196,148,46,0.08) !important; }
 [data-theme="light"] .otp-digit {
   background: #f4f6f9 !important;
   border-color: rgba(13,27,42,0.15) !important;
   color: #0d1b2a !important;
 }
 [data-theme="light"] #otp-modal { background: rgba(13,27,42,0.5) !important; }
+
+/* CTA section — dark bg image + overlay */
+[data-theme="light"] .final-cta-bg {
+  filter: brightness(1) !important;
+  opacity: 0.08 !important;
+}
+[data-theme="light"] .final-cta-overlay {
+  background: radial-gradient(ellipse at center, rgba(244,246,249,0.5) 0%, rgba(244,246,249,0.97) 100%) !important;
+}
+[data-theme="light"] .final-cta { background: #eef1f5 !important; }
+[data-theme="light"] .final-cta-title { color: #0d1b2a !important; }
+[data-theme="light"] .section-cta::before { display: none !important; }
 
 /* Filter button on results page */
 [data-theme="light"] .filter-btn {
@@ -180,7 +192,8 @@
   color: #0d1b2a !important;
 }
 [data-theme="light"] .filter-text { color: rgba(13,27,42,0.65) !important; }
+[data-theme="light"] .filter-btn svg path { fill: #0d1b2a !important; }
 
 /* Notif dots */
 [data-theme="light"] .notif-dot { background: #dde2ea !important; }
-[data-theme="light"] .notif-dot.active { background: #0d7c8f !important; }
+[data-theme="light"] .notif-dot.active { background: #c4942e !important; }
