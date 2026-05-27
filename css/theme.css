@@ -1,0 +1,120 @@
+/* ── SkyVayu Theme CSS ── */
+/* CSS variables are injected by js/theme.js via inline styles on :root */
+/* This file handles only what CSS vars can't reach: hardcoded bg/colors in inline styles */
+
+/* Toggle button */
+#theme-toggle {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(143,144,151,0.25);
+  background: rgba(255,255,255,0.08);
+  color: #c5c6cd;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color .2s, background .2s, color .2s;
+  flex-shrink: 0;
+}
+#theme-toggle:hover { border-color: #fbbf24; color: #fbbf24; }
+
+/* Light mode — override hardcoded backgrounds that can't be reached by vars */
+[data-theme="light"] body { background: #f4f6f9 !important; color: #0d1b2a !important; }
+
+/* Nav hardcoded bg */
+[data-theme="light"] nav,
+[data-theme="light"] .nav {
+  background: #ffffff !important;
+  box-shadow: 0 1px 0 rgba(13,27,42,0.10) !important;
+}
+
+/* Hero hardcoded overlay */
+[data-theme="light"] .hero { background: #f4f6f9 !important; }
+[data-theme="light"] .hero-bg { filter: brightness(0.1) !important; opacity: 0.2 !important; }
+[data-theme="light"] .hero-overlay {
+  background: linear-gradient(to bottom,
+    rgba(244,246,249,0.8) 0%,
+    rgba(244,246,249,0.95) 60%,
+    #f4f6f9 100%) !important;
+}
+
+/* Sections with hardcoded dark backgrounds */
+[data-theme="light"] .section-how   { background: #eef1f5 !important; }
+[data-theme="light"] .section-why   { background: #f4f6f9 !important; }
+[data-theme="light"] .section-routes { background: #eef1f5 !important; }
+[data-theme="light"] .section-cta   { background: #eef1f5 !important; }
+[data-theme="light"] .booking-section { background: #f4f6f9 !important; }
+[data-theme="light"] footer, [data-theme="light"] .home-footer { background: #e7ebf1 !important; }
+
+/* Cards with hardcoded rgba dark backgrounds */
+[data-theme="light"] .bento-card,
+[data-theme="light"] .step,
+[data-theme="light"] .quote-card,
+[data-theme="light"] .live-card,
+[data-theme="light"] .route-card,
+[data-theme="light"] .summary-card,
+[data-theme="light"] .traveller-card,
+[data-theme="light"] .flight-card,
+[data-theme="light"] .accordion,
+[data-theme="light"] .timeline-item,
+[data-theme="light"] .support-card,
+[data-theme="light"] .booking-card,
+[data-theme="light"] .card,
+[data-theme="light"] .filter-dropdown,
+[data-theme="light"] .accordion-header,
+[data-theme="light"] .accordion-body {
+  background: #ffffff !important;
+  border-color: rgba(13,27,42,0.10) !important;
+  box-shadow: 0 1px 3px rgba(13,27,42,0.06) !important;
+  backdrop-filter: none !important;
+}
+
+/* Stats bar */
+[data-theme="light"] .stats-bar { background: #eef1f5 !important; }
+
+/* Inputs */
+[data-theme="light"] input,
+[data-theme="light"] .field-input,
+[data-theme="light"] .b-input,
+[data-theme="light"] .b-input-date,
+[data-theme="light"] .filter-select {
+  background: #ffffff !important;
+  border-color: rgba(13,27,42,0.15) !important;
+  color: #0d1b2a !important;
+}
+[data-theme="light"] input::placeholder { color: rgba(13,27,42,0.35) !important; }
+
+/* Text overrides for hardcoded colours */
+[data-theme="light"] .hero-h1,
+[data-theme="light"] .hero-h1 span,
+[data-theme="light"] .hero-title { color: #0d1b2a !important; }
+[data-theme="light"] .hero-h1 em,
+[data-theme="light"] .hero-title em { color: #c4942e !important; }
+[data-theme="light"] .hero-sub,
+[data-theme="light"] .hero-eyebrow { color: rgba(13,27,42,0.65) !important; }
+
+/* Buttons */
+[data-theme="light"] .btn-select,
+[data-theme="light"] .btn-pay,
+[data-theme="light"] .btn-cta,
+[data-theme="light"] .btn-cta-primary,
+[data-theme="light"] .btn-primary { background: #0d7c8f !important; color: #fff !important; }
+[data-theme="light"] .btn-book-now { background: #0d7c8f !important; color: #fff !important; }
+
+/* Progress */
+[data-theme="light"] .progress-wrap { background: rgba(13,124,143,0.12) !important; }
+[data-theme="light"] .progress-fill { background: #0d7c8f !important; }
+
+/* Image gradients */
+[data-theme="light"] .img-gradient,
+[data-theme="light"] .route-img-gradient {
+  background: linear-gradient(0deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 55%) !important;
+}
+
+/* Confirmed page bg */
+[data-theme="light"] .bg-image { opacity: 0.03 !important; }
+
+/* Index nav links */
+[data-theme="light"] .nav-links a { color: rgba(13,27,42,0.65) !important; }
+[data-theme="light"] .nav-links a.active,
+[data-theme="light"] .nav-links a:hover { color: #c4942e !important; }
+[data-theme="light"] .nav-logo,
+[data-theme="light"] .logo { color: #c4942e !important; }
