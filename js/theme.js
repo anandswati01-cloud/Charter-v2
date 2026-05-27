@@ -19,6 +19,8 @@ var PORCELAIN = {
   "--cyan-strong":      "#a87a20",
   "--cyan-soft":        "#dcb352",
   "--cyan-bg":          "rgba(196,148,46,0.10)",
+  "--cyan-faint":       "rgba(196,148,46,0.08)",
+  "--cyan-border":      "rgba(196,148,46,0.35)",
   "--green":            "#c4942e",
   "--green-bg":         "rgba(196,148,46,0.10)",
   "--shadow-sm":        "0 1px 2px rgba(13,27,42,0.04), 0 1px 1px rgba(13,27,42,0.03)",

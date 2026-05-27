@@ -194,6 +194,17 @@
 [data-theme="light"] .filter-text { color: rgba(13,27,42,0.65) !important; }
 [data-theme="light"] .filter-btn svg path { fill: #0d1b2a !important; }
 
-/* Notif dots */
-[data-theme="light"] .notif-dot { background: #dde2ea !important; }
-[data-theme="light"] .notif-dot.active { background: #c4942e !important; }
+ /* Notif dots */
+ [data-theme="light"] .notif-dot { background: #dde2ea !important; }
+ [data-theme="light"] .notif-dot.active { background: #c4942e !important; }
+
+/* payment2 — icons use currentColor, set to gold */
+[data-theme="light"] .accordion-icon { color: #c4942e !important; background: rgba(196,148,46,0.10) !important; border-color: rgba(196,148,46,0.20) !important; }
+[data-theme="light"] .trust-icon { color: #c4942e !important; background: rgba(196,148,46,0.10) !important; border-color: rgba(196,148,46,0.20) !important; }
+[data-theme="light"] .security-note-inline svg { color: #c4942e !important; }
+[data-theme="light"] .security-note-inline { color: rgba(13,27,42,0.55) !important; }
+
+/* confirm bar on results */
+[data-theme="light"] .confirm-bar { background: rgba(196,148,46,0.06) !important; border-color: rgba(196,148,46,0.30) !important; }
+[data-theme="light"] .confirm-title { color: #c4942e !important; }
+[data-theme="light"] .btn-confirm { background: #c4942e !important; color: #ffffff !important; }
