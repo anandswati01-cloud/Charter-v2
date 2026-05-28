@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.skyvayu.com/sitemap.xml
+
+Disallow: /admin/
+Disallow: /operator/
