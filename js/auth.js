@@ -51,7 +51,7 @@
     sb.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/'
+        redirectTo: 'https://www.skyvayu.com'
       }
     }).then(function (res) {
       if (res.error) {
