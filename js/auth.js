@@ -12,8 +12,37 @@
     if (_sb) return _sb;
     var url = SKYVAYU_CONFIG.supabaseUrl;
     var key = SKYVAYU_CONFIG.supabaseKey;
-    _sb = window.supabase.createClient(url, key);
+    _sb = window.supabase.createClient(url, key, {
+      auth: {
+        flowType: 'implicit',
+        detectSessionInUrl: true,
+        persistSession: true
+      }
+    });
+    window._svSupabase = _sb;
     return _sb;
+  }
+
+  /* ── Update nav UI ──────────────────────────────────────── */
+  function updateAuthUI(session) {
+    var user = session ? session.user : null;
+    var loginBtn = document.getElementById('sv-login-btn');
+    var userChip = document.getElementById('sv-user-chip');
+    var userName = document.getElementById('sv-user-name');
+
+    if (user) {
+      if (loginBtn) loginBtn.style.display = 'none';
+      if (userChip) userChip.style.display = 'flex';
+      if (userName) {
+        var display = user.user_metadata && user.user_metadata.full_name
+          ? user.user_metadata.full_name.split(' ')[0]
+          : user.email.split('@')[0];
+        userName.textContent = display;
+      }
+    } else {
+      if (loginBtn) loginBtn.style.display = '';
+      if (userChip) userChip.style.display = 'none';
+    }
   }
 
   /* ── Kick off Google OAuth ──────────────────────────────── */
@@ -31,8 +60,6 @@
           showToast('Sign-in failed: ' + res.error.message, 'error');
         }
       }
-      /* On success the browser redirects to Google – no further
-         action needed here; the session is picked up on return. */
     });
   };
 
@@ -47,7 +74,7 @@
     });
   };
 
-  /* ── Get current session ────────────────────────────────── */
+  /* ── Get current session ──────────────────────────────── */
   window.getSession = function (cb) {
     var sb = getClient();
     sb.auth.getSession().then(function (res) {
@@ -55,8 +82,7 @@
     });
   };
 
-  /* ── Persist query data across OAuth redirect ───────────── */
-  /* Before redirect we stash pending query in sessionStorage  */
+  /* ── Persist query data across OAuth redirect ──────────── */
   window.stashPendingQuery = function (queryData) {
     try {
       sessionStorage.setItem('sv_pending_query', JSON.stringify(queryData));
@@ -74,41 +100,13 @@
     return null;
   };
 
-  /* ── Auth state listener ────────────────────────────────── */
-  function updateAuthUI(session) {
-    var user = session ? session.user : null;
-
-    /* Login button in nav */
-    var loginBtn = document.getElementById('sv-login-btn');
-    var userChip = document.getElementById('sv-user-chip');
-    var userName = document.getElementById('sv-user-name');
-
-    if (user) {
-      /* Show user chip, hide login button */
-      if (loginBtn) loginBtn.style.display = 'none';
-      if (userChip) userChip.style.display = 'flex';
-      if (userName) {
-        var display = user.user_metadata && user.user_metadata.full_name
-          ? user.user_metadata.full_name.split(' ')[0]
-          : user.email.split('@')[0];
-        userName.textContent = display;
-      }
-    } else {
-      /* Show login button, hide user chip */
-      if (loginBtn) loginBtn.style.display = '';
-      if (userChip) userChip.style.display = 'none';
-    }
-  }
-
-  /* ── Bootstrap on page load ─────────────────────────────── */
+  /* ── Initialise ─────────────────────────────────────────── */
   function init() {
     var sb = getClient();
 
-    /* Listen for auth changes */
     sb.auth.onAuthStateChange(function (event, session) {
       updateAuthUI(session);
 
-      /* If user just signed in, process any stashed query */
       if (event === 'SIGNED_IN') {
         var pending = window.popPendingQuery();
         if (pending && typeof saveQueryToSupabase === 'function') {
@@ -120,14 +118,8 @@
         }
       }
     });
-
-    /* Sync UI on first load */
-    sb.auth.getSession().then(function (res) {
-      updateAuthUI(res.data.session);
-    });
   }
 
-  /* Run after DOM is ready */
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
