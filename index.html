@@ -959,6 +959,16 @@
     .trust-bar { animation: fadeUp 0.6s 0.3s ease both; }
     .booking-section { animation: fadeUp 0.6s 0.4s ease both; }
   </style>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta name="description" content="SkyVayu — Private charter flights across India and beyond. Direct quotes, no middlemen, transparent pricing. Book Mumbai–Delhi, Delhi–Goa, and international routes instantly.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.skyvayu.com/">
+  <meta property="og:title" content="SkyVayu — Private Charter Flights. Direct. Transparent. Fast.">
+  <meta property="og:description" content="Private charter flights across India and beyond. Direct quotes, no middlemen, transparent pricing.">
+  <meta property="og:image" content="https://www.skyvayu.com/og-image.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SkyVayu — Private Charter Flights">
+  <meta name="twitter:description" content="Book private charter flights with direct, transparent pricing. No middlemen.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 <body>
@@ -1170,7 +1180,7 @@
           <div class="section-eyebrow">Destinations</div>
           <h2 class="section-title" style="margin-bottom:0">Curated Popular Routes</h2>
         </div>
-        <span class="view-all">View All Routes</span>
+        <a href="/fleet" class="view-all">View All Routes</a>
       </div>
       <div class="routes-grid">
         <div class="route-card">
@@ -1179,7 +1189,7 @@
           <div class="route-badge">Most Popular</div>
           <div class="route-info">
             <div class="route-name">Mumbai → Delhi</div>
-            <button class="route-book">Book Now</button>
+            <button class="route-book" onclick="prefillRoute('Mumbai','Delhi')">Book Now</button>
           </div>
         </div>
         <div class="route-card">
@@ -1187,7 +1197,7 @@
           <div class="route-gradient"></div>
           <div class="route-info">
             <div class="route-name">Delhi → Goa</div>
-            <button class="route-book">Book Now</button>
+            <button class="route-book" onclick="prefillRoute('Delhi','Goa')">Book Now</button>
           </div>
         </div>
         <div class="route-card">
@@ -1195,7 +1205,7 @@
           <div class="route-gradient"></div>
           <div class="route-info">
             <div class="route-name">Mumbai → Dubai</div>
-            <button class="route-book">Book Now</button>
+            <button class="route-book" onclick="prefillRoute('Mumbai','Dubai')">Book Now</button>
           </div>
         </div>
       </div>
@@ -1223,9 +1233,9 @@
         <div class="footer-logo">SkyVayu</div>
         <p class="footer-tagline">Elevating the standards of private aviation through technical precision and elite service.</p>
         <div class="footer-socials">
-          <div class="social-btn">in</div>
-          <div class="social-btn">𝕏</div>
-          <div class="social-btn">ig</div>
+          <a href="https://www.linkedin.com/company/skyvayu" target="_blank" rel="noopener" class="social-btn" aria-label="LinkedIn">in</a>
+          <a href="https://twitter.com/skyvayu" target="_blank" rel="noopener" class="social-btn" aria-label="X (Twitter)">𝕏</a>
+          <a href="https://www.instagram.com/skyvayu" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram">ig</a>
         </div>
       </div>
       <div>
@@ -1460,6 +1470,16 @@ function handleGoogleSignIn() {
   closeAuthModal();
   signInWithGoogle();
 }
+
+  function prefillRoute(from, to) {
+    var depEl = document.getElementById('departure');
+    var destEl = document.getElementById('destination');
+    if (depEl) { depEl.value = from; depEl.dispatchEvent(new Event('input')); }
+    if (destEl) { destEl.value = to; destEl.dispatchEvent(new Event('input')); }
+    var bookingSection = document.querySelector('.booking-section');
+    if (bookingSection) { bookingSection.scrollIntoView({behavior:'smooth', block:'start'}); }
+    setTimeout(function(){ if (depEl) depEl.focus(); }, 600);
+  }
 </script>
 </body>
 </html>
