@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/theme.css"/>
+  <script src="js/theme.js"></script>
+  <title>About Us — SkyVayu | Private Charter Flights</title>
+  <meta name="description" content="SkyVayu was built on one conviction: booking a charter flight should be transparent and fast. No brokers. No opacity. Real quotes in 60 minutes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0c1324;
+      --navy-mid: #0f1a30;
+      --navy-light: #162040;
+      --gold: #fbbf24;
+      --gold-light: #fcd34d;
+      --white: #ffffff;
+      --white-60: rgba(255,255,255,0.6);
+      --white-30: rgba(255,255,255,0.3);
+      --white-10: rgba(255,255,255,0.1);
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--white-10);
+      height: 72px;
+      display: flex;
+      align-items: center;
+      padding: 0 48px;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 26px;
+      color: var(--gold);
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white-60);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-links .active {
+      color: var(--gold);
+      border-bottom: 2px solid var(--gold);
+      padding-bottom: 3px;
+    }
+
+    .nav-cta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: var(--gold);
+      padding: 10px 20px;
+      border-radius: 2px;
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--gold-light); }
+
+    #theme-toggle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--white-10);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white-60);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    #theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 140px 48px 80px;
+      max-width: 1280px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--white-10);
+    }
+
+    .page-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 7vw, 80px);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      max-width: 700px;
+    }
+
+    .page-title em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    /* ── SECTIONS ── */
+    .about-section {
+      padding: 80px 48px;
+      max-width: 1280px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--white-10);
+    }
+
+    .about-section:last-of-type {
+      border-bottom: none;
+    }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 32px;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    .section-heading {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+    }
+
+    .section-heading em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .section-body {
+      font-size: 16px;
+      line-height: 1.85;
+      color: var(--white-60);
+    }
+
+    .section-body p {
+      margin: 0 0 20px;
+    }
+
+    .section-body p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ── STATS ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--white-10);
+      border: 1px solid var(--white-10);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 64px;
+    }
+
+    .stat-item {
+      background: var(--navy-light);
+      padding: 40px 32px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 52px;
+      font-weight: 400;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white-30);
+    }
+
+    /* ── DIFFERENTIATORS ── */
+    .diff-heading {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 4vw, 52px);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -0.5px;
+      margin-bottom: 56px;
+      max-width: 480px;
+    }
+
+    .diff-heading em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .diff-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--white-10);
+      border: 1px solid var(--white-10);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .diff-item {
+      background: var(--navy-light);
+      padding: 36px 32px;
+    }
+
+    .diff-icon {
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    .diff-title {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+
+    .diff-body {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--white-60);
+    }
+
+    /* ── PROMISE / CTA ── */
+    .promise-section {
+      background: var(--navy-light);
+      border-top: 1px solid var(--white-10);
+      border-bottom: 1px solid var(--white-10);
+      padding: 100px 48px;
+      text-align: center;
+    }
+
+    .promise-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 24px;
+    }
+
+    .promise-heading {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 5vw, 64px);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -1px;
+      margin-bottom: 24px;
+    }
+
+    .promise-heading em {
+      font-style: italic;
+      color: var(--gold);
+    }
+
+    .promise-body {
+      font-size: 16px;
+      color: var(--white-60);
+      line-height: 1.8;
+      max-width: 680px;
+      margin: 0 auto 40px;
+    }
+
+    .promise-cta {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: var(--gold);
+      padding: 16px 36px;
+      border-radius: 2px;
+      transition: background 0.2s;
+    }
+
+    .promise-cta:hover { background: var(--gold-light); }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: var(--navy-mid);
+      border-top: 1px solid var(--white-10);
+      padding: 64px 48px 32px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 2fr;
+      gap: 48px;
+      margin-bottom: 48px;
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 28px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .footer-tagline {
+      font-size: 14px;
+      color: var(--white-60);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .footer-socials {
+      display: flex;
+      gap: 12px;
+    }
+
+    .social-btn {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--white-10);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      color: var(--white-60);
+      text-decoration: none;
+    }
+
+    .social-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    .footer-heading {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--white-30);
+      margin-bottom: 20px;
+    }
+
+    .footer-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-links a {
+      font-size: 14px;
+      color: var(--white-60);
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover { color: var(--white); }
+
+    .newsletter-input-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .newsletter-input {
+      flex: 1;
+      background: var(--white-10);
+      border: 1px solid var(--white-10);
+      border-radius: 2px;
+      padding: 10px 14px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .newsletter-input::placeholder { color: var(--white-30); }
+    .newsletter-input:focus { border-color: var(--gold); }
+
+    .newsletter-submit {
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      padding: 10px 16px;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    .newsletter-submit:hover { background: var(--gold-light); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--white-10);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .footer-copy {
+      font-size: 12px;
+      color: var(--white-30);
+    }
+
+    .footer-ops {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white-30);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      .nav { padding: 0 24px; }
+      .page-header, .about-section { padding-left: 24px; padding-right: 24px; }
+      .section-grid { grid-template-columns: 1fr; gap: 32px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .diff-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .promise-section { padding: 64px 24px; }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links { display: none; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="/" class="nav-logo">SkyVayu</a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/routes">Routes</a></li>
+      <li><a href="/about" class="active">About Us</a></li>
+    </ul>
+    <div>
+      <button id="theme-toggle" onclick="toggleTheme()" title="Switch to light mode">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+      <a href="/#book" class="nav-cta">Get Quotes</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <div class="page-label">About SkyVayu</div>
+    <h1 class="page-title">Private aviation,<br><em>reimagined for India.</em></h1>
+  </header>
+
+  <!-- OUR STORY -->
+  <section class="about-section">
+    <div class="section-label">Our Story</div>
+    <div class="section-grid">
+      <div class="section-heading">Built on a single conviction.</div>
+      <div class="section-body">
+        <p>SkyVayu was built on a single conviction: booking a charter flight should be as transparent and fast as any other premium service. No brokers. No opacity. No guesswork.</p>
+        <p>We connect travellers directly with India's finest DGCA-licensed operators — delivering real competitive quotes within 60 minutes, across 115+ airports nationwide and beyond.</p>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">115+</div>
+        <div class="stat-label">Airports Covered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">60</div>
+        <div class="stat-label">Min. Avg. Quote</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">DGCA Verified</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">&#8377;0</div>
+        <div class="stat-label">Broker Fees</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR MISSION -->
+  <section class="about-section">
+    <div class="section-label">Our Mission</div>
+    <div class="section-grid">
+      <div class="section-heading">Democratising access to <em>private skies.</em></div>
+      <div class="section-body">
+        <p>For too long, private aviation in India has been locked behind a wall of middlemen, inflated pricing, and opaque processes. SkyVayu tears that wall down.</p>
+        <p>Our platform lets verified operators compete for your booking in real time — which means you always receive the best available market rate, with complete transparency at every step.</p>
+        <p>From urgent medivac flights to leisure trips to Lakshadweep, SkyVayu handles it all on one unified platform built for people who cannot afford to waste time.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHAT MAKES US DIFFERENT -->
+  <section class="about-section">
+    <div class="section-label">What Makes Us Different</div>
+    <div class="diff-heading">Built different, <em>by design.</em></div>
+    <div class="diff-grid">
+      <div class="diff-item">
+        <div class="diff-icon">&#10003;</div>
+        <div class="diff-title">Verified operators only</div>
+        <div class="diff-body">Every operator on SkyVayu is DGCA licensed and manually verified before being listed. Safety is not a selling point — it is a baseline requirement.</div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-icon">&#9889;</div>
+        <div class="diff-title">Live competitive quotes</div>
+        <div class="diff-body">Operators compete for your booking in real time. You receive multiple quotes within 60 minutes and choose based on aircraft, price, and operator credentials — not a broker's preference.</div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-icon">&#8377;</div>
+        <div class="diff-title">Zero hidden charges</div>
+        <div class="diff-body">Every quote you see is GST-inclusive and final. No surprises at checkout, no last-minute add-ons. What you see is exactly what you pay.</div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-icon">&#127759;</div>
+        <div class="diff-title">Domestic &amp; international</div>
+        <div class="diff-body">From Leh to Lakshadweep, Mumbai to Dubai — one platform covers every route. India's most comprehensive charter marketplace, built for wherever you need to be.</div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-icon">&#10010;</div>
+        <div class="diff-title">Speciality missions</div>
+        <div class="diff-body">Medivac, VIP transport, cargo, pet travel — SkyVayu handles non-standard missions that generic platforms cannot. Purpose-built for the full spectrum of charter needs.</div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-icon">&#128274;</div>
+        <div class="diff-title">Secured payments</div>
+        <div class="diff-body">Every transaction is processed through a fully secured payment gateway. Your financial details are protected at every stage, with 100% payment security guaranteed.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OUR PROMISE -->
+  <section class="promise-section">
+    <div class="promise-label">Our Promise</div>
+    <div class="promise-heading">The sky is yours.<br><em>We just make it simpler.</em></div>
+    <p class="promise-body">SkyVayu exists to give every passenger the information, confidence, and speed they deserve when booking a charter flight. We are India's charter marketplace — built on trust, driven by technology, defined by transparency.</p>
+    <a href="/#book" class="promise-cta">Get Instant Quotes &#8594;</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">SkyVayu</div>
+        <p class="footer-tagline">Elevating the standards of private aviation through technical precision and elite service.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/company/skyvayu" target="_blank" rel="noopener" class="social-btn">in</a>
+          <a href="https://x.com/skyvayu" target="_blank" rel="noopener" class="social-btn">&#120143;</a>
+          <a href="https://instagram.com/skyvayu" target="_blank" rel="noopener" class="social-btn">ig</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Company</div>
+        <ul class="footer-links">
+          <li><a href="/fleet">Fleet</a></li>
+          <li><a href="/routes">Routes</a></li>
+          <li><a href="/about">About Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Support</div>
+        <ul class="footer-links">
+          <li><a href="/help">Help Center</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+          <li><a href="/cookies">Cookie Policy</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Newsletter</div>
+        <p class="footer-tagline">Receive curated aviation insights and empty leg alerts.</p>
+        <div class="newsletter-input-row">
+          <input class="newsletter-input" type="email" placeholder="Email address">
+          <button class="newsletter-submit">&#8594;</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">&copy; 2025 SkyVayu Aviation. The Celestial Navigator.</div>
+      <div class="footer-ops">Global Ops: Mumbai &middot; Delhi &middot; Dubai</div>
+    </div>
+  </footer>
+
+</body>
+</html>
