@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/theme.css"/>
+  <script src="js/theme.js"></script>
+  <title>Fleet — SkyVayu | Charter Aircraft in India</title>
+  <meta name="description" content="SkyVayu partners with DGCA-licensed NSOPs across India to offer a varied fleet — from King Air turboprops to ultra-long-range heavy jets. Book any aircraft in 60 minutes.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0c1324;
+      --navy-mid: #0f1a30;
+      --navy-light: #162040;
+      --gold: #fbbf24;
+      --gold-light: #fcd34d;
+      --white: #ffffff;
+      --white-60: rgba(255,255,255,0.6);
+      --white-30: rgba(255,255,255,0.3);
+      --white-10: rgba(255,255,255,0.1);
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--white-10);
+      height: 72px;
+      display: flex;
+      align-items: center;
+      padding: 0 48px;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 26px;
+      color: var(--gold);
+      letter-spacing: -0.5px;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white-60);
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--gold); }
+    .nav-links .active { color: var(--gold); border-bottom: 2px solid var(--gold); padding-bottom: 3px; }
+
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+
+    .nav-cta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: var(--gold);
+      padding: 10px 20px;
+      border-radius: 2px;
+      transition: background 0.2s;
+    }
+
+    .nav-cta:hover { background: var(--gold-light); }
+
+    #theme-toggle {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--white-10);
+      background: transparent;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--white-60);
+      transition: border-color 0.2s, color 0.2s;
+    }
+
+    #theme-toggle:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 140px 48px 80px;
+      max-width: 1280px;
+      margin: 0 auto;
+      border-bottom: 1px solid var(--white-10);
+    }
+
+    .page-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 7vw, 80px);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -1px;
+      max-width: 800px;
+      margin-bottom: 28px;
+    }
+
+    .page-title em { font-style: italic; color: var(--gold); }
+
+    .page-subtitle {
+      font-size: 17px;
+      color: var(--white-60);
+      line-height: 1.8;
+      max-width: 680px;
+    }
+
+    /* ── NSOP NOTICE ── */
+    .nsop-notice {
+      background: var(--navy-light);
+      border: 1px solid var(--white-10);
+      border-left: 3px solid var(--gold);
+      border-radius: 4px;
+      padding: 28px 32px;
+      margin: 48px 0 0;
+      max-width: 860px;
+    }
+
+    .nsop-notice-title {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .nsop-notice-body {
+      font-size: 15px;
+      color: var(--white-60);
+      line-height: 1.8;
+    }
+
+    .nsop-notice-body strong { color: var(--white); font-weight: 500; }
+
+    /* ── CATEGORY FILTER ── */
+    .filter-bar {
+      padding: 48px 48px 0;
+      max-width: 1280px;
+      margin: 0 auto;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      border-radius: 2px;
+      border: 1px solid var(--white-10);
+      background: transparent;
+      color: var(--white-60);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(251,191,36,0.06);
+    }
+
+    /* ── FLEET GRID ── */
+    .fleet-section {
+      padding: 48px 48px 80px;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .fleet-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2px;
+    }
+
+    /* ── AIRCRAFT CARD ── */
+    .aircraft-card {
+      background: var(--navy-light);
+      border: 1px solid var(--white-10);
+      overflow: hidden;
+      transition: transform 0.25s, border-color 0.25s;
+      cursor: pointer;
+    }
+
+    .aircraft-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(251,191,36,0.35);
+    }
+
+    .aircraft-img-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: var(--navy-mid);
+    }
+
+    .aircraft-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s;
+      filter: brightness(0.88);
+    }
+
+    .aircraft-card:hover .aircraft-img-wrap img {
+      transform: scale(1.04);
+    }
+
+    .aircraft-category-badge {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      background: rgba(12,19,36,0.82);
+      border: 1px solid var(--white-10);
+      color: var(--gold);
+      padding: 4px 10px;
+      border-radius: 2px;
+      backdrop-filter: blur(6px);
+    }
+
+    .aircraft-body {
+      padding: 24px 24px 28px;
+    }
+
+    .aircraft-name {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 400;
+      letter-spacing: -0.3px;
+      margin-bottom: 4px;
+    }
+
+    .aircraft-full-name {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--white-30);
+      margin-bottom: 20px;
+    }
+
+    .aircraft-specs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--white-10);
+      border: 1px solid var(--white-10);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .spec-item {
+      background: var(--navy);
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .spec-value {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .spec-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--white-30);
+    }
+
+    .aircraft-desc {
+      font-size: 13px;
+      color: var(--white-60);
+      line-height: 1.75;
+      margin-bottom: 20px;
+    }
+
+    .aircraft-book-btn {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 9px 18px;
+      border-radius: 2px;
+      transition: all 0.2s;
+      background: transparent;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .aircraft-book-btn:hover {
+      background: var(--gold);
+      color: var(--navy);
+    }
+
+    /* ── BOTTOM CTA ── */
+    .fleet-cta {
+      background: var(--navy-light);
+      border-top: 1px solid var(--white-10);
+      padding: 80px 48px;
+      text-align: center;
+    }
+
+    .fleet-cta-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    .fleet-cta-heading {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 5vw, 56px);
+      font-weight: 400;
+      letter-spacing: -0.5px;
+      margin-bottom: 16px;
+    }
+
+    .fleet-cta-heading em { font-style: italic; color: var(--gold); }
+
+    .fleet-cta-sub {
+      font-size: 15px;
+      color: var(--white-60);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.75;
+    }
+
+    .fleet-cta-btn {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: var(--gold);
+      padding: 16px 36px;
+      border-radius: 2px;
+      transition: background 0.2s;
+    }
+
+    .fleet-cta-btn:hover { background: var(--gold-light); }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: var(--navy-mid);
+      border-top: 1px solid var(--white-10);
+      padding: 64px 48px 32px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 2fr;
+      gap: 48px;
+      margin-bottom: 48px;
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .footer-logo {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 28px;
+      color: var(--gold);
+      margin-bottom: 16px;
+    }
+
+    .footer-tagline {
+      font-size: 14px;
+      color: var(--white-60);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+
+    .footer-socials { display: flex; gap: 12px; }
+
+    .social-btn {
+      width: 36px; height: 36px;
+      border: 1px solid var(--white-10);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+      color: var(--white-60);
+      text-decoration: none;
+    }
+
+    .social-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+    .footer-heading {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--white-30);
+      margin-bottom: 20px;
+    }
+
+    .footer-links { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    .footer-links a { font-size: 14px; color: var(--white-60); transition: color 0.2s; }
+    .footer-links a:hover { color: var(--white); }
+
+    .newsletter-input-row { display: flex; gap: 8px; margin-top: 16px; }
+
+    .newsletter-input {
+      flex: 1;
+      background: var(--white-10);
+      border: 1px solid var(--white-10);
+      border-radius: 2px;
+      padding: 10px 14px;
+      color: var(--white);
+      font-family: var(--font-body);
+      font-size: 14px;
+      outline: none;
+    }
+
+    .newsletter-input::placeholder { color: var(--white-30); }
+    .newsletter-input:focus { border-color: var(--gold); }
+
+    .newsletter-submit {
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      padding: 10px 16px;
+      border-radius: 2px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+
+    .newsletter-submit:hover { background: var(--gold-light); }
+
+    .footer-bottom {
+      border-top: 1px solid var(--white-10);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .footer-copy { font-size: 12px; color: var(--white-30); }
+
+    .footer-ops {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white-30);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .fleet-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 900px) {
+      .nav { padding: 0 24px; }
+      .page-header, .fleet-section, .filter-bar { padding-left: 24px; padding-right: 24px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .fleet-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="/" class="nav-logo">SkyVayu</a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/routes">Routes</a></li>
+      <li><a href="/about">About Us</a></li>
+    </ul>
+    <div class="nav-right">
+      <button id="theme-toggle" onclick="toggleTheme()" title="Switch to light mode">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+      </button>
+      <a href="/#book" class="nav-cta">Get Quotes</a>
+    </div>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <header class="page-header">
+    <div class="page-label">Our Fleet</div>
+    <h1 class="page-title">Every aircraft.<br><em>One platform.</em></h1>
+    <p class="page-subtitle">From short-hop turboprops to ultra-long-range heavy jets — SkyVayu gives you access to India's most comprehensive charter fleet through our network of verified operator partners.</p>
+
+    <div class="nsop-notice">
+      <div class="nsop-notice-title">A note on how we operate</div>
+      <div class="nsop-notice-body">
+        SkyVayu is <strong>not a Non-Scheduled Operator Permit (NSOP) holder</strong>. We are a technology platform that connects passengers directly with <strong>DGCA-licensed NSOP operators</strong> across India. Every aircraft you see here is operated by a verified partner operator under their own DGCA-issued permit — giving you full regulatory compliance, competitive market pricing, and access to a varied fleet without broker markups.
+      </div>
+    </div>
+  </header>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterFleet(this, 'all')">All Aircraft</button>
+    <button class="filter-btn" onclick="filterFleet(this, 'turboprop')">Turboprop</button>
+    <button class="filter-btn" onclick="filterFleet(this, 'light-jet')">Light Jet</button>
+    <button class="filter-btn" onclick="filterFleet(this, 'midsize-jet')">Midsize Jet</button>
+    <button class="filter-btn" onclick="filterFleet(this, 'heavy-jet')">Heavy Jet</button>
+  </div>
+
+  <!-- FLEET GRID -->
+  <section class="fleet-section">
+    <div class="fleet-grid" id="fleet-grid">
+
+      <!-- King Air C90 -->
+      <div class="aircraft-card" data-category="turboprop">
+        <div class="aircraft-img-wrap">
+          <img src="https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=800&q=80&auto=format&fit=crop" alt="King Air C90 turboprop aircraft" loading="lazy">
+          <span class="aircraft-category-badge">Turboprop</span>
+        </div>
+        <div class="aircraft-body">
+          <div class="aircraft-name">King Air C90</div>
+          <div class="aircraft-full-name">Beechcraft King Air C90GTx</div>
+          <div class="aircraft-specs">
+            <div class="spec-item">
+              <div class="spec-value">6</div>
+              <div class="spec-label">Passengers</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">1,860</div>
+              <div class="spec-label">Range (km)</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">295</div>
+              <div class="spec-label">Speed (km/h)</div>
+            </div>
+          </div>
+          <p class="aircraft-desc">The workhorse of Indian regional aviation. The C90 thrives on shorter sectors and connects tier-2 and tier-3 cities where jets cannot operate. Ideal for executive hops, medivac, and leisure trips.</p>
+          <a href="/#book" class="aircraft-book-btn">Book This Aircraft &#8594;</a>
+        </div>
+      </div>
+
+      <!-- King Air B200 -->
+      <div class="aircraft-card" data-category="turboprop">
+        <div class="aircraft-img-wrap">
+          <img src="https://images.unsplash.com/photo-1559060017-445f04bcc2d6?w=800&q=80&auto=format&fit=crop" alt="King Air B200 turboprop" loading="lazy">
+          <span class="aircraft-category-badge">Turboprop</span>
+        </div>
+        <div class="aircraft-body">
+          <div class="aircraft-name">King Air B200</div>
+          <div class="aircraft-full-name">Beechcraft King Air B200GT</div>
+          <div class="aircraft-specs">
+            <div class="spec-item">
+              <div class="spec-value">9</div>
+              <div class="spec-label">Passengers</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">2,870</div>
+              <div class="spec-label">Range (km)</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">530</div>
+              <div class="spec-label">Speed (km/h)</div>
+            </div>
+          </div>
+          <p class="aircraft-desc">The most widely operated charter turboprop in India. The B200 offers exceptional range, a pressurised cabin, and the ability to operate from short or unpaved strips — perfect for reaching India's most remote destinations.</p>
+          <a href="/#book" class="aircraft-book-btn">Book This Aircraft &#8594;</a>
+        </div>
+      </div>
+
+      <!-- Citation CJ2 -->
+      <div class="aircraft-card" data-category="light-jet">
+        <div class="aircraft-img-wrap">
+          <img src="https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=800&q=80&auto=format&fit=crop" alt="Citation CJ2 light jet" loading="lazy">
+          <span class="aircraft-category-badge">Light Jet</span>
+        </div>
+        <div class="aircraft-body">
+          <div class="aircraft-name">Citation CJ2</div>
+          <div class="aircraft-full-name">Cessna Citation CJ2+</div>
+          <div class="aircraft-specs">
+            <div class="spec-item">
+              <div class="spec-value">7</div>
+              <div class="spec-label">Passengers</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">3,220</div>
+              <div class="spec-label">Range (km)</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">745</div>
+              <div class="spec-label">Speed (km/h)</div>
+            </div>
+          </div>
+          <p class="aircraft-desc">The Citation CJ2 redefines entry-level jet travel. A stand-up cabin, transcontinental range, and the ability to use smaller airports make it one of the most versatile jets in Indian private aviation.</p>
+          <a href="/#book" class="aircraft-book-btn">Book This Aircraft &#8594;</a>
+        </div>
+      </div>
+
+      <!-- Hawker 800 -->
+      <div class="aircraft-card" data-category="midsize-jet">
+        <div class="aircraft-img-wrap">
+          <img src="https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?w=800&q=80&auto=format&fit=crop" alt="Hawker 800 midsize jet" loading="lazy">
+          <span class="aircraft-category-badge">Midsize Jet</span>
+        </div>
+        <div class="aircraft-body">
+          <div class="aircraft-name">Hawker 800</div>
+          <div class="aircraft-full-name">Hawker Beechcraft 800XP</div>
+          <div class="aircraft-specs">
+            <div class="spec-item">
+              <div class="spec-value">9</div>
+              <div class="spec-label">Passengers</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">5,150</div>
+              <div class="spec-label">Range (km)</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">820</div>
+              <div class="spec-label">Speed (km/h)</div>
+            </div>
+          </div>
+          <p class="aircraft-desc">A proven midsize workhorse with a wide, flat-floor cabin and a range that comfortably covers most South Asian and Middle Eastern sectors nonstop. The Hawker 800 is the benchmark for business travel across India.</p>
+          <a href="/#book" class="aircraft-book-btn">Book This Aircraft &#8594;</a>
+        </div>
+      </div>
+
+      <!-- Falcon 2000 -->
+      <div class="aircraft-card" data-category="heavy-jet">
+        <div class="aircraft-img-wrap">
+          <img src="https://images.unsplash.com/photo-1532509774891-141d37f25ae9?w=800&q=80&auto=format&fit=crop" alt="Falcon 2000 heavy jet" loading="lazy">
+          <span class="aircraft-category-badge">Heavy Jet</span>
+        </div>
+        <div class="aircraft-body">
+          <div class="aircraft-name">Falcon 2000</div>
+          <div class="aircraft-full-name">Dassault Falcon 2000LXS</div>
+          <div class="aircraft-specs">
+            <div class="spec-item">
+              <div class="spec-value">10</div>
+              <div class="spec-label">Passengers</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">7,400</div>
+              <div class="spec-label">Range (km)</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">900</div>
+              <div class="spec-label">Speed (km/h)</div>
+            </div>
+          </div>
+          <p class="aircraft-desc">Dassault's iconic trijet brings European luxury to India's skies. The Falcon 2000 delivers an ultra-wide, three-zone cabin, intercontinental range, and the ability to operate from shorter runways — a rare capability at this size.</p>
+          <a href="/#book" class="aircraft-book-btn">Book This Aircraft &#8594;</a>
+        </div>
+      </div>
+
+      <!-- Legacy 650 -->
+      <div class="aircraft-card" data-category="heavy-jet">
+        <div class="aircraft-img-wrap">
+          <img src="https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&q=80&auto=format&fit=crop" alt="Embraer Legacy 650 heavy jet" loading="lazy">
+          <span class="aircraft-category-badge">Heavy Jet</span>
+        </div>
+        <div class="aircraft-body">
+          <div class="aircraft-name">Legacy 650</div>
+          <div class="aircraft-full-name">Embraer Legacy 650E</div>
+          <div class="aircraft-specs">
+            <div class="spec-item">
+              <div class="spec-value">14</div>
+              <div class="spec-label">Passengers</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">7,224</div>
+              <div class="spec-label">Range (km)</div>
+            </div>
+            <div class="spec-item">
+              <div class="spec-value">870</div>
+              <div class="spec-label">Speed (km/h)</div>
+            </div>
+          </div>
+          <p class="aircraft-desc">The largest aircraft on our platform. The Legacy 650E seats up to 14 passengers in a full stand-up, three-cabin interior with lie-flat seating — delivering an airliner-like experience in a jet that can reach Dubai, Singapore, or London without a stop.</p>
+          <a href="/#book" class="aircraft-book-btn">Book This Aircraft &#8594;</a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="fleet-cta">
+    <div class="fleet-cta-label">Ready to fly?</div>
+    <div class="fleet-cta-heading">Don't see what you need?<br><em>We'll find it.</em></div>
+    <p class="fleet-cta-sub">Our operator network covers more than what's listed here. Tell us your mission — passengers, sector, and dates — and we'll source the right aircraft within 60 minutes.</p>
+    <a href="/#book" class="fleet-cta-btn">Get Instant Quotes &#8594;</a>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-logo">SkyVayu</div>
+        <p class="footer-tagline">Elevating the standards of private aviation through technical precision and elite service.</p>
+        <div class="footer-socials">
+          <a href="https://linkedin.com/company/skyvayu" target="_blank" rel="noopener" class="social-btn">in</a>
+          <a href="https://x.com/skyvayu" target="_blank" rel="noopener" class="social-btn">&#120143;</a>
+          <a href="https://instagram.com/skyvayu" target="_blank" rel="noopener" class="social-btn">ig</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-heading">Company</div>
+        <ul class="footer-links">
+          <li><a href="/fleet">Fleet</a></li>
+          <li><a href="/routes">Routes</a></li>
+          <li><a href="/about">About Us</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Support</div>
+        <ul class="footer-links">
+          <li><a href="/help">Help Center</a></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+          <li><a href="/cookies">Cookie Policy</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-heading">Newsletter</div>
+        <p class="footer-tagline">Receive curated aviation insights and empty leg alerts.</p>
+        <div class="newsletter-input-row">
+          <input class="newsletter-input" type="email" placeholder="Email address">
+          <button class="newsletter-submit">&#8594;</button>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">&copy; 2025 SkyVayu Aviation. The Celestial Navigator.</div>
+      <div class="footer-ops">Global Ops: Mumbai &middot; Delhi &middot; Dubai</div>
+    </div>
+  </footer>
+
+  <script>
+    function filterFleet(btn, category) {
+      // Update active button
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      // Show/hide cards
+      document.querySelectorAll('.aircraft-card').forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.style.display = '';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+
+</body>
+</html>
