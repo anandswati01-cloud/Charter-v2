@@ -105,6 +105,11 @@
 
   /* —— Initialise ————————————————————————————————————————— */
   function init() {
+    /* Debug — log exactly what's in the URL when page loads */
+    console.log('auth.js init — URL:', window.location.href);
+    console.log('auth.js init — hash:', window.location.hash);
+    console.log('auth.js init — search:', window.location.search);
+
     var sb = getClient();
 
     /* onAuthStateChange handles SIGNED_IN after the PKCE exchange completes */
