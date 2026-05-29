@@ -54,7 +54,7 @@
     sb.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://www.skyvayu.com'
+        redirectTo: window.location.origin + '/'
       }
     }).then(function (res) {
       if (res.error) {
@@ -109,14 +109,20 @@
 
     /* onAuthStateChange handles SIGNED_IN after the PKCE exchange completes */
     sb.auth.onAuthStateChange(function (event, session) {
+      console.log('Auth event:', event, session ? session.user.email : 'no session');
       updateAuthUI(session);
       if (event === 'SIGNED_IN') {
+        /* Clean up the code/hash from the URL without reloading */
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
         var pending = window.popPendingQuery();
         if (pending && typeof saveQueryToSupabase === 'function') {
           saveQueryToSupabase(pending).then(function () {
-            window.location.href = 'results';
+            window.location.href = 'results.html';
           }).catch(function (err) {
             console.error('saveQuery failed after OAuth:', err);
+            window.location.href = 'results.html';
           });
         }
       }
