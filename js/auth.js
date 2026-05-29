@@ -16,7 +16,7 @@
     var key = SKYVAYU_CONFIG.supabaseKey;
     _sb = window.supabase.createClient(url, key, {
       auth: {
-        flowType: 'implicit',
+        flowType: 'pkce',
         detectSessionInUrl: true,
         persistSession: true,
         autoRefreshToken: true,
