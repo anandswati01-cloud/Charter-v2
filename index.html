@@ -487,7 +487,7 @@
         
 /* ── MULTI-SECTOR PANEL ── */
 .multi-sector-wrap { display: none; margin-bottom: 24px; }
-.sector-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 16px; margin-bottom: 12px; align-items: end; }
+.sector-row { display: grid; grid-template-columns: 1fr 1fr 1fr 80px auto; gap: 16px; margin-bottom: 12px; align-items: end; }
 .sector-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
 .remove-sector-btn { width: 36px; height: 46px; border: 1px solid var(--white-10); border-radius: 2px; background: transparent; color: var(--white-30); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
 .remove-sector-btn:hover { border-color: #ef4444; color: #ef4444; }
@@ -1273,6 +1273,7 @@ function getQuotes() {
         var dep=document.getElementById('sec-dep-'+n);
         var dest=document.getElementById('sec-dest-'+n);
         var date=document.getElementById('sec-date-'+n);
+        var paxEl=document.getElementById('sec-pax-'+n);
         if(!dep||!dep.value.trim()){showErr('err-sec-dep-'+n,'Please enter a departure city');valid=false;}
         if(!dest||!dest.value.trim()){showErr('err-sec-dest-'+n,'Please enter a destination city');valid=false;}
         if(!date||!date.value){showErr('err-sec-date-'+n,'Please select a date & time');valid=false;}
@@ -1282,7 +1283,7 @@ function getQuotes() {
     var pax=document.getElementById('paxNum')?document.getElementById('paxNum').textContent:'2';
     var params=new URLSearchParams({from:from,to:to,date:date,pax:pax,trip:tripMode});
     if(tripMode==='Round Trip'&&returnDate)params.set('returnDate',returnDate);
-    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open'};
+    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(paxEl&&paxEl.value?paxEl.value:2)||2});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open'};
     openOtpModal();
   }
   
@@ -1310,6 +1311,10 @@ function getQuotes() {
         <div class="input-label sector-label">Date &amp; Time</div>
         <input class="input-field" type="datetime-local" id="sec-date-${n}" tabindex="${10 + (n-1)*3 + 3}" oninput="clearErr(this)">
         <span class="error-msg" id="err-sec-date-${n}"></span>
+      </div>
+      <div class="input-group">
+        <div class="input-label sector-label">Pax</div>
+        <input class="input-field" type="number" id="sec-pax-${n}" min="1" max="50" value="2" tabindex="${(n-1)*4+4}" placeholder="Pax" style="width:100%;min-width:0;">
       </div>
       <button class="remove-sector-btn" onclick="removeSector(${n})" title="Remove sector">&times;</button>
     `;
