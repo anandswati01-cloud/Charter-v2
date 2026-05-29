@@ -14,13 +14,13 @@
     if (window._svSupabase) { _sb = window._svSupabase; return _sb; }
     var url = SKYVAYU_CONFIG.supabaseUrl;
     var key = SKYVAYU_CONFIG.supabaseKey;
-    /* Use default PKCE flow — do NOT set flowType:'implicit' */
-    /* (implicit breaks Supabase's server-side code exchange) */
     _sb = window.supabase.createClient(url, key, {
       auth: {
+        flowType: 'pkce',
         detectSessionInUrl: true,
         persistSession: true,
-        autoRefreshToken: true
+        autoRefreshToken: true,
+        storage: window.localStorage
       }
     });
     window._svSupabase = _sb;
@@ -107,16 +107,20 @@
   function init() {
     var sb = getClient();
 
-    /* onAuthStateChange handles SIGNED_IN after the PKCE exchange completes */
     sb.auth.onAuthStateChange(function (event, session) {
       updateAuthUI(session);
       if (event === 'SIGNED_IN') {
+        /* Clean up the code/hash from the URL without reloading */
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
         var pending = window.popPendingQuery();
         if (pending && typeof saveQueryToSupabase === 'function') {
           saveQueryToSupabase(pending).then(function () {
-            window.location.href = 'results';
+            window.location.href = 'results.html';
           }).catch(function (err) {
             console.error('saveQuery failed after OAuth:', err);
+            window.location.href = 'results.html';
           });
         }
       }
