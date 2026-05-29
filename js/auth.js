@@ -14,13 +14,13 @@
     if (window._svSupabase) { _sb = window._svSupabase; return _sb; }
     var url = SKYVAYU_CONFIG.supabaseUrl;
     var key = SKYVAYU_CONFIG.supabaseKey;
-    /* Use default PKCE flow — do NOT set flowType:'implicit' */
-    /* (implicit breaks Supabase's server-side code exchange) */
     _sb = window.supabase.createClient(url, key, {
       auth: {
+        flowType: 'implicit',
         detectSessionInUrl: true,
         persistSession: true,
-        autoRefreshToken: true
+        autoRefreshToken: true,
+        storage: window.localStorage
       }
     });
     window._svSupabase = _sb;
@@ -54,7 +54,7 @@
     sb.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin + '/'
+        redirectTo: 'https://www.skyvayu.com'
       }
     }).then(function (res) {
       if (res.error) {
@@ -127,19 +127,6 @@
         }
       }
     });
-
-    /* Explicitly exchange code if present in URL (PKCE flow) */
-    var urlParams = new URLSearchParams(window.location.search);
-    var code = urlParams.get('code');
-    if (code) {
-      console.log('Found OAuth code in URL, exchanging...');
-      sb.auth.exchangeCodeForSession(code).then(function(res) {
-        console.log('Code exchange result:', res.error ? res.error.message : 'success');
-        if (res.error) {
-          console.error('Code exchange failed:', res.error);
-        }
-      });
-    }
 
     /* Sync UI for users who already have a session in storage */
     sb.auth.getSession().then(function (res) {
