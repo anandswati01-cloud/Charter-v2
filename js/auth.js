@@ -10,11 +10,14 @@
 
   function getClient() {
     if (_sb) return _sb;
+    /* Re-use any client already created by another script */
+    if (window._svSupabase) { _sb = window._svSupabase; return _sb; }
     var url = SKYVAYU_CONFIG.supabaseUrl;
     var key = SKYVAYU_CONFIG.supabaseKey;
+    /* Use default PKCE flow — do NOT set flowType:'implicit' */
+    /* (implicit breaks Supabase's server-side code exchange) */
     _sb = window.supabase.createClient(url, key, {
       auth: {
-        flowType: 'implicit',
         detectSessionInUrl: true,
         persistSession: true,
         autoRefreshToken: true
@@ -60,7 +63,6 @@
           showToast('Sign-in failed: ' + res.error.message, 'error');
         }
       }
-      /* On success the browser redirects to Google — no further action needed here */
     });
   };
 
@@ -105,11 +107,9 @@
   function init() {
     var sb = getClient();
 
-    /* Listen for auth state changes (covers SIGNED_IN after OAuth redirect) */
+    /* onAuthStateChange handles SIGNED_IN after the PKCE exchange completes */
     sb.auth.onAuthStateChange(function (event, session) {
       updateAuthUI(session);
-
-      /* If user just signed in, process any stashed query */
       if (event === 'SIGNED_IN') {
         var pending = window.popPendingQuery();
         if (pending && typeof saveQueryToSupabase === 'function') {
@@ -122,8 +122,7 @@
       }
     });
 
-    /* Also call getSession() directly to sync UI on regular page loads */
-    /* This handles the case where session exists in localStorage */
+    /* Sync UI for users who already have a session in storage */
     sb.auth.getSession().then(function (res) {
       if (res.data && res.data.session) {
         updateAuthUI(res.data.session);
