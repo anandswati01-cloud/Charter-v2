@@ -487,12 +487,15 @@
         
 /* ── MULTI-SECTOR PANEL ── */
 .multi-sector-wrap { display: none; margin-bottom: 24px; }
-.sector-row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 16px; margin-bottom: 12px; align-items: end; }
-.sector-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
-.remove-sector-btn { width: 36px; height: 46px; border: 1px solid var(--white-10); border-radius: 2px; background: transparent; color: var(--white-30); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+.sector-row { margin-bottom: 0; }
+.sector-row + .sector-row { border-top: 1px solid rgba(255,255,255,0.07); margin-top: 20px; padding-top: 20px; }
+.sector-row-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.sector-heading { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold); }
+.sector-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--white-60); }
+.remove-sector-btn { background: none; border: 1px solid var(--white-10); border-radius: 4px; color: var(--white-30); font-size: 16px; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
 .remove-sector-btn:hover { border-color: #ef4444; color: #ef4444; }
-.add-sector-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; padding: 9px 18px; border: 1px dashed var(--white-30); border-radius: 2px; background: transparent; color: var(--white-60); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-.add-sector-btn:hover { border-color: var(--gold); color: var(--gold); }
+.add-sector-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; padding: 10px 20px; border: 1px dashed rgba(251,191,36,0.35); border-radius: 6px; background: rgba(251,191,36,0.04); color: var(--gold); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; }
+.add-sector-btn:hover { border-color: var(--gold); background: rgba(251,191,36,0.08); }
 
         /* ── HOW IT WORKS ── */
     .section {
@@ -1047,7 +1050,10 @@
         <!-- MULTI-SECTOR PANEL (shown for Multiple Sectors only) -->
         <div class="multi-sector-wrap" id="multi-sector-wrap">
           <div id="sectors-list"></div>
-          <button class="add-sector-btn" onclick="addSector()">+ Add Sector</button>
+        <button class="add-sector-btn" onclick="addSector()">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="6" y1="0" x2="6" y2="12" stroke="currentColor" stroke-width="1.5"/><line x1="0" y1="6" x2="12" y2="6" stroke="currentColor" stroke-width="1.5"/></svg>
+          Add Sector
+        </button>
         </div>
 
         <div class="special-row">
@@ -1283,7 +1289,7 @@ function getQuotes() {
     var pax=document.getElementById('paxNum')?document.getElementById('paxNum').textContent:'2';
     var params=new URLSearchParams({from:from,to:to,date:date,pax:pax,trip:tripMode});
     if(tripMode==='Round Trip'&&returnDate)params.set('returnDate',returnDate);
-    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(paxEl&&paxEl.value?paxEl.value:2)||2});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open'};
+    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(paxEl?paxEl.textContent:2)||2});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open'};
     openOtpModal();
   }
   
@@ -1297,23 +1303,48 @@ function getQuotes() {
     row.className = 'sector-row';
     row.id = 'sector-' + n;
     row.innerHTML = `
-      <div class="input-group">
-        <div class="input-label sector-label">Sector ${n} — From</div>
-                <div class="ac-wrap"><input class="input-field" id="sec-dep-${n}" type="text" tabindex="${10 + (n-1)*3 + 1}" placeholder="Departure city or airport" oninput="clearErr(this);acInput(this,'ac-sdep-${n}')" onkeydown="acKey(event,'ac-sdep-${n}')" onblur="acBlur('ac-sdep-${n}')"><div class="ac-dropdown" id="ac-sdep-${n}"></div></div>
-        <span class="error-msg" id="err-sec-dep-${n}"></span>
+      <div class="sector-row-header">
+        <span class="sector-heading">Sector ${n}</span>
+        <button class="remove-sector-btn" onclick="removeSector(${n})" title="Remove sector">&times;</button>
       </div>
-      <div class="input-group">
-        <div class="input-label sector-label">Sector ${n} — To</div>
-                <div class="ac-wrap"><input class="input-field" id="sec-dest-${n}" type="text" tabindex="${10 + (n-1)*3 + 2}" placeholder="Destination city or airport" oninput="clearErr(this);acInput(this,'ac-sdest-${n}')" onkeydown="acKey(event,'ac-sdest-${n}')" onblur="acBlur('ac-sdest-${n}')"><div class="ac-dropdown" id="ac-sdest-${n}"></div></div>
-        <span class="error-msg" id="err-sec-dest-${n}"></span>
+      <div class="inputs-grid-v2">
+        <!-- From -->
+        <div class="input-col">
+          <div class="input-group">
+            <div class="input-label sector-label">From</div>
+            <div class="ac-wrap"><input class="input-field" type="text" id="sec-dep-${n}" tabindex="${(n-1)*4+1}" placeholder="Departure city or airport" autocomplete="off" oninput="clearErr(this);acInput(this,'ac-sdep-${n}')" onkeydown="acKey(event,'ac-sdep-${n}')" onfocus="acInput(this,'ac-sdep-${n}')" onblur="acBlur('ac-sdep-${n}')"><div class="ac-dropdown" id="ac-sdep-${n}"></div></div>
+            <span class="error-msg" id="err-sec-dep-${n}"></span>
+          </div>
+        </div>
+        <!-- To -->
+        <div class="input-col">
+          <div class="input-group">
+            <div class="input-label sector-label">To</div>
+            <div class="ac-wrap"><input class="input-field" type="text" id="sec-dest-${n}" tabindex="${(n-1)*4+2}" placeholder="Destination city or airport" autocomplete="off" oninput="clearErr(this);acInput(this,'ac-sdest-${n}')" onkeydown="acKey(event,'ac-sdest-${n}')" onfocus="acInput(this,'ac-sdest-${n}')" onblur="acBlur('ac-sdest-${n}')"><div class="ac-dropdown" id="ac-sdest-${n}"></div></div>
+            <span class="error-msg" id="err-sec-dest-${n}"></span>
+          </div>
+        </div>
+        <!-- Date & Time -->
+        <div class="input-col">
+          <div class="input-group">
+            <div class="input-label sector-label">Date &amp; Time</div>
+            <input class="input-field" type="datetime-local" id="sec-date-${n}" tabindex="${(n-1)*4+3}" oninput="clearErr(this)">
+            <span class="error-msg" id="err-sec-date-${n}"></span>
+          </div>
+        </div>
+        <!-- Passengers -->
+        <div class="input-col">
+          <div class="input-group">
+            <div class="input-label sector-label">Passengers</div>
+            <div class="pax-control">
+              <button class="pax-btn" onclick="changeSectorPax(${n},-1)">&#8722;</button>
+              <span class="pax-num" id="sec-pax-${n}">2</span>
+              <button class="pax-btn" onclick="changeSectorPax(${n},1)">+</button>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="input-group">
-        <div class="input-label sector-label" style="display:flex;justify-content:space-between;align-items:center;">Date &amp; Time<span style="display:flex;align-items:center;gap:4px;"><span style="font-size:10px;letter-spacing:0.08em;text-transform:uppercase;">Pax</span><input type="number" id="sec-pax-${n}" min="1" max="50" value="2" style="width:40px;padding:2px 4px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);border-radius:4px;color:#fff;font-size:12px;text-align:center;outline:none;" oninput="this.value=Math.max(1,Math.min(50,parseInt(this.value)||1))"></span></div>
-        <input class="input-field" type="datetime-local" id="sec-date-${n}" tabindex="${10 + (n-1)*3 + 3}" oninput="clearErr(this)">
-        <span class="error-msg" id="err-sec-date-${n}"></span>
-      </div>
-            <button class="remove-sector-btn" onclick="removeSector(${n})" title="Remove sector">&times;</button>
-    `;
+    `
     list.appendChild(row);
     updateSectorLabels();
   }
@@ -1325,13 +1356,12 @@ function getQuotes() {
   }
 
   function updateSectorLabels() {
-    const rows = document.querySelectorAll('.sector-row');
-    rows.forEach((row, i) => {
-      const labels = row.querySelectorAll('.sector-label');
-      labels[0].textContent = 'Sector ' + (i + 1) + ' — From';
-      labels[1].textContent = 'Sector ' + (i + 1) + ' — To';
-    });
-  }
+  const rows = document.querySelectorAll('.sector-row');
+  rows.forEach((row, i) => {
+    const heading = row.querySelector('.sector-heading');
+    if (heading) heading.textContent = 'Sector ' + (i + 1);
+  });
+}
   
   function clearErr(el) {
     const errId = 'err-' + el.id;
@@ -1389,6 +1419,13 @@ function openAuthModal() {
   var m = document.getElementById('auth-modal');
   if (m) m.style.display = 'flex';
 }
+function changeSectorPax(n, delta) {
+  var el = document.getElementById('sec-pax-' + n);
+  if (!el) return;
+  var val = Math.max(1, Math.min(50, parseInt(el.textContent) + delta));
+  el.textContent = val;
+}
+
 
 function closeAuthModal() {
   var m = document.getElementById('auth-modal');
