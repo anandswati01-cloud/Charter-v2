@@ -105,16 +105,9 @@
 
   /* —— Initialise ————————————————————————————————————————— */
   function init() {
-    /* Debug — log exactly what's in the URL when page loads */
-    console.log('auth.js init — URL:', window.location.href);
-    console.log('auth.js init — hash:', window.location.hash);
-    console.log('auth.js init — search:', window.location.search);
-
     var sb = getClient();
 
-    /* onAuthStateChange handles SIGNED_IN after the PKCE exchange completes */
     sb.auth.onAuthStateChange(function (event, session) {
-      console.log('Auth event:', event, session ? session.user.email : 'no session');
       updateAuthUI(session);
       if (event === 'SIGNED_IN') {
         /* Clean up the code/hash from the URL without reloading */
