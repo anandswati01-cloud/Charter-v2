@@ -12,6 +12,7 @@
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   transition: border-color .2s, background .2s, color .2s;
+  align-self: center;
   flex-shrink: 0;
 }
 #theme-toggle:hover { border-color: #fbbf24; color: #fbbf24; }
