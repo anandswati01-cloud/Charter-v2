@@ -128,6 +128,19 @@
       }
     });
 
+    /* Explicitly exchange code if present in URL (PKCE flow) */
+    var urlParams = new URLSearchParams(window.location.search);
+    var code = urlParams.get('code');
+    if (code) {
+      console.log('Found OAuth code in URL, exchanging...');
+      sb.auth.exchangeCodeForSession(code).then(function(res) {
+        console.log('Code exchange result:', res.error ? res.error.message : 'success');
+        if (res.error) {
+          console.error('Code exchange failed:', res.error);
+        }
+      });
+    }
+
     /* Sync UI for users who already have a session in storage */
     sb.auth.getSession().then(function (res) {
       if (res.data && res.data.session) {
