@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — SkyVayu</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="/css/global.css" />
+  <link rel="stylesheet" href="/css/nav.css" />
+  <link rel="stylesheet" href="/css/theme.css" />
+  <style>
+    .profile-page {
+      min-height: 100vh;
+      background: var(--surface);
+      padding: 48px 24px 80px;
+    }
+    .profile-container {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .profile-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+    }
+    .profile-title {
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    .profile-subtitle {
+      font-size: 15px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+    }
+    .profile-card {
+      background: var(--surface-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 32px;
+    }
+    .profile-form-group {
+      margin-bottom: 24px;
+    }
+    .profile-label {
+      display: block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+    .profile-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 15px;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .profile-input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+    .profile-input[readonly] {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .profile-input-hint {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .profile-save-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+      margin-top: 8px;
+    }
+    .profile-save-btn:hover { opacity: 0.88; }
+    .profile-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .profile-status {
+      margin-top: 16px;
+      font-size: 13px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      display: none;
+    }
+    .profile-status.success {
+      display: block;
+      background: rgba(16, 185, 129, 0.12);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .profile-status.error {
+      display: block;
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+    .profile-sign-out {
+      margin-top: 32px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .profile-sign-out-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-secondary);
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .profile-sign-out-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--text-secondary);
+    }
+    #profile-loading {
+      text-align: center;
+      padding: 60px 0;
+      color: var(--text-secondary);
+    }
+    #profile-unauthenticated {
+      text-align: center;
+      padding: 60px 0;
+    }
+    #profile-unauthenticated h2 {
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+    #profile-unauthenticated p {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-logo">SkyVayu</a>
+    <div class="nav-links">
+      <a href="/fleet" class="nav-link">Fleet</a>
+      <a href="/about" class="nav-link">About Us</a>
+    </div>
+    <div class="nav-actions" style="display:flex;align-items:center;gap:12px;">
+      <button id="theme-toggle" aria-label="Toggle theme">
+        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <a id="nav-get-quotes" href="/#booking" class="btn-primary btn-sm">GET QUOTES</a>
+      <span id="nav-user-chip" style="display:none;">
+        <a href="/profile" id="nav-user-name" style="color:var(--gold);font-size:13px;font-weight:600;text-decoration:none;"></a>
+      </span>
+      <button id="nav-sign-in" class="btn-secondary btn-sm" style="display:none;" onclick="signInWithGoogle()">SIGN IN</button>
+    </div>
+  </nav>
+
+  <div class="profile-page">
+    <div class="profile-container">
+      <div id="profile-loading">Loading your profile…</div>
+
+      <div id="profile-unauthenticated" style="display:none;">
+        <h2>Sign in to view your profile</h2>
+        <p>Create a profile to pre-fill your booking details and track your quotations.</p>
+        <button class="btn-primary" onclick="signInWithGoogle()">SIGN IN WITH GOOGLE</button>
+      </div>
+
+      <div id="profile-content" style="display:none;">
+        <p class="profile-eyebrow">Account</p>
+        <h1 class="profile-title">My Profile</h1>
+        <p class="profile-subtitle">Your details are pre-filled when requesting quotations.</p>
+
+        <div class="profile-card">
+          <form id="profile-form" onsubmit="saveProfile(event)">
+            <div class="profile-form-group">
+              <label class="profile-label" for="profile-name">Full Name</label>
+              <input id="profile-name" class="profile-input" type="text" placeholder="Your full name" autocomplete="name" />
+            </div>
+            <div class="profile-form-group">
+              <label class="profile-label" for="profile-email">Email Address</label>
+              <input id="profile-email" class="profile-input" type="email" placeholder="your@email.com" readonly />
+              <p class="profile-input-hint">Email is set by your Google account and cannot be changed here.</p>
+            </div>
+            <div class="profile-form-group">
+              <label class="profile-label" for="profile-phone">Phone Number</label>
+              <input id="profile-phone" class="profile-input" type="tel" placeholder="+91 98765 43210" autocomplete="tel" />
+            </div>
+            <button type="submit" class="profile-save-btn" id="save-btn">SAVE CHANGES</button>
+            <div id="profile-status" class="profile-status"></div>
+          </form>
+
+          <div class="profile-sign-out">
+            <button class="profile-sign-out-btn" onclick="handleSignOut()">Sign out</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/theme.js"></script>
+  <script>
+    var _session = null;
+
+    function showStatus(msg, type) {
+      var el = document.getElementById('profile-status');
+      el.textContent = msg;
+      el.className = 'profile-status ' + type;
+    }
+
+    function loadProfile(session) {
+      _session = session;
+      document.getElementById('profile-loading').style.display = 'none';
+      document.getElementById('profile-content').style.display = 'block';
+
+      // Pre-fill from session metadata
+      document.getElementById('profile-email').value = session.user.email || '';
+      document.getElementById('profile-name').value = session.user.user_metadata.full_name || '';
+
+      // Load saved profile from DB
+      getClient().from('profiles')
+        .select('full_name, email, phone')
+        .eq('id', session.user.id)
+        .single()
+        .then(function(res) {
+          if (res.data) {
+            document.getElementById('profile-name').value = res.data.full_name || session.user.user_metadata.full_name || '';
+            document.getElementById('profile-email').value = res.data.email || session.user.email || '';
+            document.getElementById('profile-phone').value = res.data.phone || '';
+          }
+        });
+    }
+
+    function saveProfile(e) {
+      e.preventDefault();
+      if (!_session) return;
+      var btn = document.getElementById('save-btn');
+      btn.disabled = true;
+      btn.textContent = 'SAVING…';
+
+      var payload = {
+        id: _session.user.id,
+        full_name: document.getElementById('profile-name').value.trim(),
+        email: _session.user.email,
+        phone: document.getElementById('profile-phone').value.trim(),
+        updated_at: new Date().toISOString()
+      };
+
+      getClient().from('profiles')
+        .upsert(payload, { onConflict: 'id' })
+        .then(function(res) {
+          btn.disabled = false;
+          btn.textContent = 'SAVE CHANGES';
+          if (res.error) {
+            showStatus('Could not save: ' + res.error.message, 'error');
+          } else {
+            showStatus('Profile saved successfully.', 'success');
+          }
+        });
+    }
+
+    function handleSignOut() {
+      signOut().then(function() {
+        window.location.href = '/';
+      });
+    }
+
+    // Wait for auth
+    (function waitForAuth() {
+      if (typeof getSession !== 'function') {
+        setTimeout(waitForAuth, 80);
+        return;
+      }
+      getSession().then(function(session) {
+        if (session) {
+          loadProfile(session);
+        } else {
+          document.getElementById('profile-loading').style.display = 'none';
+          document.getElementById('profile-unauthenticated').style.display = 'block';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
