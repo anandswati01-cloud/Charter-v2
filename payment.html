@@ -295,5 +295,30 @@ nav{
 <script src="js/config.js"></script>
 <script src="js/supabase.js"></script>
 <script src="js/payment.js"></script>
+  <script>
+    /* — Profile pre-fill: populate contact fields from saved profile — */
+    (function prefillFromProfile() {
+      if (typeof getSession !== 'function' || typeof getClient !== 'function') {
+        setTimeout(prefillFromProfile, 100);
+        return;
+      }
+      getSession().then(function(session) {
+        if (!session) return;
+        getClient().from('profiles')
+          .select('full_name, email, phone')
+          .eq('id', session.user.id)
+          .single()
+          .then(function(res) {
+            if (!res.data) return;
+            var nameEl = document.getElementById('client-name');
+            var emailEl = document.getElementById('client-email');
+            var phoneEl = document.getElementById('client-phone');
+            if (nameEl && !nameEl.value) nameEl.value = res.data.full_name || session.user.user_metadata.full_name || '';
+            if (emailEl && !emailEl.value) emailEl.value = res.data.email || session.user.email || '';
+            if (phoneEl && !phoneEl.value) phoneEl.value = res.data.phone || '';
+          });
+      });
+    })();
+  </script>
 </body>
 </html>
