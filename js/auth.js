@@ -114,6 +114,14 @@
         if (window.history && window.history.replaceState) {
           window.history.replaceState({}, document.title, window.location.pathname);
         }
+        /* — Upsert client profile on sign-in — */
+        getClient().from('profiles').upsert({
+          id: session.user.id,
+          full_name: session.user.user_metadata.full_name || '',
+          email: session.user.email || ''
+        }, { onConflict: 'id' }).then(function(res) {
+          if (res.error) console.error('profile upsert failed:', res.error.message);
+        });
         var pending = window.popPendingQuery();
         if (pending && typeof saveQueryToSupabase === 'function') {
           saveQueryToSupabase(pending).then(function () {
