@@ -366,7 +366,7 @@ nav{
         setTimeout(prefillFromProfile, 100);
         return;
       }
-      getSession().then(function(session) {
+      getSession(function(session) {
         if (!session) return;
         getClient().from('profiles')
           .select('full_name, email, phone')
