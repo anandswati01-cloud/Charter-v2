@@ -19,6 +19,8 @@
       --white-60: rgba(255,255,255,0.6);
       --white-30: rgba(255,255,255,0.3);
       --white-10: rgba(255,255,255,0.1);
+      --green: #22c55e;
+      --red: #ef4444;
       --font-display: 'Cormorant Garamond', Georgia, serif;
       --font-mono: 'DM Mono', monospace;
       --font-body: 'DM Sans', sans-serif;
@@ -31,8 +33,7 @@
       color: var(--white);
       font-family: var(--font-body);
       overflow-x: hidden;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       min-height: 100vh;
     }
 
@@ -43,7 +44,7 @@
       position: fixed;
       top: 0; left: 0; right: 0;
       z-index: 100;
-      background: rgba(2, 6, 23, 0.85);
+      background: rgba(2,6,23,0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--white-10);
@@ -60,134 +61,62 @@
       max-width: 1200px;
       margin: 0 auto;
     }
-    .nav-logo {
-      font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 500;
-      color: var(--white);
-      letter-spacing: 0.02em;
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    .nav-links a {
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--white-60);
-      transition: color 0.2s;
-    }
+    .nav-logo { font-family: var(--font-display); font-size: 1.5rem; font-weight: 500; color: var(--white); }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; margin: 0; padding: 0; }
+    .nav-links a { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white-60); transition: color 0.2s; }
     .nav-links a:hover { color: var(--white); }
-    .nav-links a.active { color: var(--white); border-bottom: 1px solid var(--gold); padding-bottom: 2px; }
-    .nav-cta {
-      background: var(--gold);
-      color: var(--navy) !important;
-      padding: 8px 20px;
-      border-radius: 2px;
-      font-weight: 500;
-      font-size: 0.75rem !important;
-      letter-spacing: 0.08em !important;
-      text-transform: uppercase;
-      transition: background 0.2s !important;
-    }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-cta { background: var(--gold); color: var(--navy) !important; padding: 8px 20px; border-radius: 2px; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
     .nav-cta:hover { background: var(--gold-light) !important; }
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-    }
-    .user-chip {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      padding: 4px 12px;
-      border-radius: 20px;
-      background: var(--white-10);
-      font-size: 0.8rem;
-      color: var(--white);
-      text-decoration: none;
-      transition: background 0.2s;
-    }
+    .user-chip { display: flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 20px; background: var(--white-10); font-size: 0.8rem; color: var(--white); transition: background 0.2s; }
     .user-chip:hover { background: var(--white-30); }
+    #theme-toggle { background: none; border: none; cursor: pointer; color: var(--white-60); font-size: 1.1rem; padding: 4px; line-height: 1; }
+    #theme-toggle:hover { color: var(--white); }
 
-    /* PROFILE PAGE */
-    .profile-page {
-      padding-top: 120px;
-      padding-bottom: 80px;
-      min-height: 100vh;
-    }
-    .profile-container {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-    .profile-label {
-      font-size: 0.7rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--white-60);
-      margin-bottom: 12px;
-    }
-    .profile-title {
-      font-family: var(--font-display);
-      font-size: 3rem;
-      font-weight: 500;
-      color: var(--white);
-      margin: 0 0 12px 0;
-      line-height: 1.1;
-    }
-    .profile-subtitle {
-      color: var(--white-60);
-      font-size: 0.95rem;
-      margin: 0 0 48px 0;
-    }
+    /* PAGE LAYOUT */
+    .profile-page { padding-top: 100px; padding-bottom: 80px; }
+    .profile-container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
 
-    /* PROFILE CARD */
-    .profile-card {
-      background: var(--navy-mid);
-      border: 1px solid var(--white-10);
-      border-radius: 4px;
-      padding: 40px;
-    }
-    .field-group {
-      margin-bottom: 32px;
-    }
-    .field-label {
-      font-size: 0.65rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--white-60);
-      margin-bottom: 8px;
-    }
-    .field-value {
-      font-size: 1rem;
-      color: var(--white);
-      font-family: var(--font-mono);
-      padding: 12px 0;
+    /* PAGE HEADER */
+    .page-label { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--white-60); margin-bottom: 10px; }
+    .page-title { font-family: var(--font-display); font-size: 3rem; font-weight: 500; color: var(--white); margin: 0 0 8px 0; }
+    .page-subtitle { color: var(--white-60); font-size: 0.9rem; margin: 0 0 48px 0; }
+
+    /* SECTION HEADERS */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; margin-top: 40px;
+      padding-bottom: 12px;
       border-bottom: 1px solid var(--white-10);
     }
-    .field-note {
-      font-size: 0.75rem;
-      color: var(--white-30);
-      margin-top: 6px;
+    .section-header:first-of-type { margin-top: 0; }
+    .section-title { font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--white-60); }
+    .kyc-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px;
     }
+    .kyc-badge.verified { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+    .kyc-badge.pending { background: rgba(251,191,36,0.12); color: var(--gold); border: 1px solid rgba(251,191,36,0.3); }
+    .kyc-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .kyc-dot.verified { background: var(--green); }
+    .kyc-dot.pending { background: var(--gold); }
+
+    /* CARD */
+    .profile-card { background: var(--navy-mid); border: 1px solid var(--white-10); border-radius: 4px; padding: 32px 36px; }
+
+    /* FIELD GRID */
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+    .field-grid.single { grid-template-columns: 1fr; }
+    .field-group { margin-bottom: 28px; }
+    .field-label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--white-60); margin-bottom: 8px; }
+    .field-value { font-size: 0.95rem; color: var(--white); font-family: var(--font-mono); padding: 10px 0; border-bottom: 1px solid var(--white-10); }
+    .field-note { font-size: 0.72rem; color: var(--white-30); margin-top: 5px; }
     .field-input {
-      width: 100%;
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid var(--white-30);
-      color: var(--white);
-      font-family: var(--font-mono);
-      font-size: 1rem;
-      padding: 12px 0;
-      outline: none;
-      transition: border-color 0.2s;
+      width: 100%; background: transparent; border: none;
+      border-bottom: 1px solid var(--white-30); color: var(--white);
+      font-family: var(--font-mono); font-size: 0.95rem;
+      padding: 10px 0; outline: none; transition: border-color 0.2s;
       box-sizing: border-box;
     }
     .field-input::placeholder { color: var(--white-30); }
@@ -195,93 +124,86 @@
 
     /* SAVE BUTTON */
     .save-btn {
-      background: var(--gold);
-      color: var(--navy);
-      border: none;
-      padding: 14px 32px;
-      font-family: var(--font-body);
-      font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      cursor: pointer;
-      border-radius: 2px;
-      transition: background 0.2s, opacity 0.2s;
-      margin-top: 8px;
+      background: var(--gold); color: var(--navy); border: none;
+      padding: 12px 28px; font-family: var(--font-body);
+      font-size: 0.72rem; font-weight: 500; letter-spacing: 0.12em;
+      text-transform: uppercase; cursor: pointer; border-radius: 2px;
+      transition: background 0.2s; margin-top: 4px;
     }
     .save-btn:hover { background: var(--gold-light); }
     .save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* STATUS */
-    .status-msg {
-      margin-top: 16px;
-      font-size: 0.8rem;
-      color: var(--gold);
-      min-height: 20px;
-    }
+    .status-msg { margin-top: 12px; font-size: 0.78rem; color: var(--gold); min-height: 18px; }
 
     /* SIGN OUT */
-    .signout-section {
-      margin-top: 40px;
-      padding-top: 32px;
-      border-top: 1px solid var(--white-10);
-    }
-    .signout-link {
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--white-30);
-      cursor: pointer;
-      transition: color 0.2s;
-      background: none;
-      border: none;
-      padding: 0;
-      font-family: var(--font-body);
-    }
-    .signout-link:hover { color: var(--white-60); }
+    .signout-row { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--white-10); }
+    .signout-btn { background: none; border: none; cursor: pointer; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white-30); font-family: var(--font-body); padding: 0; transition: color 0.2s; }
+    .signout-btn:hover { color: var(--white-60); }
 
-    /* LIGHT THEME OVERRIDES */
-    [data-theme="light"] body {
-      background: #f9f7f4;
-      color: #0c1324;
+    /* BOOKINGS SECTION */
+    .bookings-section { margin-top: 48px; }
+    .bookings-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--white-10); }
+    .tab-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-body); font-size: 0.72rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--white-30); padding: 10px 20px 10px 0;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: color 0.2s;
     }
-    [data-theme="light"] .nav {
-      background: rgba(249, 247, 244, 0.9);
-      border-bottom-color: rgba(12, 19, 36, 0.1);
+    .tab-btn.active { color: var(--white); border-bottom-color: var(--gold); }
+    .tab-btn:hover { color: var(--white-60); }
+
+    .tab-panel { display: none; margin-top: 20px; }
+    .tab-panel.active { display: block; }
+
+    /* BOOKING CARD */
+    .booking-item {
+      background: var(--navy-mid); border: 1px solid var(--white-10);
+      border-radius: 4px; padding: 20px 24px;
+      display: grid; grid-template-columns: 1fr auto;
+      align-items: center; gap: 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
     }
-    [data-theme="light"] .nav-logo,
-    [data-theme="light"] .nav-links a { color: #0c1324; }
-    [data-theme="light"] .nav-links a:hover { color: #0c1324; }
+    .booking-item:hover { border-color: var(--white-30); }
+    .booking-route { font-family: var(--font-display); font-size: 1.15rem; font-weight: 500; color: var(--white); margin-bottom: 6px; }
+    .booking-route .arrow { color: var(--gold); margin: 0 8px; }
+    .booking-meta { font-size: 0.75rem; color: var(--white-60); font-family: var(--font-mono); }
+    .booking-meta span { margin-right: 16px; }
+    .booking-status {
+      font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+    }
+    .booking-status.confirmed { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+    .booking-status.open { background: rgba(251,191,36,0.12); color: var(--gold); border: 1px solid rgba(251,191,36,0.25); }
+    .booking-status.expired { background: rgba(255,255,255,0.05); color: var(--white-30); border: 1px solid var(--white-10); }
+    .booking-status.incomplete { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.2); }
+
+    .empty-state { padding: 40px 0; text-align: center; color: var(--white-30); font-size: 0.85rem; }
+    .empty-state .empty-icon { font-size: 2rem; margin-bottom: 12px; opacity: 0.4; }
+
+    /* LIGHT THEME */
+    [data-theme="light"] body { background: #f9f7f4; color: #0c1324; }
+    [data-theme="light"] .nav { background: rgba(249,247,244,0.92); border-bottom-color: rgba(12,19,36,0.1); }
+    [data-theme="light"] .nav-logo, [data-theme="light"] .nav-links a { color: #0c1324; }
     [data-theme="light"] .user-chip { background: rgba(12,19,36,0.08); color: #0c1324; }
-    [data-theme="light"] .profile-title { color: #0c1324; }
-    [data-theme="light"] .profile-subtitle { color: rgba(12,19,36,0.6); }
-    [data-theme="light"] .profile-label,
-    [data-theme="light"] .field-label { color: rgba(12,19,36,0.5); }
-    [data-theme="light"] .profile-card {
-      background: #ffffff;
-      border-color: rgba(12,19,36,0.1);
-      box-shadow: 0 2px 16px rgba(12,19,36,0.06);
-    }
-    [data-theme="light"] .field-value,
-    [data-theme="light"] .field-input { color: #0c1324; border-bottom-color: rgba(12,19,36,0.2); }
-    [data-theme="light"] .field-input::placeholder { color: rgba(12,19,36,0.3); }
-    [data-theme="light"] .field-note { color: rgba(12,19,36,0.4); }
-    [data-theme="light"] .signout-section { border-top-color: rgba(12,19,36,0.1); }
-    [data-theme="light"] .signout-link { color: rgba(12,19,36,0.4); }
-    [data-theme="light"] .signout-link:hover { color: rgba(12,19,36,0.7); }
-
-    #theme-toggle {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: var(--white-60);
-      font-size: 1.1rem;
-      padding: 4px;
-      transition: color 0.2s;
-      line-height: 1;
-    }
-    #theme-toggle:hover { color: var(--white); }
-    [data-theme="light"] #theme-toggle { color: rgba(12,19,36,0.5); }
+    [data-theme="light"] .page-title { color: #0c1324; }
+    [data-theme="light"] .page-subtitle, [data-theme="light"] .page-label,
+    [data-theme="light"] .section-title, [data-theme="light"] .field-label { color: rgba(12,19,36,0.5); }
+    [data-theme="light"] .profile-card, [data-theme="light"] .booking-item { background: #fff; border-color: rgba(12,19,36,0.1); box-shadow: 0 2px 12px rgba(12,19,36,0.05); }
+    [data-theme="light"] .field-value, [data-theme="light"] .field-input { color: #0c1324; border-bottom-color: rgba(12,19,36,0.15); }
+    [data-theme="light"] .field-input::placeholder { color: rgba(12,19,36,0.25); }
+    [data-theme="light"] .field-note { color: rgba(12,19,36,0.35); }
+    [data-theme="light"] .section-header, [data-theme="light"] .signout-row,
+    [data-theme="light"] .bookings-tabs { border-color: rgba(12,19,36,0.1); }
+    [data-theme="light"] .tab-btn { color: rgba(12,19,36,0.4); }
+    [data-theme="light"] .tab-btn.active { color: #0c1324; }
+    [data-theme="light"] .booking-route { color: #0c1324; }
+    [data-theme="light"] .booking-meta { color: rgba(12,19,36,0.5); }
+    [data-theme="light"] .empty-state { color: rgba(12,19,36,0.3); }
+    [data-theme="light"] .signout-btn { color: rgba(12,19,36,0.3); }
+    [data-theme="light"] .signout-btn:hover { color: rgba(12,19,36,0.6); }
+    [data-theme="light"] #theme-toggle { color: rgba(12,19,36,0.4); }
     [data-theme="light"] #theme-toggle:hover { color: #0c1324; }
   </style>
 </head>
@@ -295,50 +217,118 @@
         <li><a href="/about">About Us</a></li>
       </ul>
       <div class="nav-right">
-        <button id="theme-toggle" title="Toggle theme">☀</button>
+        <button id="theme-toggle" title="Toggle theme">&#9728;</button>
         <a href="/profile" class="user-chip" id="user-chip" style="display:none">
           <span id="user-name-nav">My Account</span>
         </a>
-        <a href="/payment" class="nav-cta" id="nav-get-quotes">GET QUOTES</a>
+        <a href="/payment" class="nav-cta">GET QUOTES</a>
       </div>
     </div>
   </nav>
 
   <div class="profile-page">
     <div class="profile-container">
-      <p class="profile-label">Account</p>
-      <h1 class="profile-title">My Profile</h1>
-      <p class="profile-subtitle">Your details are pre-filled when requesting quotations.</p>
+      <p class="page-label">Account</p>
+      <h1 class="page-title">My Profile</h1>
+      <p class="page-subtitle">Your details are pre-filled when requesting quotations.</p>
 
+      <!-- PERSONAL INFO -->
+      <div class="section-header">
+        <span class="section-title">Personal Information</span>
+      </div>
       <div class="profile-card">
-        <div class="field-group">
-          <div class="field-label">Full Name</div>
-          <div class="field-value" id="display-name">—</div>
+        <div class="field-grid">
+          <div class="field-group">
+            <div class="field-label">Full Name</div>
+            <div class="field-value" id="display-name">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Email Address</div>
+            <div class="field-value" id="display-email">—</div>
+            <div class="field-note">Set by Google — cannot be changed here.</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Phone Number</div>
+            <input type="tel" id="phone-input" class="field-input" placeholder="+91 98765 43210">
+          </div>
         </div>
+        <button class="save-btn" id="save-personal-btn" onclick="savePersonal()">Save Changes</button>
+        <div class="status-msg" id="personal-status"></div>
+      </div>
 
-        <div class="field-group">
-          <div class="field-label">Email Address</div>
-          <div class="field-value" id="display-email">—</div>
-          <div class="field-note">Email is set by your Google account and cannot be changed here.</div>
+      <!-- KYC INFORMATION -->
+      <div class="section-header">
+        <span class="section-title">KYC Information</span>
+        <span class="kyc-badge pending" id="kyc-badge">
+          <span class="kyc-dot pending" id="kyc-dot"></span>
+          <span id="kyc-status-text">Not Verified</span>
+        </span>
+      </div>
+      <div class="profile-card">
+        <div class="field-grid">
+          <div class="field-group">
+            <div class="field-label">Date of Birth</div>
+            <input type="date" id="dob-input" class="field-input">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Nationality</div>
+            <input type="text" id="nationality-input" class="field-input" placeholder="Indian">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Passport Number</div>
+            <input type="text" id="passport-input" class="field-input" placeholder="A1234567">
+          </div>
+          <div class="field-group">
+            <div class="field-label">Aadhaar Number</div>
+            <input type="text" id="aadhaar-input" class="field-input" placeholder="XXXX XXXX XXXX" maxlength="14">
+          </div>
         </div>
+        <div class="field-note" style="margin-bottom: 20px;">Your documents are encrypted and used only for flight compliance. DGCA regulations require KYC for all charter passengers.</div>
+        <button class="save-btn" id="save-kyc-btn" onclick="saveKyc()">Save KYC Details</button>
+        <div class="status-msg" id="kyc-status"></div>
 
-        <div class="field-group">
-          <div class="field-label">Phone Number</div>
-          <input
-            type="tel"
-            id="phone-input"
-            class="field-input"
-            placeholder="+91 98765 43210"
-          >
-        </div>
-
-        <button class="save-btn" id="save-btn" onclick="saveProfile()">Save Changes</button>
-        <div class="status-msg" id="status-msg"></div>
-
-        <div class="signout-section">
-          <button class="signout-link" onclick="handleSignOut()">Sign out</button>
+        <div class="signout-row">
+          <button class="signout-btn" onclick="handleSignOut()">Sign out</button>
         </div>
       </div>
+
+      <!-- BOOKINGS -->
+      <div class="bookings-section">
+        <div class="section-header" style="margin-top: 0;">
+          <span class="section-title">My Bookings</span>
+        </div>
+
+        <div class="bookings-tabs">
+          <button class="tab-btn active" onclick="switchTab('active', this)">Active</button>
+          <button class="tab-btn" onclick="switchTab('past', this)">Past</button>
+          <button class="tab-btn" onclick="switchTab('incomplete', this)">Incomplete</button>
+        </div>
+
+        <div id="tab-active" class="tab-panel active">
+          <div class="empty-state" id="active-empty">
+            <div class="empty-icon">&#9992;</div>
+            <div>No active bookings</div>
+          </div>
+          <div id="active-list"></div>
+        </div>
+
+        <div id="tab-past" class="tab-panel">
+          <div class="empty-state" id="past-empty">
+            <div class="empty-icon">&#9992;</div>
+            <div>No past bookings</div>
+          </div>
+          <div id="past-list"></div>
+        </div>
+
+        <div id="tab-incomplete" class="tab-panel">
+          <div class="empty-state" id="incomplete-empty">
+            <div class="empty-icon">&#9992;</div>
+            <div>No incomplete bookings</div>
+          </div>
+          <div id="incomplete-list"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -348,22 +338,122 @@
   <script src="/js/auth.js"></script>
   <script src="/js/theme.js"></script>
   <script>
-    function showStatus(msg, isError) {
-      const el = document.getElementById('status-msg');
+    let currentUserId = null;
+
+    function showStatus(id, msg, isError) {
+      const el = document.getElementById(id);
+      if (!el) return;
       el.textContent = msg;
       el.style.color = isError ? '#ef4444' : 'var(--gold)';
-      if (msg) setTimeout(() => { el.textContent = ''; }, 3000);
+      if (msg) setTimeout(() => { el.textContent = ''; }, 3500);
+    }
+
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    function formatDate(d) {
+      if (!d) return '—';
+      const dt = new Date(d);
+      return dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    function statusLabel(status) {
+      const map = { confirmed: 'Confirmed', open: 'Awaiting Quote', expired: 'Expired', cancelled: 'Cancelled', pending: 'Pending', incomplete: 'Incomplete' };
+      return map[status] || status;
+    }
+
+    function statusClass(status) {
+      if (status === 'confirmed') return 'confirmed';
+      if (status === 'open') return 'open';
+      if (status === 'expired' || status === 'cancelled') return 'expired';
+      return 'incomplete';
+    }
+
+    function buildBookingCard(b) {
+      return `<div class="booking-item">
+        <div>
+          <div class="booking-route">${b.departure || '—'} <span class="arrow">&#8594;</span> ${b.destination || '—'}</div>
+          <div class="booking-meta">
+            <span>${formatDate(b.flight_date)}</span>
+            <span>${b.trip_type === 'roundtrip' ? 'Round Trip' : 'One Way'}</span>
+            <span>${b.passengers || 1} Pax</span>
+          </div>
+        </div>
+        <div class="booking-status ${statusClass(b.status)}">${statusLabel(b.status)}</div>
+      </div>`;
+    }
+
+    function loadBookings(userId) {
+      const sb = window._svSupabase;
+      if (!sb) return;
+      const today = new Date().toISOString().split('T')[0];
+
+      sb.from('queries').select('*').eq('user_id', userId).order('created_at', { ascending: false })
+        .then(({ data, error }) => {
+          if (error || !data) return;
+
+          const active = data.filter(b => b.status === 'open' || b.status === 'confirmed');
+          const past = data.filter(b => (b.status === 'confirmed' || b.status === 'expired') && b.flight_date < today);
+          const incomplete = data.filter(b => b.status === 'expired' && b.flight_date >= today);
+
+          const aList = document.getElementById('active-list');
+          const pList = document.getElementById('past-list');
+          const iList = document.getElementById('incomplete-list');
+
+          if (active.length > 0) {
+            document.getElementById('active-empty').style.display = 'none';
+            aList.innerHTML = active.map(buildBookingCard).join('');
+          }
+          if (past.length > 0) {
+            document.getElementById('past-empty').style.display = 'none';
+            pList.innerHTML = past.map(buildBookingCard).join('');
+          }
+          if (incomplete.length > 0) {
+            document.getElementById('incomplete-empty').style.display = 'none';
+            iList.innerHTML = incomplete.map(buildBookingCard).join('');
+          }
+        });
+
+      // Also load from bookings table
+      sb.from('bookings').select('*').eq('user_id', userId).order('created_at', { ascending: false })
+        .then(({ data, error }) => {
+          if (error || !data || data.length === 0) return;
+          const today = new Date().toISOString().split('T')[0];
+          const active = data.filter(b => b.status === 'pending' || b.status === 'confirmed');
+          const past = data.filter(b => b.status === 'confirmed' && b.flight_date < today);
+          const incomplete = data.filter(b => b.status === 'incomplete');
+
+          const aList = document.getElementById('active-list');
+          const pList = document.getElementById('past-list');
+          const iList = document.getElementById('incomplete-list');
+
+          if (active.length) {
+            document.getElementById('active-empty').style.display = 'none';
+            aList.innerHTML += active.map(buildBookingCard).join('');
+          }
+          if (past.length) {
+            document.getElementById('past-empty').style.display = 'none';
+            pList.innerHTML += past.map(buildBookingCard).join('');
+          }
+          if (incomplete.length) {
+            document.getElementById('incomplete-empty').style.display = 'none';
+            iList.innerHTML += incomplete.map(buildBookingCard).join('');
+          }
+        });
     }
 
     function loadProfile(session) {
-      // getSession(cb) calls cb(session) where session has .user inside
       const user = session && session.user ? session.user : session;
       if (!user) return;
+      currentUserId = user.id;
 
       document.getElementById('display-name').textContent = user.user_metadata?.full_name || user.email?.split('@')[0] || '—';
       document.getElementById('display-email').textContent = user.email || '—';
 
-      // Show user chip in nav
       const chip = document.getElementById('user-chip');
       const nameNav = document.getElementById('user-name-nav');
       if (chip && user.user_metadata?.full_name) {
@@ -371,36 +461,62 @@
         chip.style.display = 'flex';
       }
 
-      // Load phone from Supabase profiles table
       const sb = window._svSupabase;
       if (sb) {
-        sb.from('profiles').select('phone').eq('id', user.id).single()
-          .then(({ data, error }) => {
-            if (data && data.phone) {
-              document.getElementById('phone-input').value = data.phone;
+        sb.from('profiles').select('phone, date_of_birth, nationality, passport_number, aadhaar_number, kyc_verified').eq('id', user.id).single()
+          .then(({ data }) => {
+            if (!data) return;
+            if (data.phone) document.getElementById('phone-input').value = data.phone;
+            if (data.date_of_birth) document.getElementById('dob-input').value = data.date_of_birth;
+            if (data.nationality) document.getElementById('nationality-input').value = data.nationality;
+            if (data.passport_number) document.getElementById('passport-input').value = data.passport_number;
+            if (data.aadhaar_number) document.getElementById('aadhaar-input').value = data.aadhaar_number;
+            if (data.kyc_verified) {
+              const badge = document.getElementById('kyc-badge');
+              const dot = document.getElementById('kyc-dot');
+              const txt = document.getElementById('kyc-status-text');
+              badge.className = 'kyc-badge verified';
+              dot.className = 'kyc-dot verified';
+              txt.textContent = 'Verified';
             }
           });
       }
+
+      loadBookings(user.id);
     }
 
-    async function saveProfile() {
-      const btn = document.getElementById('save-btn');
+    function savePersonal() {
+      const btn = document.getElementById('save-personal-btn');
       btn.disabled = true;
-      showStatus('Saving…');
+      showStatus('personal-status', 'Saving…');
       const phone = document.getElementById('phone-input').value.trim();
       const sb = window._svSupabase;
-      if (!sb) { showStatus('Not connected.', true); btn.disabled = false; return; }
+      if (!sb || !currentUserId) { showStatus('personal-status', 'Not connected.', true); btn.disabled = false; return; }
+      sb.from('profiles').upsert({ id: currentUserId, phone }, { onConflict: 'id' })
+        .then(({ error }) => {
+          btn.disabled = false;
+          showStatus('personal-status', error ? 'Error: ' + error.message : 'Saved.', !!error);
+        });
+    }
 
-      getSession(function(session) {
-        const user = session && session.user ? session.user : session;
-        if (!user || !user.id) { showStatus('Please sign in.', true); btn.disabled = false; return; }
-        sb.from('profiles').upsert({ id: user.id, phone: phone }, { onConflict: 'id' })
-          .then(({ error }) => {
-            btn.disabled = false;
-            if (error) { showStatus('Error: ' + error.message, true); }
-            else { showStatus('Saved successfully.'); }
-          });
-      });
+    function saveKyc() {
+      const btn = document.getElementById('save-kyc-btn');
+      btn.disabled = true;
+      showStatus('kyc-status', 'Saving…');
+      const sb = window._svSupabase;
+      if (!sb || !currentUserId) { showStatus('kyc-status', 'Not connected.', true); btn.disabled = false; return; }
+      const payload = {
+        id: currentUserId,
+        date_of_birth: document.getElementById('dob-input').value || null,
+        nationality: document.getElementById('nationality-input').value.trim() || null,
+        passport_number: document.getElementById('passport-input').value.trim() || null,
+        aadhaar_number: document.getElementById('aadhaar-input').value.trim() || null
+      };
+      sb.from('profiles').upsert(payload, { onConflict: 'id' })
+        .then(({ error }) => {
+          btn.disabled = false;
+          showStatus('kyc-status', error ? 'Error: ' + error.message : 'KYC details saved.', !!error);
+        });
     }
 
     function handleSignOut() {
@@ -410,24 +526,17 @@
     }
 
     function waitForAuth() {
-      const maxAttempts = 20;
       let attempts = 0;
       function check() {
         attempts++;
         if (typeof getSession === 'function') {
           getSession(function(session) {
             const user = session && session.user ? session.user : session;
-            if (user && user.id) {
-              loadProfile(session);
-            } else {
-              window.location.href = '/?signin=required';
-            }
+            if (user && user.id) { loadProfile(session); }
+            else { window.location.href = '/?signin=required'; }
           });
-        } else if (attempts < maxAttempts) {
-          setTimeout(check, 300);
-        } else {
-          showStatus('Auth failed to load.', true);
-        }
+        } else if (attempts < 20) { setTimeout(check, 300); }
+        else { showStatus('personal-status', 'Auth failed to load.', true); }
       }
       check();
     }
