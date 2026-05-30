@@ -5,9 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Profile — SkyVayu</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="/css/global.css" />
-  <link rel="stylesheet" href="/css/nav.css" />
-  <link rel="stylesheet" href="/css/theme.css" />
+  <link rel="stylesheet" href="css/theme.css" />
   <style>
     .profile-page {
       min-height: 100vh;
@@ -21,170 +19,150 @@
     .profile-eyebrow {
       font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.12em;
+      letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--gold);
       margin-bottom: 12px;
     }
     .profile-title {
-      font-size: clamp(28px, 4vw, 40px);
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 8px;
+      font-family: var(--font-serif);
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 400;
+      color: var(--text);
+      margin: 0 0 8px;
+      line-height: 1.1;
     }
     .profile-subtitle {
-      font-size: 15px;
-      color: var(--text-secondary);
-      margin-bottom: 40px;
+      font-size: 14px;
+      color: var(--text-dim);
+      margin: 0 0 48px;
     }
     .profile-card {
-      background: var(--surface-card);
+      background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 4px;
       padding: 32px;
+      margin-bottom: 16px;
     }
-    .profile-form-group {
-      margin-bottom: 24px;
+    .profile-field {
+      margin-bottom: 28px;
+    }
+    .profile-field:last-child {
+      margin-bottom: 0;
     }
     .profile-label {
       display: block;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 600;
-      letter-spacing: 0.1em;
+      letter-spacing: 2px;
       text-transform: uppercase;
-      color: var(--text-secondary);
+      color: var(--text-dim);
       margin-bottom: 8px;
     }
     .profile-input {
       width: 100%;
-      padding: 12px 16px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-primary);
-      font-size: 15px;
-      font-family: inherit;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 0;
+      font-family: var(--font-serif);
+      font-size: 18px;
+      color: var(--text);
+      outline: none;
       transition: border-color 0.2s;
       box-sizing: border-box;
     }
     .profile-input:focus {
-      outline: none;
       border-color: var(--gold);
     }
     .profile-input[readonly] {
       opacity: 0.6;
-      cursor: not-allowed;
+      cursor: default;
     }
-    .profile-input-hint {
-      font-size: 12px;
-      color: var(--text-secondary);
-      margin-top: 4px;
+    .profile-hint {
+      font-size: 11px;
+      color: var(--text-muted, var(--text-dim));
+      margin-top: 6px;
+      opacity: 0.7;
     }
     .profile-save-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 14px 28px;
+      display: inline-block;
+      margin-top: 32px;
+      padding: 14px 32px;
       background: var(--gold);
-      color: var(--navy);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
+      color: #0c1224;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
       text-transform: uppercase;
       border: none;
-      border-radius: 6px;
       cursor: pointer;
       transition: opacity 0.2s;
-      margin-top: 8px;
     }
-    .profile-save-btn:hover { opacity: 0.88; }
+    .profile-save-btn:hover { opacity: 0.85; }
     .profile-save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .profile-signout {
+      display: inline-block;
+      margin-top: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: var(--text-dim);
+      background: none;
+      border: none;
+      cursor: pointer;
+      text-transform: uppercase;
+      padding: 0;
+    }
+    .profile-signout:hover { color: var(--text); }
     .profile-status {
       margin-top: 16px;
       font-size: 13px;
-      padding: 10px 16px;
-      border-radius: 6px;
-      display: none;
+      min-height: 20px;
     }
-    .profile-status.success {
-      display: block;
-      background: rgba(16, 185, 129, 0.12);
-      color: #10b981;
-      border: 1px solid rgba(16, 185, 129, 0.25);
-    }
-    .profile-status.error {
-      display: block;
-      background: rgba(239, 68, 68, 0.1);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.2);
-    }
-    .profile-sign-out {
-      margin-top: 32px;
-      padding-top: 24px;
-      border-top: 1px solid var(--border);
-    }
-    .profile-sign-out-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
-      padding: 10px 20px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: color 0.2s, border-color 0.2s;
-    }
-    .profile-sign-out-btn:hover {
-      color: var(--text-primary);
-      border-color: var(--text-secondary);
+    .profile-status.success { color: #4ade80; }
+    .profile-status.error { color: #f87171; }
+    #profile-unauthenticated {
+      text-align: center;
+      padding: 80px 0;
     }
     #profile-loading {
       text-align: center;
-      padding: 60px 0;
-      color: var(--text-secondary);
-    }
-    #profile-unauthenticated {
-      text-align: center;
-      padding: 60px 0;
-    }
-    #profile-unauthenticated h2 {
-      color: var(--text-primary);
-      margin-bottom: 8px;
-    }
-    #profile-unauthenticated p {
-      color: var(--text-secondary);
-      margin-bottom: 24px;
+      padding: 80px 0;
+      color: var(--text-dim);
     }
   </style>
 </head>
 <body>
   <nav class="nav">
     <a href="/" class="nav-logo">SkyVayu</a>
-    <div class="nav-links">
-      <a href="/fleet" class="nav-link">Fleet</a>
-      <a href="/about" class="nav-link">About Us</a>
-    </div>
-    <div class="nav-actions" style="display:flex;align-items:center;gap:12px;">
-      <button id="theme-toggle" aria-label="Toggle theme">
-        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/fleet">Fleet</a></li>
+      <li><a href="/about">About Us</a></li>
+    </ul>
+    <div class="nav-right">
+      <button id="theme-toggle" onclick="toggleTheme()" title="Switch theme" aria-label="Toggle theme">
+        <svg id="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg id="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
-      <a id="nav-get-quotes" href="/#booking" class="btn-primary btn-sm">GET QUOTES</a>
-      <span id="nav-user-chip" style="display:none;">
-        <a href="/profile" id="nav-user-name" style="color:var(--gold);font-size:13px;font-weight:600;text-decoration:none;"></a>
-      </span>
-      <button id="nav-sign-in" class="btn-secondary btn-sm" style="display:none;" onclick="signInWithGoogle()">SIGN IN</button>
+      <!-- user chip (shown when logged in) -->
+      <div id="sv-user-chip" style="display:none;align-items:center;gap:8px;">
+        <a href="/profile" id="sv-user-name" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;text-decoration:none;"></a>
+      </div>
+      <a href="/" class="btn-primary" id="sv-login-btn" style="display:none;">Sign In</a>
     </div>
   </nav>
 
   <div class="profile-page">
     <div class="profile-container">
-      <div id="profile-loading">Loading your profile…</div>
+
+      <div id="profile-loading">Loading&hellip;</div>
 
       <div id="profile-unauthenticated" style="display:none;">
-        <h2>Sign in to view your profile</h2>
-        <p>Create a profile to pre-fill your booking details and track your quotations.</p>
-        <button class="btn-primary" onclick="signInWithGoogle()">SIGN IN WITH GOOGLE</button>
+        <p style="color:var(--text-dim);font-family:var(--font-mono);font-size:12px;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;">You are not signed in.</p>
+        <a href="/" class="btn-primary">Go to Home</a>
       </div>
 
       <div id="profile-content" style="display:none;">
@@ -193,37 +171,35 @@
         <p class="profile-subtitle">Your details are pre-filled when requesting quotations.</p>
 
         <div class="profile-card">
-          <form id="profile-form" onsubmit="saveProfile(event)">
-            <div class="profile-form-group">
-              <label class="profile-label" for="profile-name">Full Name</label>
-              <input id="profile-name" class="profile-input" type="text" placeholder="Your full name" autocomplete="name" />
-            </div>
-            <div class="profile-form-group">
-              <label class="profile-label" for="profile-email">Email Address</label>
-              <input id="profile-email" class="profile-input" type="email" placeholder="your@email.com" readonly />
-              <p class="profile-input-hint">Email is set by your Google account and cannot be changed here.</p>
-            </div>
-            <div class="profile-form-group">
-              <label class="profile-label" for="profile-phone">Phone Number</label>
-              <input id="profile-phone" class="profile-input" type="tel" placeholder="+91 98765 43210" autocomplete="tel" />
-            </div>
-            <button type="submit" class="profile-save-btn" id="save-btn">SAVE CHANGES</button>
-            <div id="profile-status" class="profile-status"></div>
-          </form>
-
-          <div class="profile-sign-out">
-            <button class="profile-sign-out-btn" onclick="handleSignOut()">Sign out</button>
+          <div class="profile-field">
+            <label class="profile-label" for="prof-name">Full Name</label>
+            <input class="profile-input" id="prof-name" type="text" placeholder="Your name" autocomplete="name" />
+          </div>
+          <div class="profile-field">
+            <label class="profile-label" for="prof-email">Email Address</label>
+            <input class="profile-input" id="prof-email" type="email" readonly />
+            <p class="profile-hint">Email is set by your Google account and cannot be changed here.</p>
+          </div>
+          <div class="profile-field">
+            <label class="profile-label" for="prof-phone">Phone Number</label>
+            <input class="profile-input" id="prof-phone" type="tel" placeholder="+91 98765 43210" autocomplete="tel" />
           </div>
         </div>
+
+        <button class="profile-save-btn" onclick="saveProfile()">Save Changes</button>
+        <p id="profile-status" class="profile-status"></p>
+        <br/>
+        <button class="profile-signout" onclick="handleSignOut()">Sign out</button>
       </div>
+
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-  <script src="/js/config.js"></script>
-  <script src="/js/supabase.js"></script>
-  <script src="/js/auth.js"></script>
-  <script src="/js/theme.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/theme.js"></script>
   <script>
     var _session = null;
 
@@ -238,50 +214,47 @@
       document.getElementById('profile-loading').style.display = 'none';
       document.getElementById('profile-content').style.display = 'block';
 
-      // Pre-fill from session metadata
-      document.getElementById('profile-email').value = session.user.email || '';
-      document.getElementById('profile-name').value = session.user.user_metadata.full_name || '';
+      // Pre-fill from session
+      var nameEl = document.getElementById('prof-name');
+      var emailEl = document.getElementById('prof-email');
+      var phoneEl = document.getElementById('prof-phone');
+
+      if (emailEl) emailEl.value = session.user.email || '';
+      if (nameEl) nameEl.value = session.user.user_metadata && session.user.user_metadata.full_name
+        ? session.user.user_metadata.full_name : '';
 
       // Load saved profile from DB
-      getClient().from('profiles')
-        .select('full_name, email, phone')
-        .eq('id', session.user.id)
-        .single()
-        .then(function(res) {
+      getClient().from('profiles').select('full_name, phone')
+        .eq('id', session.user.id).single().then(function(res) {
           if (res.data) {
-            document.getElementById('profile-name').value = res.data.full_name || session.user.user_metadata.full_name || '';
-            document.getElementById('profile-email').value = res.data.email || session.user.email || '';
-            document.getElementById('profile-phone').value = res.data.phone || '';
+            if (nameEl && res.data.full_name) nameEl.value = res.data.full_name;
+            if (phoneEl && res.data.phone) phoneEl.value = res.data.phone;
           }
         });
     }
 
-    function saveProfile(e) {
-      e.preventDefault();
+    function saveProfile() {
       if (!_session) return;
-      var btn = document.getElementById('save-btn');
+      var nameEl = document.getElementById('prof-name');
+      var phoneEl = document.getElementById('prof-phone');
+      var btn = document.querySelector('.profile-save-btn');
       btn.disabled = true;
-      btn.textContent = 'SAVING…';
-
-      var payload = {
+      showStatus('Saving…', '');
+      getClient().from('profiles').upsert({
         id: _session.user.id,
-        full_name: document.getElementById('profile-name').value.trim(),
-        email: _session.user.email,
-        phone: document.getElementById('profile-phone').value.trim(),
+        full_name: nameEl ? nameEl.value.trim() : '',
+        email: _session.user.email || '',
+        phone: phoneEl ? phoneEl.value.trim() : '',
         updated_at: new Date().toISOString()
-      };
-
-      getClient().from('profiles')
-        .upsert(payload, { onConflict: 'id' })
-        .then(function(res) {
-          btn.disabled = false;
-          btn.textContent = 'SAVE CHANGES';
-          if (res.error) {
-            showStatus('Could not save: ' + res.error.message, 'error');
-          } else {
-            showStatus('Profile saved successfully.', 'success');
-          }
-        });
+      }, { onConflict: 'id' }).then(function(res) {
+        btn.disabled = false;
+        if (res.error) {
+          showStatus('Error: ' + res.error.message, 'error');
+        } else {
+          showStatus('Profile saved.', 'success');
+          setTimeout(function() { showStatus('', ''); }, 3000);
+        }
+      });
     }
 
     function handleSignOut() {
