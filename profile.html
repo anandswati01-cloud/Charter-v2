@@ -68,8 +68,7 @@
     .nav-right { display: flex; align-items: center; gap: 16px; }
     .nav-cta { background: var(--gold); color: var(--navy) !important; padding: 8px 20px; border-radius: 2px; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
     .nav-cta:hover { background: var(--gold-light) !important; }
-    .user-chip { display: flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 20px; background: var(--white-10); font-size: 0.8rem; color: var(--white); transition: background 0.2s; }
-    .user-chip:hover { background: var(--white-30); }
+
     #theme-toggle { background: none; border: none; cursor: pointer; color: var(--white-60); font-size: 1.1rem; padding: 4px; line-height: 1; }
     #theme-toggle:hover { color: var(--white); }
 
@@ -186,7 +185,7 @@
     [data-theme="light"] body { background: #f9f7f4; color: #0c1324; }
     [data-theme="light"] .nav { background: rgba(249,247,244,0.92); border-bottom-color: rgba(12,19,36,0.1); }
     [data-theme="light"] .nav-logo, [data-theme="light"] .nav-links a { color: #0c1324; }
-    [data-theme="light"] .user-chip { background: rgba(12,19,36,0.08); color: #0c1324; }
+
     [data-theme="light"] .page-title { color: #0c1324; }
     [data-theme="light"] .page-subtitle, [data-theme="light"] .page-label,
     [data-theme="light"] .section-title, [data-theme="light"] .field-label { color: rgba(12,19,36,0.5); }
@@ -217,10 +216,10 @@
         <li><a href="/about">About Us</a></li>
       </ul>
       <div class="nav-right">
-        <button id="theme-toggle" title="Toggle theme">&#9728;</button>
-        <a href="/profile" class="user-chip" id="user-chip" style="display:none">
-          <span id="user-name-nav">My Account</span>
-        </a>
+        <button id="theme-toggle" onclick="toggleTheme()" title="Switch to light mode"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+        <div id="sv-user-chip" style="display:none; align-items:center; gap:8px;">
+          <a href="/profile" id="sv-user-name" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;text-transform:uppercase;color:#fbbf24;text-decoration:none;"></a>
+        </div>
         <a href="/payment" class="nav-cta">GET QUOTES</a>
       </div>
     </div>
@@ -301,7 +300,6 @@
         <div class="bookings-tabs">
           <button class="tab-btn active" onclick="switchTab('active', this)">Active</button>
           <button class="tab-btn" onclick="switchTab('past', this)">Past</button>
-          <button class="tab-btn" onclick="switchTab('incomplete', this)">Incomplete</button>
         </div>
 
         <div id="tab-active" class="tab-panel active">
@@ -318,14 +316,6 @@
             <div>No past bookings</div>
           </div>
           <div id="past-list"></div>
-        </div>
-
-        <div id="tab-incomplete" class="tab-panel">
-          <div class="empty-state" id="incomplete-empty">
-            <div class="empty-icon">&#9992;</div>
-            <div>No incomplete bookings</div>
-          </div>
-          <div id="incomplete-list"></div>
         </div>
       </div>
 
@@ -398,11 +388,8 @@
 
           const active = data.filter(b => b.status === 'open' || b.status === 'confirmed');
           const past = data.filter(b => (b.status === 'confirmed' || b.status === 'expired') && b.flight_date < today);
-          const incomplete = data.filter(b => b.status === 'expired' && b.flight_date >= today);
-
           const aList = document.getElementById('active-list');
           const pList = document.getElementById('past-list');
-          const iList = document.getElementById('incomplete-list');
 
           if (active.length > 0) {
             document.getElementById('active-empty').style.display = 'none';
@@ -411,10 +398,6 @@
           if (past.length > 0) {
             document.getElementById('past-empty').style.display = 'none';
             pList.innerHTML = past.map(buildBookingCard).join('');
-          }
-          if (incomplete.length > 0) {
-            document.getElementById('incomplete-empty').style.display = 'none';
-            iList.innerHTML = incomplete.map(buildBookingCard).join('');
           }
         });
 
@@ -425,23 +408,16 @@
           const today = new Date().toISOString().split('T')[0];
           const active = data.filter(b => b.status === 'pending' || b.status === 'confirmed');
           const past = data.filter(b => b.status === 'confirmed' && b.flight_date < today);
-          const incomplete = data.filter(b => b.status === 'incomplete');
-
-          const aList = document.getElementById('active-list');
-          const pList = document.getElementById('past-list');
-          const iList = document.getElementById('incomplete-list');
+          const aList2 = document.getElementById('active-list');
+          const pList2 = document.getElementById('past-list');
 
           if (active.length) {
             document.getElementById('active-empty').style.display = 'none';
-            aList.innerHTML += active.map(buildBookingCard).join('');
+            aList2.innerHTML += active.map(buildBookingCard).join('');
           }
           if (past.length) {
             document.getElementById('past-empty').style.display = 'none';
-            pList.innerHTML += past.map(buildBookingCard).join('');
-          }
-          if (incomplete.length) {
-            document.getElementById('incomplete-empty').style.display = 'none';
-            iList.innerHTML += incomplete.map(buildBookingCard).join('');
+            pList2.innerHTML += past.map(buildBookingCard).join('');
           }
         });
     }
@@ -454,8 +430,8 @@
       document.getElementById('display-name').textContent = user.user_metadata?.full_name || user.email?.split('@')[0] || '—';
       document.getElementById('display-email').textContent = user.email || '—';
 
-      const chip = document.getElementById('user-chip');
-      const nameNav = document.getElementById('user-name-nav');
+      const chip = document.getElementById('sv-user-chip');
+      const nameNav = document.getElementById('sv-user-name');
       if (chip && user.user_metadata?.full_name) {
         nameNav.textContent = user.user_metadata.full_name.split(' ')[0];
         chip.style.display = 'flex';
