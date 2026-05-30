@@ -61,7 +61,7 @@
       max-width: 1200px;
       margin: 0 auto;
     }
-    .nav-logo { font-family: var(--font-display); font-size: 26px; font-weight: 400; font-style: italic; letter-spacing: -0.5px; color: var(--white); }
+    .nav-logo { font-family: var(--font-display); font-size: 26px; font-weight: 400; font-style: italic; letter-spacing: -0.5px; color: var(--gold); }
     .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; margin: 0; padding: 0; }
     .nav-links a { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--white-60); transition: color 0.2s; }
     .nav-links a:hover { color: var(--white); }
@@ -181,28 +181,35 @@
     .empty-state .empty-icon { font-size: 2rem; margin-bottom: 12px; opacity: 0.4; }
 
     /* LIGHT THEME */
-    [data-theme="light"] body { background: #f9f7f4; color: #0c1324; }
-    [data-theme="light"] .nav { background: rgba(249,247,244,0.92); border-bottom-color: rgba(12,19,36,0.1); }
-    [data-theme="light"] .nav-logo, [data-theme="light"] .nav-links a { color: #0c1324; }
-
-    [data-theme="light"] .page-title { color: #0c1324; }
-    [data-theme="light"] .page-subtitle, [data-theme="light"] .page-label,
-    [data-theme="light"] .section-title, [data-theme="light"] .field-label { color: rgba(12,19,36,0.5); }
-    [data-theme="light"] .profile-card, [data-theme="light"] .booking-item { background: #fff; border-color: rgba(12,19,36,0.1); box-shadow: 0 2px 12px rgba(12,19,36,0.05); }
-    [data-theme="light"] .field-value, [data-theme="light"] .field-input { color: #0c1324; border-bottom-color: rgba(12,19,36,0.15); }
-    [data-theme="light"] .field-input::placeholder { color: rgba(12,19,36,0.25); }
-    [data-theme="light"] .field-note { color: rgba(12,19,36,0.35); }
-    [data-theme="light"] .section-header, [data-theme="light"] .signout-row,
-    [data-theme="light"] .bookings-tabs { border-color: rgba(12,19,36,0.1); }
-    [data-theme="light"] .tab-btn { color: rgba(12,19,36,0.4); }
-    [data-theme="light"] .tab-btn.active { color: #0c1324; }
-    [data-theme="light"] .booking-route { color: #0c1324; }
-    [data-theme="light"] .booking-meta { color: rgba(12,19,36,0.5); }
-    [data-theme="light"] .empty-state { color: rgba(12,19,36,0.3); }
-    [data-theme="light"] .signout-btn { color: rgba(12,19,36,0.3); }
-    [data-theme="light"] .signout-btn:hover { color: rgba(12,19,36,0.6); }
-    [data-theme="light"] #theme-toggle { background: rgba(0,0,0,0.06); color: rgba(12,19,36,0.4); }
-    [data-theme="light"] #theme-toggle:hover { color: #0c1324; }
+        /* ── LIGHT MODE ── */
+    [data-theme="light"] body { background: #f4f6f9 !important; color: #0d1b2a !important; }
+    [data-theme="light"] .nav { background: rgba(255,255,255,0.92) !important; border-bottom-color: rgba(13,27,42,0.1) !important; }
+    [data-theme="light"] .nav-logo { color: #c4942e !important; }
+    [data-theme="light"] .nav-links a { color: rgba(13,27,42,0.65) !important; }
+    [data-theme="light"] .page-title { color: #0d1b2a !important; }
+    [data-theme="light"] .page-subtitle,
+    [data-theme="light"] .page-label,
+    [data-theme="light"] .section-title,
+    [data-theme="light"] .field-label { color: rgba(13,27,42,0.55) !important; }
+    [data-theme="light"] .profile-card,
+    [data-theme="light"] .booking-item { background: #ffffff !important; border-color: rgba(13,27,42,0.1) !important; }
+    [data-theme="light"] .field-value,
+    [data-theme="light"] .field-input { color: #0d1b2a !important; border-bottom-color: rgba(13,27,42,0.15) !important; }
+    [data-theme="light"] .field-input::placeholder { color: rgba(13,27,42,0.35) !important; }
+    [data-theme="light"] .field-note { color: rgba(13,27,42,0.4) !important; }
+    [data-theme="light"] .section-header,
+    [data-theme="light"] .signout-row,
+    [data-theme="light"] .bookings-tabs { border-color: rgba(13,27,42,0.1) !important; }
+    [data-theme="light"] .tab-btn { color: rgba(13,27,42,0.4) !important; }
+    [data-theme="light"] .tab-btn.active { color: #0d1b2a !important; border-bottom-color: #c4942e !important; }
+    [data-theme="light"] .booking-route { color: #0d1b2a !important; }
+    [data-theme="light"] .booking-meta { color: rgba(13,27,42,0.55) !important; }
+    [data-theme="light"] .empty-state { color: rgba(13,27,42,0.35) !important; }
+    [data-theme="light"] .signout-btn { color: rgba(13,27,42,0.4) !important; }
+    [data-theme="light"] .signout-btn:hover { color: #0d1b2a !important; }
+    [data-theme="light"] #theme-toggle { background: rgba(0,0,0,0.06) !important; color: rgba(13,27,42,0.5) !important; }
+    [data-theme="light"] #theme-toggle:hover { background: rgba(0,0,0,0.1) !important; color: #0d1b2a !important; }
+    [data-theme="light"] .status-msg { color: #c4942e !important; }
   </style>
 </head>
 <body>
