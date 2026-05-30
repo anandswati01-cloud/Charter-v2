@@ -200,6 +200,17 @@ function goToPayment2() {
   if (!clientPhone || !/^[\d\s+\-()+]{7,20}$/.test(clientPhone)) { showErr('client-phone','err-client-phone'); valid = false; }
   if (!valid) { setEditMode(true); return; }
 
+  /* — Phone OTP gate — */
+  if (!window.payPhoneOtpVerified) {
+    var otpErrEl = document.getElementById('err-client-phone');
+    if (otpErrEl) {
+      otpErrEl.textContent = 'Please verify your phone number with OTP before proceeding.';
+      otpErrEl.style.display = 'block';
+    }
+    setEditMode(true);
+    return;
+  }
+
   // Save traveller details to sessionStorage for payment2
   sessionStorage.setItem('sv_traveller', JSON.stringify({
     name:  clientName,
