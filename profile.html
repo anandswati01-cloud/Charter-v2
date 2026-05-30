@@ -296,7 +296,7 @@
         setTimeout(waitForAuth, 80);
         return;
       }
-      getSession().then(function(session) {
+      getSession(function(session) {
         if (session) {
           loadProfile(session);
         } else {
