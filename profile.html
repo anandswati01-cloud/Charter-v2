@@ -355,7 +355,11 @@
       if (msg) setTimeout(() => { el.textContent = ''; }, 3000);
     }
 
-    function loadProfile(user) {
+    function loadProfile(session) {
+      // getSession(cb) calls cb(session) where session has .user inside
+      const user = session && session.user ? session.user : session;
+      if (!user) return;
+
       document.getElementById('display-name').textContent = user.user_metadata?.full_name || user.email?.split('@')[0] || '—';
       document.getElementById('display-email').textContent = user.email || '—';
 
@@ -387,8 +391,9 @@
       const sb = window._svSupabase;
       if (!sb) { showStatus('Not connected.', true); btn.disabled = false; return; }
 
-      getSession(function(user) {
-        if (!user) { showStatus('Please sign in.', true); btn.disabled = false; return; }
+      getSession(function(session) {
+        const user = session && session.user ? session.user : session;
+        if (!user || !user.id) { showStatus('Please sign in.', true); btn.disabled = false; return; }
         sb.from('profiles').upsert({ id: user.id, phone: phone }, { onConflict: 'id' })
           .then(({ error }) => {
             btn.disabled = false;
@@ -410,9 +415,10 @@
       function check() {
         attempts++;
         if (typeof getSession === 'function') {
-          getSession(function(user) {
-            if (user) {
-              loadProfile(user);
+          getSession(function(session) {
+            const user = session && session.user ? session.user : session;
+            if (user && user.id) {
+              loadProfile(session);
             } else {
               window.location.href = '/?signin=required';
             }
