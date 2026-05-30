@@ -941,7 +941,7 @@
       <button id="sv-login-btn" onclick="openAuthModal()" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--white-60);background:transparent;border:1px solid rgba(255,255,255,0.25);padding:8px 16px;border-radius:2px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--gold)';this.style.color='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='var(--white-60)'">Sign In</button>
       <!-- User chip (shown when logged in) -->
       <div id="sv-user-chip" style="display:none;align-items:center;gap:8px;">
-        <span id="sv-user-name" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;"></span>
+        <a href="/profile" id="sv-user-name" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;text-decoration:none;"></a>
         <button onclick="signOut()" style="font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);background:transparent;border:none;cursor:pointer;padding:2px 6px;" title="Sign out">&#x2715;</button>
       </div>
       <a href="#book" class="nav-cta">Get Quotes</a>
