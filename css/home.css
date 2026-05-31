@@ -65,7 +65,7 @@
  
     .nav-links a {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--white-60);
@@ -82,7 +82,7 @@
  
     .nav-cta {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--navy);
@@ -128,7 +128,7 @@
  
     .hero-eyebrow {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 3px;
       text-transform: uppercase;
       color: var(--gold);
@@ -210,7 +210,7 @@
  
     .trust-label {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 12px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--white-60);
@@ -245,7 +245,7 @@
  
     .booking-card-sub {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--gold);
@@ -259,7 +259,7 @@
  
     .trip-btn {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 1.2px;
       text-transform: uppercase;
       padding: 8px 18px;
@@ -292,7 +292,7 @@
  
     .input-label {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 12px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--white-60);
@@ -367,7 +367,7 @@
  
     .req-chip {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 12px;
       letter-spacing: 1px;
       text-transform: uppercase;
       padding: 7px 14px;
@@ -392,7 +392,7 @@
       background: var(--gold);
       color: var(--navy);
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 14px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       padding: 14px 28px;
@@ -422,7 +422,7 @@
  
     .section-eyebrow {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 3px;
       text-transform: uppercase;
       color: var(--gold);
@@ -471,7 +471,7 @@
     }
  
     .step-desc {
-      font-size: 14px;
+      font-size: 16px;
       line-height: 1.7;
       color: var(--white-60);
     }
@@ -527,7 +527,7 @@
     }
  
     .bento-desc {
-      font-size: 14px;
+      font-size: 16px;
       line-height: 1.7;
       color: var(--white-60);
     }
@@ -548,7 +548,7 @@
  
     .view-all {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 13px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--gold);
@@ -591,7 +591,7 @@
       top: 16px;
       left: 16px;
       font-family: var(--font-mono);
-      font-size: 9px;
+      font-size: 11px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       background: var(--gold);
@@ -620,7 +620,7 @@
  
     .route-book {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 12px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--gold);
@@ -709,7 +709,7 @@
     }
  
     .footer-tagline {
-      font-size: 14px;
+      font-size: 16px;
       color: var(--white-60);
       line-height: 1.7;
       margin-bottom: 24px;
@@ -728,7 +728,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
+      font-size: 16px;
       cursor: pointer;
       transition: border-color 0.2s;
     }
@@ -737,7 +737,7 @@
  
     .footer-heading {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 12px;
       letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--gold);
@@ -752,7 +752,7 @@
     }
  
     .footer-links a {
-      font-size: 14px;
+      font-size: 16px;
       color: var(--white-60);
       transition: color 0.2s;
       cursor: pointer;
@@ -774,7 +774,7 @@
       padding: 10px 14px;
       color: var(--white);
       font-family: var(--font-body);
-      font-size: 14px;
+      font-size: 16px;
       outline: none;
     }
  
@@ -805,13 +805,13 @@
     }
  
     .footer-copy {
-      font-size: 12px;
+      font-size: 14px;
       color: var(--white-30);
     }
  
     .footer-ops {
       font-family: var(--font-mono);
-      font-size: 10px;
+      font-size: 12px;
       letter-spacing: 1.5px;
       text-transform: uppercase;
       color: var(--white-30);
