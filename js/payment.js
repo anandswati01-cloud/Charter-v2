@@ -243,6 +243,10 @@ async function confirmBooking() {
   if (!clientPhone || !/^[\d\s+\-()+]{7,20}$/.test(clientPhone)) { showErr('client-phone','err-client-phone'); valid = false; }
   if (!valid) { setEditMode(true); return; }
 
+    // Get authenticated user
+    var sessionData = await supabase.auth.getSession();
+    var currentUser = (sessionData && sessionData.data && sessionData.data.session) ? sessionData.data.session.user : null;
+
   var raw = sessionStorage.getItem('sv_selected_quote') || sessionStorage.getItem('sv_selected_op');
   var q = {};
   if (raw) { try { q = JSON.parse(raw); } catch(e){} }
@@ -269,7 +273,8 @@ async function confirmBooking() {
     passengers:    parseInt(queryData.rs_pax) || null,
     total_amount:  price,
     platform_fee:  platformFee,
-    status:        'confirmed'
+    status:        'confirmed',
+    user_id:         currentUser ? currentUser.id : null
   };
 
   _confirmInProgress = true;
