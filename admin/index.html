@@ -67,12 +67,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   <div class="login-box">
     <div class="login-logo"><span class="sky">Sky</span><span class="vayu">Vayu</span></div>
     <p class="admin-tag">Super Admin Panel</p>
-    <div class="login-error" id="login-error">Incorrect password</div>
-    <div class="field-group"><label class="field-label">Admin password</label><input type="password" class="field-input" id="admin-password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doAdminLogin()"/></div>
-    <button class="btn-primary" onclick="doAdminLogin()">Sign in</button>
+    <div class="login-error" id="login-error">Invalid credentials or not an admin</div>
+    <div class="field-group">
+      <label class="field-label">EMAIL</label>
+      <input type="email" id="admin-email" class="field-input" placeholder="Enter admin email" autocomplete="email"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label">PASSWORD</label>
+      <input type="password" id="admin-pw" class="field-input" placeholder="Enter admin password" autocomplete="current-password"/>
+    </div>
+    <button class="btn-login" onclick="doAdminLogin()">Sign in</button>
   </div>
 </div>
-<!-- DASHBOARD -->
 <div id="page-dashboard">
   <div class="top-bar">
     <div class="top-logo">
@@ -110,7 +116,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <script>
 var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;
 var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
-var ADMIN_PASSWORD='SkyVayu@Admin2026'; /* TODO: replace with Supabase Auth */
+/* Auth via Supabase signInWithPassword + profiles.is_admin check */
 var allOperators=[];
 
 function escapeHtml(str){
@@ -141,24 +147,35 @@ function sbFetch(path,opts){
 
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500);}
 
-function doAdminLogin(){
-  var pw=document.getElementById('admin-password').value;
-  if(pw!==ADMIN_PASSWORD){document.getElementById('login-error').classList.add('show');return;}
-  document.getElementById('login-error').classList.remove('show');
+async function doAdminLogin(){
+  var email=document.getElementById('admin-email').value.trim();
+  var pw=document.getElementById('admin-pw').value.trim();
+  var errEl=document.getElementById('login-error');
+  errEl.classList.remove('show');
+  if(!email||!pw){errEl.classList.add('show');return;}
+  var sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+  window.__sb=sb;
+  var authRes=await sb.auth.signInWithPassword({email:email,password:pw});
+  if(authRes.error){errEl.classList.add('show');return;}
+  var uid=authRes.data.user.id;
+  var {data:profile,error:pe}=await sb.from('profiles').select('is_admin,full_name').eq('id',uid).single();
+  if(pe||!profile||!profile.is_admin){
+    await sb.auth.signOut();
+    errEl.textContent='Access denied: not an admin account.';
+    errEl.classList.add('show');
+    return;
+  }
   document.getElementById('page-login').style.display='none';
-  document.getElementById('page-dashboard').style.display='block';
-  loadAll();
+  document.getElementById('page-dashboard').style.display='flex';
+  var nameEl=document.querySelector('.admin-user-name');
+  if(nameEl)nameEl.textContent=profile.full_name||email;
+  initDashboard();
 }
 
-function doAdminLogout(){
+async function doAdminLogout(){
+  if(window.__sb)await window.__sb.auth.signOut();
   document.getElementById('page-dashboard').style.display='none';
-document.getElementById('page-login').style.display='flex';
-
-/* Debug: watch stat-pending for changes */
-var _obs = new MutationObserver(function(muts){
-  muts.forEach(function(m){
-    console.log('stat-pending changed to:', document.getElementById('stat-pending').textContent, new Error().stack);
-  });
+  document.getElementById('page-login').style.display='flex';
 });
 var _el = document.getElementById('stat-pending');
 if(_el) _obs.observe(_el, {childList:true, characterData:true, subtree:true});
