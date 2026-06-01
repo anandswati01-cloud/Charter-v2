@@ -462,6 +462,10 @@ async function confirmBooking() {
   var traveller = JSON.parse(sessionStorage.getItem('sv_traveller') || '{}');
   var ref = generateRef(q.operator_name || q.name);
 
+    // Get authenticated user
+    var sessionData = await supabase.auth.getSession();
+    var currentUser = (sessionData && sessionData.data && sessionData.data.session) ? sessionData.data.session.user : null;
+
   var bookingPayload = {
     query_id:      sessionStorage.getItem('sv_query_id') || null,
     quote_id:      q.id || null,
@@ -476,7 +480,8 @@ async function confirmBooking() {
     passengers:    parseInt(queryData.rs_pax) || null,
     total_amount:  price,
     platform_fee:  landing,
-    status:        'confirmed'
+    status:        'confirmed',
+      user_id:         currentUser ? currentUser.id : null
   };
 
   var saved = await saveBookingToSupabase(bookingPayload);

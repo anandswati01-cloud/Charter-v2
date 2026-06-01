@@ -115,7 +115,8 @@ async function saveBookingToSupabase(bookingData) {
     passengers:    parseInt(bookingData.passengers)         || null,
     total_amount:  parseFloat(bookingData.total_amount)     || null,
     platform_fee:  parseFloat(bookingData.platform_fee)     || null,
-    status:        'confirmed'
+    status:        'confirmed',
+    user_id:       bookingData.user_id     || null
   };
   try {
     var response = await fetchWithTimeout(

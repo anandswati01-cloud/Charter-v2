@@ -152,7 +152,16 @@ function doAdminLogin(){
 
 function doAdminLogout(){
   document.getElementById('page-dashboard').style.display='none';
-  document.getElementById('page-login').style.display='flex';
+document.getElementById('page-login').style.display='flex';
+
+/* Debug: watch stat-pending for changes */
+var _obs = new MutationObserver(function(muts){
+  muts.forEach(function(m){
+    console.log('stat-pending changed to:', document.getElementById('stat-pending').textContent, new Error().stack);
+  });
+});
+var _el = document.getElementById('stat-pending');
+if(_el) _obs.observe(_el, {childList:true, characterData:true, subtree:true});
   document.getElementById('admin-password').value='';
 }
 
@@ -162,7 +171,9 @@ async function loadAll(){
 
 async function loadOperators(){
   var res=await sbFetch('operators?order=created_at.desc&select=*,operator_users(id,username,full_name,role)');
+  console.log('loadOperators res.ok:',res.ok,'res.status:',res.status,'data length:',Array.isArray(res.data)?res.data.length:'not array', 'data:',res.data);
   allOperators=res.ok?res.data:[];
+  console.log('allOperators set to:',allOperators.length,'items');
   updateStats();
   renderTab('pending');renderTab('approved');renderTab('rejected');
 }
@@ -212,6 +223,7 @@ function updateStats(){
   var p=allOperators.filter(function(o){return o.approval_status==='pending';}).length;
   var a=allOperators.filter(function(o){return o.approval_status==='approved';}).length;
   var r=allOperators.filter(function(o){return o.approval_status==='rejected';}).length;
+  console.log('updateStats: pending='+p+' approved='+a+' rejected='+r);
   document.getElementById('stat-pending').textContent=p;document.getElementById('stat-approved').textContent=a;document.getElementById('stat-rejected').textContent=r;
   document.getElementById('badge-pending').textContent=p;document.getElementById('badge-approved').textContent=a;document.getElementById('badge-rejected').textContent=r;
 }
@@ -339,7 +351,6 @@ async function rejectAircraft(acId){
 
 document.getElementById('page-login').style.display='flex';
 </script>
-  <script src="../js/supabase.js"></script>
   <script src="../js/graphify.js"></script>
 </body>
 </html>

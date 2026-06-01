@@ -171,6 +171,46 @@ nav{
   .summary-card{position:static;}
   .fields-grid{grid-template-columns:1fr;}
 }
+
+  /* — Phone OTP verification — */
+  .btn-send-otp {
+    padding: 8px 16px;
+    background: var(--gold, #fbbf24);
+    color: #0c1224;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .btn-send-otp:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-send-otp:hover:not(:disabled) { opacity: 0.85; }
+  .btn-otp-ghost {
+    padding: 8px 14px;
+    background: transparent;
+    color: var(--text-dim, #8f9097);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    border: 1px solid var(--border, rgba(143,144,151,0.2));
+    border-radius: 4px;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .btn-otp-ghost:hover { color: var(--text, #e4e2e4); }
+  .btn-otp-link {
+    background: none;
+    border: none;
+    color: var(--text-dim, #8f9097);
+    font-size: 11px;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+  .btn-otp-link:hover { color: var(--gold, #fbbf24); }
 </style>
 <script src="js/theme.js"></script>
 </head>
@@ -224,6 +264,29 @@ nav{
           <div class="field-value" id="val-phone">—</div>
           <input class="field-input" type="tel" id="client-phone" placeholder="+91 98765 43210" oninput="clearErr(this)"/>
           <span class="error-msg" id="err-client-phone">Please enter a valid phone number</span>
+          <!-- OTP Verification for phone -->
+          <div id="pay-otp-block" style="margin-top:12px;">
+            <!-- Step 1: Send OTP -->
+            <div id="pay-otp-step1" style="display:flex;align-items:center;gap:8px;">
+              <button type="button" id="pay-send-otp-btn" class="btn-send-otp" onclick="paySendOTP()">SEND OTP</button>
+              <span id="pay-phone-verified-badge" style="display:none;color:#10b981;font-size:12px;font-weight:600;letter-spacing:0.08em;">&#10003; VERIFIED</span>
+            </div>
+            <!-- Step 2: Enter OTP -->
+            <div id="pay-otp-step2" style="display:none;margin-top:10px;">
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                <input id="pay-otp-input" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit code" class="field-input" style="width:140px;letter-spacing:0.15em;" oninput="this.value=this.value.replace(/[^0-9]/g,'')"/>
+                <button type="button" class="btn-send-otp" onclick="payVerifyOTP()">VERIFY</button>
+                <button type="button" id="pay-otp-resend-btn" class="btn-otp-ghost" onclick="paySendOTP()" style="display:none;">RESEND</button>
+              </div>
+              <div style="margin-top:6px;display:flex;align-items:center;gap:12px;">
+                <span id="pay-otp-timer" style="font-size:11px;color:var(--text-dim,#8f9097);"></span>
+                <button type="button" class="btn-otp-link" onclick="payChangePhone()">Change number</button>
+              </div>
+              <span id="pay-otp-error" style="display:none;font-size:12px;color:#ef4444;margin-top:4px;display:block;"></span>
+            </div>
+            <!-- Demo bar (test only) -->
+            <div id="pay-otp-demo-bar" style="display:none;margin-top:8px;padding:8px 12px;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.3);border-radius:6px;font-size:12px;color:var(--gold,#fbbf24);font-family:monospace;"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -294,6 +357,134 @@ nav{
 
 <script src="js/config.js"></script>
 <script src="js/supabase.js"></script>
-<script src="js/payment.js"></script>
+<script src="js/otp.js"></script>
+  <script src="js/payment.js"></script>
+  <script>
+    /* — Profile pre-fill: populate contact fields from saved profile — */
+    (function prefillFromProfile() {
+      if (typeof getSession !== 'function' || typeof getClient !== 'function') {
+        setTimeout(prefillFromProfile, 100);
+        return;
+      }
+      getSession(function(session) {
+        if (!session) return;
+        getClient().from('profiles')
+          .select('full_name, email, phone')
+          .eq('id', session.user.id)
+          .single()
+          .then(function(res) {
+            if (!res.data) return;
+            var nameEl = document.getElementById('client-name');
+            var emailEl = document.getElementById('client-email');
+            var phoneEl = document.getElementById('client-phone');
+            if (nameEl && !nameEl.value) nameEl.value = res.data.full_name || session.user.user_metadata.full_name || '';
+            if (emailEl && !emailEl.value) emailEl.value = res.data.email || session.user.email || '';
+            if (phoneEl && !phoneEl.value) phoneEl.value = res.data.phone || '';
+          });
+      });
+    })();
+  </script>
+  <script>
+    /* — Payment page: Phone OTP verification — */
+    var payPhoneOtpVerified = false;
+    var payOtpGenerated     = '';
+    var payOtpPhone         = '';
+    var payOtpTimer         = null;
+
+    function paySendOTP() {
+      var phoneEl = document.getElementById('client-phone');
+      if (!phoneEl) return;
+      var phone = phoneEl.value.trim();
+      if (!phone || phone.length < 7) {
+        document.getElementById('err-client-phone').textContent = 'Please enter a valid phone number';
+        document.getElementById('err-client-phone').style.display = 'block';
+        return;
+      }
+      document.getElementById('err-client-phone').style.display = 'none';
+      payOtpPhone = phone;
+      phoneEl.readOnly = true;
+
+      // Generate 6-digit OTP
+      payOtpGenerated = Math.floor(100000 + Math.random() * 900000).toString();
+
+      // Show demo bar (replace with real SMS gateway in production)
+      var demoBar = document.getElementById('pay-otp-demo-bar');
+      demoBar.textContent = 'Demo — OTP: ' + payOtpGenerated;
+      demoBar.style.display = 'block';
+
+      // Show step 2
+      document.getElementById('pay-otp-step2').style.display = 'block';
+      document.getElementById('pay-send-otp-btn').disabled = true;
+      document.getElementById('pay-send-otp-btn').textContent = 'OTP SENT';
+      document.getElementById('pay-otp-input').focus();
+
+      // Start 30s resend countdown
+      payStartResendTimer(30);
+    }
+
+    function payVerifyOTP() {
+      var inputEl = document.getElementById('pay-otp-input');
+      var errEl   = document.getElementById('pay-otp-error');
+      var entered = (inputEl.value || '').trim();
+
+      if (!entered || entered !== payOtpGenerated) {
+        errEl.textContent = 'Incorrect OTP. Please try again.';
+        errEl.style.display = 'block';
+        inputEl.style.borderColor = '#ef4444';
+        return;
+      }
+
+      // Verified!
+      payPhoneOtpVerified = true;
+      clearInterval(payOtpTimer);
+
+      document.getElementById('pay-otp-block').style.display = 'none';
+      document.getElementById('pay-phone-verified-badge').style.display = 'inline';
+      document.getElementById('pay-otp-demo-bar').style.display = 'none';
+
+      // Lock phone input as verified
+      var phoneEl = document.getElementById('client-phone');
+      if (phoneEl) { phoneEl.readOnly = true; }
+
+      errEl.style.display = 'none';
+    }
+
+    function payChangePhone() {
+      payPhoneOtpVerified = false;
+      payOtpGenerated = '';
+      clearInterval(payOtpTimer);
+
+      var phoneEl = document.getElementById('client-phone');
+      if (phoneEl) { phoneEl.readOnly = false; phoneEl.value = ''; phoneEl.focus(); }
+
+      document.getElementById('pay-otp-step2').style.display = 'none';
+      document.getElementById('pay-send-otp-btn').disabled = false;
+      document.getElementById('pay-send-otp-btn').textContent = 'SEND OTP';
+      document.getElementById('pay-otp-demo-bar').style.display = 'none';
+      document.getElementById('pay-otp-input').value = '';
+      document.getElementById('pay-otp-error').style.display = 'none';
+      document.getElementById('pay-otp-timer').textContent = '';
+      document.getElementById('pay-otp-resend-btn').style.display = 'none';
+    }
+
+    function payStartResendTimer(seconds) {
+      clearInterval(payOtpTimer);
+      var timerEl  = document.getElementById('pay-otp-timer');
+      var resendEl = document.getElementById('pay-otp-resend-btn');
+      var remaining = seconds;
+      resendEl.style.display = 'none';
+      timerEl.textContent = 'Resend in ' + remaining + 's';
+      payOtpTimer = setInterval(function() {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(payOtpTimer);
+          timerEl.textContent = '';
+          resendEl.style.display = 'inline-block';
+        } else {
+          timerEl.textContent = 'Resend in ' + remaining + 's';
+        }
+      }, 1000);
+    }
+  </script>
 </body>
 </html>
