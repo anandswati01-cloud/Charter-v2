@@ -220,7 +220,6 @@ async function doAdminLogout(){
 var _el = document.getElementById('stat-pending');
 if(_el) _obs.observe(_el, {childList:true, characterData:true, subtree:true});
   document.getElementById('admin-password').value='';
-}
 
 async function loadAll(){
   await Promise.all([loadOperators(),loadPendingAircraft(),loadPendingEmployees()]);
