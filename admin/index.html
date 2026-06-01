@@ -152,7 +152,16 @@ function doAdminLogin(){
 
 function doAdminLogout(){
   document.getElementById('page-dashboard').style.display='none';
-  document.getElementById('page-login').style.display='flex';
+document.getElementById('page-login').style.display='flex';
+
+/* Debug: watch stat-pending for changes */
+var _obs = new MutationObserver(function(muts){
+  muts.forEach(function(m){
+    console.log('stat-pending changed to:', document.getElementById('stat-pending').textContent, new Error().stack);
+  });
+});
+var _el = document.getElementById('stat-pending');
+if(_el) _obs.observe(_el, {childList:true, characterData:true, subtree:true});
   document.getElementById('admin-password').value='';
 }
 
@@ -342,7 +351,6 @@ async function rejectAircraft(acId){
 
 document.getElementById('page-login').style.display='flex';
 </script>
-  <script src="../js/supabase.js"></script>
   <script src="../js/graphify.js"></script>
 </body>
 </html>
