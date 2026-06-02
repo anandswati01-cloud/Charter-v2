@@ -239,14 +239,14 @@ async function doAdminLogin(){
   if(adminCheck.error||!adminCheck.data||!adminCheck.data.is_admin){await sb.auth.signOut();errEl.textContent='Access denied. Not an admin account.';errEl.classList.add('show');return;}
   var obs=await loadOperators(token);
   document.getElementById('page-login').style.display='none';
-  document.getElementById('page-dashboard').style.display='flex';
+  document.getElementById('page-dashboard').style.display='block';
   showToast('Welcome, '+letterId,'ok');
 }
 
 async function doAdminLogout(){
   if(window.__sb)await window.__sb.auth.signOut();
   document.getElementById('page-dashboard').style.display='none';
-  document.getElementById('page-login').style.display='flex';
+  document.getElementById('page-login').style.display='block';
 var _el = document.getElementById('stat-pending');
 if(_el) _obs.observe(_el, {childList:true, characterData:true, subtree:true});
   document.getElementById('admin-password').value='';
@@ -436,7 +436,7 @@ async function rejectAircraft(acId){
   else showToast('Failed to reject aircraft. Please try again.','error');
 }
 
-document.getElementById('page-login').style.display='flex';
+document.getElementById('page-login').style.display='block';
 </script>
   <script src="../js/graphify.js"></script>
 </body>
