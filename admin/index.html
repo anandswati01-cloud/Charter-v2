@@ -99,6 +99,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .stat-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;}
 .stat-num{font-family:var(--font-display);font-size:32px;font-weight:300;color:var(--gold);line-height:1;}
 .stat-label{font-size:12px;color:var(--text-tertiary);margin-top:4px;}
+.pw-wrap{position:relative;display:flex;align-items:center;}
+.pw-wrap .field-input{flex:1;padding-right:44px;}
+.pw-toggle{position:absolute;right:10px;background:none;border:none;cursor:pointer;color:var(--text);opacity:0.6;padding:4px;display:flex;align-items:center;transition:opacity .2s;}
+.pw-toggle:hover{opacity:1;}
+.forgot-row{text-align:right;margin:-4px 0 14px;}
+.forgot-link{background:none;border:none;color:var(--blue-light);font-size:12px;cursor:pointer;padding:0;text-decoration:underline;}
+.forgot-link:hover{color:var(--gold);}
+.forgot-msg{font-size:13px;color:var(--text);opacity:.8;margin-bottom:8px;}
+.forgot-status{font-size:12px;margin-top:6px;min-height:18px;}
+.forgot-status.error{color:#f87272;}
+.forgot-status.ok{color:#6ee7b7;}
+#forgot-section{margin-bottom:8px;}
+#forgot-section .field-input{width:100%;box-sizing:border-box;}
 </style>
 </head>
 <body>
@@ -114,7 +127,19 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     </div>
     <div class="field-group">
       <label class="field-label">PASSWORD</label>
-      <input type="password" id="admin-pw" class="field-input" placeholder="Enter admin password" autocomplete="current-password"/>
+      <div class="pw-wrap">
+        <input type="password" id="admin-pw" class="field-input" placeholder="Enter admin password" autocomplete="current-password"/>
+        <button type="button" class="pw-toggle" onclick="toggleAdminPw()" title="Show/hide password">
+          <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="forgot-row"><button type="button" class="forgot-link" onclick="showForgotAdmin()">Forgot password?</button></div>
+    <div id="forgot-section" style="display:none">
+      <p class="forgot-msg">Enter your admin email to receive a reset link.</p>
+      <input type="email" id="forgot-email" class="field-input" placeholder="Enter your email"/>
+      <button type="button" class="btn-login" style="margin-top:10px" onclick="sendAdminReset()">Send reset link</button>
+      <p id="forgot-status" class="forgot-status"></p>
     </div>
     <button class="btn-login" onclick="doAdminLogin()">Sign in</button>
   </div>
@@ -157,8 +182,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <script>
 var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;
 var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
-/* Auth const {createClient}=window.supabase;
-via Supabase signInWithPassword + profiles.is_admin check */
+const {createClient}=window.supabase;
 var allOperators=[];
 
 function escapeHtml(str){
@@ -189,6 +213,9 @@ function sbFetch(path,opts){
 
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500);}
 
+function toggleAdminPw(){var i=document.getElementById('admin-pw');var e=document.getElementById('eye-icon');if(i.type==='password'){i.type='text';e.style.opacity='0.4';}else{i.type='password';e.style.opacity='1';}}
+function showForgotAdmin(){var s=document.getElementById('forgot-section');s.style.display=s.style.display==='none'?'block':'none';document.getElementById('forgot-status').textContent='';}
+async function sendAdminReset(){var email=document.getElementById('forgot-email').value.trim();var st=document.getElementById('forgot-status');st.textContent='';if(!email){st.textContent='Please enter your email.';st.className='forgot-status error';return;}var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);var res=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/admin/reset'});if(res.error){st.textContent='No account found for this email.';st.className='forgot-status error';}else{st.textContent='Reset link sent! Check your inbox.';st.className='forgot-status ok';}}
 async function doAdminLogin(){
   var email=document.getElementById('admin-email').value.trim();
   var pw=document.getElementById('admin-pw').value.trim();
