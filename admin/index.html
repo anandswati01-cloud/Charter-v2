@@ -106,12 +106,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .forgot-row{text-align:right;margin:-4px 0 14px;}
 .forgot-link{background:none;border:none;color:var(--blue-light);font-size:12px;cursor:pointer;padding:0;text-decoration:underline;}
 .forgot-link:hover{color:var(--gold);}
-.forgot-msg{font-size:13px;color:var(--text);opacity:.8;margin-bottom:8px;}
-.forgot-status{font-size:12px;margin-top:6px;min-height:18px;}
+.forgot-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;}
+.forgot-modal-overlay.open{display:flex;}
+.forgot-modal{background:var(--bg-card);border:1px solid var(--blue-border);border-radius:16px;padding:36px 32px 28px;width:100%;max-width:400px;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+.forgot-modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text);opacity:0.5;font-size:22px;cursor:pointer;line-height:1;padding:2px 6px;}
+.forgot-modal-close:hover{opacity:1;}
+.forgot-modal h3{font-family:var(--font-display);color:var(--gold);font-size:20px;margin:0 0 6px;}
+.forgot-modal p{font-size:13px;color:var(--text);opacity:.75;margin:0 0 18px;}
+.forgot-status{font-size:12px;margin-top:8px;min-height:16px;}
 .forgot-status.error{color:#f87272;}
 .forgot-status.ok{color:#6ee7b7;}
-#forgot-section{margin-bottom:8px;}
-#forgot-section .field-input{width:100%;box-sizing:border-box;}
 </style>
 </head>
 <body>
@@ -135,13 +139,18 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       </div>
     </div>
     <div class="forgot-row"><button type="button" class="forgot-link" onclick="showForgotAdmin()">Forgot password?</button></div>
-    <div id="forgot-section" style="display:none">
-      <p class="forgot-msg">Enter your admin email to receive a reset link.</p>
-      <input type="email" id="forgot-email" class="field-input" placeholder="Enter your email"/>
-      <button type="button" class="btn-login" style="margin-top:10px" onclick="sendAdminReset()">Send reset link</button>
-      <p id="forgot-status" class="forgot-status"></p>
-    </div>
+
     <button class="btn-login" onclick="doAdminLogin()">Sign in</button>
+  </div>
+</div>
+<div id="forgot-modal" class="forgot-modal-overlay" onclick="if(event.target===this)closeForgotAdmin()">
+  <div class="forgot-modal">
+    <button class="forgot-modal-close" onclick="closeForgotAdmin()" title="Close">&times;</button>
+    <h3>Reset Password</h3>
+    <p>Enter your admin email and we'll send you a reset link.</p>
+    <input type="email" id="forgot-email" class="field-input" placeholder="Enter your email" style="width:100%;box-sizing:border-box"/>
+    <button type="button" class="btn-login" style="margin-top:12px;width:100%" onclick="sendAdminReset()">Send reset link</button>
+    <p id="forgot-status" class="forgot-status"></p>
   </div>
 </div>
 <div id="page-dashboard">
@@ -214,7 +223,8 @@ function sbFetch(path,opts){
 function showToast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'');t.classList.add('show');setTimeout(function(){t.classList.remove('show');},3500);}
 
 function toggleAdminPw(){var i=document.getElementById('admin-pw');var e=document.getElementById('eye-icon');if(i.type==='password'){i.type='text';e.style.opacity='0.4';}else{i.type='password';e.style.opacity='1';}}
-function showForgotAdmin(){var s=document.getElementById('forgot-section');s.style.display=s.style.display==='none'?'block':'none';document.getElementById('forgot-status').textContent='';}
+function showForgotAdmin(){var m=document.getElementById('forgot-modal');document.getElementById('forgot-status').textContent='';document.getElementById('forgot-email').value='';m.classList.add('open');}
+function closeForgotAdmin(){document.getElementById('forgot-modal').classList.remove('open');}
 async function sendAdminReset(){var email=document.getElementById('forgot-email').value.trim();var st=document.getElementById('forgot-status');st.textContent='';if(!email){st.textContent='Please enter your email.';st.className='forgot-status error';return;}var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);var res=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/admin/reset'});if(res.error){st.textContent='No account found for this email.';st.className='forgot-status error';}else{st.textContent='Reset link sent! Check your inbox.';st.className='forgot-status ok';}}
 async function doAdminLogin(){
   var email=document.getElementById('admin-email').value.trim();
