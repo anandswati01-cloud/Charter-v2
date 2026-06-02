@@ -126,10 +126,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <p class="admin-tag">Super Admin Panel</p>
     <div class="login-error" id="login-error">Invalid credentials or not an admin</div>
     <div class="field-group">
-      <label class="field-label">EMAIL OR USERNAME</label>
-      <input type="text" id="admin-email" class="field-input" placeholder="Enter email or username" autocomplete="username"/>
-    </div>
-    <div class="field-group">
       <label class="field-label">PASSWORD</label>
       <div class="pw-wrap">
         <input type="password" id="admin-pw" class="field-input" placeholder="Enter admin password" autocomplete="current-password"/>
@@ -227,21 +223,16 @@ function showForgotAdmin(){var m=document.getElementById('forgot-modal');documen
 function closeForgotAdmin(){document.getElementById('forgot-modal').classList.remove('open');}
 async function sendAdminReset(){var email=document.getElementById('forgot-email').value.trim();var st=document.getElementById('forgot-status');st.textContent='';if(!email){st.textContent='Please enter your email.';st.className='forgot-status error';return;}var sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);var res=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/admin/reset'});if(res.error){st.textContent='No account found for this email.';st.className='forgot-status error';}else{st.textContent='Reset link sent! Check your inbox.';st.className='forgot-status ok';}}
 async function doAdminLogin(){
-  var input=document.getElementById('admin-email').value.trim();
   var pw=document.getElementById('admin-pw').value.trim();
   var errEl=document.getElementById('login-error');
   errEl.classList.remove('show');
-  if(!input||!pw){errEl.classList.add('show');return;}
+  if(!pw){errEl.textContent='Please enter your password.';errEl.classList.add('show');return;}
+  var email=SKYVAYU_CONFIG.adminEmail||'';
+  if(!email){errEl.textContent='Admin email not configured.';errEl.classList.add('show');return;}
   var sb=createClient(SUPABASE_URL,SUPABASE_KEY);
   window.__sb=sb;
-  var email=input;
-  if(!input.includes('@')){
-    var look=await sb.from('profiles').select('email').ilike('username',input).single();
-    if(look.error||!look.data){errEl.textContent='No admin account found for that username.';errEl.classList.add('show');return;}
-    email=look.data.email;
-  }
   var authRes=await sb.auth.signInWithPassword({email:email,password:pw});
-  if(authRes.error){errEl.textContent=authRes.error.message||'Invalid credentials.';errEl.classList.add('show');return;}
+  if(authRes.error){errEl.textContent=authRes.error.message||'Invalid password.';errEl.classList.add('show');return;}
   var user=authRes.data.user;
   var token=authRes.data.session.access_token;var letterId=authRes.data.session.user.email;
   var adminCheck=await sb.from('profiles').select('is_admin').eq('id',user.id).single();
