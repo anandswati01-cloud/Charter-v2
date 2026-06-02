@@ -153,10 +153,12 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 <div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;
 var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
-/* Auth via Supabase signInWithPassword + profiles.is_admin check */
+/* Auth const {createClient}=window.supabase;
+via Supabase signInWithPassword + profiles.is_admin check */
 var allOperators=[];
 
 function escapeHtml(str){
