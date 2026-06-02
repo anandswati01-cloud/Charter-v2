@@ -7,5 +7,5 @@
 var SKYVAYU_CONFIG = {
   supabaseUrl: 'https://bkumggqijgxyfotpbcni.supabase.co',
   supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdW1nZ3Fpamd4eWZvdHBiY25pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUzMTIwOTYsImV4cCI6MjA5MDg4ODA5Nn0.AS1JMDGmMPoQh07--yw3QsHYQF4wIiiOCCEpOYOOQcM',
-  adminEmail: 'REPLACE_WITH_ADMIN_EMAIL'
+  adminEmail: 'anandswati01@gmail.com'
 };
