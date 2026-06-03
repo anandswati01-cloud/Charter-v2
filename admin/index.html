@@ -6,16 +6,16 @@
 <title>SkyVayu | Admin</title>
 <script src="../js/config.js"></script>
 <script src="../js/supabase.js"></script>
-<style>
+<link rel="preconnect" href="https://fonts.googleapis.com"/><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/><style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#0C1E36;--bg-secondary:#0E2040;--bg-card:#132B4A;--bg-card-hover:#163354;
-  --gold:#E8D8A0;--gold-dim:rgba(232,216,160,0.6);--gold-faint:rgba(232,216,160,0.08);
+  --bg:#0C1324;--bg-secondary:#0E1A30;--bg-card:#0F1F3A;--bg-card-hover:#132840;
+  --gold:#FBBF24;--gold-dim:rgba(251,191,36,0.6);--gold-faint:rgba(251,191,36,0.08);--gold-border:rgba(251,191,36,0.2);
   --blue:#185FA5;--blue-light:#85B7EB;--blue-faint:rgba(24,95,165,0.15);--blue-border:rgba(133,183,235,0.2);
   --green:#3B6D11;--green-light:#97C459;--green-faint:rgba(59,109,17,0.2);
   --red:#E24B4A;--red-faint:rgba(226,75,74,0.1);
   --amber:#EF9F27;--amber-faint:rgba(239,159,39,0.1);
-  --text:#EEE8D5;--text-secondary:rgba(232,216,160,0.55);--text-tertiary:rgba(133,183,235,0.5);
+  --text:#EEE8D5;--text-secondary:rgba(238,232,213,0.6);--text-tertiary:rgba(133,183,235,0.5);
   --border:rgba(133,183,235,0.12);--border-hover:rgba(133,183,235,0.28);
   --radius:8px;--radius-lg:12px;
   --font-display:Georgia,'Times New Roman',serif;
@@ -98,7 +98,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
 .stat-card{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:18px 20px;}
 .stat-num{font-family:var(--font-display);font-size:32px;font-weight:300;color:var(--gold);line-height:1;}
-.stat-label{font-size:12px;color:var(--text-tertiary);margin-top:4px;}
+.stat-label{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);margin-top:6px;}
 .pw-wrap{position:relative;display:flex;align-items:center;}
 .pw-wrap .field-input{flex:1;padding-right:44px;}
 .pw-toggle{position:absolute;right:10px;background:none;border:none;cursor:pointer;color:var(--text);opacity:0.6;padding:4px;display:flex;align-items:center;transition:opacity .2s;}
@@ -149,11 +149,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
     <p id="forgot-status" class="forgot-status"></p>
   </div>
 </div>
-<div id="page-dashboard">
+<div id="page-dashboard"><aside class="admin-sidebar"><div class="sidebar-logo"><span class="sky" style="font-family:var(--font-mono)">S K Y</span><span class="vayu">Vayu</span><span class="portal-tag">Super Admin</span></div><div class="admin-user-card"><span class="admin-role">Super Admin</span><div class="admin-username" id="nav-username"></div></div><nav class="sidebar-nav"><div class="sidebar-nav-item active" onclick="switchTab('operators')">&#9698; Operators <span class="sidebar-nav-badge" id="sb-pending">0</span></div><div class="sidebar-nav-item" onclick="switchTab('aircraft')">&#9992; Aircraft</div><div class="sidebar-nav-item" onclick="switchTab('employees')">&#9786; Employees</div></nav><div class="sidebar-footer"><button class="btn-logout" onclick="signOut()">Sign out</button></div></aside><div class="admin-main">
   <div class="top-bar">
     <div class="top-logo">
       <div><span class="sky">Sky</span><span class="vayu">Vayu</span></div>
-      <span class="tag">Super Admin</span>
+      <span class="tag" style="font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase">Super Admin</span>
     </div>
     <div class="top-right">
       <span class="top-user">Logged in as Swati</span>
@@ -239,7 +239,7 @@ async function doAdminLogin(){
   if(adminCheck.error||!adminCheck.data||!adminCheck.data.is_admin){await sb.auth.signOut();errEl.textContent='Access denied. Not an admin account.';errEl.classList.add('show');return;}
   var obs=await loadOperators(token);
   document.getElementById('page-login').style.display='none';
-  document.getElementById('page-dashboard').style.display='block';
+  document.getElementById('page-dashboard').style.display='flex';
   showToast('Welcome, '+letterId,'ok');
 }
 
