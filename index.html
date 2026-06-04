@@ -1441,13 +1441,14 @@ function closeAuthModal() {
 function openOtpModal() {
   getSession(function(session) {
     if (session) {
-      /* Already signed in — save query and go to results */
+      /* Already signed in — attach user_id and save query */
       if (window._pendingQueryData && typeof saveQueryToSupabase === 'function') {
+        window._pendingQueryData.user_id = session.user.id;
         saveQueryToSupabase(window._pendingQueryData).then(function() {
-          window.location.href = 'results';
+          window.location.href = 'results.html';
         }).catch(function(err) { console.error(err); });
       } else {
-        window.location.href = 'results';
+        window.location.href = 'results.html';
       }
     } else {
       /* Not signed in — stash query and open Google sign-in */

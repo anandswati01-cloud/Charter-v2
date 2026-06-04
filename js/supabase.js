@@ -58,6 +58,7 @@ async function saveQueryToSupabase(queryData) {
     medivac:      queryData.medivac                     || false,
     pets:         queryData.pets                        || false,
     infants:      queryData.infants                     || false,
+    user_id:      queryData.user_id                     || null,
     status:       'open'
   };
   try {
