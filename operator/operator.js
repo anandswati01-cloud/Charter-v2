@@ -42,10 +42,11 @@ async function doLogin(){
   var username=document.getElementById('login-username').value.trim();
   var password=document.getElementById('login-password').value;
   var errEl=document.getElementById('login-error');errEl.classList.remove('show');
-  if(!username||!password){errEl.textContent='Please enter username and password';errEl.classList.add('show');return;}
+  if(!username||!password){errEl.textContent='Please enter username or email and password';errEl.classList.add('show');return;}
   var btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='Signing in...';
   try{
-    var userRes=await sbFetch('operator_users?username=eq.'+encodeURIComponent(username));
+    var queryField=username.includes('@')?'email':'username';
+    var userRes=await sbFetch('operator_users?'+queryField+'=eq.'+encodeURIComponent(username.toLowerCase()));
     if(!userRes.ok||!userRes.data||!userRes.data.length){
       errEl.textContent='Invalid username or password';errEl.classList.add('show');return;
     }
