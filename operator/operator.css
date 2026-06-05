@@ -19,7 +19,8 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
 
 /* ── Login Page ── */
 #page-login{display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--navy);padding:24px;position:relative;overflow:hidden;}
-#page-login::before{content:'';position:absolute;inset:0;background-image:url('../airplane.png');background-size:cover;background-position:50% 40%;filter:brightness(0.35);z-index:0;}
+#page-login::before{content:'';position:absolute;inset:0;background-image:url('../airplane.png');background-size:cover;background-position:50% 40%;filter:brightness(0.25) saturate(0.4);z-index:0;}
+#page-login::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(12,19,36,0.7) 0%,rgba(12,19,36,0.8) 50%,#0c1324 100%);z-index:1;}
 
 .login-box{background:var(--navy-light);border:0.5px solid var(--white-10);border-radius:var(--radius-lg);padding:44px 40px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,0.4);position:relative;z-index:2;}
 .login-logo{margin-bottom:32px;text-align:center;}
