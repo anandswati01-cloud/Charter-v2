@@ -28,6 +28,15 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 .field-group{margin-bottom:16px;}
 .field-label{font-family:var(--font-mono);font-size:10px;font-weight:400;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-tertiary);display:block;margin-bottom:7px;}
 .field-input{width:100%;height:44px;padding:0 14px;background:rgba(255,255,255,0.04);border:0.5px solid var(--border-hover);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .2s,box-shadow .2s;}
+/* ===== PASSWORD EYE TOGGLE ===== */
+.password-wrapper{position:relative;width:100%;}
+.password-wrapper .field-input{padding-right:44px;}
+.eye-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-secondary);padding:4px;display:flex;align-items:center;justify-content:center;transition:color .2s;}
+.eye-toggle:hover{color:var(--gold);}
+/* ===== FORGOT PASSWORD LINK ===== */
+.forgot-password-link{color:var(--text-secondary);font-size:12px;text-decoration:none;letter-spacing:0.5px;transition:color .2s;}
+.forgot-password-link:hover{color:var(--gold);}
+
 .field-input:focus{border-color:var(--gold-border);box-shadow:0 0 0 3px var(--gold-faint);}
 .field-input::placeholder{color:rgba(133,183,235,0.3);}
 .btn-primary{width:100%;height:46px;background:var(--gold);color:var(--bg);border:none;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:8px;}
