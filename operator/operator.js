@@ -162,6 +162,86 @@ function getClaimFor(queryId){for(var i=0;i<allActiveClaims.length;i++)if(allAct
 
 /* ============ DATA LOADING ============ */
 
+// ===== PASSWORD VISIBILITY TOGGLE =====
+function togglePasswordVisibility() {
+  var input = document.getElementById('login-password');
+  var showIcon = document.getElementById('eye-icon-show');
+  var hideIcon = document.getElementById('eye-icon-hide');
+  if (input.type === 'password') {
+    input.type = 'text';
+    showIcon.style.display = 'none';
+    hideIcon.style.display = 'block';
+  } else {
+    input.type = 'password';
+    showIcon.style.display = 'block';
+    hideIcon.style.display = 'none';
+  }
+}
+
+// ===== FORGOT PASSWORD =====
+function showForgotPassword() {
+  document.getElementById('forgot-password-modal').style.display = 'flex';
+  document.getElementById('forgot-email').value = '';
+  document.getElementById('forgot-error').style.display = 'none';
+  document.getElementById('forgot-success').style.display = 'none';
+  document.getElementById('forgot-submit-btn').disabled = false;
+  document.getElementById('forgot-submit-btn').textContent = 'Send Reset Link';
+  setTimeout(function(){ document.getElementById('forgot-email').focus(); }, 100);
+}
+
+function closeForgotPassword() {
+  document.getElementById('forgot-password-modal').style.display = 'none';
+}
+
+async function doForgotPassword() {
+  var email = (document.getElementById('forgot-email').value || '').trim().toLowerCase();
+  var errEl = document.getElementById('forgot-error');
+  var okEl = document.getElementById('forgot-success');
+  var btn = document.getElementById('forgot-submit-btn');
+  errEl.style.display = 'none';
+  okEl.style.display = 'none';
+  if (!email) {
+    errEl.textContent = 'Please enter your email address.';
+    errEl.style.display = 'block';
+    return;
+  }
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  try {
+    var opUrl = SKYVAYU_CONFIG.supabaseUrl + '/rest/v1/operators?select=id,company_name,email&email=eq.' + encodeURIComponent(email) + '&limit=1';
+    var opRes = await fetch(opUrl, {
+      headers: {
+        'apikey': SKYVAYU_CONFIG.supabaseKey,
+        'Authorization': 'Bearer ' + SKYVAYU_CONFIG.supabaseKey
+      }
+    });
+    var ops = await opRes.json();
+    if (ops && ops.length > 0) {
+      var token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+      var expiry = new Date(Date.now() + 3600000).toISOString();
+      await fetch(SKYVAYU_CONFIG.supabaseUrl + '/rest/v1/operators?id=eq.' + ops[0].id, {
+        method: 'PATCH',
+        headers: {
+          'apikey': SKYVAYU_CONFIG.supabaseKey,
+          'Authorization': 'Bearer ' + SKYVAYU_CONFIG.supabaseKey,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({ reset_token: token, reset_token_expiry: expiry })
+      });
+      await sendEmail('password_reset', { operator_id: ops[0].id, email: ops[0].email, company_name: ops[0].company_name, reset_token: token });
+    }
+    okEl.style.display = 'block';
+    btn.textContent = 'Sent!';
+  } catch(e) {
+    errEl.textContent = 'Something went wrong. Please try again.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Send Reset Link';
+  }
+}
+
+
 async function loadAllData(){
   if(!currentOperator)return;
   var opId=currentOperator.id;
