@@ -1,18 +1,19 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap');
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
     --bg:#0C1324;--bg-secondary:#0E1A30;--bg-card:#0F1F3A;--bg-card-hover:#132840;
-    --gold:#FBBF24;--gold-dim:rgba(251,191,36,0.6);--gold-faint:rgba(251,191,36,0.08);--gold-border:rgba(251,191,36,0.2);
+    --gold:#FBBF24;--gold-light:#fcd34d;--gold-dim:rgba(251,191,36,0.6);--gold-faint:rgba(251,191,36,0.08);--gold-border:rgba(251,191,36,0.2);
     --blue:#185FA5;--blue-light:#85B7EB;--blue-faint:rgba(24,95,165,0.15);--blue-border:rgba(133,183,235,0.2);
     --green:#3B6D11;--green-light:#97C459;--green-faint:rgba(59,109,17,0.2);
     --red:#E24B4A;--red-faint:rgba(226,75,74,0.1);
     --amber:#EF9F27;--amber-faint:rgba(239,159,39,0.1);
     --text:#EEE8D5;--text-secondary:rgba(238,232,213,0.6);--text-tertiary:rgba(133,183,235,0.5);
-    --border:rgba(133,183,235,0.1);--border-hover:rgba(133,183,235,0.25);
+    --border:rgba(133,183,235,0.12);--border-hover:rgba(133,183,235,0.28);
     --radius:8px;--radius-lg:12px;
     --font-display:'Cormorant Garamond',Georgia,serif;
-    --font-mono:'DM Mono',monospace;
-    --font:'DM Sans',sans-serif;
+    --font-mono:'DM Mono','Courier New',monospace;
+    --font:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+    --font-body:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
 }
 html{scroll-behavior:smooth}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6}
