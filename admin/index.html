@@ -27,14 +27,15 @@
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.6;}
 /* LOGIN */
-#page-login{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;}
-.login-box{background:var(--bg-card);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:40px 36px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.3);}
-.login-logo{text-align:center;margin-bottom:24px;}
-.login-logo .sky{font-size:9px;letter-spacing:4px;color:var(--blue-light);text-transform:uppercase;}
-.login-logo .vayu{font-family:var(--font-display);font-size:26px;color:var(--gold);display:block;}
-.admin-tag{font-size:11px;color:var(--text-tertiary);text-align:center;margin-bottom:24px;letter-spacing:.05em;}
+#page-login{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:#0c1324;}
+#page-login::before{content:'';position:absolute;inset:0;background-image:url('../airplane.png');background-size:cover;background-position:50% 40%;filter:brightness(0.45) saturate(0.5);z-index:0;}
+#page-login::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(12,19,36,0.5) 0%,rgba(12,19,36,0.65) 55%,#0c1324 100%);z-index:1;}
+.login-box{background:rgba(12,19,36,0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:0.5px solid rgba(251,191,36,0.18);border-radius:var(--radius-lg);padding:36px 36px;width:100%;max-width:380px;box-shadow:0 8px 48px rgba(0,0,0,0.5);position:relative;z-index:2;}
+.login-logo{text-align:center;margin-bottom:16px;}
+.brand-logo{font-family:var(--font-display);font-size:26px;font-weight:400;font-style:italic;color:var(--gold);letter-spacing:-0.5px;}
+.admin-tag{font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3);text-align:center;margin-bottom:28px;}
 .field-group{margin-bottom:16px;}
-.field-label{font-size:11px;font-weight:500;color:var(--text-tertiary);letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px;}
+.field-label{font-family:var(--font-mono);font-size:10px;font-weight:400;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.3);display:block;margin-bottom:7px;}
 .field-input{width:100%;height:42px;padding:0 14px;background:rgba(255,255,255,0.04);border:0.5px solid var(--border-hover);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--font);outline:none;transition:border-color .2s,box-shadow .2s;}
 .field-input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(133,183,235,.1);}
 .field-input::placeholder{color:rgba(133,183,235,0.3);}
@@ -126,7 +127,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 <!-- LOGIN -->
 <div id="page-login">
   <div class="login-box">
-    <div class="login-logo"><span class="sky">Sky</span><span class="vayu">Vayu</span></div>
+    <div class="login-logo"><span class="brand-logo">SkyVayu</span></div>
     <p class="admin-tag">Super Admin Panel</p>
     <div class="login-error" id="login-error">Invalid credentials or not an admin</div>
     <div class="field-group">
