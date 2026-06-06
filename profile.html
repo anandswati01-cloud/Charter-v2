@@ -367,7 +367,7 @@
     }
 
     function buildBookingCard(b) {
-      return `<div class="booking-item">
+      return `<div class="booking-item" onclick="location.href='results.html?query_id=${b.id}'" style="cursor:pointer;">
         <div>
           <div class="booking-route">${b.departure || '—'} <span class="arrow">&#8594;</span> ${b.destination || '—'}</div>
           <div class="booking-meta">
