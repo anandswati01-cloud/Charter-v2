@@ -22,7 +22,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
 #page-login::before{content:'';position:absolute;inset:0;background-image:url('../airplane.png');background-size:cover;background-position:50% 40%;filter:brightness(0.45) saturate(0.5);z-index:0;}
 #page-login::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(12,19,36,0.5) 0%,rgba(12,19,36,0.65) 55%,#0c1324 100%);z-index:1;}
 
-.login-box{background:var(--navy-light);border:0.5px solid var(--white-10);border-radius:var(--radius-lg);padding:44px 40px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,0,0,0.4);position:relative;z-index:2;}
+.login-box{background:rgba(12,19,36,0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:0.5px solid rgba(251,191,36,0.18);border-radius:var(--radius-lg);padding:44px 40px;width:100%;max-width:400px;box-shadow:0 8px 48px rgba(0,0,0,0.5);position:relative;z-index:2;}
 .login-logo{margin-bottom:32px;text-align:center;}
 .login-logo .sky{font-family:var(--font-mono);font-size:9px;letter-spacing:4px;color:var(--white-60);text-transform:uppercase;}
 .login-logo .vayu{font-family:var(--font-display);font-size:32px;font-weight:400;color:var(--gold);display:block;line-height:1;letter-spacing:0.5px;}
