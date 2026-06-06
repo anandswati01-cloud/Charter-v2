@@ -86,6 +86,7 @@ async function saveQueryToSupabase(queryData) {
     var data = JSON.parse(text);
     var saved = (Array.isArray(data) && data[0]) ? data[0] : null;
     if (saved) sendEmail('new_query_assigned', { query_id: saved.id });
+    if (saved) { sessionStorage.setItem('sv_query_id', saved.id); sessionStorage.setItem('sv_query', JSON.stringify(saved)); sessionStorage.removeItem('sv_query_start'); }
     return saved;
   } catch (e) {
     if (e.name === 'AbortError') {
