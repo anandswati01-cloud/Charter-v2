@@ -77,7 +77,7 @@ async function doLogin(){
       errEl.textContent='Your registration was not approved. Please contact SkyVayu.';
       errEl.classList.add('show');return;
     }
-    currentUser=user;currentOperator=op;
+    currentUser=user;currentOperator=op;sessionStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
     /* Fire-and-forget last_login update — don't block on it */
     sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
@@ -104,9 +104,8 @@ function doLogout(){
   if(refreshInterval){clearInterval(refreshInterval);refreshInterval=null;}
   if(claimRefreshInterval){clearInterval(claimRefreshInterval);claimRefreshInterval=null;}
   if(currentClaimId)releaseClaim(currentClaimId);
-  currentUser=null;currentOperator=null;currentClaimId=null;
+  currentUser=null;currentOperator=null;currentClaimId=null;sessionStorage.removeItem('opSession');
   document.getElementById('page-dashboard').classList.remove('active');
-  document.getElementById('page-login').style.display='flex';
   document.getElementById('login-username').value='';
   document.getElementById('login-password').value='';
 }
@@ -305,6 +304,55 @@ function renderActiveList(queries){
   }).join('');
 }
 
+// ── View Shared Quote ────────────────────────────────────
+var _viewQuoteData = null;
+
+function viewSharedQuote(quoteId) {
+  var q = (window._sharedQuotes || []).find(function(x){ return x.id === quoteId; });
+  if(!q) { showToast('Quote not found', 'error'); return; }
+  _viewQuoteData = q;
+  var query = q.queries || {};
+  var route = query.trip_type === 'multi' ? 'Multiple sectors'
+    : escapeHtml(query.departure || '-') + ' → ' + escapeHtml(query.destination || '-');
+  var date = fmtDate(query.flight_date) + (query.flight_time ? ' at ' + escapeHtml(query.flight_time) : '');
+  var base = Number(q.base_charge || 0);
+  var handling = Number(q.handling_fee || 0);
+  var crew = Number(q.crew_accommodation || 0);
+  var catering = Number(q.catering || 0);
+  var subtotal = base + handling + crew + catering;
+  var gst = Math.round(subtotal * 0.18);
+  var total = subtotal + gst;
+  var aircraft = escapeHtml(q.aircraft_type || '') + (q.aircraft_registration ? ' (' + escapeHtml(q.aircraft_registration) + ')' : '');
+  document.getElementById('vq-route').textContent = route;
+  document.getElementById('vq-date').textContent = date;
+  document.getElementById('vq-aircraft').textContent = aircraft;
+  document.getElementById('vq-pax').textContent = String(query.passengers || '-');
+  document.getElementById('vq-base').textContent = fmtPrice(base);
+  document.getElementById('vq-handling').textContent = fmtPrice(handling);
+  document.getElementById('vq-crew').textContent = fmtPrice(crew);
+  document.getElementById('vq-catering').textContent = fmtPrice(catering);
+  document.getElementById('vq-subtotal').textContent = fmtPrice(subtotal);
+  document.getElementById('vq-gst').textContent = fmtPrice(gst);
+  document.getElementById('vq-total').textContent = fmtPrice(total);
+  var notesEl = document.getElementById('vq-notes-row');
+  if(q.notes) {
+    notesEl.style.display = '';
+    document.getElementById('vq-notes').textContent = q.notes;
+  } else { notesEl.style.display = 'none'; }
+  var byEl = document.getElementById('vq-by-row');
+  if(isOwner()) {
+    var u = lookupUser(q.submitted_by);
+    if(u) { byEl.style.display = ''; document.getElementById('vq-by').textContent = escapeHtml(u.full_name || u.username); }
+    else { byEl.style.display = 'none'; }
+  } else { byEl.style.display = 'none'; }
+  document.getElementById('view-quote-modal').classList.add('open');
+}
+
+function closeViewQuoteModal() {
+  document.getElementById('view-quote-modal').classList.remove('open');
+  _viewQuoteData = null;
+}
+
 function renderSharedList(quotes){
   var el=document.getElementById('list-shared');
   if(!quotes.length){var msg=isOwner()?'No quotes shared yet':'You haven\'t shared any quotes yet';el.innerHTML='<div class="empty-state"><div class="empty-title">'+msg+'</div></div>';return;}
@@ -312,8 +360,9 @@ function renderSharedList(quotes){
     var query=q.queries||{};
     var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+' → '+escapeHtml(query.destination||'-');
     var empBadge='';
-    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' · '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+escapeHtml(q.notes)+'</div>':'')+'</div>';
+    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card" style="cursor:pointer;" onclick="viewSharedQuote(\''+q.id+'\')">'+'<div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' · '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+escapeHtml(q.notes)+'</div>':'')+'</div>';
   }).join('');
+  window._sharedQuotes = quotes;
 }
 
 function renderConfirmedList(quotes){
@@ -1211,4 +1260,26 @@ window.addEventListener('beforeunload',function(){
   }
 });
 
-document.getElementById('page-login').style.display='flex';
+(function(){
+  var saved=sessionStorage.getItem('opSession');
+  if(saved){
+    try{
+      var s=JSON.parse(saved);
+      if(s&&s.user&&s.operator){
+        currentUser=s.user;currentOperator=s.operator;
+        document.getElementById('page-login').style.display='none';
+        document.getElementById('page-dashboard').classList.add('active');
+        document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
+        document.getElementById('sidebar-role').textContent=currentOperator.company_name;
+        var rt=document.getElementById('sidebar-role-tag');
+        if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
+        applyRoleRestrictions();
+        loadAllData();
+        refreshInterval=setInterval(loadAllData,5000);
+        claimRefreshInterval=setInterval(updateClaimTimers,1000);
+        return;
+      }
+    }catch(e){sessionStorage.removeItem('opSession');}
+  }
+  document.getElementById('page-login').style.display='flex';
+})();

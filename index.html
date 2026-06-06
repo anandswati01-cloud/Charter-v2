@@ -924,8 +924,60 @@
   <meta name="twitter:title" content="SkyVayu — Private Charter Flights">
   <meta name="twitter:description" content="Book private charter flights with direct, transparent pricing. No middlemen.">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/auth.js"></script>
 </head>
 <body>
+<!-- ── Active query resume banner ─────────────────── -->
+<div id="resume-banner" style="display:none;position:fixed;top:0;left:0;width:100%;z-index:9999;background:linear-gradient(90deg,#c9a84c,#e8c86a);color:#1a1a1a;padding:12px 20px;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-family:'DM Sans',sans-serif;font-size:14px;">
+  <span>✈️ You have an active quote request. <strong id="resume-route"></strong></span>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <a href="#" onclick="resumeQuery();return false;" style="background:#1a1a1a;color:#e8c86a;padding:6px 16px;border-radius:20px;font-weight:600;font-size:13px;text-decoration:none;">View Quotes</a>
+    <button onclick="dismissResumeBanner()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#1a1a1a;line-height:1;padding:0 4px;">&times;</button>
+  </div>
+</div>
+<script>
+(function() {
+  function showResumeBanner() {
+    var qId = sessionStorage.getItem('sv_query_id');
+    var qData = sessionStorage.getItem('sv_query');
+    if (!qId || sessionStorage.getItem('sv_banner_dismissed') === qId) return;
+    var banner = document.getElementById('resume-banner');
+    if (!banner) return;
+    banner.style.display = 'flex';
+    if (qData) {
+      try {
+        var q = JSON.parse(qData);
+        var route = (q.departure||'')+' → '+(q.destination||'');
+        var routeEl = document.getElementById('resume-route');
+        if (routeEl && route.trim() !== '→') routeEl.textContent = route;
+      } catch(e) {}
+    }
+    document.body.style.paddingTop = '48px';
+  }
+  window.resumeQuery = function() {
+    var qId = sessionStorage.getItem('sv_query_id');
+    if (qId) window.location.href = 'results.html?query_id=' + qId;
+  };
+  window.dismissResumeBanner = function() {
+    var qId = sessionStorage.getItem('sv_query_id');
+    if (qId) sessionStorage.setItem('sv_banner_dismissed', qId);
+    var banner = document.getElementById('resume-banner');
+    if (banner) banner.style.display = 'none';
+    document.body.style.paddingTop = '';
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', showResumeBanner);
+  } else {
+    showResumeBanner();
+  }
+})();
+</script>
+<div id="uc-banner" style="background:#1a2535;border-bottom:1px solid rgba(242,202,80,0.3);padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;z-index:9999;font-family:'DM Mono','Courier New',monospace;">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F2CA50" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  <span style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(238,232,213,0.85);">This website is under construction — not a live product. Queries submitted are for testing only.</span>
+  <button onclick="document.getElementById('uc-banner').style.display='none'" style="position:absolute;right:16px;background:none;border:none;color:rgba(238,232,213,0.5);font-size:16px;cursor:pointer;line-height:1;padding:0;" title="Dismiss">&times;</button>
+</div>
 
   <!-- NAV -->
   <nav class="nav">
@@ -1375,10 +1427,8 @@ function getQuotes() {
   }
 
 </script>
-  <script src="js/config.js"></script>
-<script src="js/supabase.js"></script>
+  <script src="js/supabase.js"></script>
 <script src="js/airports.js"></script>
-<script src="js/auth.js"></script>
 
 
 <!-- AUTH MODAL -->
@@ -1436,13 +1486,14 @@ function closeAuthModal() {
 function openOtpModal() {
   getSession(function(session) {
     if (session) {
-      /* Already signed in — save query and go to results */
+      /* Already signed in — attach user_id and save query */
       if (window._pendingQueryData && typeof saveQueryToSupabase === 'function') {
+        window._pendingQueryData.user_id = session.user.id;
         saveQueryToSupabase(window._pendingQueryData).then(function() {
-          window.location.href = 'results';
+          window.location.href = 'results.html';
         }).catch(function(err) { console.error(err); });
       } else {
-        window.location.href = 'results';
+        window.location.href = 'results.html';
       }
     } else {
       /* Not signed in — stash query and open Google sign-in */

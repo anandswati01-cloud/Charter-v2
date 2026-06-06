@@ -124,6 +124,7 @@
         });
         var pending = window.popPendingQuery();
         if (pending && typeof saveQueryToSupabase === 'function') {
+          pending.user_id = session.user.id;
           saveQueryToSupabase(pending).then(function () {
             window.location.href = 'results.html';
           }).catch(function (err) {
