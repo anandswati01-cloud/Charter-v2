@@ -516,7 +516,7 @@ function populateSidebar(data) {
 async function loadQueryAndSidebar() {
   // First try sessionStorage — merge both possible schemas
   var sessionData = queryData || {};
-  var hasFullData = sessionData.departure || sessionData.flight_date || sessionData.rs_route;
+  var hasFullData = sessionData.flight_date || sessionData.passengers || sessionData.rs_route;
 
   if (!hasFullData && queryId) {
     // Fetch from Supabase
