@@ -460,42 +460,79 @@ if (!sessionStorage.getItem('sv_query_start')) {
 }
 var queryStart = parseInt(sessionStorage.getItem('sv_query_start'));
 
-// ── Populate sidebar from session ──
-// sv_query stores: rs_type, rs_route ("Mumbai (VABB) → Delhi (VIDP)" or "X ⇄ Y"), rs_date, rs_pax
-function populateSidebar() {
-  var route = queryData.rs_route || '';
-  var parts = route.split(/→|⇄/).map(function(s){ return s.trim(); });
-  var dep = parts[0] || '';
-  var dest = parts[1] || '';
+// ── Populate sidebar from query data ──
+// Reads from the queries table schema: departure, destination, flight_date, flight_time, passengers, trip_type, medivac, pets, infants
+function populateSidebar(data) {
+  data = data || {};
 
   function getCode(s) { var m = s.match(/\(([^)]+)\)/); return m ? m[1] : s.substring(0,3).toUpperCase(); }
   function getName(s) { return s.replace(/\s*\([^)]+\)/, '').trim(); }
+
+  var dep = data.departure || '';
+  var dest = data.destination || '';
 
   document.getElementById('dep-code').textContent = dep ? getCode(dep) : 'DEP';
   document.getElementById('dep-name').textContent = dep ? getName(dep) : '—';
   document.getElementById('dest-code').textContent = dest ? getCode(dest) : 'ARR';
   document.getElementById('dest-name').textContent = dest ? getName(dest) : '—';
 
-  document.getElementById('meta-date').textContent = queryData.rs_date || '—';
-  var pax = queryData.rs_pax || '—';
-  var tripType = queryData.rs_type || 'One Way';
+  // Format date and time
+  var dateStr = data.flight_date || '';
+  var timeStr = data.flight_time || '';
+  var displayDate = dateStr;
+  if (dateStr) {
+    try {
+      var d = new Date(dateStr);
+      displayDate = d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch(e) { displayDate = dateStr; }
+  }
+  var dateTimeDisplay = displayDate ? (timeStr ? displayDate + ', ' + timeStr : displayDate) : '—';
+  document.getElementById('meta-date').textContent = dateTimeDisplay;
+
+  var pax = data.passengers || data.rs_pax || '—';
+  var tripType = data.trip_type || data.rs_type || 'One Way';
   document.getElementById('meta-pax').textContent = pax + ' Passenger' + (parseInt(pax) !== 1 ? 's' : '') + ', ' + tripType;
 
   // Special requirements chips
   var reqs = [];
-  if (queryData.rs_medivac === true || queryData.rs_medivac === 'true') reqs.push('Medivac');
-  if (queryData.rs_pets === true || queryData.rs_pets === 'true') reqs.push('Pets');
-  if (queryData.rs_infants === true || queryData.rs_infants === 'true') reqs.push('Infants');
-  if (queryData.rs_vip === true || queryData.rs_vip === 'true') reqs.push('VIP Passenger');
+  if (data.medivac === true || data.medivac === 'true' || data.rs_medivac === true || data.rs_medivac === 'true') reqs.push('Medivac');
+  if (data.pets === true || data.pets === 'true' || data.rs_pets === true || data.rs_pets === 'true') reqs.push('Pets');
+  if (data.infants === true || data.infants === 'true' || data.rs_infants === true || data.rs_infants === 'true') reqs.push('Infants');
+  if (data.vip === true || data.vip === 'true' || data.rs_vip === true || data.rs_vip === 'true') reqs.push('VIP Passenger');
   var reqEl = document.getElementById('meta-reqs');
-  if (reqs.length) {
-    reqEl.style.display = 'flex';
-    reqEl.innerHTML = reqs.map(function(r) {
-      return '<span style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#342800;background:var(--cyan);border-radius:20px;padding:3px 10px;">' + r + '</span>';
-    }).join('');
-  } else {
-    reqEl.style.display = 'none';
+  if (reqEl) {
+    if (reqs.length) {
+      reqEl.style.display = 'flex';
+      reqEl.innerHTML = reqs.map(function(r) {
+        return '<span style="font-family:var(--font-mono);font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#342800;background:var(--cyan);border-radius:20px;padding:3px 10px;">' + r + '</span>';
+      }).join('');
+    } else {
+      reqEl.style.display = 'none';
+    }
   }
+}
+
+// Fetch query from Supabase and populate sidebar (fallback when sessionStorage is incomplete)
+async function loadQueryAndSidebar() {
+  // First try sessionStorage — merge both possible schemas
+  var sessionData = queryData || {};
+  var hasFullData = sessionData.departure || sessionData.flight_date || sessionData.rs_route;
+
+  if (!hasFullData && queryId) {
+    // Fetch from Supabase
+    try {
+      var res = await fetch(SUPABASE_URL + '/rest/v1/queries?id=eq.' + queryId + '&limit=1', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+      });
+      var rows = await res.json();
+      if (Array.isArray(rows) && rows.length > 0) {
+        sessionData = rows[0];
+      }
+    } catch(e) {
+      console.warn('loadQueryAndSidebar: fetch failed', e);
+    }
+  }
+  populateSidebar(sessionData);
 }
 
 // ── Timer — always calculated from wall clock, survives tab switching/minimising ──
@@ -695,7 +732,7 @@ document.addEventListener('click', function(e) {
 });
 
 // ── Boot ──
-populateSidebar();
+loadQueryAndSidebar();
 startTimer();
 // Show query ID for debugging
 var debugEl = document.getElementById('debug-query-id');
