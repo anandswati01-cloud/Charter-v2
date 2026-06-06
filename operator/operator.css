@@ -94,7 +94,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
 .btn-logout:hover{border-color:var(--red);color:var(--red);}
 
 /* ── Main Content Area ── */
-.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:radial-gradient(ellipse 80% 60% at 70% 10%,rgba(251,191,36,0.035) 0%,transparent 70%),var(--navy);}
 .main-header{padding:20px 28px 0;border-bottom:0.5px solid var(--white-10);background:rgba(12,19,36,0.6);backdrop-filter:blur(8px);position:sticky;top:0;z-index:10;}
 .main-topbar{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;}
 .breadcrumb{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--white-30);}
@@ -117,6 +117,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
 .stat-card.blue::before{background:var(--gold);}
 .stat-card.green::before{background:var(--green-light);}
 .stat-card.amber::before{background:var(--amber);}
+.stat-card.blue{background:linear-gradient(135deg,rgba(251,191,36,0.06) 0%,var(--navy-light) 60%);}
 .stat-num{font-family:var(--font-display);font-size:38px;font-weight:300;color:var(--white);line-height:1;margin-bottom:6px;}
 .stat-card.blue .stat-num{color:var(--gold);}
 .stat-card.green .stat-num{color:var(--green-light);}
@@ -131,7 +132,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
 
 /* ── Query Cards (Figma-spec) ── */
 .query-card{background:var(--navy-light);border:0.5px solid var(--white-10);border-radius:var(--radius-lg);padding:20px 22px;margin-bottom:12px;transition:border-color .2s,box-shadow .2s;}
-.query-card:hover{border-color:var(--gold-border);box-shadow:0 4px 16px rgba(0,0,0,0.2);}
+.query-card:hover{border-color:var(--gold-border);box-shadow:0 4px 16px rgba(0,0,0,0.2);border-left-color:var(--gold);border-left-width:2px;}
 .query-card.locked{opacity:.65;background:var(--gold-faint);}
 .query-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
 .query-route{font-family:var(--font-display);font-size:18px;font-weight:400;color:var(--white);}
