@@ -247,5 +247,68 @@
 <div class="toast" id="toast"></div>
 <script src="../js/supabase.js"></script>
 <script src="operator.js"></script>
+
+<!-- View Shared Quote Modal -->
+<div class="modal-overlay" id="view-quote-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Quote details</span>
+      <button class="modal-close" onclick="closeViewQuoteModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:rgba(0,0,0,0.15);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
+        <div style="font-family:var(--font-display);font-size:20px;color:var(--gold);margin-bottom:6px;" id="vq-route">—</div>
+        <div style="font-size:12px;color:var(--white-60);margin-bottom:4px;" id="vq-date">—</div>
+        <div style="font-size:12px;color:var(--white-60);" id="vq-aircraft">—</div>
+      </div>
+      <div class="charge-row" style="border-bottom:0.5px solid var(--white-10);padding:8px 0;margin-bottom:12px;">
+        <span class="charge-label">Passengers</span>
+        <span class="charge-value" id="vq-pax">—</span>
+      </div>
+      <div style="border-radius:var(--radius);border:0.5px solid var(--white-10);overflow:hidden;">
+        <div class="charge-row" style="padding:9px 14px;border-bottom:0.5px solid var(--white-10);">
+          <span class="charge-label">Base charge</span>
+          <span class="charge-value" id="vq-base">Rs.0</span>
+        </div>
+        <div class="charge-row" style="padding:9px 14px;border-bottom:0.5px solid var(--white-10);">
+          <span class="charge-label">Handling fee</span>
+          <span class="charge-value" id="vq-handling">Rs.0</span>
+        </div>
+        <div class="charge-row" style="padding:9px 14px;border-bottom:0.5px solid var(--white-10);">
+          <span class="charge-label">Crew accommodation</span>
+          <span class="charge-value" id="vq-crew">Rs.0</span>
+        </div>
+        <div class="charge-row" style="padding:9px 14px;border-bottom:0.5px solid var(--white-10);">
+          <span class="charge-label">Catering</span>
+          <span class="charge-value" id="vq-catering">Rs.0</span>
+        </div>
+        <div class="charge-row" style="padding:9px 14px;border-bottom:0.5px solid var(--white-10);">
+          <span class="charge-label">Subtotal</span>
+          <span class="charge-value" id="vq-subtotal">Rs.0</span>
+        </div>
+        <div class="charge-row" style="padding:9px 14px;border-bottom:0.5px solid var(--white-10);">
+          <span class="charge-label">GST (18%)</span>
+          <span class="charge-value" id="vq-gst">Rs.0</span>
+        </div>
+        <div class="total-row" style="padding:12px 14px;">
+          <span class="total-label">Total quote</span>
+          <span class="total-value" id="vq-total">Rs.0</span>
+        </div>
+      </div>
+      <div class="charge-row" id="vq-notes-row" style="display:none;margin-top:14px;padding:8px 0;flex-direction:column;align-items:flex-start;gap:4px;">
+        <span class="charge-label">Notes to client</span>
+        <span style="font-size:13px;color:var(--white-60);margin-top:4px;" id="vq-notes"></span>
+      </div>
+      <div class="charge-row" id="vq-by-row" style="display:none;margin-top:8px;padding:8px 0;">
+        <span class="charge-label">Submitted by</span>
+        <span style="font-size:13px;color:var(--white-60);" id="vq-by"></span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-logout" style="width:auto;padding:0 20px;" onclick="closeViewQuoteModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
