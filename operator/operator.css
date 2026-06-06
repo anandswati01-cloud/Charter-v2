@@ -22,8 +22,8 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
 #page-login::before{content:'';position:absolute;inset:0;background-image:url('../airplane.png');background-size:cover;background-position:50% 40%;filter:brightness(0.45) saturate(0.5);z-index:0;}
 #page-login::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(12,19,36,0.5) 0%,rgba(12,19,36,0.65) 55%,#0c1324 100%);z-index:1;}
 
-.login-box{background:rgba(12,19,36,0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:0.5px solid rgba(251,191,36,0.18);border-radius:var(--radius-lg);padding:44px 40px;width:100%;max-width:400px;box-shadow:0 8px 48px rgba(0,0,0,0.5);position:relative;z-index:2;}
-.login-logo{margin-bottom:32px;text-align:center;}
+.login-box{background:rgba(12,19,36,0.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:0.5px solid rgba(251,191,36,0.18);border-radius:var(--radius-lg);padding:36px 36px;width:100%;max-width:400px;box-shadow:0 8px 48px rgba(0,0,0,0.5);position:relative;z-index:2;}
+.login-logo{margin-bottom:16px;text-align:center;}
 .brand-logo{font-family:var(--font-display);font-size:26px;font-weight:400;font-style:italic;color:var(--gold);letter-spacing:-0.5px;}
 .login-title{font-family:var(--font-display);font-size:22px;font-weight:300;color:var(--gold);margin-bottom:4px;text-align:center;}
 .login-sub{font-family:var(--font-mono);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--white-30);text-align:center;margin-bottom:32px;}
@@ -36,12 +36,12 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
 .eye-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--white-60);padding:4px;display:flex;align-items:center;justify-content:center;transition:color .2s;}
 .eye-toggle:hover{color:var(--gold);}
 /* ===== FORGOT PASSWORD LINK ===== */
-.forgot-password-link{color:var(--white-60);font-size:12px;text-decoration:none;letter-spacing:0.5px;transition:color .2s;}
+.forgot-password-link{color:var(--white-60);font-size:12px;text-decoration:none;letter-spacing:0.5px;transition:color .2s;display:block;text-align:right;}
 .forgot-password-link:hover{color:var(--gold);}
 
 .field-input:focus{border-color:var(--gold-border);box-shadow:0 0 0 3px var(--gold-faint);}
 .field-input::placeholder{color:rgba(255,255,255,0.25);}
-.btn-primary{width:100%;height:46px;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:8px;}
+.btn-primary{width:100%;height:46px;background:var(--gold);color:var(--navy);border:none;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:8px;margin-bottom:14px;}
 .btn-primary:hover{background:#fcd34d;}
 .btn-primary:disabled{background:rgba(251,191,36,0.3);cursor:not-allowed;color:rgba(12,19,36,0.5);}
 .login-error{background:var(--red-faint);border:0.5px solid rgba(226,75,74,0.3);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:16px;display:none;}
