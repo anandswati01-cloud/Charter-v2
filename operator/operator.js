@@ -77,7 +77,7 @@ async function doLogin(){
       errEl.textContent='Your registration was not approved. Please contact SkyVayu.';
       errEl.classList.add('show');return;
     }
-    currentUser=user;currentOperator=op;
+    currentUser=user;currentOperator=op;sessionStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
     /* Fire-and-forget last_login update — don't block on it */
     sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
@@ -104,9 +104,31 @@ function doLogout(){
   if(refreshInterval){clearInterval(refreshInterval);refreshInterval=null;}
   if(claimRefreshInterval){clearInterval(claimRefreshInterval);claimRefreshInterval=null;}
   if(currentClaimId)releaseClaim(currentClaimId);
-  currentUser=null;currentOperator=null;currentClaimId=null;
+  currentUser=null;currentOperator=null;currentClaimId=null;sessionStorage.removeItem('opSession');
   document.getElementById('page-dashboard').classList.remove('active');
+  (function(){
+  var saved=sessionStorage.getItem('opSession');
+  if(saved){
+    try{
+      var s=JSON.parse(saved);
+      if(s&&s.user&&s.operator){
+        currentUser=s.user;currentOperator=s.operator;
+        document.getElementById('page-login').style.display='none';
+        document.getElementById('page-dashboard').classList.add('active');
+        document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
+        document.getElementById('sidebar-role').textContent=currentOperator.company_name;
+        var rt=document.getElementById('sidebar-role-tag');
+        if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
+        applyRoleRestrictions();
+        loadAllData();
+        refreshInterval=setInterval(loadAllData,5000);
+        claimRefreshInterval=setInterval(updateClaimTimers,1000);
+        return;
+      }
+    }catch(e){sessionStorage.removeItem('opSession');}
+  }
   document.getElementById('page-login').style.display='flex';
+})();
   document.getElementById('login-username').value='';
   document.getElementById('login-password').value='';
 }
