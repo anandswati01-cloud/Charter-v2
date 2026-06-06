@@ -106,29 +106,6 @@ function doLogout(){
   if(currentClaimId)releaseClaim(currentClaimId);
   currentUser=null;currentOperator=null;currentClaimId=null;sessionStorage.removeItem('opSession');
   document.getElementById('page-dashboard').classList.remove('active');
-  (function(){
-  var saved=sessionStorage.getItem('opSession');
-  if(saved){
-    try{
-      var s=JSON.parse(saved);
-      if(s&&s.user&&s.operator){
-        currentUser=s.user;currentOperator=s.operator;
-        document.getElementById('page-login').style.display='none';
-        document.getElementById('page-dashboard').classList.add('active');
-        document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
-        document.getElementById('sidebar-role').textContent=currentOperator.company_name;
-        var rt=document.getElementById('sidebar-role-tag');
-        if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
-        applyRoleRestrictions();
-        loadAllData();
-        refreshInterval=setInterval(loadAllData,5000);
-        claimRefreshInterval=setInterval(updateClaimTimers,1000);
-        return;
-      }
-    }catch(e){sessionStorage.removeItem('opSession');}
-  }
-  document.getElementById('page-login').style.display='flex';
-})();
   document.getElementById('login-username').value='';
   document.getElementById('login-password').value='';
 }
@@ -1233,4 +1210,26 @@ window.addEventListener('beforeunload',function(){
   }
 });
 
-document.getElementById('page-login').style.display='flex';
+(function(){
+  var saved=sessionStorage.getItem('opSession');
+  if(saved){
+    try{
+      var s=JSON.parse(saved);
+      if(s&&s.user&&s.operator){
+        currentUser=s.user;currentOperator=s.operator;
+        document.getElementById('page-login').style.display='none';
+        document.getElementById('page-dashboard').classList.add('active');
+        document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
+        document.getElementById('sidebar-role').textContent=currentOperator.company_name;
+        var rt=document.getElementById('sidebar-role-tag');
+        if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
+        applyRoleRestrictions();
+        loadAllData();
+        refreshInterval=setInterval(loadAllData,5000);
+        claimRefreshInterval=setInterval(updateClaimTimers,1000);
+        return;
+      }
+    }catch(e){sessionStorage.removeItem('opSession');}
+  }
+  document.getElementById('page-login').style.display='flex';
+})();
