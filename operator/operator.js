@@ -245,7 +245,7 @@ async function loadAllData(){
   if(!currentOperator)return;
   var opId=currentOperator.id;
   var results=await Promise.all([
-    sbFetch('queries?status=eq.open&order=created_at.desc'),
+    sbFetch('queries?status=eq.open&aircraft_category=eq.'+(currentOperator.aircraft_category||'fixed_wing')+'&order=created_at.desc'),
     sbFetch('quotes?operator_id=eq.'+opId+'&select=*,queries(*)&order=created_at.desc'),
     sbFetch('query_claims?operator_id=eq.'+opId+'&expires_at=gt.'+encodeURIComponent(nowIso())),
     sbFetch('operator_users?operator_id=eq.'+opId+'&order=created_at.asc')
