@@ -245,7 +245,7 @@ async function loadAllData(){
   if(!currentOperator)return;
   var opId=currentOperator.id;
   var results=await Promise.all([
-    sbFetch('queries?status=eq.open&aircraft_category=eq.'+(currentOperator.aircraft_category||'fixed_wing')+'&order=created_at.desc'),
+    sbFetch('queries?status=eq.open&aircraft_category=in.('+( currentOperator.aircraft_category||'fixed_wing')+')&order=created_at.desc'),
     sbFetch('quotes?operator_id=eq.'+opId+'&select=*,queries(*)&order=created_at.desc'),
     sbFetch('query_claims?operator_id=eq.'+opId+'&expires_at=gt.'+encodeURIComponent(nowIso())),
     sbFetch('operator_users?operator_id=eq.'+opId+'&order=created_at.asc')
@@ -1201,6 +1201,7 @@ async function submitRegistration(){
   var phone    = document.getElementById('reg-phone').value.trim();
   var username = document.getElementById('reg-username').value.trim();
   var password = document.getElementById('reg-password').value;
+  var acCat = [document.getElementById('reg-cat-fixed')&&document.getElementById('reg-cat-fixed').checked?'fixed_wing':'',document.getElementById('reg-cat-heli')&&document.getElementById('reg-cat-heli').checked?'helicopter':''].filter(Boolean).join(',')||'fixed_wing';
   var errEl    = document.getElementById('reg-error');
   errEl.classList.remove('show');
   if(!company||!name||!email||!phone||!username||!password){
@@ -1217,7 +1218,7 @@ async function submitRegistration(){
     btn.disabled=false;btn.textContent='Submit application';return;
   }
   var opRes = await sbFetch('operators',{method:'POST',prefer:'return=representation',body:{
-    company_name:company,owner_name:name,owner_phone:phone,owner_email:email,approval_status:'pending'
+    company_name:company,owner_name:name,owner_phone:phone,owner_email:email,aircraft_category:acCat,approval_status:'pending'
   }});
   if(!opRes.ok||!opRes.data||!opRes.data.length||!opRes.data[0]){
     errEl.textContent='Registration failed. Please try again.';errEl.classList.add('show');
