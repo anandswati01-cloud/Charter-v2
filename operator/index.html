@@ -25,6 +25,15 @@
           <svg id="eye-icon-show" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           <svg id="eye-icon-hide" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
+
+      <div style="margin:16px 12px 8px;padding:12px 14px;background:var(--blue-faint,rgba(23,176,214,0.06));border:1px solid var(--blue-border,rgba(23,176,214,0.2));border-radius:8px;">
+        <div style="font-size:11px;font-weight:700;color:var(--blue,#17b0d6);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Aircraft Category</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-main,#1a1a2e);"><input type="checkbox" id="cat-fixed" value="fixed_wing" style="width:15px;height:15px;accent-color:#17b0d6;"> Fixed Wing</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-main,#1a1a2e);"><input type="checkbox" id="cat-heli" value="helicopter" style="width:15px;height:15px;accent-color:#17b0d6;"> Helicopter</label>
+        </div>
+        <button onclick="saveCategorySettings()" style="width:100%;padding:7px;background:#17b0d6;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save</button>
+      </div>
       </div>
     </div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign in</button>
