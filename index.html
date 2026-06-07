@@ -289,6 +289,41 @@
       border-color: var(--gold);
     }
 
+    /* ── AIRCRAFT TYPE SELECTOR (above trip tabs) ── */
+    .aircraft-selector {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .aircraft-btn {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 8px 20px;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--white-60);
+      background: transparent;
+      border: 1px solid var(--white-10);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .aircraft-btn.active {
+      background: rgba(23,176,214,0.15);
+      color: #17b0d6;
+      border-color: #17b0d6;
+    }
+
+    .aircraft-btn:hover:not(.active) {
+      border-color: var(--white-30);
+      color: var(--white-80);
+    }
+
     .inputs-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr auto;
@@ -1050,6 +1085,14 @@
         <div class="booking-card-sub">Get verified quotations within 60 minutes</div>
       </div>
 
+      <div class="aircraft-selector">
+        <button class="aircraft-btn active" data-type="fixed_wing" onclick="selectAircraftType(this,'fixed_wing')">
+          ✈ Fixed Wing
+        </button>
+        <button class="aircraft-btn" data-type="helicopter" onclick="selectAircraftType(this,'helicopter')">
+          🚁 Helicopter
+        </button>
+      </div>
       <div class="trip-selector">
         <button class="trip-btn active" onclick="selectTrip(this)">One Way</button>
         <button class="trip-btn" onclick="selectTrip(this)">Round Trip</button>
@@ -1306,6 +1349,12 @@
     }
   }
 
+
+
+    function selectAircraftType(btn, type) {
+      document.querySelectorAll('.aircraft-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+    }
     function toggleChip(chip) {
       chip.classList.toggle('active');
     }
@@ -1339,9 +1388,9 @@ function getQuotes() {
     }
     if(!valid)return;
     var pax=document.getElementById('paxNum')?document.getElementById('paxNum').textContent:'2';
-    var params=new URLSearchParams({from:from,to:to,date:date,pax:pax,trip:tripMode});
+    var acType=(document.querySelector('.aircraft-btn.active')||{dataset:{}}).dataset.type||'fixed_wing';var params=new URLSearchParams({from:from,to:to,date:date,pax:pax,trip:tripMode,ac:acType});
     if(tripMode==='Round Trip'&&returnDate)params.set('returnDate',returnDate);
-    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(paxEl?paxEl.textContent:2)||2});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open'};
+    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(paxEl?paxEl.textContent:2)||2});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open',aircraft_category:acType};
     openOtpModal();
   }
   
