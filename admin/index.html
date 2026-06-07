@@ -244,7 +244,7 @@ async function doAdminLogin(){
   var token=authRes.data.session.access_token;var letterId=authRes.data.session.user.email;
   var adminCheck=await sb.from('profiles').select('is_admin').eq('id',user.id).single();
   if(adminCheck.error||!adminCheck.data||!adminCheck.data.is_admin){await sb.auth.signOut();errEl.textContent='Access denied. Not an admin account.';errEl.classList.add('show');return;}
-  var obs=await loadOperators(token);
+  await loadAll();
   document.getElementById('page-login').style.display='none';
   document.getElementById('page-dashboard').style.display='flex';
   showToast('Welcome, '+letterId,'ok');

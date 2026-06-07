@@ -217,7 +217,7 @@ nav{
     <div class="success-title">Booking Confirmed</div>
     <div class="success-sub">Your luxury journey has been secured. Confirmation details, itinerary, and terminal access codes have been sent to your registered mobile and email.</div>
     <div class="ref-row">
-      <span class="ref-id">REF ID: <span id="conf-ref">SV-000000</span></span>
+      <span class="ref-id">REF ID: <span id="conf-ref">—</span></span>
       <button class="btn-copy" onclick="copyRef()">
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
         Copy Reference
@@ -342,6 +342,7 @@ nav{
 
 <script>
 var conf = JSON.parse(sessionStorage.getItem('sv_confirmation') || '{}');
+if (!conf.ref) { var _r = sessionStorage.getItem('sv_booking_ref'); if (_r) conf.ref = _r; }
 
 if (!conf.ref) {
   // No confirmation data — redirect home

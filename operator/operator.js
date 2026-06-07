@@ -300,7 +300,7 @@ function renderActiveList(queries){
       +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
       +(timer?'<div class="query-timer">Window: '+timer+' remaining</div>':'')
       +lockInfo
-      +'<div class="query-actions"><button class="btn-sm btn-blue" '+btnDisabled+' onclick="openQuoteModal(\''+escapeHtml(q.id)+'\')">'+btnTxt+'</button></div></div>';
+      +'<div class="query-actions"><button class="btn-sm btn-blue" '+btnDisabled+' onclick="openQuoteModal(\''+escapeHtml(q.id)+'\')">'+btnTxt+'</button>'+(claim&&claim.claimed_by===currentUser.id?'<button class="btn-sm btn-red" onclick="declineQuery(\''+escapeHtml(q.id)+'\',\''+escapeHtml(claim.id)+'\')" style="margin-left:6px">Decline</button>':'')+'</div></div>';
   }).join('');
 }
 
@@ -419,6 +419,20 @@ async function tryClaim(queryId){
 async function releaseClaim(claimId){
   if(!claimId)return;
   await sbFetch('query_claims?id=eq.'+claimId,{method:'DELETE'});
+}
+
+async function declineQuery(queryId, claimId) {
+  var reason = prompt('Reason for declining this query (optional):') || '';
+  // Update query status to declined with reason
+  await sbFetch('queries?id=eq.' + queryId, {
+    method: 'PATCH',
+    prefer: 'return=minimal',
+    body: { status: 'declined', decline_reason: reason }
+  });
+  // Release the claim
+  if (claimId) await sbFetch('query_claims?id=eq.' + claimId, { method: 'DELETE' });
+  showToast('Query declined.', 'info');
+  await loadAllData();
 }
 
 /* ============ AIRCRAFT AVAILABILITY ============ */

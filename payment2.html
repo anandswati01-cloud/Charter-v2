@@ -340,7 +340,12 @@ nav{
     </div>
     <div class="summary-body">
       <div class="summary-rows">
-        <div class="summary-row">
+                <div class="summary-row" id="p2-route-row" style="flex-direction:column;align-items:flex-start;gap:2px;">
+          <span class="row-label">Route</span>
+          <span class="row-value" id="p2-route" style="font-size:13px;">—</span>
+          <span class="row-label" id="p2-date" style="margin-top:2px;font-size:11px;opacity:0.6;">—</span>
+        </div>
+<div class="summary-row">
           <span class="row-label">Base Fare</span>
           <span class="row-value" id="p2-charter">—</span>
         </div>
@@ -395,6 +400,31 @@ var charter = price - landing - gst;
 function fmt(n){ return n ? '₹' + Number(n).toLocaleString('en-IN') : '—'; }
 
 document.getElementById('p2-aircraft').textContent = (q.aircraft_type || q.aircraft || 'Aircraft').toUpperCase();
+
+// --- Route display: handle single and multi-sector ---
+(function() {
+  var routeStr = '';
+  var sectors = queryData.sectors;
+  if (sectors && Array.isArray(sectors) && sectors.length) {
+    // Multi-sector: build "DEL → BOM → GOA" from legs
+    var points = [];
+    sectors.forEach(function(s) { if (s.from) points.push(s.from); if (s.to) points.push(s.to); });
+    // Deduplicate consecutive duplicates
+    points = points.filter(function(p, i) { return i === 0 || p !== points[i-1]; });
+    routeStr = points.join(' → ');
+  } else {
+    // Single-sector fallback: use q.route or queryData.rs_route
+    var raw = q.route || queryData.rs_route || '';
+    if (raw) { routeStr = String(raw).replace(/-/g, ' → '); }
+  }
+  var routeEl = document.getElementById('p2-route');
+  if (routeEl) routeEl.textContent = routeStr || '—';
+  var dateEl = document.getElementById('p2-date');
+  if (dateEl) {
+    var d = queryData.rs_date || queryData.flight_date || '';
+    dateEl.textContent = d ? new Date(d).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : '';
+  }
+})();
 document.getElementById('p2-charter').textContent = fmt(charter);
 document.getElementById('p2-landing').textContent = fmt(landing);
 document.getElementById('p2-gst').textContent = fmt(gst);
@@ -495,7 +525,7 @@ async function confirmBooking() {
   sendEmail('booking_confirmed', { booking_id: saved.id, booking_ref: ref });
 
   sessionStorage.setItem('sv_confirmation', JSON.stringify({
-    ref:          ref,
+    ref:          saved.ref || ref,
     route:        bookingPayload.route || '—',
     date:         bookingPayload.flight_date || '—',
     op_name:      bookingPayload.operator_name || '—',
@@ -506,6 +536,7 @@ async function confirmBooking() {
     client_email: traveller.email || '—',
     client_phone: traveller.phone || '—'
   }));
+  sessionStorage.setItem('sv_booking_ref', saved.ref || ref);
 
   window.location.href = 'confirmed.html';
 }
