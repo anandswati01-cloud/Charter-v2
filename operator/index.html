@@ -25,6 +25,15 @@
           <svg id="eye-icon-show" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
           <svg id="eye-icon-hide" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
         </button>
+
+      <div style="margin:16px 12px 8px;padding:12px 14px;background:var(--blue-faint,rgba(23,176,214,0.06));border:1px solid var(--blue-border,rgba(23,176,214,0.2));border-radius:8px;">
+        <div style="font-size:11px;font-weight:700;color:var(--blue,#17b0d6);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Aircraft Category</div>
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-main,#1a1a2e);"><input type="checkbox" id="cat-fixed" value="fixed_wing" style="width:15px;height:15px;accent-color:#17b0d6;"> Fixed Wing</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-main,#1a1a2e);"><input type="checkbox" id="cat-heli" value="helicopter" style="width:15px;height:15px;accent-color:#17b0d6;"> Helicopter</label>
+        </div>
+        <button onclick="saveCategorySettings()" style="width:100%;padding:7px;background:#17b0d6;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save</button>
+      </div>
       </div>
     </div>
     <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign in</button>
@@ -211,6 +220,17 @@
   <input type="file" id="aop-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAopFileSelected(this)"/>
 </div>
 <div style="background:var(--blue-faint);border:0.5px solid var(--blue-border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-secondary);margin-bottom:16px;">Your application will be reviewed by the SkyVayu team. You will be notified once approved.</div>
+<div class="field-group" style="margin-bottom:12px;">
+  <label class="field-label" style="margin-bottom:6px;display:block;">Aircraft Category <span style="color:#e74c3c">*</span></label>
+  <div style="display:flex;gap:20px;margin-top:4px;">
+    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:14px;">
+      <input type="checkbox" id="reg-cat-fixed" value="fixed_wing" style="width:15px;height:15px;accent-color:#17b0d6;"> ✈ Fixed Wing
+    </label>
+    <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:14px;">
+      <input type="checkbox" id="reg-cat-heli" value="helicopter" style="width:15px;height:15px;accent-color:#17b0d6;"> 🚁 Helicopter
+    </label>
+  </div>
+</div>
 <div id="reg-error" class="login-error"></div>
 </div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('register-modal')">Cancel</button><button class="btn-sm btn-blue" id="reg-submit-btn" onclick="submitRegistration()">Submit application</button></div></div></div>
 <div id="page-pending" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--bg);padding:24px;"><div style="text-align:center;max-width:400px;"><div style="font-family:var(--font-display);font-size:28px;color:var(--gold);margin-bottom:12px;">Registration submitted</div><div style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:24px;">Your company registration is under review. You will be able to log in once approved.</div><button class="btn-primary" style="width:auto;padding:0 24px;" onclick="document.getElementById('page-pending').style.display='none';document.getElementById('page-login').style.display='flex';">Back to login</button></div></div>
@@ -257,13 +277,13 @@
     </div>
     <div class="modal-body">
       <div style="background:rgba(0,0,0,0.15);border-radius:var(--radius);padding:14px 16px;margin-bottom:20px;">
-        <div style="font-family:var(--font-display);font-size:20px;color:var(--gold);margin-bottom:6px;" id="vq-route">—</div>
-        <div style="font-size:12px;color:var(--white-60);margin-bottom:4px;" id="vq-date">—</div>
-        <div style="font-size:12px;color:var(--white-60);" id="vq-aircraft">—</div>
+        <div style="font-family:var(--font-display);font-size:20px;color:var(--gold);margin-bottom:6px;" id="vq-route">â</div>
+        <div style="font-size:12px;color:var(--white-60);margin-bottom:4px;" id="vq-date">â</div>
+        <div style="font-size:12px;color:var(--white-60);" id="vq-aircraft">â</div>
       </div>
       <div class="charge-row" style="border-bottom:0.5px solid var(--white-10);padding:8px 0;margin-bottom:12px;">
         <span class="charge-label">Passengers</span>
-        <span class="charge-value" id="vq-pax">—</span>
+        <span class="charge-value" id="vq-pax">â</span>
       </div>
       <div style="border-radius:var(--radius);border:0.5px solid var(--white-10);overflow:hidden;">
         <div class="charge-row" style="padding:9px 14px;border-bottom:0.5px solid var(--white-10);">

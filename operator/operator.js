@@ -89,6 +89,7 @@ async function doLogin(){
     rt.className='role-tag '+(isOwner()?'':'employee');
     applyRoleRestrictions();
     await loadAllData();
+  populateCategoryCheckboxes();
     refreshInterval=setInterval(loadAllData,5000);
     claimRefreshInterval=setInterval(updateClaimTimers,1000);
   }catch(e){
@@ -245,7 +246,7 @@ async function loadAllData(){
   if(!currentOperator)return;
   var opId=currentOperator.id;
   var results=await Promise.all([
-    sbFetch('queries?status=eq.open&order=created_at.desc'),
+    sbFetch('queries?status=eq.open&aircraft_category=in.('+( currentOperator.aircraft_category||'fixed_wing')+')&order=created_at.desc'),
     sbFetch('quotes?operator_id=eq.'+opId+'&select=*,queries(*)&order=created_at.desc'),
     sbFetch('query_claims?operator_id=eq.'+opId+'&expires_at=gt.'+encodeURIComponent(nowIso())),
     sbFetch('operator_users?operator_id=eq.'+opId+'&order=created_at.asc')
@@ -1201,6 +1202,7 @@ async function submitRegistration(){
   var phone    = document.getElementById('reg-phone').value.trim();
   var username = document.getElementById('reg-username').value.trim();
   var password = document.getElementById('reg-password').value;
+  var acCat = [document.getElementById('reg-cat-fixed')&&document.getElementById('reg-cat-fixed').checked?'fixed_wing':'',document.getElementById('reg-cat-heli')&&document.getElementById('reg-cat-heli').checked?'helicopter':''].filter(Boolean).join(',')||'fixed_wing';
   var errEl    = document.getElementById('reg-error');
   errEl.classList.remove('show');
   if(!company||!name||!email||!phone||!username||!password){
@@ -1217,7 +1219,7 @@ async function submitRegistration(){
     btn.disabled=false;btn.textContent='Submit application';return;
   }
   var opRes = await sbFetch('operators',{method:'POST',prefer:'return=representation',body:{
-    company_name:company,owner_name:name,owner_phone:phone,owner_email:email,approval_status:'pending'
+    company_name:company,owner_name:name,owner_phone:phone,owner_email:email,aircraft_category:acCat,approval_status:'pending'
   }});
   if(!opRes.ok||!opRes.data||!opRes.data.length||!opRes.data[0]){
     errEl.textContent='Registration failed. Please try again.';errEl.classList.add('show');
@@ -1297,3 +1299,34 @@ window.addEventListener('beforeunload',function(){
   }
   document.getElementById('page-login').style.display='flex';
 })();
+
+
+function saveCategorySettings(){
+  var fixedEl = document.getElementById('cat-fixed');
+  var heliEl = document.getElementById('cat-heli');
+  if(!fixedEl && !heliEl){ showToast('Category checkboxes not found.','error'); return; }
+  var fixedChecked = fixedEl && fixedEl.checked;
+  var heliChecked = heliEl && heliEl.checked;
+  if(!fixedChecked && !heliChecked){ showToast('Please select at least one category.','error'); return; }
+  var cats = [fixedChecked?'fixed_wing':null, heliChecked?'helicopter':null].filter(Boolean).join(',');
+  if(!currentOperator){ showToast('Not logged in.','error'); return; }
+  sbFetch('operator_users?id=eq.'+currentOperator.id, {method:'PATCH', body:{aircraft_category:cats}})
+    .then(function(res){
+      if(res.ok){
+        currentOperator.aircraft_category = cats;
+        showToast('Category saved!','success');
+        loadAllData();
+      } else {
+        showToast('Save failed. Try again.','error');
+      }
+    });
+}
+
+function populateCategoryCheckboxes(){
+  if(!currentOperator) return;
+  var cats = (currentOperator.aircraft_category || 'fixed_wing').split(',').map(function(s){ return s.trim(); });
+  var fixedEl = document.getElementById('cat-fixed');
+  var heliEl = document.getElementById('cat-heli');
+  if(fixedEl) fixedEl.checked = cats.indexOf('fixed_wing') !== -1;
+  if(heliEl) heliEl.checked = cats.indexOf('helicopter') !== -1;
+}
