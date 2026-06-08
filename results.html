@@ -99,11 +99,9 @@ nav{
 .progress-fill{height:4px;background:var(--cyan);border-radius:4px;width:0%;transition:width 1s linear;position:absolute;top:0;left:0;}
 
 /* stats */
-.stats-bar{background:var(--dark);border-radius:4px;padding:10px 12px;display:flex;justify-content:space-between;margin-bottom:16px;}
-.stat-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.stat-num{font-size:15px;font-weight:700;color:var(--text);text-align:center;}
-.stat-num.cyan{color:var(--cyan);}
-.stat-label{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);}
+.stats-bar{background:var(--dark);border-radius:4px;padding:10px 14px;margin-bottom:16px;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);}
+.stats-bar .cyan{color:var(--cyan);font-weight:700;}
+.stats-bar span{color:var(--text);font-weight:700;}
 
 /* notifications */
 .notif-list{display:flex;flex-direction:column;gap:14px;position:relative;}
@@ -340,18 +338,7 @@ nav{
       </div>
 
       <div class="stats-bar">
-        <div class="stat-item">
-          <div class="stat-num" id="stat-notified">—</div>
-          <div class="stat-label">Notified</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num" id="stat-reviewing">—</div>
-          <div class="stat-label">Reviewing</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num cyan" id="stat-received">0</div>
-          <div class="stat-label">Received</div>
-        </div>
+        <span id="stat-notified-txt">—</span>&nbsp;operators notified&nbsp;&nbsp;·&nbsp;&nbsp;<span class="cyan" id="stat-received-txt">0</span>&nbsp;quotes received
       </div>
 
       <div class="notif-list">
@@ -363,15 +350,6 @@ nav{
           <div>
             <div class="notif-label">New quote received</div>
             <div class="notif-time">Just now</div>
-          </div>
-        </div>
-        <div class="notif-row">
-          <div class="notif-dot">
-            <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M4.054 7.904L7.35 4.608L6.519 3.777L4.054 6.242L2.829 5.017L1.998 5.848L4.054 7.904ZM4.667 11.667C3.315 11.326 2.2 10.551 1.32 9.341C.44 8.13 0 6.786 0 5.308V1.75L4.667 0L9.333 1.75V5.308C9.333 6.786 8.893 8.13 8.014 9.341C7.134 10.551 6.018 11.326 4.667 11.667Z" fill="#C5C6CD"/></svg>
-          </div>
-          <div>
-            <div class="notif-label">SkyVayu reviewed</div>
-            <div class="notif-time">12 mins ago</div>
           </div>
         </div>
         <div class="notif-row" style="opacity:.5;">
