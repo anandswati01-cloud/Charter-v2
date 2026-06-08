@@ -126,13 +126,12 @@ async function loadQuotes() {
 
       document.getElementById('stat-received-txt').textContent = quotes.length;
 
-      var opRes = await fetch(SUPABASE_URL + '/rest/v1/operators?approval_status=eq.approved&select=id', {
-              headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-      });
-          var ops = await opRes.json();
-          var total = Array.isArray(ops) ? ops.length : 0;
-          document.getElementById('stat-notified-txt').textContent = total;
-
+    var viewRes = await fetch(SUPABASE_URL + '/rest/v1/query_views?query_id=eq.' + queryId + '&select=id', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    var views = await viewRes.json();
+    var notifiedCount = Array.isArray(views) ? views.length : 0;
+    document.getElementById('stat-notified-txt').textContent = notifiedCount;
       allQuotes = quotes;
           applyFilters();
     } catch(e) {
