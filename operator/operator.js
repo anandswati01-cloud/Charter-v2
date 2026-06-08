@@ -89,6 +89,7 @@ async function doLogin(){
     rt.className='role-tag '+(isOwner()?'':'employee');
     applyRoleRestrictions();
     await loadAllData();
+  populateCategoryCheckboxes();
     refreshInterval=setInterval(loadAllData,5000);
     claimRefreshInterval=setInterval(updateClaimTimers,1000);
   }catch(e){
@@ -1298,3 +1299,34 @@ window.addEventListener('beforeunload',function(){
   }
   document.getElementById('page-login').style.display='flex';
 })();
+
+
+function saveCategorySettings(){
+  var fixedEl = document.getElementById('cat-fixed');
+  var heliEl = document.getElementById('cat-heli');
+  if(!fixedEl && !heliEl){ showToast('Category checkboxes not found.','error'); return; }
+  var fixedChecked = fixedEl && fixedEl.checked;
+  var heliChecked = heliEl && heliEl.checked;
+  if(!fixedChecked && !heliChecked){ showToast('Please select at least one category.','error'); return; }
+  var cats = [fixedChecked?'fixed_wing':null, heliChecked?'helicopter':null].filter(Boolean).join(',');
+  if(!currentOperator){ showToast('Not logged in.','error'); return; }
+  sbFetch('operator_users?id=eq.'+currentOperator.id, {method:'PATCH', body:{aircraft_category:cats}})
+    .then(function(res){
+      if(res.ok){
+        currentOperator.aircraft_category = cats;
+        showToast('Category saved!','success');
+        loadAllData();
+      } else {
+        showToast('Save failed. Try again.','error');
+      }
+    });
+}
+
+function populateCategoryCheckboxes(){
+  if(!currentOperator) return;
+  var cats = (currentOperator.aircraft_category || 'fixed_wing').split(',').map(function(s){ return s.trim(); });
+  var fixedEl = document.getElementById('cat-fixed');
+  var heliEl = document.getElementById('cat-heli');
+  if(fixedEl) fixedEl.checked = cats.indexOf('fixed_wing') !== -1;
+  if(heliEl) heliEl.checked = cats.indexOf('helicopter') !== -1;
+}
