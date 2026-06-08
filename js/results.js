@@ -124,15 +124,14 @@ async function loadQuotes() {
           var quotes = await res.json();
           if (!Array.isArray(quotes)) return;
 
-      document.getElementById('stat-received').textContent = quotes.length;
+      document.getElementById('stat-received-txt').textContent = quotes.length;
 
       var opRes = await fetch(SUPABASE_URL + '/rest/v1/operators?approval_status=eq.approved&select=id', {
               headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
       });
           var ops = await opRes.json();
           var total = Array.isArray(ops) ? ops.length : 0;
-          document.getElementById('stat-notified').textContent = total;
-          document.getElementById('stat-reviewing').textContent = Math.max(0, total - quotes.length);
+          document.getElementById('stat-notified-txt').textContent = total;
 
       allQuotes = quotes;
           applyFilters();
