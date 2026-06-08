@@ -1335,20 +1335,26 @@ function populateCategoryCheckboxes(){
 // ── Track which operators have seen each query ──
 async function markQueriesViewed(queryIds) {
   if (!queryIds || !queryIds.length || !currentOperator) return;
+  // Use authenticated user JWT for RLS to pass
+  var sessionStr = localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token');
+  var jwt = sessionStr ? JSON.parse(sessionStr).access_token : SUPABASE_KEY;
   var rows = queryIds.map(function(qid) {
     return { query_id: qid, operator_id: currentOperator.id };
   });
   try {
-    await fetch(SUPABASE_URL + '/rest/v1/query_views', {
-      method: 'POST',
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': 'Bearer ' + SUPABASE_KEY,
-        'Content-Type': 'application/json',
-        'Prefer': 'resolution=ignore-duplicates'
-      },
-      body: JSON.stringify(rows)
-    });
+    // Insert each row individually to gracefully handle duplicates (409)
+    await Promise.all(rows.map(function(row) {
+      return fetch(SUPABASE_URL + '/rest/v1/query_views', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + jwt,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(row)
+      }).catch(function(){});
+    }));
   } catch(e) {
     console.warn('markQueriesViewed failed', e);
   }
