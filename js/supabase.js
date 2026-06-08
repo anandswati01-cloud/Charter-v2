@@ -58,6 +58,7 @@ async function saveQueryToSupabase(queryData) {
     medivac:      queryData.medivac                     || false,
     pets:         queryData.pets                        || false,
     infants:      queryData.infants                     || false,
+    vip:         queryData.vip                         || false,
     user_id:      queryData.user_id                     || null,
     status:       'open',
     aircraft_category: queryData.aircraft_category || 'fixed_wing'
