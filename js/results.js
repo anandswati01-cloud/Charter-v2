@@ -109,6 +109,57 @@ function updateTimer() {
     document.getElementById('progress-fill').style.width = pct + '%';
 }
 
+// ── Aviation Facts ──
+var AVIATION_FACTS = [
+    { stat: '~900', text: 'charter flights operate in India every month' },
+    { stat: '3x', text: 'faster boarding than commercial airlines' },
+    { stat: '5,000+', text: 'private airports & airstrips across India' },
+    { stat: '60 min', text: 'average time saved per trip vs commercial flight' },
+    { stat: '99%', text: 'on-time performance for private charters' },
+    { stat: '₹0', text: 'hidden fees — price you see is the price you pay' },
+    { stat: '<2hrs', text: 'notice needed to book most charter flights' },
+    { stat: '150+', text: 'aircraft types available for charter in India' }
+];
+var factsInterval = null;
+var factsIndex = 0;
+
+function initFacts() {
+    var card = document.getElementById('fact-card');
+    var dotsEl = document.getElementById('fact-dots');
+    if (!card || !dotsEl) return;
+    // Build items
+    var itemsHTML = AVIATION_FACTS.map(function(f, i) {
+        return '<div class="fact-item' + (i===0?' visible':'') + '" id="fact-item-'+i+'">' +
+               '<div class="fact-stat">'+f.stat+'</div>' +
+               '<div class="fact-text">'+f.text+'</div>' +
+               '</div>';
+    }).join('');
+    card.innerHTML = itemsHTML;
+    // Build dots
+    var dotsHTML = AVIATION_FACTS.map(function(_, i) {
+        return '<div class="fact-dot'+(i===0?' active':'')+'" id="fact-dot-'+i+'"></div>';
+    }).join('');
+    dotsEl.innerHTML = dotsHTML;
+    factsIndex = 0;
+    if (factsInterval) clearInterval(factsInterval);
+    factsInterval = setInterval(function() {
+        var prev = factsIndex;
+        factsIndex = (factsIndex + 1) % AVIATION_FACTS.length;
+        var prevItem = document.getElementById('fact-item-'+prev);
+        var nextItem = document.getElementById('fact-item-'+factsIndex);
+        var prevDot = document.getElementById('fact-dot-'+prev);
+        var nextDot = document.getElementById('fact-dot-'+factsIndex);
+        if (prevItem) prevItem.classList.remove('visible');
+        if (nextItem) nextItem.classList.add('visible');
+        if (prevDot) prevDot.classList.remove('active');
+        if (nextDot) nextDot.classList.add('active');
+    }, 4000);
+}
+
+function stopFacts() {
+    if (factsInterval) { clearInterval(factsInterval); factsInterval = null; }
+}
+
 // ── Load quotes from Supabase ──
 async function loadQuotes() {
     if (!queryId) {
@@ -148,10 +199,12 @@ var aircraftImages = [
 function renderQuotes(quotes) {
     var container = document.getElementById('quotes-container');
     if (!quotes.length) {
-          container.innerHTML = '<div class="loading-state"><div class="spinner"></div><div>Waiting for quotes from operators...</div><div style="font-size:12px;margin-top:8px;opacity:.6;">Operators have 60 minutes to respond</div></div>';
+          container.innerHTML = '<div class="loading-state"><div class="spinner"></div><div>Waiting for quotes from operators...</div><div style="font-size:12px;margin-top:8px;opacity:.6;">Operators have 60 minutes to respond</div><div class="facts-section" id="facts-section"><div class="facts-label">Did you know?</div><div class="fact-card" id="fact-card"></div><div class="fact-dots" id="fact-dots"></div></div></div>';
+          initFacts();
           return;
     }
 
+  stopFacts();
   var html = '';
     quotes.forEach(function(q, i) {
           quotesMap[q.id] = q;
@@ -281,6 +334,7 @@ loadQueryAndSidebar();
 startTimer();
 var debugEl = document.getElementById('debug-query-id');
 if (debugEl && queryId) debugEl.textContent = 'ID: ' + queryId.substring(0,8) + '…';
+initFacts();
 loadQuotes();
 setInterval(loadQuotes, 5000);
 
