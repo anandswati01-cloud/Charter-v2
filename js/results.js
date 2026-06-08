@@ -216,9 +216,8 @@ function selectQuote(id) {
 }
 
 // ── Filters ──
-var filterSort = 'price';
+var filterPriceSort = 'asc';
 var filterMinSeats = 0;
-var filterMaxPrice = 0;
 var allQuotes = [];
 
 function toggleFilters() {
@@ -226,8 +225,10 @@ function toggleFilters() {
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
 }
 
-function setSort(val) {
-    filterSort = val;
+function setPriceSort(dir) {
+    filterPriceSort = dir;
+    document.getElementById('pill-price-asc').classList.toggle('active', dir === 'asc');
+    document.getElementById('pill-price-desc').classList.toggle('active', dir === 'desc');
     applyFilters();
 }
 
@@ -236,16 +237,12 @@ function setMinSeats(val) {
     applyFilters();
 }
 
-function setMaxPrice(val) {
-    filterMaxPrice = val;
-    applyFilters();
-}
-
 function resetFilters() {
-    filterSort = 'price';
+    filterPriceSort = 'asc';
     filterMinSeats = 0;
-    filterMaxPrice = 0;
     document.querySelectorAll('.filter-select').forEach(function(s){ s.selectedIndex = 0; });
+    document.getElementById('pill-price-asc').classList.add('active');
+    document.getElementById('pill-price-desc').classList.remove('active');
     applyFilters();
     document.getElementById('filter-panel').style.display = 'none';
 }
@@ -255,13 +252,10 @@ function applyFilters() {
     if (filterMinSeats > 0) {
           filtered = filtered.filter(function(q){ return (q.seats_available || 0) >= filterMinSeats; });
     }
-    if (filterMaxPrice > 0) {
-          filtered = filtered.filter(function(q){ return (q.price || 0) <= filterMaxPrice; });
-    }
-    if (filterSort === 'price') {
+    if (filterPriceSort === 'asc') {
           filtered.sort(function(a,b){ return (a.price||0) - (b.price||0); });
-    } else if (filterSort === 'seats') {
-          filtered.sort(function(a,b){ return (b.seats_available||0) - (a.seats_available||0); });
+    } else {
+          filtered.sort(function(a,b){ return (b.price||0) - (a.price||0); });
     }
     renderQuotes(filtered);
 }
