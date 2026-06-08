@@ -269,6 +269,7 @@ async function loadAllData(){
   document.getElementById('count-confirmed').textContent=confirmed.length;
   document.getElementById('nav-badge-queries').textContent=unquoted.length+shared.length;
   renderActiveList(unquoted);
+  markQueriesViewed(unquoted.map(function(q){return q.id;}));
   renderSharedList(shared);
   renderConfirmedList(confirmed);
 }
@@ -1329,4 +1330,26 @@ function populateCategoryCheckboxes(){
   var heliEl = document.getElementById('cat-heli');
   if(fixedEl) fixedEl.checked = cats.indexOf('fixed_wing') !== -1;
   if(heliEl) heliEl.checked = cats.indexOf('helicopter') !== -1;
+}
+
+// ── Track which operators have seen each query ──
+async function markQueriesViewed(queryIds) {
+  if (!queryIds || !queryIds.length || !currentOperator) return;
+  var rows = queryIds.map(function(qid) {
+    return { query_id: qid, operator_id: currentOperator.id };
+  });
+  try {
+    await fetch(SUPABASE_URL + '/rest/v1/query_views', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=ignore-duplicates'
+      },
+      body: JSON.stringify(rows)
+    });
+  } catch(e) {
+    console.warn('markQueriesViewed failed', e);
+  }
 }
