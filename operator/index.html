@@ -201,6 +201,21 @@
     <div class="field-group" style="margin:0;"><label class="field-label">Expiry date</label><input type="date" class="field-input" id="ins-expiry"/></div>
   </div>
 </div>
+      <!-- CABIN AMENITIES -->
+      <div class="amenities-section" style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid rgba(196,134,10,0.2);">
+        <div class="section-label" style="text-transform:uppercase;letter-spacing:.06em;font-size:.7rem;color:var(--gold);margin-bottom:.75rem;">CABIN AMENITIES</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem;">
+          <label class="amenity-check"><input type="checkbox" id="am-wifi"> In-flight Wi-Fi</label>
+          <label class="amenity-check"><input type="checkbox" id="am-oven"> Oven</label>
+          <label class="amenity-check"><input type="checkbox" id="am-microwave"> Microwave</label>
+          <label class="amenity-check"><input type="checkbox" id="am-coffee"> Coffee Machine</label>
+          <label class="amenity-check"><input type="checkbox" id="am-flatbed"> Lie-flat / Sleeper Seats</label>
+          <label class="amenity-check"><input type="checkbox" id="am-lavatory"> Lavatory</label>
+          <label class="amenity-check"><input type="checkbox" id="am-satphone"> Satellite Phone</label>
+          <label class="amenity-check"><input type="checkbox" id="am-entertainment"> Entertainment System</label>
+          <label class="amenity-check"><input type="checkbox" id="am-nonsmoking"> Non-smoking</label>
+        </div>
+      </div>
 <div id="ac-save-error" style="font-size:12px;color:var(--red);margin-top:10px;display:none;"></div>
 </div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('aircraft-modal')">Cancel</button><button class="btn-sm btn-blue" id="btn-save-aircraft" onclick="saveAircraft()">Submit for review</button></div></div></div>
 <div class="modal-overlay" id="employee-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Add employee</span><button class="modal-close" onclick="closeModal('employee-modal')">&times;</button></div><div class="modal-body"><div class="field-group"><label class="field-label">Full name</label><input type="text" class="field-input" id="emp-name" placeholder="Employee full name"/></div><div class="field-group"><label class="field-label">Company employee ID <span style="color:var(--red);">*</span></label><input type="text" class="field-input" id="emp-id" placeholder="e.g. EMP-001 or staff ID number"/></div><div class="field-group"><label class="field-label">Username</label><input type="text" class="field-input" id="emp-username" placeholder="Choose a username"/></div><div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="emp-password" placeholder="Set a password"/></div><div style="background:var(--blue-faint);border:0.5px solid var(--blue-border);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-secondary);margin-bottom:4px;">This employee will need SkyVayu approval before they can log in.</div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('employee-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="saveEmployee()">Submit for approval</button></div></div></div>
