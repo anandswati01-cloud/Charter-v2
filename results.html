@@ -220,7 +220,8 @@ nav{
 .cloud-2{top:28px;animation:cloud-drift 11s linear infinite 3s;}
 .cloud-3{top:52px;animation:cloud-drift 9s linear infinite 1.5s;}
 /* plane flies across */
-.plane-wrap{position:absolute;top:50%;left:-80px;animation:plane-fly 5s linear infinite;}
+.plane-wrap,.plane-wrap-2{position:absolute;top:50%;left:-80px;animation:plane-fly 5s linear infinite;}
+.plane-wrap-2{animation-delay:-2.5s;}
 /* rotor spins */
 .rotor{transform-origin:50% 50%;animation:rotor-spin .25s linear infinite;}
 @keyframes cloud-drift{from{transform:translateX(340px);}to{transform:translateX(-120px);}}
@@ -455,6 +456,24 @@ nav{
             <svg class="cloud cloud-3" width="36" height="18" viewBox="0 0 36 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 13c-2.2 0-4-1.8-4-4 0-2 1.5-3.7 3.5-3.9C5 2.5 7.5 1 10.5 1c1.5 0 2.8.5 3.8 1.3C15.3 1.5 16.8 1 18.5 1 22 1 25 4 25 7.5c0 .2 0 .5-.1.7H26c1.9 0 3.5 1.6 3.5 3.5S27.9 15 26 15H5z" stroke="#17b0d6" stroke-width="1.2" fill="none" opacity=".7"/></svg>
             <!-- Private jet (plane) flying across -->
             <svg class="plane-wrap" width="64" height="32" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Fuselage -->
+              <path d="M4 17 Q16 15 36 16 L56 15 Q60 15 61 16.5 Q60 18 56 18 L36 17 Q16 18 4 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Nose cone -->
+              <path d="M56 15 Q63 16 61 18 Q63 16.5 56 18" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Main wing -->
+              <path d="M28 16.5 L18 8 L14 8.5 L24 16.5Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Tail wing -->
+              <path d="M10 17 L5 11 L3 11.5 L8 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Vertical tail -->
+              <path d="M8 17 L8 12 L11 12" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Engine under wing -->
+              <ellipse cx="21" cy="19" rx="4" ry="2" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Windows (3 dots) -->
+              <circle cx="40" cy="15.5" r="1" fill="#c9a84c"/>
+              <circle cx="45" cy="15.5" r="1" fill="#c9a84c"/>
+              <circle cx="50" cy="15.5" r="1" fill="#c9a84c"/>
+            </svg>
+              <svg class="plane-wrap-2" width="64" height="32" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
               <!-- Fuselage -->
               <path d="M4 17 Q16 15 36 16 L56 15 Q60 15 61 16.5 Q60 18 56 18 L36 17 Q16 18 4 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
               <!-- Nose cone -->
