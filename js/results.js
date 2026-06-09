@@ -127,33 +127,39 @@ function initFacts() {
     var card = document.getElementById('fact-card');
     var dotsEl = document.getElementById('fact-dots');
     if (!card || !dotsEl) return;
-    // Build items
+    // Always rebuild DOM (container was just reset), but keep current index if already cycling
     var itemsHTML = AVIATION_FACTS.map(function(f, i) {
-        return '<div class="fact-item' + (i===0?' visible':'') + '" id="fact-item-'+i+'">' +
+        return '<div class="fact-item' + (i===factsIndex?' visible':'') + '" id="fact-item-'+i+'">' +
                '<div class="fact-stat">'+f.stat+'</div>' +
                '<div class="fact-text">'+f.text+'</div>' +
                '</div>';
     }).join('');
     card.innerHTML = itemsHTML;
-    // Build dots
     var dotsHTML = AVIATION_FACTS.map(function(_, i) {
-        return '<div class="fact-dot'+(i===0?' active':'')+'" id="fact-dot-'+i+'"></div>';
+        return '<div class="fact-dot'+(i===factsIndex?' active':'')+'" id="fact-dot-'+i+'"></div>';
     }).join('');
     dotsEl.innerHTML = dotsHTML;
-    factsIndex = 0;
-    if (factsInterval) clearInterval(factsInterval);
-    factsInterval = setInterval(function() {
-        var prev = factsIndex;
-        factsIndex = (factsIndex + 1) % AVIATION_FACTS.length;
-        var prevItem = document.getElementById('fact-item-'+prev);
-        var nextItem = document.getElementById('fact-item-'+factsIndex);
-        var prevDot = document.getElementById('fact-dot-'+prev);
-        var nextDot = document.getElementById('fact-dot-'+factsIndex);
-        if (prevItem) prevItem.classList.remove('visible');
-        if (nextItem) nextItem.classList.add('visible');
-        if (prevDot) prevDot.classList.remove('active');
-        if (nextDot) nextDot.classList.add('active');
-    }, 4000);
+    // Only start interval if not already running
+    if (!factsInterval) {
+        factsIndex = 0;
+        // Show first item
+        var firstItem = document.getElementById('fact-item-0');
+        var firstDot = document.getElementById('fact-dot-0');
+        if (firstItem) firstItem.classList.add('visible');
+        if (firstDot) firstDot.classList.add('active');
+        factsInterval = setInterval(function() {
+            var prev = factsIndex;
+            factsIndex = (factsIndex + 1) % AVIATION_FACTS.length;
+            var prevItem = document.getElementById('fact-item-'+prev);
+            var nextItem = document.getElementById('fact-item-'+factsIndex);
+            var prevDot = document.getElementById('fact-dot-'+prev);
+            var nextDot = document.getElementById('fact-dot-'+factsIndex);
+            if (prevItem) prevItem.classList.remove('visible');
+            if (nextItem) nextItem.classList.add('visible');
+            if (prevDot) prevDot.classList.remove('active');
+            if (nextDot) nextDot.classList.add('active');
+        }, 4000);
+    }
 }
 
 function stopFacts() {
@@ -334,7 +340,6 @@ loadQueryAndSidebar();
 startTimer();
 var debugEl = document.getElementById('debug-query-id');
 if (debugEl && queryId) debugEl.textContent = 'ID: ' + queryId.substring(0,8) + '…';
-initFacts();
 loadQuotes();
 setInterval(loadQuotes, 5000);
 
