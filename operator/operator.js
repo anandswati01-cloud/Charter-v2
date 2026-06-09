@@ -789,6 +789,7 @@ async function saveAircraft(){
   var type = document.getElementById('ac-type').value.trim();
   var reg  = document.getElementById('ac-reg').value.trim();
   var seats= parseInt(document.getElementById('ac-seats').value)||null;
+  const amenities = {wifi:document.getElementById('am-wifi')?.checked||false,oven:document.getElementById('am-oven')?.checked||false,microwave:document.getElementById('am-microwave')?.checked||false,coffee:document.getElementById('am-coffee')?.checked||false,flatbed:document.getElementById('am-flatbed')?.checked||false,lavatory:document.getElementById('am-lavatory')?.checked||false,satphone:document.getElementById('am-satphone')?.checked||false,entertainment:document.getElementById('am-entertainment')?.checked||false,nonsmoking:document.getElementById('am-nonsmoking')?.checked||false};
   var errEl = document.getElementById('ac-save-error');
   errEl.style.display='none';
   if(!type||!reg){errEl.textContent='Please enter aircraft type and registration.';errEl.style.display='block';return;}
@@ -806,7 +807,7 @@ async function saveAircraft(){
   var btn = document.getElementById('btn-save-aircraft');
   btn.disabled=true;btn.textContent='Uploading...';
   var acRes = await sbFetch('aircraft',{method:'POST',prefer:'return=representation',body:{
-    operator_id:currentOperator.id, aircraft_type:type, registration:reg, seats:seats,
+    operator_id:currentOperator.id, aircraft_type:type, registration:reg, seats:seats,amenities:amenities,
     is_active:false, doc_status:'pending'
   }});
   if(!acRes.ok||!acRes.data||!acRes.data.length||!acRes.data[0]){
@@ -1007,6 +1008,7 @@ async function loadRoster(){
   });
   aircraftList.forEach(function(ac){
     html+='<div class="roster-cell-ac"><div class="ac-type">'+escapeHtml(ac.aircraft_type)+'</div><div class="ac-reg">'+escapeHtml(ac.registration)+'</div></div>';
+  ['am-wifi','am-oven','am-microwave','am-coffee','am-flatbed','am-lavatory','am-satphone','am-entertainment','am-nonsmoking'].forEach(function(id){var el=document.getElementById(id);if(el)el.checked=false;});
     dates.forEach(function(d,idx){
       var iso=toIso(d);
       var cls='roster-cell'+(idx===0?' today':'');
