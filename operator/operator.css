@@ -267,3 +267,10 @@ textarea.field-input{height:80px;padding:10px 14px;resize:vertical;}
     .main-content{padding:16px;}
     .stat-row{grid-template-columns:1fr;}
 }
+
+
+/* ── CABIN AMENITIES ── */
+.amenities-section { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid rgba(196,134,10,0.2); }
+.amenity-check { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.85rem; color: var(--text-muted, #9ca3af); padding: 0.25rem 0; }
+.amenity-check input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--gold, #C4860A); cursor: pointer; flex-shrink: 0; }
+.amenity-check:hover { color: var(--gold, #C4860A); }
