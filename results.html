@@ -220,15 +220,13 @@ nav{
 .cloud-2{top:28px;animation:cloud-drift 11s linear infinite 3s;}
 .cloud-3{top:52px;animation:cloud-drift 9s linear infinite 1.5s;}
 /* plane flies across */
-.plane-wrap{position:absolute;top:50%;transform:translateY(-50%);animation:plane-fly 4s ease-in-out infinite;}
+.plane-wrap{position:absolute;top:50%;left:-80px;animation:plane-fly 5s linear infinite;}
 /* rotor spins */
 .rotor{transform-origin:50% 50%;animation:rotor-spin .25s linear infinite;}
 @keyframes cloud-drift{from{transform:translateX(340px);}to{transform:translateX(-120px);}}
 @keyframes plane-fly{
-  0%{left:-60px;opacity:0;}
-  10%{opacity:1;}
-  90%{opacity:1;}
-  100%{left:340px;opacity:0;}
+  from{transform:translateX(0) translateY(-50%);}
+  to{transform:translateX(480px) translateY(-50%);}
 }
 @keyframes rotor-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
 /* ── AVIATION FACTS ── */
