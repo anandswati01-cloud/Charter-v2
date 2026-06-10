@@ -350,8 +350,8 @@ async function loadPendingEmployees(){
     var opName=(e.operators&&e.operators.company_name)||'Unknown';
     var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
     return '<div class="op-card">'
-      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+escapeHtml(ini)+'</div><div><div class="op-company">'+escapeHtml(e.full_name||e.username)+'</div><div class="op-meta">'+escapeHtml(opName)+' ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ· @'+escapeHtml(e.username)+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
-      +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+escapeHtml(e.employee_id||'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Company</span>'+escapeHtml(opName)+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
+      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+escapeHtml(ini)+'</div><div><div class="op-company">'+escapeHtml(e.full_name||e.username)+'</div><div class="op-meta">'+escapeHtml(opName)+' ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ· @'+escapeHtml(e.username)+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
+      +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+escapeHtml(e.employee_id||'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Company</span>'+escapeHtml(opName)+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
       +'<div class="action-row"><button class="btn-approve" onclick="approveEmployee(\''+escapeHtml(e.id)+'\')">&#10003; Approve</button><button class="btn-reject" onclick="showEmpRejectInput(\''+escapeHtml(e.id)+'\')">&#10007; Reject</button><input class="rejection-input" id="emp-reject-reason-'+escapeHtml(e.id)+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="emp-confirm-reject-'+escapeHtml(e.id)+'" onclick="rejectEmployee(\''+escapeHtml(e.id)+'\')">Confirm</button></div>'
       +'</div>';
   }).join('');
@@ -389,8 +389,8 @@ function showTab(tab){
   document.getElementById('tab-content-'+tab).style.display='block';
 }
 
-function fmtDateTime(iso){if(!iso)return'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ';return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
-function fmtDate(d){if(!d)return'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
+function fmtDateTime(iso){if(!iso)return'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ';return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function fmtDate(d){if(!d)return'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
 
 async function openDocument(docUrl){
   if(!docUrl){showToast('No document uploaded','error');return;}
@@ -437,7 +437,7 @@ function renderOperatorCard(op){
   }
   return '<div class="op-card">'
     +'<div class="op-card-top"><div><div class="op-company">'+escapeHtml(op.company_name)+'</div><div class="op-meta">Applied '+fmtDateTime(op.created_at)+(empCount?' &middot; '+empCount+' emp':'')+'</div></div><span class="status-badge '+statusClass+'">'+statusLabel+'</span></div>'
-    +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+escapeHtml(op.owner_name||'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Phone</span>'+escapeHtml(op.owner_phone||'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Email</span>'+escapeHtml(op.owner_email||'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+escapeHtml(owner.username):'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div></div>'
+    +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+escapeHtml(op.owner_name||'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Phone</span>'+escapeHtml(op.owner_phone||'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Email</span>'+escapeHtml(op.owner_email||'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+escapeHtml(owner.username):'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div></div>'
     +docHtml+actionHtml+'</div>';
 }
 
@@ -551,7 +551,7 @@ async function loadDatabaseSection(){
   var results=await Promise.all([
     sb.from('queries').select('*').order('created_at',{ascending:false}),
     sb.from('quotes').select('*').order('created_at',{ascending:false}),
-    sb.from('profiles').select('*').order('created_at',{ascending:false}),
+    sb.rpc('get_all_users'),
     sb.from('operators').select('*').order('created_at',{ascending:false}),
     sb.from('aircraft').select('*').order('created_at',{ascending:false}),
     sb.from('operator_users').select('*').order('created_at',{ascending:false})
@@ -586,7 +586,7 @@ function dbBadge(status){
 }
 
 function dbTd(val,cls){
-  var v=(val===null||val===undefined)?'<span style="opacity:0.3">—</span>':escapeHtml(String(val));
+  var v=(val===null||val===undefined)?'<span style="opacity:0.3">â</span>':escapeHtml(String(val));
   return '<td class="'+(cls||'')+'">'+v+'</td>';
 }
 
@@ -613,15 +613,15 @@ function renderDbPane(tab){
 function renderQueriesTable(data){
   var rows=data.map(function(q){
     return '<tr>'+
-      dbTd(q.id?q.id.substring(0,8)+'…':'-','db-id')+
+      dbTd(q.id?q.id.substring(0,8)+'â¦':'-','db-id')+
       dbTd(q.trip_type)+
-      '<td style="color:var(--white);font-weight:500">'+escapeHtml((q.departure||'-'))+' → '+escapeHtml((q.destination||'-'))+'</td>'+
+      '<td style="color:var(--white);font-weight:500">'+escapeHtml((q.departure||'-'))+' â '+escapeHtml((q.destination||'-'))+'</td>'+
       dbTd(q.flight_date)+
       dbTd(q.passengers)+
       dbTd(q.aircraft_category)+
       '<td>'+dbBadge(q.status)+'</td>'+
       dbTd(q.client_phone)+
-      dbTd(q.user_id?q.user_id.substring(0,8)+'…':'-','db-id')+
+      dbTd(q.user_id?q.user_id.substring(0,8)+'â¦':'-','db-id')+
       dbTd(q.created_at?q.created_at.substring(0,10):'-')+
       '</tr>';
   }).join('');
@@ -631,12 +631,12 @@ function renderQueriesTable(data){
 function renderQuotesTable(data){
   var rows=data.map(function(q){
     return '<tr>'+
-      dbTd(q.id?q.id.substring(0,8)+'…':'-','db-id')+
-      dbTd(q.query_id?q.query_id.substring(0,8)+'…':'-','db-id')+
+      dbTd(q.id?q.id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(q.query_id?q.query_id.substring(0,8)+'â¦':'-','db-id')+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(q.operator_name||'-')+'</td>'+
       dbTd(q.aircraft_type)+
       dbTd(q.aircraft_registration)+
-      '<td style="color:var(--gold);font-weight:500">₹'+escapeHtml(q.price?Number(q.price).toLocaleString('en-IN'):'-')+'</td>'+
+      '<td style="color:var(--gold);font-weight:500">â¹'+escapeHtml(q.price?Number(q.price).toLocaleString('en-IN'):'-')+'</td>'+
       '<td>'+dbBadge(q.status)+'</td>'+
       dbTd(q.notes,'',120)+
       dbTd(q.created_at?q.created_at.substring(0,10):'-')+
@@ -652,20 +652,20 @@ function renderClientsTable(data){
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(c.full_name||'-')+'</td>'+
       dbTd(c.email)+
       dbTd(c.phone)+
-      dbTd(c.nationality)+
-      dbTd(c.date_of_birth)+
+      '<td>'+dbBadge(c.provider||'email')+'</td>'+
       '<td>'+dbBadge(c.kyc_verified?'verified':'pending')+'</td>'+
       '<td>'+dbBadge(c.is_admin?'admin':'client')+'</td>'+
+      dbTd(c.last_sign_in_at?c.last_sign_in_at.substring(0,10):'-')+
       dbTd(c.created_at?c.created_at.substring(0,10):'-')+
       '</tr>';
   }).join('');
-  return '<table class="db-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Nationality</th><th>DOB</th><th>KYC</th><th>Role</th><th>Joined</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  return '<table class="db-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Provider</th><th>KYC</th><th>Role</th><th>Last Login</th><th>Joined</th></tr></thead><tbody>'+rows+'</tbody></table>';
 }
 
 function renderOperatorsDbTable(data){
   var rows=data.map(function(o){
     return '<tr>'+
-      dbTd(o.id?o.id.substring(0,8)+'…':'-','db-id')+
+      dbTd(o.id?o.id.substring(0,8)+'â¦':'-','db-id')+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(o.company_name||'-')+'</td>'+
       dbTd(o.owner_name)+
       dbTd(o.owner_email)+
@@ -682,11 +682,11 @@ function renderOperatorsDbTable(data){
 function renderAircraftDbTable(data){
   var rows=data.map(function(a){
     return '<tr>'+
-      dbTd(a.id?a.id.substring(0,8)+'…':'-','db-id')+
+      dbTd(a.id?a.id.substring(0,8)+'â¦':'-','db-id')+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(a.aircraft_type||'-')+'</td>'+
       dbTd(a.registration)+
       dbTd(a.seats)+
-      dbTd(a.operator_id?a.operator_id.substring(0,8)+'…':'-','db-id')+
+      dbTd(a.operator_id?a.operator_id.substring(0,8)+'â¦':'-','db-id')+
       '<td>'+dbBadge(a.doc_status||'pending')+'</td>'+
       dbTd(a.coa_expiry)+
       dbTd(a.cor_expiry)+
@@ -700,14 +700,14 @@ function renderAircraftDbTable(data){
 function renderEmployeesTable(data){
   var rows=data.map(function(e){
     return '<tr>'+
-      dbTd(e.id?e.id.substring(0,8)+'…':'-','db-id')+
+      dbTd(e.id?e.id.substring(0,8)+'â¦':'-','db-id')+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(e.full_name||'-')+'</td>'+
       dbTd(e.username)+
       dbTd(e.email)+
       dbTd(e.phone)+
       dbTd(e.role)+
       dbTd(e.aircraft_category)+
-      dbTd(e.operator_id?e.operator_id.substring(0,8)+'…':'-','db-id')+
+      dbTd(e.operator_id?e.operator_id.substring(0,8)+'â¦':'-','db-id')+
       '<td>'+dbBadge(e.is_approved?'approved':'pending')+'</td>'+
       dbTd(e.created_at?e.created_at.substring(0,10):'-')+
       '</tr>';
