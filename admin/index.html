@@ -27,7 +27,7 @@
   --font-mono:'DM Mono','Courier New',monospace;
   --font:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
 }
-body{font-family:var(--font);background:var(--navy);color:var(--white);min-height:100vh;font-size:14px;line-height:1.6;}
+body{font-family:var(--font);background:var(--navy);color:var(--white);min-height:100vh;font-size:16px;line-height:1.6;}
 /* LOGIN */
 #page-login{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden;background:#0c1324;}
 #page-login::before{content:'';position:absolute;inset:0;background-image:url('../airplane.png');background-size:cover;background-position:50% 40%;filter:brightness(0.45) saturate(0.5);z-index:0;}
@@ -291,8 +291,8 @@ async function loadPendingEmployees(){
     var opName=(e.operators&&e.operators.company_name)||'Unknown';
     var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
     return '<div class="op-card">'
-      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+escapeHtml(ini)+'</div><div><div class="op-company">'+escapeHtml(e.full_name||e.username)+'</div><div class="op-meta">'+escapeHtml(opName)+' Â· @'+escapeHtml(e.username)+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
-      +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+escapeHtml(e.employee_id||'â')+'</div><div class="op-detail"><span>Company</span>'+escapeHtml(opName)+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
+      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+escapeHtml(ini)+'</div><div><div class="op-company">'+escapeHtml(e.full_name||e.username)+'</div><div class="op-meta">'+escapeHtml(opName)+' ÃÂ· @'+escapeHtml(e.username)+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
+      +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+escapeHtml(e.employee_id||'Ã¢ÂÂ')+'</div><div class="op-detail"><span>Company</span>'+escapeHtml(opName)+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
       +'<div class="action-row"><button class="btn-approve" onclick="approveEmployee(\''+escapeHtml(e.id)+'\')">&#10003; Approve</button><button class="btn-reject" onclick="showEmpRejectInput(\''+escapeHtml(e.id)+'\')">&#10007; Reject</button><input class="rejection-input" id="emp-reject-reason-'+escapeHtml(e.id)+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="emp-confirm-reject-'+escapeHtml(e.id)+'" onclick="rejectEmployee(\''+escapeHtml(e.id)+'\')">Confirm</button></div>'
       +'</div>';
   }).join('');
@@ -330,8 +330,8 @@ function showTab(tab){
   document.getElementById('tab-content-'+tab).style.display='block';
 }
 
-function fmtDateTime(iso){if(!iso)return'â';return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
-function fmtDate(d){if(!d)return'â';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
+function fmtDateTime(iso){if(!iso)return'Ã¢ÂÂ';return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function fmtDate(d){if(!d)return'Ã¢ÂÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
 
 async function openDocument(docUrl){
   if(!docUrl){showToast('No document uploaded','error');return;}
@@ -378,7 +378,7 @@ function renderOperatorCard(op){
   }
   return '<div class="op-card">'
     +'<div class="op-card-top"><div><div class="op-company">'+escapeHtml(op.company_name)+'</div><div class="op-meta">Applied '+fmtDateTime(op.created_at)+(empCount?' &middot; '+empCount+' emp':'')+'</div></div><span class="status-badge '+statusClass+'">'+statusLabel+'</span></div>'
-    +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+escapeHtml(op.owner_name||'â')+'</div><div class="op-detail"><span>Phone</span>'+escapeHtml(op.owner_phone||'â')+'</div><div class="op-detail"><span>Email</span>'+escapeHtml(op.owner_email||'â')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+escapeHtml(owner.username):'â')+'</div></div>'
+    +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+escapeHtml(op.owner_name||'Ã¢ÂÂ')+'</div><div class="op-detail"><span>Phone</span>'+escapeHtml(op.owner_phone||'Ã¢ÂÂ')+'</div><div class="op-detail"><span>Email</span>'+escapeHtml(op.owner_email||'Ã¢ÂÂ')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+escapeHtml(owner.username):'Ã¢ÂÂ')+'</div></div>'
     +docHtml+actionHtml+'</div>';
 }
 
