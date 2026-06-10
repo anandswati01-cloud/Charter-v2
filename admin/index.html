@@ -122,6 +122,41 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
 .forgot-status{font-size:12px;margin-top:8px;min-height:16px;}
 .forgot-status.error{color:#f87272;}
 .forgot-status.ok{color:#6ee7b7;}
+
+.db-section{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.db-section.active{display:flex;}
+.db-header{padding:20px 28px 12px;border-bottom:0.5px solid var(--white-10);display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.db-title{font-family:var(--font-display);font-size:32px;font-weight:400;color:var(--gold);}
+.db-search{flex:1;min-width:200px;height:36px;padding:0 12px;background:rgba(255,255,255,0.05);border:0.5px solid var(--white-10);border-radius:var(--radius);color:var(--white);font-size:13px;font-family:var(--font);outline:none;}
+.db-search:focus{border-color:var(--gold);}
+.db-tabs{display:flex;gap:0;border-bottom:0.5px solid var(--white-10);padding:0 28px;overflow-x:auto;}
+.db-tab{padding:10px 18px;font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;font-weight:500;color:var(--white-30);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;}
+.db-tab:hover{color:var(--white-60);}
+.db-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.db-count{background:var(--gold-faint);color:var(--gold);font-size:9px;padding:1px 5px;border-radius:8px;margin-left:5px;}
+.db-content{flex:1;overflow-y:auto;padding:0 28px 28px;}
+.db-pane{display:none;}
+.db-pane.active{display:block;}
+.db-table-wrap{overflow-x:auto;margin-top:16px;}
+table.db-table{width:100%;border-collapse:collapse;font-size:13px;}
+table.db-table th{font-family:var(--font-mono);font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--white-30);padding:8px 12px;text-align:left;border-bottom:0.5px solid var(--white-10);white-space:nowrap;font-weight:400;}
+table.db-table td{padding:10px 12px;border-bottom:0.5px solid rgba(255,255,255,0.04);color:var(--white-60);vertical-align:top;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+table.db-table tr:hover td{background:rgba(255,255,255,0.03);}
+table.db-table td.db-id{font-family:var(--font-mono);font-size:10px;color:var(--white-30);max-width:80px;}
+table.db-table td.db-name{color:var(--white);font-weight:500;}
+.db-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-family:var(--font-mono);font-size:9px;letter-spacing:0.5px;text-transform:uppercase;}
+.db-badge.open{background:rgba(59,109,17,0.2);color:#97C459;}
+.db-badge.closed,.db-badge.rejected{background:rgba(226,75,74,0.15);color:#E24B4A;}
+.db-badge.quoted,.db-badge.active,.db-badge.approved,.db-badge.verified{background:rgba(251,191,36,0.15);color:#fbbf24;}
+.db-badge.confirmed{background:rgba(24,95,250,0.15);color:#185FA5;}
+.db-badge.pending{background:rgba(239,159,39,0.1);color:#EF9F27;}
+.db-badge.client,.db-badge.admin{background:rgba(255,255,255,0.07);color:var(--white-60);}
+.db-empty{padding:40px;text-align:center;color:var(--white-30);font-size:13px;}
+.db-loading{padding:40px;text-align:center;color:var(--white-30);font-size:13px;}
+.db-summary{display:flex;gap:12px;padding:16px 28px 4px;flex-wrap:wrap;}
+.db-stat-card{background:var(--bg-card);border:0.5px solid var(--white-10);border-radius:var(--radius);padding:12px 18px;min-width:100px;}
+.db-stat-num{font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--white);}
+.db-stat-label{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--white-30);margin-top:2px;}
 </style>
 </head>
 <body>
@@ -155,7 +190,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
     <p id="forgot-status" class="forgot-status"></p>
   </div>
 </div>
-<div id="page-dashboard"><aside class="admin-sidebar"><div class="sidebar-logo"><span class="brand-logo">SkyVayu</span><span class="portal-tag">Super Admin</span></div><div class="admin-user-card"><span class="admin-role">Super Admin</span><div class="admin-username" id="nav-username"></div></div><nav class="sidebar-nav"><div class="sidebar-nav-item active" onclick="switchTab('operators')">Operators <span class="sidebar-nav-badge" id="sb-pending">0</span></div><div class="sidebar-nav-item" onclick="switchTab('aircraft')">Aircraft</div><div class="sidebar-nav-item" onclick="switchTab('employees')">Employees</div></nav><div class="sidebar-footer"><button class="btn-logout" onclick="signOut()">Sign out</button></div></aside><div class="admin-main">
+<div id="page-dashboard"><aside class="admin-sidebar"><div class="sidebar-logo"><span class="brand-logo">SkyVayu</span><span class="portal-tag">Super Admin</span></div><div class="admin-user-card"><span class="admin-role">Super Admin</span><div class="admin-username" id="nav-username"></div></div><nav class="sidebar-nav"><div class="sidebar-nav-item active" onclick="switchTab('operators')">Operators <span class="sidebar-nav-badge" id="sb-pending">0</span></div><div class="sidebar-nav-item" onclick="switchTab('aircraft')">Aircraft</div><div class="sidebar-nav-item" onclick="switchTab('employees')">Employees</div><div class="sidebar-nav-item" id="nav-database" onclick="switchSection('database')">&#9783; Database</div></nav><div class="sidebar-footer"><button class="btn-logout" onclick="signOut()">Sign out</button></div></aside><div class="admin-main">
   <div class="top-bar">
     <div class="top-logo">
       <span class="brand-logo">SkyVayu</span>
@@ -187,6 +222,30 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
     <div id="tab-content-aircraft" style="display:none;"><div class="loading">Loading...</div></div>
     <div id="tab-content-employees" style="display:none;"><div class="loading">Loading...</div></div>
   </div>
+
+<div id="section-database" class="db-section">
+  <div class="db-header">
+    <div class="db-title">Database</div>
+    <input class="db-search" id="db-search" type="text" placeholder="Search all records..." oninput="dbSearch(this.value)"/>
+  </div>
+  <div class="db-summary" id="db-summary-row"></div>
+  <div class="db-tabs">
+    <div class="db-tab active" id="dbtab-queries" onclick="switchDbTab('queries')">Queries <span class="db-count" id="dbc-queries">-</span></div>
+    <div class="db-tab" id="dbtab-quotes" onclick="switchDbTab('quotes')">Quotes <span class="db-count" id="dbc-quotes">-</span></div>
+    <div class="db-tab" id="dbtab-clients" onclick="switchDbTab('clients')">Clients <span class="db-count" id="dbc-clients">-</span></div>
+    <div class="db-tab" id="dbtab-operators" onclick="switchDbTab('operators')">Operators <span class="db-count" id="dbc-operators">-</span></div>
+    <div class="db-tab" id="dbtab-aircraft" onclick="switchDbTab('aircraft')">Aircraft <span class="db-count" id="dbc-aircraft">-</span></div>
+    <div class="db-tab" id="dbtab-employees" onclick="switchDbTab('employees')">Employees <span class="db-count" id="dbc-employees">-</span></div>
+  </div>
+  <div class="db-content">
+    <div class="db-pane active" id="dbpane-queries"><div class="db-loading">Loading...</div></div>
+    <div class="db-pane" id="dbpane-quotes"><div class="db-loading">Loading...</div></div>
+    <div class="db-pane" id="dbpane-clients"><div class="db-loading">Loading...</div></div>
+    <div class="db-pane" id="dbpane-operators"><div class="db-loading">Loading...</div></div>
+    <div class="db-pane" id="dbpane-aircraft"><div class="db-loading">Loading...</div></div>
+    <div class="db-pane" id="dbpane-employees"><div class="db-loading">Loading...</div></div>
+  </div>
+</div>
 </div>
 <div class="toast" id="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -291,8 +350,8 @@ async function loadPendingEmployees(){
     var opName=(e.operators&&e.operators.company_name)||'Unknown';
     var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
     return '<div class="op-card">'
-      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+escapeHtml(ini)+'</div><div><div class="op-company">'+escapeHtml(e.full_name||e.username)+'</div><div class="op-meta">'+escapeHtml(opName)+' ÃÂÃÂÃÂÃÂ· @'+escapeHtml(e.username)+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
-      +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+escapeHtml(e.employee_id||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Company</span>'+escapeHtml(opName)+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
+      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+escapeHtml(ini)+'</div><div><div class="op-company">'+escapeHtml(e.full_name||e.username)+'</div><div class="op-meta">'+escapeHtml(opName)+' ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ· @'+escapeHtml(e.username)+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
+      +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+escapeHtml(e.employee_id||'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Company</span>'+escapeHtml(opName)+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
       +'<div class="action-row"><button class="btn-approve" onclick="approveEmployee(\''+escapeHtml(e.id)+'\')">&#10003; Approve</button><button class="btn-reject" onclick="showEmpRejectInput(\''+escapeHtml(e.id)+'\')">&#10007; Reject</button><input class="rejection-input" id="emp-reject-reason-'+escapeHtml(e.id)+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="emp-confirm-reject-'+escapeHtml(e.id)+'" onclick="rejectEmployee(\''+escapeHtml(e.id)+'\')">Confirm</button></div>'
       +'</div>';
   }).join('');
@@ -330,8 +389,8 @@ function showTab(tab){
   document.getElementById('tab-content-'+tab).style.display='block';
 }
 
-function fmtDateTime(iso){if(!iso)return'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
-function fmtDate(d){if(!d)return'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
+function fmtDateTime(iso){if(!iso)return'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ';return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function fmtDate(d){if(!d)return'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
 
 async function openDocument(docUrl){
   if(!docUrl){showToast('No document uploaded','error');return;}
@@ -378,7 +437,7 @@ function renderOperatorCard(op){
   }
   return '<div class="op-card">'
     +'<div class="op-card-top"><div><div class="op-company">'+escapeHtml(op.company_name)+'</div><div class="op-meta">Applied '+fmtDateTime(op.created_at)+(empCount?' &middot; '+empCount+' emp':'')+'</div></div><span class="status-badge '+statusClass+'">'+statusLabel+'</span></div>'
-    +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+escapeHtml(op.owner_name||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Phone</span>'+escapeHtml(op.owner_phone||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Email</span>'+escapeHtml(op.owner_email||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+escapeHtml(owner.username):'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ')+'</div></div>'
+    +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+escapeHtml(op.owner_name||'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Phone</span>'+escapeHtml(op.owner_phone||'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Email</span>'+escapeHtml(op.owner_email||'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+escapeHtml(owner.username):'ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div></div>'
     +docHtml+actionHtml+'</div>';
 }
 
@@ -442,6 +501,220 @@ async function rejectAircraft(acId){
   else showToast('Failed to reject aircraft. Please try again.','error');
 }
 
+
+// ===== DATABASE SECTION =====
+var _dbData={queries:[],quotes:[],clients:[],operators:[],aircraft:[],employees:[]};
+var _dbFilter='';
+var _dbActiveTab='queries';
+var _dbLoaded=false;
+
+function switchSection(section){
+  var topBar=document.querySelector('.top-bar');
+  var tabsBar=document.querySelector('.tabs-bar');
+  var content=document.querySelector('.content');
+  var dbSection=document.getElementById('section-database');
+  document.querySelectorAll('.sidebar-nav-item').forEach(function(el){el.classList.remove('active');});
+  if(section==='database'){
+    if(topBar)topBar.style.display='none';
+    if(tabsBar)tabsBar.style.display='none';
+    if(content)content.style.display='none';
+    dbSection.classList.add('active');
+    document.getElementById('nav-database').classList.add('active');
+    if(!_dbLoaded){_dbLoaded=true;loadDatabaseSection();}
+  }else{
+    if(topBar)topBar.style.display='';
+    if(tabsBar)tabsBar.style.display='';
+    if(content)content.style.display='';
+    dbSection.classList.remove('active');
+    document.querySelectorAll('.sidebar-nav-item').forEach(function(el){
+      if(el.getAttribute('onclick')==="switchTab('operators')")el.classList.add('active');
+    });
+  }
+}
+
+function switchDbTab(tab){
+  _dbActiveTab=tab;
+  document.querySelectorAll('.db-tab').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('dbtab-'+tab).classList.add('active');
+  document.querySelectorAll('.db-pane').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('dbpane-'+tab).classList.add('active');
+  renderDbPane(tab);
+}
+
+function dbSearch(val){
+  _dbFilter=(val||'').toLowerCase();
+  renderDbPane(_dbActiveTab);
+}
+
+async function loadDatabaseSection(){
+  var sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+  var results=await Promise.all([
+    sb.from('queries').select('*').order('created_at',{ascending:false}),
+    sb.from('quotes').select('*').order('created_at',{ascending:false}),
+    sb.from('profiles').select('*').order('created_at',{ascending:false}),
+    sb.from('operators').select('*').order('created_at',{ascending:false}),
+    sb.from('aircraft').select('*').order('created_at',{ascending:false}),
+    sb.from('operator_users').select('*').order('created_at',{ascending:false})
+  ]);
+  var keys=['queries','quotes','clients','operators','aircraft','employees'];
+  results.forEach(function(r,i){_dbData[keys[i]]=r.data||[];});
+  keys.forEach(function(t){
+    var el=document.getElementById('dbc-'+t);
+    if(el)el.textContent=_dbData[t].length;
+  });
+  var summaryEl=document.getElementById('db-summary-row');
+  if(summaryEl){
+    var stats=[
+      {label:'Total Queries',val:_dbData.queries.length},
+      {label:'Active Queries',val:_dbData.queries.filter(function(q){return q.status==='open';}).length},
+      {label:'Total Quotes',val:_dbData.quotes.length},
+      {label:'Clients',val:_dbData.clients.length},
+      {label:'Operators',val:_dbData.operators.length},
+      {label:'Aircraft',val:_dbData.aircraft.length},
+      {label:'Staff',val:_dbData.employees.length}
+    ];
+    summaryEl.innerHTML=stats.map(function(s){
+      return '<div class="db-stat-card"><div class="db-stat-num">'+s.val+'</div><div class="db-stat-label">'+s.label+'</div></div>';
+    }).join('');
+  }
+  renderDbPane(_dbActiveTab);
+}
+
+function dbBadge(status){
+  var s=(status||'unknown').toLowerCase().replace(/ /g,'_');
+  return '<span class="db-badge '+s+'">'+escapeHtml(status||'unknown')+'</span>';
+}
+
+function dbTd(val,cls){
+  var v=(val===null||val===undefined)?'<span style="opacity:0.3">—</span>':escapeHtml(String(val));
+  return '<td class="'+(cls||'')+'">'+v+'</td>';
+}
+
+function renderDbPane(tab){
+  var pane=document.getElementById('dbpane-'+tab);
+  if(!pane)return;
+  var data=(_dbData[tab]||[]).slice();
+  var f=_dbFilter;
+  if(f){data=data.filter(function(row){return JSON.stringify(row).toLowerCase().includes(f);});}
+  if(data.length===0){
+    pane.innerHTML='<div class="db-empty">No records'+(f?' matching "'+escapeHtml(f)+'"':'')+'.</div>';
+    return;
+  }
+  var html='';
+  if(tab==='queries')html=renderQueriesTable(data);
+  else if(tab==='quotes')html=renderQuotesTable(data);
+  else if(tab==='clients')html=renderClientsTable(data);
+  else if(tab==='operators')html=renderOperatorsDbTable(data);
+  else if(tab==='aircraft')html=renderAircraftDbTable(data);
+  else if(tab==='employees')html=renderEmployeesTable(data);
+  pane.innerHTML='<div class="db-table-wrap">'+html+'</div>';
+}
+
+function renderQueriesTable(data){
+  var rows=data.map(function(q){
+    return '<tr>'+
+      dbTd(q.id?q.id.substring(0,8)+'…':'-','db-id')+
+      dbTd(q.trip_type)+
+      '<td style="color:var(--white);font-weight:500">'+escapeHtml((q.departure||'-'))+' → '+escapeHtml((q.destination||'-'))+'</td>'+
+      dbTd(q.flight_date)+
+      dbTd(q.passengers)+
+      dbTd(q.aircraft_category)+
+      '<td>'+dbBadge(q.status)+'</td>'+
+      dbTd(q.client_phone)+
+      dbTd(q.user_id?q.user_id.substring(0,8)+'…':'-','db-id')+
+      dbTd(q.created_at?q.created_at.substring(0,10):'-')+
+      '</tr>';
+  }).join('');
+  return '<table class="db-table"><thead><tr><th>ID</th><th>Type</th><th>Route</th><th>Date</th><th>Pax</th><th>Category</th><th>Status</th><th>Phone</th><th>User ID</th><th>Created</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function renderQuotesTable(data){
+  var rows=data.map(function(q){
+    return '<tr>'+
+      dbTd(q.id?q.id.substring(0,8)+'…':'-','db-id')+
+      dbTd(q.query_id?q.query_id.substring(0,8)+'…':'-','db-id')+
+      '<td style="color:var(--white);font-weight:500">'+escapeHtml(q.operator_name||'-')+'</td>'+
+      dbTd(q.aircraft_type)+
+      dbTd(q.aircraft_registration)+
+      '<td style="color:var(--gold);font-weight:500">₹'+escapeHtml(q.price?Number(q.price).toLocaleString('en-IN'):'-')+'</td>'+
+      '<td>'+dbBadge(q.status)+'</td>'+
+      dbTd(q.notes,'',120)+
+      dbTd(q.created_at?q.created_at.substring(0,10):'-')+
+      '</tr>';
+  }).join('');
+  return '<table class="db-table"><thead><tr><th>ID</th><th>Query</th><th>Operator</th><th>Aircraft</th><th>Reg</th><th>Price</th><th>Status</th><th>Notes</th><th>Created</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function renderClientsTable(data){
+  var rows=data.map(function(c){
+    return '<tr>'+
+      dbTd(c.id?c.id.substring(0,8)+'…':'-','db-id')+
+      '<td style="color:var(--white);font-weight:500">'+escapeHtml(c.full_name||'-')+'</td>'+
+      dbTd(c.email)+
+      dbTd(c.phone)+
+      dbTd(c.nationality)+
+      dbTd(c.date_of_birth)+
+      '<td>'+dbBadge(c.kyc_verified?'verified':'pending')+'</td>'+
+      '<td>'+dbBadge(c.is_admin?'admin':'client')+'</td>'+
+      dbTd(c.created_at?c.created_at.substring(0,10):'-')+
+      '</tr>';
+  }).join('');
+  return '<table class="db-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Nationality</th><th>DOB</th><th>KYC</th><th>Role</th><th>Joined</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function renderOperatorsDbTable(data){
+  var rows=data.map(function(o){
+    return '<tr>'+
+      dbTd(o.id?o.id.substring(0,8)+'…':'-','db-id')+
+      '<td style="color:var(--white);font-weight:500">'+escapeHtml(o.company_name||'-')+'</td>'+
+      dbTd(o.owner_name)+
+      dbTd(o.owner_email)+
+      dbTd(o.owner_phone)+
+      dbTd(o.dgca_licence_no)+
+      '<td>'+dbBadge(o.approval_status)+'</td>'+
+      dbTd(o.aop_expiry_date)+
+      dbTd(o.created_at?o.created_at.substring(0,10):'-')+
+      '</tr>';
+  }).join('');
+  return '<table class="db-table"><thead><tr><th>ID</th><th>Company</th><th>Owner</th><th>Email</th><th>Phone</th><th>DGCA Licence</th><th>Status</th><th>AOP Expiry</th><th>Joined</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function renderAircraftDbTable(data){
+  var rows=data.map(function(a){
+    return '<tr>'+
+      dbTd(a.id?a.id.substring(0,8)+'…':'-','db-id')+
+      '<td style="color:var(--white);font-weight:500">'+escapeHtml(a.aircraft_type||'-')+'</td>'+
+      dbTd(a.registration)+
+      dbTd(a.seats)+
+      dbTd(a.operator_id?a.operator_id.substring(0,8)+'…':'-','db-id')+
+      '<td>'+dbBadge(a.doc_status||'pending')+'</td>'+
+      dbTd(a.coa_expiry)+
+      dbTd(a.cor_expiry)+
+      dbTd(a.insurance_expiry)+
+      dbTd(a.created_at?a.created_at.substring(0,10):'-')+
+      '</tr>';
+  }).join('');
+  return '<table class="db-table"><thead><tr><th>ID</th><th>Type</th><th>Reg</th><th>Seats</th><th>Operator</th><th>Doc Status</th><th>COA Exp</th><th>COR Exp</th><th>Insurance Exp</th><th>Created</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function renderEmployeesTable(data){
+  var rows=data.map(function(e){
+    return '<tr>'+
+      dbTd(e.id?e.id.substring(0,8)+'…':'-','db-id')+
+      '<td style="color:var(--white);font-weight:500">'+escapeHtml(e.full_name||'-')+'</td>'+
+      dbTd(e.username)+
+      dbTd(e.email)+
+      dbTd(e.phone)+
+      dbTd(e.role)+
+      dbTd(e.aircraft_category)+
+      dbTd(e.operator_id?e.operator_id.substring(0,8)+'…':'-','db-id')+
+      '<td>'+dbBadge(e.is_approved?'approved':'pending')+'</td>'+
+      dbTd(e.created_at?e.created_at.substring(0,10):'-')+
+      '</tr>';
+  }).join('');
+  return '<table class="db-table"><thead><tr><th>ID</th><th>Name</th><th>Username</th><th>Email</th><th>Phone</th><th>Role</th><th>Category</th><th>Operator</th><th>Status</th><th>Created</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
 (async()=>{
   const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
   window.__sb=sb;
@@ -461,3 +734,4 @@ async function rejectAircraft(acId){
   <script src="../js/graphify.js"></script>
 </body>
 </html>
+
