@@ -125,7 +125,7 @@ function applyRoleRestrictions(){
 /* ============ NAV ============ */
 
 function showSection(section){
-  ['queries','fleet','roster','employees','revenue'].forEach(function(s){
+  ['queries','fleet','roster','employees','revenue','profile'].forEach(function(s){
     var el=document.getElementById('section-'+s);if(el)el.style.display='none';
     var nav=document.getElementById('nav-'+s);if(nav)nav.classList.remove('active');
   });
@@ -136,7 +136,8 @@ function showSection(section){
   if(section==='employees')loadEmployees();
   if(section==='revenue')loadRevenue();
   if(section==='queries')loadAllData();
-}
+
+  if (section === 'profile') loadProfileCategory();}
 
 function showSubtab(tab){
   ['active','shared','confirmed'].forEach(function(t){
@@ -1322,6 +1323,35 @@ function saveCategorySettings(){
       } else {
         showToast('Save failed. Try again.','error');
       }
+    });
+}
+
+function loadProfileCategory() {
+  if (!currentOperator) return;
+  var cats = currentOperator.aircraft_category || [];
+  var fixedEl = document.getElementById('profile-cat-fixed');
+  var heliEl = document.getElementById('profile-cat-heli');
+  if (fixedEl) fixedEl.checked = cats.indexOf('fixed') !== -1;
+  if (heliEl) heliEl.checked = cats.indexOf('heli') !== -1;
+}
+
+function saveProfileCategory() {
+  var cats = [];
+  if (document.getElementById('profile-cat-fixed') && document.getElementById('profile-cat-fixed').checked) cats.push('fixed');
+  if (document.getElementById('profile-cat-heli') && document.getElementById('profile-cat-heli').checked) cats.push('heli');
+  var btn = document.getElementById('profile-cat-save-btn');
+  var msg = document.getElementById('profile-cat-msg');
+  if (btn) btn.disabled = true;
+  sbFetch('operator_users?id=eq.' + currentOperator.id, 'PATCH', {aircraft_category: cats})
+    .then(function() {
+      currentOperator.aircraft_category = cats;
+      if (msg) { msg.style.display = 'block'; msg.style.color = '#4caf50'; msg.textContent = 'Saved successfully!'; }
+      if (btn) btn.disabled = false;
+      setTimeout(function(){ if(msg) msg.style.display = 'none'; }, 3000);
+    })
+    .catch(function(err) {
+      if (msg) { msg.style.display = 'block'; msg.style.color = '#f44336'; msg.textContent = 'Error saving. Please try again.'; }
+      if (btn) btn.disabled = false;
     });
 }
 
