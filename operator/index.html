@@ -28,10 +28,7 @@
 
       <div style="margin:16px 12px 8px;padding:12px 14px;background:var(--blue-faint,rgba(23,176,214,0.06));border:1px solid var(--blue-border,rgba(23,176,214,0.2));border-radius:8px;">
         <div style="font-size:11px;font-weight:700;color:var(--blue,#17b0d6);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Aircraft Category</div>
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:10px;">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-main,#1a1a2e);"><input type="checkbox" id="cat-fixed" value="fixed_wing" style="width:15px;height:15px;accent-color:#17b0d6;"> Fixed Wing</label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px;color:var(--text-main,#1a1a2e);"><input type="checkbox" id="cat-heli" value="helicopter" style="width:15px;height:15px;accent-color:#17b0d6;"> Helicopter</label>
-        </div>
+        
         <button onclick="saveCategorySettings()" style="width:100%;padding:7px;background:#17b0d6;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">Save</button>
       </div>
       </div>
@@ -86,6 +83,7 @@
       <div class="nav-item active" id="nav-queries" onclick="showSection('queries')">Queries <span class="nav-badge" id="nav-badge-queries">0</span></div>
       <div class="nav-item" id="nav-fleet" onclick="showSection('fleet')">Fleet</div>
       <div class="nav-item" id="nav-roster" onclick="showSection('roster')">Roster</div>
+    <div id="nav-profile" class="nav-item" onclick="showSection('profile')">Profile</div>
     </div>
     <div class="nav-section" id="nav-admin-section">
       <div class="nav-label">Administration</div>
@@ -150,6 +148,29 @@
   </div>
 </div>
 <!-- ================= MODALS ================= -->
+
+<!-- ================= PROFILE SECTION ================= -->
+<div id="section-profile" style="display:none;">
+  <div class="main-header"><div class="page-title">Profile</div></div>
+  <div class="main-content">
+    <div class="card" style="max-width:500px;margin:0 auto;">
+      <div class="card-header"><h3 style="margin:0;">Aircraft Category</h3></div>
+      <div class="card-body" style="padding:20px;">
+        <p style="margin:0 0 16px;color:#888;font-size:14px;">Select the aircraft categories your company operates.</p>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:12px;font-size:15px;">
+          <input type="checkbox" id="profile-cat-fixed" style="width:18px;height:18px;cursor:pointer;"/>
+          <span>Fixed Wing</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-bottom:20px;font-size:15px;">
+          <input type="checkbox" id="profile-cat-heli" style="width:18px;height:18px;cursor:pointer;"/>
+          <span>Helicopter</span>
+        </label>
+        <button id="profile-cat-save-btn" class="btn-primary" onclick="saveProfileCategory()" style="padding:10px 24px;font-size:14px;">Save Changes</button>
+        <div id="profile-cat-msg" style="display:none;margin-top:12px;font-size:13px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="modal-overlay" id="quote-modal"><div class="modal"><div class="modal-header"><span class="modal-title">Submit quote</span><button class="modal-close" onclick="closeQuoteModal()">&times;</button></div><div class="modal-body"><div id="quote-query-info" style="background:rgba(0,0,0,0.04);border-radius:var(--radius);padding:12px 14px;margin-bottom:20px;font-size:13px;color:var(--text-secondary);"></div><div class="field-group"><label class="field-label">Select aircraft</label><select class="select-input" id="quote-aircraft" onchange="onAircraftChange()"><option value="">Choose aircraft...</option></select><div id="quote-aircraft-help" style="font-size:11px;color:var(--text-tertiary);margin-top:4px;"></div></div><div class="charge-grid"><div class="field-group"><label class="field-label">Base charge (Rs.)</label><input type="number" class="field-input" id="q-base" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Handling fee (Rs.)</label><input type="number" class="field-input" id="q-handling" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Crew accommodation (Rs.)</label><input type="number" class="field-input" id="q-crew" placeholder="0" oninput="calcQuote()"/></div><div class="field-group"><label class="field-label">Catering (Rs.)</label><input type="number" class="field-input" id="q-catering" placeholder="0" oninput="calcQuote()"/></div></div><div style="background:var(--bg-secondary);border-radius:var(--radius);padding:14px 16px;border:0.5px solid var(--border);"><div class="charge-row"><span class="charge-label">Subtotal</span><span class="charge-value" id="q-subtotal">Rs.0</span></div><div class="charge-row"><span class="charge-label">GST (18%)</span><span class="charge-value" id="q-gst">Rs.0</span></div><div class="total-row"><span class="total-label">Total quote</span><span class="total-value" id="q-total">Rs.0</span></div></div><div class="field-group" style="margin-top:16px;"><label class="field-label">Notes to client (optional)</label><textarea class="field-input" id="q-notes" placeholder="Any additional information..."></textarea></div></div><div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeQuoteModal()">Cancel</button><button class="btn-sm btn-blue" id="btn-submit-quote" onclick="submitQuote()">Share quote with client</button></div></div></div>
 <div class="modal-overlay" id="aircraft-modal"><div class="modal" style="max-width:600px;"><div class="modal-header"><span class="modal-title">Add aircraft</span><button class="modal-close" onclick="closeModal('aircraft-modal')">&times;</button></div><div class="modal-body">
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;">
