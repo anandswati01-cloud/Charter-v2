@@ -89,11 +89,10 @@ async function doLogin(){
     rt.className='role-tag '+(isOwner()?'':'employee');
     applyRoleRestrictions();
     await loadAllData();
-  populateCategoryCheckboxes();
     refreshInterval=setInterval(loadAllData,5000);
     claimRefreshInterval=setInterval(updateClaimTimers,1000);
   }catch(e){
-    console.error('Login error:', e);
+    
     errEl.textContent='An error occurred. Please try again.';
     errEl.classList.add('show');
   }finally{
