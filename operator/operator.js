@@ -1389,3 +1389,303 @@ async function markQueriesViewed(queryIds) {
     console.warn('markQueriesViewed failed', e);
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   PROFILE SECTION
+═══════════════════════════════════════════════════════════════ */
+
+async function loadProfileSection() {
+  if (!currentUser || !currentOperator) return;
+
+  // ── Hero ──────────────────────────────────────────────────────
+  var initials = (currentUser.full_name || currentUser.username || '?')
+    .split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();
+  var avatarEl = document.getElementById('profile-avatar-circle');
+  if (avatarEl) avatarEl.textContent = initials;
+
+  var nameEl = document.getElementById('profile-hero-name');
+  if (nameEl) nameEl.textContent = escapeHtml(currentUser.full_name || currentUser.username || '—');
+
+  var roleEl = document.getElementById('profile-hero-role');
+  if (roleEl) {
+    roleEl.textContent = currentUser.role === 'owner' ? 'Admin' : 'Employee';
+    roleEl.className = 'role-badge ' + (currentUser.role === 'owner' ? 'role-admin' : 'role-employee');
+  }
+
+  var companyEl = document.getElementById('profile-hero-company');
+  if (companyEl) companyEl.textContent = escapeHtml(currentOperator.company_name || '—');
+
+  var sinceEl = document.getElementById('profile-stat-since');
+  if (sinceEl && currentUser.created_at) sinceEl.textContent = fmtDate(currentUser.created_at);
+
+  var loginEl = document.getElementById('profile-stat-login');
+  if (loginEl && currentUser.last_login) loginEl.textContent = fmtDate(currentUser.last_login);
+
+  var catEl = document.getElementById('profile-stat-cat');
+  if (catEl) {
+    var cats = [];
+    if (currentUser.aircraft_category) {
+      if (currentUser.aircraft_category.indexOf('fixed') > -1) cats.push('Fixed Wing');
+      if (currentUser.aircraft_category.indexOf('heli') > -1) cats.push('Helicopter');
+    }
+    catEl.textContent = cats.length ? cats.join(', ') : '—';
+  }
+
+  // ── Personal fields ───────────────────────────────────────────
+  var setVal = function(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.value = val || '';
+  };
+  setVal('profile-full-name', currentUser.full_name);
+  setVal('profile-username', currentUser.username);
+  setVal('profile-email', currentUser.email);
+  setVal('profile-phone', currentUser.phone);
+  setVal('profile-employee-id', currentUser.employee_id);
+
+  // ── Company card (owner only) ─────────────────────────────────
+  var companyCard = document.getElementById('profile-company-card');
+  if (companyCard) {
+    if (currentUser.role === 'owner') {
+      companyCard.style.display = '';
+      setVal('profile-company-name', currentOperator.company_name);
+      setVal('profile-company-email', currentOperator.email);
+      setVal('profile-company-phone', currentOperator.phone);
+      setVal('profile-owner-name', currentOperator.owner_name);
+      setVal('profile-owner-email', currentOperator.owner_email);
+      setVal('profile-owner-phone', currentOperator.owner_phone);
+      setVal('profile-dgca', currentOperator.dgca_licence_no);
+      if (currentOperator.aop_expiry_date) setVal('profile-aop-expiry', currentOperator.aop_expiry_date.split('T')[0]);
+      // AOP document link
+      if (currentOperator.aop_document_url) {
+        var docRow = document.getElementById('profile-aop-doc');
+        var docLink = document.getElementById('profile-aop-link');
+        if (docRow) docRow.style.display = 'flex';
+        if (docLink) {
+          docLink.href = currentOperator.aop_document_url;
+          docLink.textContent = currentOperator.aop_document_name || 'View AOP Document';
+        }
+      }
+    } else {
+      companyCard.style.display = 'none';
+    }
+  }
+
+  // ── Aircraft category checkboxes ──────────────────────────────
+  var catFixed = document.getElementById('profile-cat-fixed');
+  var catHeli = document.getElementById('profile-cat-heli');
+  if (catFixed && currentUser.aircraft_category) {
+    catFixed.checked = currentUser.aircraft_category.indexOf('fixed') > -1;
+  }
+  if (catHeli && currentUser.aircraft_category) {
+    catHeli.checked = currentUser.aircraft_category.indexOf('heli') > -1;
+  }
+}
+
+// ── Edit mode toggle ─────────────────────────────────────────────
+function profileEditMode(section) {
+  var inputs = document.querySelectorAll('#profile-' + section + '-card .profile-input, #section-profile .profile-card:first-of-type .profile-input');
+  var actionsDiv = document.getElementById('profile-' + section + '-actions');
+  var editBtn = document.getElementById('profile-' + section + '-edit-btn');
+  if (section === 'personal') {
+    inputs = document.querySelectorAll('#profile-full-name, #profile-email, #profile-phone');
+  } else if (section === 'company') {
+    inputs = document.querySelectorAll('#profile-company-name, #profile-company-email, #profile-company-phone, #profile-owner-name, #profile-owner-email, #profile-owner-phone, #profile-dgca, #profile-aop-expiry');
+  }
+  inputs.forEach(function(inp) { inp.disabled = false; });
+  if (actionsDiv) actionsDiv.style.display = 'flex';
+  if (editBtn) editBtn.style.display = 'none';
+}
+
+function profileCancelEdit(section) {
+  loadProfileSection();
+  var actionsDiv = document.getElementById('profile-' + section + '-actions');
+  var editBtn = document.getElementById('profile-' + section + '-edit-btn');
+  if (actionsDiv) actionsDiv.style.display = 'none';
+  if (editBtn) editBtn.style.display = '';
+  var msg = document.getElementById('profile-' + section + '-msg');
+  if (msg) { msg.textContent = ''; msg.className = 'profile-msg'; }
+}
+
+// ── Save personal details ────────────────────────────────────────
+async function profileSavePersonal() {
+  var fullName = document.getElementById('profile-full-name').value.trim();
+  var email = document.getElementById('profile-email').value.trim();
+  var phone = document.getElementById('profile-phone').value.trim();
+  var msg = document.getElementById('profile-personal-msg');
+  var btn = document.querySelector('#profile-personal-actions .btn-primary');
+
+  if (!fullName) { profileMsg('personal', 'Full name is required.', 'error'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  var res = await sbFetch('operator_users?id=eq.' + currentUser.id, {
+    method: 'PATCH',
+    body: { full_name: fullName, email: email || null, phone: phone || null }
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Save Changes'; }
+
+  if (res.ok) {
+    currentUser.full_name = fullName;
+    currentUser.email = email;
+    currentUser.phone = phone;
+    // Update session
+    sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    // Update sidebar name
+    var sidebarName = document.getElementById('sidebar-name');
+    if (sidebarName) sidebarName.textContent = fullName;
+    profileMsg('personal', 'Personal details saved successfully.', 'success');
+    profileCancelEdit('personal');
+    loadProfileSection();
+  } else {
+    profileMsg('personal', 'Failed to save changes. Please try again.', 'error');
+  }
+}
+
+// ── Save company details ─────────────────────────────────────────
+async function profileSaveCompany() {
+  var companyName = document.getElementById('profile-company-name').value.trim();
+  var companyEmail = document.getElementById('profile-company-email').value.trim();
+  var companyPhone = document.getElementById('profile-company-phone').value.trim();
+  var ownerName = document.getElementById('profile-owner-name').value.trim();
+  var ownerEmail = document.getElementById('profile-owner-email').value.trim();
+  var ownerPhone = document.getElementById('profile-owner-phone').value.trim();
+  var dgca = document.getElementById('profile-dgca').value.trim();
+  var aopExpiry = document.getElementById('profile-aop-expiry').value;
+  var btn = document.querySelector('#profile-company-actions .btn-primary');
+
+  if (!companyName) { profileMsg('company', 'Company name is required.', 'error'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  var patchData = {
+    company_name: companyName,
+    email: companyEmail || null,
+    phone: companyPhone || null,
+    owner_name: ownerName || null,
+    owner_email: ownerEmail || null,
+    owner_phone: ownerPhone || null,
+    dgca_licence_no: dgca || null,
+    aop_expiry_date: aopExpiry || null
+  };
+
+  var res = await sbFetch('operators?id=eq.' + currentOperator.id, {
+    method: 'PATCH',
+    body: patchData
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Save Changes'; }
+
+  if (res.ok) {
+    Object.assign(currentOperator, patchData);
+    sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    // Update sidebar company
+    var sidebarComp = document.getElementById('sidebar-company');
+    if (sidebarComp) sidebarComp.textContent = companyName;
+    profileMsg('company', 'Company details saved successfully.', 'success');
+    profileCancelEdit('company');
+    loadProfileSection();
+  } else {
+    profileMsg('company', 'Failed to save changes. Please try again.', 'error');
+  }
+}
+
+// ── Change password ──────────────────────────────────────────────
+async function profileChangePassword() {
+  var current = document.getElementById('profile-pw-current').value;
+  var newPw = document.getElementById('profile-pw-new').value;
+  var confirm = document.getElementById('profile-pw-confirm').value;
+  var btn = document.querySelector('#section-profile .card:last-child .btn-primary');
+
+  if (!current || !newPw || !confirm) {
+    profileMsg('pw', 'All password fields are required.', 'error'); return;
+  }
+  if (newPw.length < 8) {
+    profileMsg('pw', 'New password must be at least 8 characters.', 'error'); return;
+  }
+  if (newPw !== confirm) {
+    profileMsg('pw', 'New passwords do not match.', 'error'); return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
+
+  var res = await sbFetch('rpc/update_operator_password', {
+    method: 'POST',
+    body: { p_user_id: currentUser.id, p_current_password: current, p_new_password: newPw }
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
+
+  if (res.ok && res.data) {
+    var result = Array.isArray(res.data) ? res.data[0] : res.data;
+    if (result && result.success) {
+      profileMsg('pw', 'Password updated successfully.', 'success');
+      document.getElementById('profile-pw-current').value = '';
+      document.getElementById('profile-pw-new').value = '';
+      document.getElementById('profile-pw-confirm').value = '';
+      document.getElementById('profile-pw-strength').className = 'profile-pw-strength';
+    } else {
+      profileMsg('pw', (result && result.message) || 'Current password is incorrect.', 'error');
+    }
+  } else {
+    profileMsg('pw', 'Failed to update password. Please try again.', 'error');
+  }
+}
+
+// ── Save aircraft category ───────────────────────────────────────
+async function saveProfileCategory() {
+  var fixed = document.getElementById('profile-cat-fixed') ? document.getElementById('profile-cat-fixed').checked : false;
+  var heli = document.getElementById('profile-cat-heli') ? document.getElementById('profile-cat-heli').checked : false;
+  var btn = document.getElementById('profile-cat-save-btn');
+  var parts = [];
+  if (fixed) parts.push('fixed');
+  if (heli) parts.push('heli');
+  var cat = parts.join(',');
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  var res = await sbFetch('operator_users?id=eq.' + currentUser.id, {
+    method: 'PATCH',
+    body: { aircraft_category: cat || null }
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Save Category'; }
+
+  if (res.ok) {
+    currentUser.aircraft_category = cat;
+    sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    profileMsg('cat', 'Aircraft category saved.', 'success');
+    loadProfileSection();
+  } else {
+    profileMsg('cat', 'Failed to save. Please try again.', 'error');
+  }
+}
+
+// ── Password strength indicator ──────────────────────────────────
+(function() {
+  document.addEventListener('input', function(e) {
+    if (e.target && e.target.id === 'profile-pw-new') {
+      var val = e.target.value;
+      var strengthEl = document.getElementById('profile-pw-strength');
+      if (!strengthEl) return;
+      if (!val) { strengthEl.className = 'profile-pw-strength'; return; }
+      var score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      strengthEl.className = 'profile-pw-strength ' + (score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong');
+    }
+  });
+})();
+
+// ── Helper: show message ─────────────────────────────────────────
+function profileMsg(section, text, type) {
+  var el = document.getElementById('profile-' + section + '-msg');
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'profile-msg ' + (type || '');
+  setTimeout(function() {
+    if (el.textContent === text) { el.textContent = ''; el.className = 'profile-msg'; }
+  }, 5000);
+}
