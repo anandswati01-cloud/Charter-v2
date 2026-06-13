@@ -274,3 +274,76 @@ textarea.field-input{height:80px;padding:10px 14px;resize:vertical;}
 .amenity-check { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.85rem; color: var(--text-muted, #9ca3af); padding: 0.25rem 0; }
 .amenity-check input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--gold, #C4860A); cursor: pointer; flex-shrink: 0; }
 .amenity-check:hover { color: var(--gold, #C4860A); }
+
+/* ═══════════════════════════════════════════
+   PROFILE SECTION
+═══════════════════════════════════════════ */
+
+/* ── Hero ─────────────────────────────────── */
+.profile-hero{display:flex;align-items:center;gap:24px;padding:28px 32px;background:linear-gradient(135deg,var(--navy-light),var(--navy-mid));border:1px solid var(--gold-border);border-radius:var(--radius-lg);margin-bottom:24px;}
+.profile-hero-avatar{width:80px;height:80px;min-width:80px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:28px;font-weight:600;color:var(--navy);letter-spacing:1px;border:2px solid var(--gold-border);}
+.profile-hero-info{flex:1;}
+.profile-hero-name{font-family:var(--font-display);font-size:26px;font-weight:400;color:var(--white);line-height:1.2;}
+.profile-hero-meta{display:flex;align-items:center;gap:10px;margin-top:6px;flex-wrap:wrap;}
+.profile-hero-company{font-size:13px;color:var(--white-60);}
+.profile-hero-stats{display:flex;gap:24px;margin-top:14px;flex-wrap:wrap;}
+.profile-stat{display:flex;flex-direction:column;gap:3px;}
+.profile-stat-label{font-family:var(--font-mono);font-size:10px;color:var(--white-30);text-transform:uppercase;letter-spacing:.1em;}
+.profile-stat-val{font-size:13px;color:var(--white-60);font-weight:500;}
+
+/* ── Grid Layout ──────────────────────────── */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.profile-card{display:flex;flex-direction:column;}
+.profile-card .card-header{display:flex;align-items:center;justify-content:space-between;}
+
+/* ── Fields ───────────────────────────────── */
+.profile-field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.profile-field-grid--single{grid-template-columns:1fr;}
+.profile-field{display:flex;flex-direction:column;gap:6px;}
+.profile-label{font-family:var(--font-mono);font-size:10px;color:var(--white-30);text-transform:uppercase;letter-spacing:.1em;}
+.profile-input{background:var(--navy);border:1px solid rgba(255,255,255,0.08);border-radius:var(--radius);padding:10px 14px;color:var(--white);font-family:var(--font);font-size:14px;transition:border-color .2s;}
+.profile-input:focus{outline:none;border-color:var(--gold-dim);}
+.profile-input:disabled{opacity:.5;cursor:default;}
+.profile-input:not(:disabled){border-color:var(--gold-border);background:var(--navy-light);}
+
+/* ── Actions / Buttons ────────────────────── */
+.profile-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;}
+.btn-icon{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--gold-border);border-radius:var(--radius);padding:6px 12px;color:var(--gold);font-size:12px;font-family:var(--font-mono);text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:all .2s;}
+.btn-icon:hover{background:var(--gold-faint);border-color:var(--gold);}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius);padding:10px 20px;color:var(--white-60);font-family:var(--font);font-size:13px;cursor:pointer;transition:all .2s;}
+.btn-ghost:hover{background:rgba(255,255,255,0.05);color:var(--white);}
+
+/* ── Messages ─────────────────────────────── */
+.profile-msg{margin-top:10px;font-size:13px;min-height:18px;border-radius:var(--radius);padding:0;}
+.profile-msg.success{color:var(--green-light);}
+.profile-msg.error{color:var(--red);}
+
+/* ── Password strength ────────────────────── */
+.profile-pw-strength{height:4px;border-radius:2px;margin-top:6px;background:rgba(255,255,255,0.08);transition:all .3s;}
+.profile-pw-strength.weak{background:var(--red);width:33%;}
+.profile-pw-strength.medium{background:var(--amber);width:66%;}
+.profile-pw-strength.strong{background:var(--green-light);width:100%;}
+
+/* ── Aircraft Category custom checkboxes ──── */
+.profile-cat-row{display:flex;gap:16px;flex-wrap:wrap;}
+.profile-cat-label{display:flex;align-items:center;gap:0;cursor:pointer;}
+.profile-cat-label input[type=checkbox]{position:absolute;opacity:0;width:0;height:0;}
+.profile-cat-check{width:18px;height:18px;min-width:18px;border:1.5px solid var(--gold-border);border-radius:4px;background:var(--navy);margin-right:10px;display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.profile-cat-label input:checked + .profile-cat-check{background:var(--gold);border-color:var(--gold);}
+.profile-cat-label input:checked + .profile-cat-check::after{content:'✓';color:var(--navy);font-size:11px;font-weight:700;}
+.profile-cat-text{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--white-60);background:var(--navy-light);border:1px solid var(--gold-border);border-radius:var(--radius);padding:12px 18px;transition:all .2s;min-width:160px;}
+.profile-cat-label:hover .profile-cat-text{background:var(--gold-faint);color:var(--white);}
+.profile-cat-label input:checked ~ .profile-cat-text{background:var(--gold-faint);color:var(--gold);border-color:var(--gold);}
+
+/* ── AOP document link ────────────────────── */
+.profile-doc-row{display:flex;align-items:center;gap:8px;margin-top:12px;padding:10px 14px;background:var(--navy);border:1px solid var(--gold-border);border-radius:var(--radius);}
+.profile-doc-link{color:var(--gold);font-size:13px;text-decoration:none;}
+.profile-doc-link:hover{text-decoration:underline;}
+
+/* ── Responsive ───────────────────────────── */
+@media(max-width:900px){
+  .profile-grid{grid-template-columns:1fr;}
+  .profile-hero{flex-direction:column;text-align:center;}
+  .profile-hero-stats{justify-content:center;}
+  .profile-field-grid{grid-template-columns:1fr;}
+}
