@@ -965,7 +965,7 @@
 <body>
 <!-- ââ Active query resume banner âââââââââââââââââââ -->
 <div id="resume-banner" style="display:none;position:fixed;top:0;left:0;width:100%;z-index:9999;background:linear-gradient(90deg,#c9a84c,#e8c86a);color:#1a1a1a;padding:12px 20px;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-family:'DM Sans',sans-serif;font-size:14px;">
-  <span>âï¸ You have an active quote request. <strong id="resume-route"></strong></span>
+  <span>✈️ You have an active quote request. <strong id="resume-route"></strong></span>
   <div style="display:flex;gap:10px;align-items:center;">
     <a href="#" onclick="resumeQuery();return false;" style="background:#1a1a1a;color:#e8c86a;padding:6px 16px;border-radius:20px;font-weight:600;font-size:13px;text-decoration:none;">View Quotes</a>
     <button onclick="dismissResumeBanner()" style="background:none;border:none;cursor:pointer;font-size:18px;color:#1a1a1a;line-height:1;padding:0 4px;">&times;</button>
@@ -985,7 +985,7 @@
         var q = JSON.parse(qData);
         var route = (q.departure||'')+' â '+(q.destination||'');
         var routeEl = document.getElementById('resume-route');
-        if (routeEl && route.trim() !== 'â') routeEl.textContent = route;
+        if (routeEl && route.trim() !== '→') routeEl.textContent = route;
       } catch(e) {}
     }
     document.body.style.paddingTop = '48px';
@@ -1042,7 +1042,7 @@
     <div class="hero-overlay"></div>
 
     <div class="hero-content">
-      <div class="hero-eyebrow">Indiaâs largest marketplace of DGCA licensed Non Scheduled operators</div>
+      <div class="hero-eyebrow">India’s largest marketplace of DGCA licensed Non Scheduled operators</div>
       <h1 class="hero-h1">
         Private Charter Flights.<br>
         <em>Direct. Transparent. Fast.</em>
@@ -1055,21 +1055,21 @@
 
     <div class="trust-bar">
       <div class="trust-item">
-        <div class="trust-icon">â</div>
+        <div class="trust-icon">✈</div>
         <div>
           <div class="trust-num">350+</div>
           <div class="trust-label">Airports Covered</div>
         </div>
       </div>
       <div class="trust-item">
-        <div class="trust-icon">â±</div>
+        <div class="trust-icon">⏱</div>
         <div>
           <div class="trust-num">60 Min</div>
           <div class="trust-label">Avg. Quotation Time</div>
         </div>
       </div>
       <div class="trust-item">
-        <div class="trust-icon">ð</div>
+        <div class="trust-icon">🔒</div>
         <div>
           <div class="trust-num">100%</div>
           <div class="trust-label">Secured Payments</div>
@@ -1088,10 +1088,10 @@
 
       <div class="aircraft-selector">
         <button class="aircraft-btn active" data-type="fixed_wing" onclick="selectAircraftType(this,'fixed_wing')">
-          â Fixed Wing
+          ✈ Fixed Wing
         </button>
         <button class="aircraft-btn" data-type="helicopter" onclick="selectAircraftType(this,'helicopter')">
-          ð Helicopter
+          🚁 Helicopter
         </button>
       </div>
       <div class="trip-selector">
@@ -1156,15 +1156,15 @@
         <div>
           <div class="input-label" style="margin-bottom:10px">Special Requirements</div>
           <div class="special-reqs">
-            <button class="req-chip" onclick="toggleChip(this)">â Medivac</button>
-            <button class="req-chip" onclick="toggleChip(this)">ð¾ Pets</button>
-            <button class="req-chip" onclick="toggleChip(this)">â VIP Passenger</button>
-            <button class="req-chip" onclick="toggleChip(this)">ð¶ Infants</button>
+            <button class="req-chip" onclick="toggleChip(this)">✚ Medivac</button>
+            <button class="req-chip" onclick="toggleChip(this)">🐾 Pets</button>
+            <button class="req-chip" onclick="toggleChip(this)">★ VIP Passenger</button>
+            <button class="req-chip" onclick="toggleChip(this)">👶 Infants</button>
           </div>
         </div>
         <button class="cta-btn" onclick="getQuotes()">
           Get Instant Quotations
-          <span class="cta-arrow">â</span>
+          <span class="cta-arrow">→</span>
         </button>
       </div>
     </div>
@@ -1202,22 +1202,22 @@
       <h2 class="section-title">Built for those who value their time</h2>
       <div class="bento-grid">
         <div class="bento-card">
-          <div class="bento-icon">â</div>
+          <div class="bento-icon">✓</div>
           <div class="bento-title">Verified operators only</div>
           <p class="bento-desc">Every operator on SkyVayu is DGCA licensed and manually verified before activation. Safety is a baseline, not a selling point.</p>
         </div>
         <div class="bento-card">
-          <div class="bento-icon">â¡</div>
+          <div class="bento-icon">⚡</div>
           <div class="bento-title">Live competitive quotes</div>
           <p class="bento-desc">Operators compete in real time. You always get the best market rate, not a fixed inflated price.</p>
         </div>
         <div class="bento-card">
-          <div class="bento-icon">ð</div>
+          <div class="bento-icon">🌏</div>
           <div class="bento-title">Domestic and international</div>
           <p class="bento-desc">From Leh to Lakshadweep or Mumbai to Dubai â one platform for all your charter needs across 350+ airports.</p>
         </div>
         <div class="bento-card">
-          <div class="bento-icon">â¹</div>
+          <div class="bento-icon">₹</div>
           <div class="bento-title">No hidden charges</div>
           <p class="bento-desc">No hidden charges â fully transparent pricing on every quotation. GST applicable.</p>
         </div>
@@ -1274,7 +1274,7 @@
       <p class="final-cta-sub">Experience the pinnacle of aviation logistics. Get your verified quotes in under an hour.</p>
       <button class="cta-btn" style="margin: 0 auto;" onclick="document.getElementById('book').scrollIntoView({behavior:'smooth'})">
         Get Instant Quotes
-        <span class="cta-arrow">â</span>
+        <span class="cta-arrow">→</span>
       </button>
     </div>
   </section>
@@ -1287,7 +1287,7 @@
         <p class="footer-tagline">Elevating the standards of private aviation through technical precision and elite service.</p>
         <div class="footer-socials">
           <a href="https://www.linkedin.com/company/skyvayu" target="_blank" rel="noopener" class="social-btn" aria-label="LinkedIn">in</a>
-          <a href="https://twitter.com/skyvayu" target="_blank" rel="noopener" class="social-btn" aria-label="X (Twitter)">ð</a>
+          <a href="https://twitter.com/skyvayu" target="_blank" rel="noopener" class="social-btn" aria-label="X (Twitter)">𝕏</a>
           <a href="https://www.instagram.com/skyvayu" target="_blank" rel="noopener" class="social-btn" aria-label="Instagram">ig</a>
         </div>
       </div>
@@ -1312,12 +1312,12 @@
         <p class="footer-tagline">Receive curated aviation insights and empty leg alerts.</p>
         <div class="newsletter-input-row">
           <input class="newsletter-input" type="email" placeholder="Email address">
-          <button class="newsletter-submit">â</button>
+          <button class="newsletter-submit">→</button>
         </div>
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="footer-copy">Â© 2025 SkyVayu Aviation. The Celestial Navigator.</div>
+      <div class="footer-copy">© 2025 SkyVayu Aviation. The Celestial Navigator.</div>
       <div class="footer-ops">Global Ops: Mumbai Â· Delhi Â· Dubai</div>
     </div>
   </footer>
