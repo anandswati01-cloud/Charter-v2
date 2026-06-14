@@ -22,13 +22,13 @@
         <label class="form-label">PASSWORD</label>
         <div class="input-group">
             <input type="password" id="login-password" class="form-input" placeholder="Enter your password"/>
-            <button class="eye-toggle" id="eye-toggle" type="button" onclick="togglePw()">
+            <button class="eye-toggle" id="eye-toggle" type="button" onclick="togglePasswordVisibility()">
                 <svg id="eye-icon-show" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 <svg id="eye-icon-hide" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95M6.343 6.343A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.956 9.956 0 01-2.006 3.566M6.343 6.343L3 3m3.343 3.343l11.314 11.314M17.657 17.657L21 21"/></svg>
             </button>
         </div>
-        <button class="btn-primary" id="login-btn" onclick="loginUser()">SIGN IN</button>
-        <p class="forgot-link"><a href="#" onclick="openForgotModal()">Forgot password?</a></p>
+        <button class="btn-primary" id="login-btn" onclick="doLogin()">SIGN IN</button>
+        <p class="forgot-link"><a href="#" onclick="showForgotPassword()">Forgot password?</a></p>
         <p class="register-link">New operator? <a href="/register">Register your company</a></p>
     </div>
 </div>
@@ -36,15 +36,15 @@
 <!-- =================== FORGOT PASSWORD MODAL =================== -->
 <div id="forgot-password-modal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
-        <div class="modal-header"><h3>Reset Password</h3><button class="modal-close" onclick="closeForgotModal()">✕</button></div>
+        <div class="modal-header"><h3>Reset Password</h3><button class="modal-close" onclick="closeForgotPassword()">✕</button></div>
         <p>Enter your registered email and we'll send you a password reset link.</p>
         <label class="form-label">Email Address</label>
         <input type="email" id="forgot-email" class="form-input" placeholder="your@email.com"/>
         <div id="forgot-error" class="error-msg" style="display:none;"></div>
         <div id="forgot-success" class="success-msg" style="display:none;">Password reset link sent! Check your email.</div>
         <div class="modal-actions">
-            <button class="btn-ghost" onclick="closeForgotModal()">Cancel</button>
-            <button class="btn-primary" id="forgot-submit-btn" onclick="sendResetLink()">Send Reset Link</button>
+            <button class="btn-ghost" onclick="closeForgotPassword()">Cancel</button>
+            <button class="btn-primary" id="forgot-submit-btn" onclick="doForgotPassword()">Send Reset Link</button>
         </div>
     </div>
 </div>
@@ -52,11 +52,11 @@
 <!-- =================== AOP UPLOAD MODAL =================== -->
 <div id="aop-upload-modal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
-        <div class="modal-header"><h3>Upload updated document</h3><button class="modal-close" onclick="closeAopModal()">✕</button></div>
+        <div class="modal-header"><h3>Upload updated document</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
         <input type="file" id="aop-file-input" accept=".pdf,.jpg,.jpeg,.png"/>
         <div class="modal-actions">
-            <button class="btn-ghost" onclick="closeAopModal()">Cancel</button>
-            <button class="btn-primary" onclick="uploadAopDoc()">Upload</button>
+            <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+            <button class="btn-primary" onclick="uploadAopDocument()">Upload</button>
         </div>
     </div>
 </div>
@@ -102,7 +102,7 @@
             Revenue
         </a>
     </nav>
-    <button class="btn-signout" onclick="signOut()">Sign out</button>
+    <button class="btn-signout" onclick="doLogout()">Sign out</button>
 </aside>
 
 <!-- MAIN CONTENT AREA -->
@@ -127,7 +127,7 @@
 <div id="section-fleet" style="display:none;">
     <div class="main-header">
         <div class="page-title">Fleet</div>
-        <button class="btn-sm btn-blue" onclick="openAddAircraftModal()">+ Add aircraft</button>
+        <button class="btn-sm btn-blue" onclick="openAircraftModal(null)">+ Add aircraft</button>
     </div>
     <div class="main-content" id="fleet-content"><div class="loading">Loading...</div></div>
 </div>
@@ -400,7 +400,7 @@
                             <div class="profile-info-item">
                                 <span class="profile-info-label">Air Operator Certificate</span>
                                 <span class="profile-info-value" id="view-aop-doc">
-                                    <button class="btn-link" id="view-aop-btn" style="display:none;" onclick="viewAopDoc()">View AOP Document</button>
+                                    <button class="btn-link" id="view-aop-btn" style="display:none;" onclick="if(window.currentOperator&&currentOperator.aop_document_url){window.open(currentOperator.aop_document_url,'_blank')}">View AOP Document</button>
                                     <span id="view-aop-none">Not uploaded</span>
                                 </span>
                             </div>
@@ -431,7 +431,7 @@
                             <div class="form-group form-group-full">
                                 <label class="form-label">Air Operator Certificate (PDF/Image)</label>
                                 <div class="file-upload-area">
-                                    <button class="btn-sm btn-ghost" onclick="openAopModal()">Upload / Replace Document</button>
+                                    <button class="btn-sm btn-ghost" onclick="openAopRenewModal()">Upload / Replace Document</button>
                                     <span class="file-upload-note" id="aop-file-name"></span>
                                 </div>
                             </div>
@@ -530,7 +530,7 @@
                             </div>
                         </label>
                     </div>
-                    <button class="btn-primary" style="margin-top:16px;" onclick="saveAircraftCategory()">Save Category</button>
+                    <button class="btn-primary" style="margin-top:16px;" onclick="saveProfileCategory()">Save Category</button>
                     <div class="profile-msg" id="profile-category-msg"></div>
                 </div>
             </div>
@@ -580,7 +580,7 @@
                         <div class="form-group"><label class="form-label">New Password</label><input type="password" id="input-new-pw" class="form-input" placeholder="New password"/></div>
                         <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" id="input-confirm-pw" class="form-input" placeholder="Confirm new password"/></div>
                     </div>
-                    <button class="btn-primary" style="margin-top:16px;" onclick="updatePassword()">Update Password</button>
+                    <button class="btn-primary" style="margin-top:16px;" onclick="profileChangePassword()">Update Password</button>
                     <div class="profile-msg" id="profile-pw-msg"></div>
                 </div>
             </div>
