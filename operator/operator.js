@@ -125,10 +125,10 @@ function applyRoleRestrictions(){
 function showSection(section){
   ['queries','fleet','roster','employees','revenue','profile'].forEach(function(s){
     var el=document.getElementById('section-'+s);if(el)el.style.display='none';
-    var nav=document.getElementById('nav-'+s);if(nav)nav.classList.remove('active');
+    var nav=document.querySelector('.nav-item[data-section="'+s+'"]');if(nav)nav.classList.remove('active');
   });
-  document.getElementById('section-'+section).style.display='block';
-  document.getElementById('nav-'+section).classList.add('active');
+  var sEl=document.getElementById('section-'+section);if(sEl)sEl.style.display='block';
+  var navEl=document.querySelector('.nav-item[data-section="'+section+'"]');if(navEl)navEl.classList.add('active');
   if(section==='fleet')loadFleet();
   if(section==='roster')loadRoster();
   if(section==='employees')loadEmployees();
@@ -1817,10 +1817,10 @@ function applyRoleRestrictions(){
 function showSection(section){
   ['queries','fleet','roster','employees','revenue','profile'].forEach(function(s){
     var el=document.getElementById('section-'+s);if(el)el.style.display='none';
-    var nav=document.getElementById('nav-'+s);if(nav)nav.classList.remove('active');
+    var nav=document.querySelector('.nav-item[data-section="'+s+'"]');if(nav)nav.classList.remove('active');
   });
-  document.getElementById('section-'+section).style.display='block';
-  document.getElementById('nav-'+section).classList.add('active');
+  var sEl=document.getElementById('section-'+section);if(sEl)sEl.style.display='block';
+  var navEl=document.querySelector('.nav-item[data-section="'+section+'"]');if(navEl)navEl.classList.add('active');
   if(section==='fleet')loadFleet();
   if(section==='roster')loadRoster();
   if(section==='employees')loadEmployees();
