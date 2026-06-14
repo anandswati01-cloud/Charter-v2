@@ -15,33 +15,33 @@
     <div class="login-box">
         <div class="login-logo"><span class="brand-logo">SkyVayu</span></div>
         <h2>Operator Portal</h2>
-        <p class="login-subtitle">Sign in to manage your queries and quotes</p>
-        <div id="login-error" class="error-msg" style="display:none;">Invalid username or password</div>
-        <label class="form-label">USERNAME OR EMAIL</label>
-        <input type="text" id="login-username" class="form-input" placeholder="Enter your username or email"/>
-        <label class="form-label">PASSWORD</label>
-        <div class="input-group">
-            <input type="password" id="login-password" class="form-input" placeholder="Enter your password"/>
+        <p class="login-sub">Sign in to manage your queries and quotes</p>
+        <div id="login-error" class="login-error" style="display:none;">Invalid username or password</div>
+        <label class="field-label">USERNAME OR EMAIL</label>
+        <input type="text" id="login-username" class="field-input" placeholder="Enter your username or email"/>
+        <label class="field-label">PASSWORD</label>
+        <div class="password-wrapper">
+            <input type="password" id="login-password" class="field-input" placeholder="Enter your password"/>
             <button class="eye-toggle" id="eye-toggle" type="button" onclick="togglePasswordVisibility()">
                 <svg id="eye-icon-show" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 <svg id="eye-icon-hide" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95M6.343 6.343A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.956 9.956 0 01-2.006 3.566M6.343 6.343L3 3m3.343 3.343l11.314 11.314M17.657 17.657L21 21"/></svg>
             </button>
         </div>
         <button class="btn-primary" id="login-btn" onclick="doLogin()">SIGN IN</button>
-        <p class="forgot-link"><a href="#" onclick="showForgotPassword()">Forgot password?</a></p>
-        <p class="register-link">New operator? <a href="/register">Register your company</a></p>
+        <p class="forgot-password-link"><a href="#" onclick="showForgotPassword()">Forgot password?</a></p>
+        <p class="login-register">New operator? <a href="/register">Register your company</a></p>
     </div>
 </div>
 
 <!-- =================== FORGOT PASSWORD MODAL =================== -->
 <div id="forgot-password-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
+    <div class="modal">
         <div class="modal-header"><h3>Reset Password</h3><button class="modal-close" onclick="closeForgotPassword()">✕</button></div>
         <p>Enter your registered email and we'll send you a password reset link.</p>
-        <label class="form-label">Email Address</label>
-        <input type="email" id="forgot-email" class="form-input" placeholder="your@email.com"/>
-        <div id="forgot-error" class="error-msg" style="display:none;"></div>
-        <div id="forgot-success" class="success-msg" style="display:none;">Password reset link sent! Check your email.</div>
+        <label class="field-label">Email Address</label>
+        <input type="email" id="forgot-email" class="field-input" placeholder="your@email.com"/>
+        <div id="forgot-error" class="login-error" style="display:none;"></div>
+        <div id="forgot-success" class="success" style="display:none;">Password reset link sent! Check your email.</div>
         <div class="modal-actions">
             <button class="btn-ghost" onclick="closeForgotPassword()">Cancel</button>
             <button class="btn-primary" id="forgot-submit-btn" onclick="doForgotPassword()">Send Reset Link</button>
@@ -51,7 +51,7 @@
 
 <!-- =================== AOP UPLOAD MODAL =================== -->
 <div id="aop-upload-modal" class="modal-overlay" style="display:none;">
-    <div class="modal-box">
+    <div class="modal">
         <div class="modal-header"><h3>Upload updated document</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
         <input type="file" id="aop-file-input" accept=".pdf,.jpg,.jpeg,.png"/>
         <div class="modal-actions">
@@ -63,16 +63,16 @@
 
 <!-- =================== DASHBOARD =================== -->
 <div id="page-dashboard" style="display:none;">
-<div class="app-layout">
+<div class="main">
 
 <!-- SIDEBAR -->
 <aside class="sidebar">
-    <div class="sidebar-brand"><span class="brand-logo">SkyVayu</span><span class="brand-sub">Operator Portal</span></div>
-    <div class="sidebar-user">
-        <div class="sidebar-avatar" id="sidebar-avatar"></div>
-        <div><div class="sidebar-name" id="sidebar-name"></div><div class="sidebar-role" id="sidebar-role"></div></div>
+    <div class="sidebar-logo"><span class="brand-logo">SkyVayu</span><span class="brand-sub">Operator Portal</span></div>
+    <div class="op-info">
+        <div class="op-avatar" id="op-avatar"></div>
+        <div><div class="op-name" id="op-name"></div><div class="op-role" id="op-role"></div></div>
     </div>
-    <nav class="sidebar-nav">
+    <nav class="sidebar">
         <a class="nav-item active" data-section="queries" onclick="showSection('queries')">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             Queries <span class="nav-badge" id="queries-badge">0</span>
@@ -106,15 +106,15 @@
 </aside>
 
 <!-- MAIN CONTENT AREA -->
-<main class="main-area">
+<main class="main-content">
 
 <!-- QUERIES SECTION -->
 <div id="section-queries" style="display:none;">
     <div class="main-header"><div class="page-title">Queries</div></div>
-    <div class="stats-row">
-        <div class="stat-card"><span class="stat-value" id="stat-active">0</span><span class="stat-label">Active queries</span></div>
-        <div class="stat-card"><span class="stat-value" id="stat-quotes">0</span><span class="stat-label">Quotes shared</span></div>
-        <div class="stat-card"><span class="stat-value" id="stat-bookings">0</span><span class="stat-label">Confirmed bookings</span></div>
+    <div class="stat-row">
+        <div class="stat-card"><span class="stat-num" id="stat-active">0</span><span class="stat-label">Active queries</span></div>
+        <div class="stat-card"><span class="stat-num" id="stat-quotes">0</span><span class="stat-label">Quotes shared</span></div>
+        <div class="stat-card"><span class="stat-num" id="stat-bookings">0</span><span class="stat-label">Confirmed bookings</span></div>
     </div>
     <div class="main-content">
         <div id="active-queries-list"><div class="loading">Loading...</div></div>
@@ -261,36 +261,36 @@
                     <div class="profile-edit" id="profile-overview-form" style="display:none;">
                         <div class="form-grid">
                             <div class="form-group form-group-full">
-                                <label class="form-label">Company Description</label>
+                                <label class="field-label">Company Description</label>
                                 <textarea id="input-company-desc" class="form-input form-textarea" rows="3" placeholder="Describe your company, specialties, service areas..."></textarea>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Year Established</label>
-                                <input type="number" id="input-year-established" class="form-input" placeholder="e.g. 2010" min="1900" max="2099"/>
+                                <label class="field-label">Year Established</label>
+                                <input type="number" id="input-year-established" class="field-input" placeholder="e.g. 2010" min="1900" max="2099"/>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Company Website</label>
-                                <input type="url" id="input-website" class="form-input" placeholder="https://yourcompany.com"/>
+                                <label class="field-label">Company Website</label>
+                                <input type="url" id="input-website" class="field-input" placeholder="https://yourcompany.com"/>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Home Base Airport (ICAO/IATA)</label>
-                                <input type="text" id="input-home-base" class="form-input" placeholder="e.g. VIDP / DEL"/>
+                                <label class="field-label">Home Base Airport (ICAO/IATA)</label>
+                                <input type="text" id="input-home-base" class="field-input" placeholder="e.g. VIDP / DEL"/>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Additional Base Airports</label>
-                                <input type="text" id="input-other-bases" class="form-input" placeholder="e.g. VABB, VOMM"/>
+                                <label class="field-label">Additional Base Airports</label>
+                                <input type="text" id="input-other-bases" class="field-input" placeholder="e.g. VABB, VOMM"/>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Sales Email</label>
-                                <input type="email" id="input-sales-email" class="form-input" placeholder="sales@yourcompany.com"/>
+                                <label class="field-label">Sales Email</label>
+                                <input type="email" id="input-sales-email" class="field-input" placeholder="sales@yourcompany.com"/>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Sales Phone</label>
-                                <input type="tel" id="input-sales-phone" class="form-input" placeholder="+91 XXXXX XXXXX"/>
+                                <label class="field-label">Sales Phone</label>
+                                <input type="tel" id="input-sales-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">24/7 Ops Phone</label>
-                                <input type="tel" id="input-ops-phone" class="form-input" placeholder="+91 XXXXX XXXXX"/>
+                                <label class="field-label">24/7 Ops Phone</label>
+                                <input type="tel" id="input-ops-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/>
                             </div>
                         </div>
                         <div class="profile-actions" id="profile-overview-actions">
@@ -335,7 +335,7 @@
                     <div class="profile-edit" id="profile-ops-form" style="display:none;">
                         <div class="form-grid">
                             <div class="form-group form-group-full">
-                                <label class="form-label">Regions Served</label>
+                                <label class="field-label">Regions Served</label>
                                 <div class="checkbox-group">
                                     <label class="checkbox-label"><input type="checkbox" name="region" value="Domestic India"/> Domestic India</label>
                                     <label class="checkbox-label"><input type="checkbox" name="region" value="South Asia (SAARC)"/> South Asia (SAARC)</label>
@@ -347,15 +347,15 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Maximum Range (nautical miles)</label>
-                                <input type="number" id="input-max-range" class="form-input" placeholder="e.g. 3000"/>
+                                <label class="field-label">Maximum Range (nautical miles)</label>
+                                <input type="number" id="input-max-range" class="field-input" placeholder="e.g. 3000"/>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Hours of Operation</label>
-                                <input type="text" id="input-ops-hours" class="form-input" placeholder="e.g. 24/7 or 0600–2200 IST"/>
+                                <label class="field-label">Hours of Operation</label>
+                                <input type="text" id="input-ops-hours" class="field-input" placeholder="e.g. 24/7 or 0600–2200 IST"/>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Minimum Notice Period</label>
+                                <label class="field-label">Minimum Notice Period</label>
                                 <select id="input-min-notice" class="form-input form-select">
                                     <option value="">Select...</option>
                                     <option value="2 hours">2 hours</option>
@@ -421,22 +421,22 @@
                     <div class="profile-edit" id="profile-certs-form" style="display:none;">
                         <div class="form-grid">
                             <div class="form-group">
-                                <label class="form-label">DGCA Licence No.</label>
-                                <input type="text" id="input-dgca-licence" class="form-input" placeholder="e.g. AOC/HQ/123/2020"/>
+                                <label class="field-label">DGCA Licence No.</label>
+                                <input type="text" id="input-dgca-licence" class="field-input" placeholder="e.g. AOC/HQ/123/2020"/>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">AOP Expiry Date</label>
-                                <input type="date" id="input-aop-expiry" class="form-input"/>
+                                <label class="field-label">AOP Expiry Date</label>
+                                <input type="date" id="input-aop-expiry" class="field-input"/>
                             </div>
                             <div class="form-group form-group-full">
-                                <label class="form-label">Air Operator Certificate (PDF/Image)</label>
+                                <label class="field-label">Air Operator Certificate (PDF/Image)</label>
                                 <div class="file-upload-area">
                                     <button class="btn-sm btn-ghost" onclick="openAopRenewModal()">Upload / Replace Document</button>
                                     <span class="file-upload-note" id="aop-file-name"></span>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">ARGUS Safety Rating</label>
+                                <label class="field-label">ARGUS Safety Rating</label>
                                 <select id="input-argus" class="form-input form-select">
                                     <option value="">Not rated</option>
                                     <option value="ARGUS Gold">ARGUS Gold</option>
@@ -445,7 +445,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">Wyvern Safety Rating</label>
+                                <label class="field-label">Wyvern Safety Rating</label>
                                 <select id="input-wyvern" class="form-input form-select">
                                     <option value="">Not rated</option>
                                     <option value="Wyvern PASS">Wyvern PASS</option>
@@ -453,7 +453,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label">IS-BAO Stage</label>
+                                <label class="field-label">IS-BAO Stage</label>
                                 <select id="input-isbao" class="form-input form-select">
                                     <option value="">Not certified</option>
                                     <option value="IS-BAO Stage 1">IS-BAO Stage 1</option>
@@ -493,12 +493,12 @@
                     </div>
                     <div class="profile-edit" id="profile-company-form" style="display:none;">
                         <div class="form-grid">
-                            <div class="form-group"><label class="form-label">Company Name</label><input type="text" id="input-company-name" class="form-input" placeholder="Your Company Pvt. Ltd."/></div>
-                            <div class="form-group"><label class="form-label">Company Email</label><input type="email" id="input-company-email" class="form-input" placeholder="info@yourcompany.com"/></div>
-                            <div class="form-group"><label class="form-label">Company Phone</label><input type="tel" id="input-company-phone" class="form-input" placeholder="+91 XXXXX XXXXX"/></div>
-                            <div class="form-group"><label class="form-label">Owner Name</label><input type="text" id="input-owner-name" class="form-input" placeholder="Full name"/></div>
-                            <div class="form-group"><label class="form-label">Owner Email</label><input type="email" id="input-owner-email" class="form-input" placeholder="owner@yourcompany.com"/></div>
-                            <div class="form-group"><label class="form-label">Owner Phone</label><input type="tel" id="input-owner-phone" class="form-input" placeholder="+91 XXXXX XXXXX"/></div>
+                            <div class="form-group"><label class="field-label">Company Name</label><input type="text" id="input-company-name" class="field-input" placeholder="Your Company Pvt. Ltd."/></div>
+                            <div class="form-group"><label class="field-label">Company Email</label><input type="email" id="input-company-email" class="field-input" placeholder="info@yourcompany.com"/></div>
+                            <div class="form-group"><label class="field-label">Company Phone</label><input type="tel" id="input-company-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/></div>
+                            <div class="form-group"><label class="field-label">Owner Name</label><input type="text" id="input-owner-name" class="field-input" placeholder="Full name"/></div>
+                            <div class="form-group"><label class="field-label">Owner Email</label><input type="email" id="input-owner-email" class="field-input" placeholder="owner@yourcompany.com"/></div>
+                            <div class="form-group"><label class="field-label">Owner Phone</label><input type="tel" id="input-owner-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/></div>
                         </div>
                         <div class="profile-actions" id="profile-company-actions">
                             <button class="btn-primary" onclick="profileSaveCompany()">Save Changes</button>
@@ -556,11 +556,11 @@
                     </div>
                     <div class="profile-edit" id="profile-personal-form" style="display:none;">
                         <div class="form-grid">
-                            <div class="form-group"><label class="form-label">Full Name</label><input type="text" id="input-full-name" class="form-input" placeholder="Your full name"/></div>
-                            <div class="form-group"><label class="form-label">Username</label><input type="text" id="input-username" class="form-input" placeholder="username"/></div>
-                            <div class="form-group"><label class="form-label">Email Address</label><input type="email" id="input-email" class="form-input" placeholder="you@email.com"/></div>
-                            <div class="form-group"><label class="form-label">Phone Number</label><input type="tel" id="input-phone" class="form-input" placeholder="+91 XXXXX XXXXX"/></div>
-                            <div class="form-group"><label class="form-label">Employee ID</label><input type="text" id="input-employee-id" class="form-input" placeholder="EMP-001" readonly/></div>
+                            <div class="form-group"><label class="field-label">Full Name</label><input type="text" id="input-full-name" class="field-input" placeholder="Your full name"/></div>
+                            <div class="form-group"><label class="field-label">Username</label><input type="text" id="input-username" class="field-input" placeholder="username"/></div>
+                            <div class="form-group"><label class="field-label">Email Address</label><input type="email" id="input-email" class="field-input" placeholder="you@email.com"/></div>
+                            <div class="form-group"><label class="field-label">Phone Number</label><input type="tel" id="input-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/></div>
+                            <div class="form-group"><label class="field-label">Employee ID</label><input type="text" id="input-employee-id" class="field-input" placeholder="EMP-001" readonly/></div>
                         </div>
                         <div class="profile-actions" id="profile-personal-actions">
                             <button class="btn-primary" onclick="profileSavePersonal()">Save Changes</button>
@@ -576,9 +576,9 @@
                 <div class="card-header"><h3>Change Password</h3></div>
                 <div class="card-body">
                     <div class="form-grid">
-                        <div class="form-group"><label class="form-label">Current Password</label><input type="password" id="input-current-pw" class="form-input" placeholder="Current password"/></div>
-                        <div class="form-group"><label class="form-label">New Password</label><input type="password" id="input-new-pw" class="form-input" placeholder="New password"/></div>
-                        <div class="form-group"><label class="form-label">Confirm New Password</label><input type="password" id="input-confirm-pw" class="form-input" placeholder="Confirm new password"/></div>
+                        <div class="form-group"><label class="field-label">Current Password</label><input type="password" id="input-current-pw" class="field-input" placeholder="Current password"/></div>
+                        <div class="form-group"><label class="field-label">New Password</label><input type="password" id="input-new-pw" class="field-input" placeholder="New password"/></div>
+                        <div class="form-group"><label class="field-label">Confirm New Password</label><input type="password" id="input-confirm-pw" class="field-input" placeholder="Confirm new password"/></div>
                     </div>
                     <button class="btn-primary" style="margin-top:16px;" onclick="profileChangePassword()">Update Password</button>
                     <div class="profile-msg" id="profile-pw-msg"></div>
