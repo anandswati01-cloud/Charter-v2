@@ -347,3 +347,111 @@ textarea.field-input{height:80px;padding:10px 14px;resize:vertical;}
   .profile-hero-stats{justify-content:center;}
   .profile-field-grid{grid-template-columns:1fr;}
 }
+
+/* ================================================================
+   AVINODE-STYLE PROFILE EXTENSIONS
+   ================================================================ */
+
+/* -- Profile Hero Banner -- */
+.profile-hero{padding:0;overflow:hidden;}
+.profile-hero-cover{
+    height:140px;background:linear-gradient(135deg,var(--navy-mid) 0%,#1a2a4a 50%,var(--navy-light) 100%);
+    background-size:cover;background-position:center;
+    position:relative;display:flex;align-items:flex-end;justify-content:flex-end;padding:12px;
+}
+.profile-cover-edit{
+    display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--radius);
+    background:rgba(0,0,0,0.45);color:rgba(255,255,255,0.85);border:1px solid rgba(255,255,255,0.2);
+    font-size:12px;cursor:pointer;transition:background 0.2s;
+}
+.profile-cover-edit:hover{background:rgba(0,0,0,0.65);}
+.profile-hero-body{
+    display:flex;align-items:flex-start;gap:20px;padding:0 24px 24px;
+    margin-top:-40px;flex-wrap:wrap;
+}
+.profile-logo-wrap{position:relative;flex-shrink:0;}
+.profile-logo-circle{
+    width:80px;height:80px;border-radius:50%;background:var(--navy-mid);
+    border:3px solid var(--navy);display:flex;align-items:center;justify-content:center;
+    font-size:28px;font-weight:700;color:var(--gold);overflow:hidden;
+}
+.profile-logo-circle img{width:100%;height:100%;object-fit:cover;}
+.profile-logo-upload-btn{
+    position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;
+    background:var(--gold);color:var(--navy);border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;
+}
+.profile-hero-info{flex:1;min-width:200px;padding-top:44px;}
+.profile-hero-name{font-size:22px;font-weight:700;color:var(--white-90);margin-bottom:6px;}
+.profile-hero-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+.profile-hero-company{font-size:14px;color:var(--white-50);}
+.profile-hero-base{font-size:13px;color:var(--gold-dim);padding:2px 8px;background:var(--gold-faint);border-radius:4px;}
+.profile-hero-tagline{font-size:13px;color:var(--white-50);font-style:italic;max-width:400px;}
+.profile-hero-stats{display:flex;gap:24px;padding-top:44px;flex-wrap:wrap;}
+.profile-stat{display:flex;flex-direction:column;gap:4px;}
+.profile-stat-label{font-size:11px;color:var(--white-30);text-transform:uppercase;letter-spacing:0.5px;}
+.profile-stat-value{font-size:16px;font-weight:600;color:var(--white-90);}
+.profile-stat-active{color:var(--green-light);}
+
+/* -- Profile Grid Full Width -- */
+.profile-full-width{grid-column:1/-1;}
+
+/* -- Profile View/Form Info Grid -- */
+.profile-view{padding:16px 0;}
+.profile-info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.profile-info-item{display:flex;flex-direction:column;gap:4px;}
+.profile-info-label{font-size:11px;text-transform:uppercase;letter-spacing:0.5px;color:var(--white-30);}
+.profile-info-value{font-size:14px;color:var(--white-90);}
+.profile-info-value a{color:var(--gold);text-decoration:none;}
+.profile-info-value a:hover{text-decoration:underline;}
+
+/* -- Form Enhancements -- */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;}
+.form-group{display:flex;flex-direction:column;gap:6px;}
+.form-group-full{grid-column:1/-1;}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+.form-helper{font-size:13px;color:var(--white-50);margin-bottom:16px;}
+
+/* -- Safety Certification Badges -- */
+.cert-badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.cert-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.3px;}
+.cert-argus{background:rgba(59,109,17,0.25);color:#97C459;border:1px solid rgba(59,109,17,0.4);}
+.cert-wyvern{background:rgba(37,99,235,0.2);color:#93c5fd;border:1px solid rgba(37,99,235,0.3);}
+.cert-isbao{background:rgba(139,92,246,0.2);color:#c4b5fd;border:1px solid rgba(139,92,246,0.3);}
+
+/* -- Checkbox Group for Regions -- */
+.checkbox-group{display:flex;flex-wrap:wrap;gap:10px;}
+.checkbox-label{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--white-70);cursor:pointer;}
+.checkbox-label input[type="checkbox"]{width:16px;height:16px;accent-color:var(--gold);cursor:pointer;}
+
+/* -- Aircraft Category Options -- */
+.category-options{display:flex;gap:16px;flex-wrap:wrap;margin-top:8px;}
+.category-option{cursor:pointer;}
+.category-option input{display:none;}
+.category-option-inner{
+    display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 24px;
+    border-radius:var(--radius-lg);border:2px solid var(--white-10);color:var(--white-50);
+    transition:all 0.2s;min-width:120px;text-align:center;font-size:14px;
+}
+.category-option:hover .category-option-inner{border-color:var(--gold-dim);color:var(--white-70);}
+.category-option input:checked ~ .category-option-inner{
+    border-color:var(--gold);color:var(--gold);background:var(--gold-faint);
+}
+
+/* -- File Upload Area -- */
+.file-upload-area{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius);border:1px dashed var(--white-10);}
+.file-upload-note{font-size:12px;color:var(--white-40);}
+
+/* -- Btn Link -- */
+.btn-link{background:none;border:none;color:var(--gold);cursor:pointer;font-size:14px;padding:0;text-decoration:underline;}
+.btn-link:hover{color:var(--gold-light);}
+
+/* -- Profile Ops Card responsive -- */
+@media(max-width:900px){
+    .profile-hero-body{flex-direction:column;margin-top:-50px;}
+    .profile-hero-stats{padding-top:16px;}
+    .profile-info-grid,.form-grid{grid-template-columns:1fr;}
+    .profile-full-width{grid-column:1;}
+    .category-options{flex-direction:column;}
+}
