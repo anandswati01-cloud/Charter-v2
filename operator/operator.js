@@ -3381,3 +3381,337 @@ function profileMsg(section, text, type) {
     if (el.textContent === text) { el.textContent = ''; el.className = 'profile-msg'; }
   }, 5000);
 }
+
+// ============================================================
+// AVINODE-STYLE PROFILE EXTENSIONS
+// ============================================================
+
+// ---- Company Overview ----
+function profileSaveOverview() {
+  var data = {
+    company_description: document.getElementById('input-company-desc').value.trim(),
+    year_established: document.getElementById('input-year-established').value.trim(),
+    website: document.getElementById('input-website').value.trim(),
+    home_base: document.getElementById('input-home-base').value.trim(),
+    other_bases: document.getElementById('input-other-bases').value.trim(),
+    sales_email: document.getElementById('input-sales-email').value.trim(),
+    sales_phone: document.getElementById('input-sales-phone').value.trim(),
+    ops_phone: document.getElementById('input-ops-phone').value.trim()
+  };
+  var companyId = currentUser && currentUser.company_id;
+  if (!companyId) { profileMsg('overview','No company linked to your account.','error'); return; }
+  fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
+    method: 'PATCH',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+    body: JSON.stringify(data)
+  }).then(function(r){ return r.json(); }).then(function(res){
+    if (res && !res.error) {
+      profileMsg('overview', 'Company overview saved.', 'success');
+      renderOverviewView(data);
+      profileCancelEdit('overview');
+    } else {
+      profileMsg('overview', (res && res.message) || 'Save failed.', 'error');
+    }
+  }).catch(function(){ profileMsg('overview','Network error.','error'); });
+}
+
+function renderOverviewView(d) {
+  setText('view-company-desc', d.company_description || '—');
+  setText('view-year-established', d.year_established || '—');
+  var websiteEl = document.getElementById('view-website');
+  if (websiteEl) websiteEl.innerHTML = d.website ? '<a href="' + escapeHtml(d.website) + '" target="_blank" rel="noopener">' + escapeHtml(d.website) + '</a>' : '—';
+  setText('view-home-base', d.home_base || '—');
+  setText('view-other-bases', d.other_bases || '—');
+  setText('view-sales-email', d.sales_email || '—');
+  setText('view-sales-phone', d.sales_phone || '—');
+  setText('view-ops-phone', d.ops_phone || '—');
+  if (d.home_base) setText('profile-hero-base', d.home_base);
+  if (d.company_description) setText('profile-hero-tagline', d.company_description.substring(0,80) + (d.company_description.length > 80 ? '...' : ''));
+}
+
+// ---- Operational Details ----
+function profileSaveOps() {
+  var regions = Array.from(document.querySelectorAll('[name="region"]:checked')).map(function(c){ return c.value; }).join(', ');
+  var data = {
+    regions_served: regions,
+    max_range_nm: document.getElementById('input-max-range').value.trim(),
+    ops_hours: document.getElementById('input-ops-hours').value.trim(),
+    min_notice_period: document.getElementById('input-min-notice').value
+  };
+  var companyId = currentUser && currentUser.company_id;
+  if (!companyId) { profileMsg('ops','No company linked.','error'); return; }
+  fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
+    method: 'PATCH',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+    body: JSON.stringify(data)
+  }).then(function(r){ return r.json(); }).then(function(res){
+    if (res && !res.error) {
+      profileMsg('ops','Operational details saved.','success');
+      setText('view-regions', data.regions_served || '—');
+      setText('view-max-range', data.max_range_nm ? data.max_range_nm + ' nm' : '—');
+      setText('view-ops-hours', data.ops_hours || '—');
+      setText('view-min-notice', data.min_notice_period || '—');
+      profileCancelEdit('ops');
+    } else {
+      profileMsg('ops',(res && res.message) || 'Save failed.','error');
+    }
+  }).catch(function(){ profileMsg('ops','Network error.','error'); });
+}
+
+// ---- Safety & Certifications ----
+function profileSaveCerts() {
+  var data = {
+    dgca_licence: document.getElementById('input-dgca-licence').value.trim(),
+    aop_expiry: document.getElementById('input-aop-expiry').value,
+    argus_rating: document.getElementById('input-argus').value,
+    wyvern_rating: document.getElementById('input-wyvern').value,
+    isbao_stage: document.getElementById('input-isbao').value
+  };
+  var companyId = currentUser && currentUser.company_id;
+  if (!companyId) { profileMsg('certs','No company linked.','error'); return; }
+  fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
+    method: 'PATCH',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+    body: JSON.stringify(data)
+  }).then(function(r){ return r.json(); }).then(function(res){
+    if (res && !res.error) {
+      profileMsg('certs','Certifications saved.','success');
+      setText('view-dgca-licence', data.dgca_licence || '—');
+      setText('view-aop-expiry', data.aop_expiry ? fmtDate(data.aop_expiry) : '—');
+      setText('view-argus', data.argus_rating || '—');
+      setText('view-wyvern', data.wyvern_rating || '—');
+      setText('view-isbao', data.isbao_stage || '—');
+      renderCertBadges(data);
+      profileCancelEdit('certs');
+    } else {
+      profileMsg('certs',(res && res.message) || 'Save failed.','error');
+    }
+  }).catch(function(){ profileMsg('certs','Network error.','error'); });
+}
+
+function renderCertBadges(d) {
+  var container = document.getElementById('view-cert-badges');
+  if (!container) return;
+  var badges = [];
+  if (d.argus_rating) badges.push('<span class="cert-badge cert-argus">' + escapeHtml(d.argus_rating) + '</span>');
+  if (d.wyvern_rating) badges.push('<span class="cert-badge cert-wyvern">' + escapeHtml(d.wyvern_rating) + '</span>');
+  if (d.isbao_stage) badges.push('<span class="cert-badge cert-isbao">' + escapeHtml(d.isbao_stage) + '</span>');
+  container.innerHTML = badges.join('');
+}
+
+// ---- Company Basic Info ----
+function profileSaveCompany() {
+  var data = {
+    company_name: document.getElementById('input-company-name').value.trim(),
+    company_email: document.getElementById('input-company-email').value.trim(),
+    company_phone: document.getElementById('input-company-phone').value.trim(),
+    owner_name: document.getElementById('input-owner-name').value.trim(),
+    owner_email: document.getElementById('input-owner-email').value.trim(),
+    owner_phone: document.getElementById('input-owner-phone').value.trim()
+  };
+  var companyId = currentUser && currentUser.company_id;
+  if (!companyId) { profileMsg('company','No company linked.','error'); return; }
+  fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
+    method: 'PATCH',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json', 'Prefer': 'return=representation' },
+    body: JSON.stringify(data)
+  }).then(function(r){ return r.json(); }).then(function(res){
+    if (res && !res.error) {
+      profileMsg('company','Company info saved.','success');
+      setText('view-company-name', data.company_name || '—');
+      setText('view-company-email', data.company_email || '—');
+      setText('view-company-phone', data.company_phone || '—');
+      setText('view-owner-name', data.owner_name || '—');
+      setText('view-owner-email', data.owner_email || '—');
+      setText('view-owner-phone', data.owner_phone || '—');
+      if (data.company_name) { setText('profile-hero-company', data.company_name); setText('sidebar-role', data.company_name); }
+      profileCancelEdit('company');
+    } else {
+      profileMsg('company',(res && res.message) || 'Save failed.','error');
+    }
+  }).catch(function(){ profileMsg('company','Network error.','error'); });
+}
+
+// ---- Logo & Cover Photo ----
+function triggerLogoUpload() {
+  var inp = document.getElementById('logo-upload-input');
+  if (inp) inp.click();
+}
+
+function triggerCoverUpload() {
+  var inp = document.getElementById('cover-upload-input');
+  if (inp) inp.click();
+}
+
+function uploadCompanyLogo(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var companyId = currentUser && currentUser.company_id;
+  if (!companyId) return;
+  var formData = new FormData();
+  formData.append('file', file);
+  var path = 'company-logos/' + companyId + '/' + Date.now() + '_logo.' + file.name.split('.').pop();
+  fetch(SUPABASE_URL + '/storage/v1/object/operator-assets/' + path, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken },
+    body: formData
+  }).then(function(r){ return r.json(); }).then(function(res){
+    if (res && res.Key) {
+      var logoUrl = SUPABASE_URL + '/storage/v1/object/public/operator-assets/' + path;
+      var img = document.getElementById('profile-logo-img');
+      var initials = document.getElementById('profile-logo-initials');
+      if (img) { img.src = logoUrl; img.style.display = 'block'; }
+      if (initials) initials.style.display = 'none';
+      // Save URL to company record
+      fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logo_url: logoUrl })
+      });
+    }
+  }).catch(function(e){ console.error('Logo upload error:', e); });
+}
+
+function uploadCoverPhoto(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var bg = document.getElementById('profile-cover-bg');
+    if (bg) bg.style.backgroundImage = 'url(' + e.target.result + ')';
+  };
+  reader.readAsDataURL(file);
+  // Also upload to storage
+  var companyId = currentUser && currentUser.company_id;
+  if (!companyId) return;
+  var formData = new FormData();
+  formData.append('file', file);
+  var path = 'company-covers/' + companyId + '/' + Date.now() + '_cover.' + file.name.split('.').pop();
+  fetch(SUPABASE_URL + '/storage/v1/object/operator-assets/' + path, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken },
+    body: formData
+  }).then(function(r){ return r.json(); }).then(function(res){
+    if (res && res.Key) {
+      var coverUrl = SUPABASE_URL + '/storage/v1/object/public/operator-assets/' + path;
+      fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cover_url: coverUrl })
+      });
+    }
+  });
+}
+
+// ---- Helper: set text content safely ----
+function setText(id, text) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+// ---- Load extended company profile on profile section open ----
+function loadExtendedProfile(companyId) {
+  if (!companyId) return;
+  fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId + '&select=*', {
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken }
+  }).then(function(r){ return r.json(); }).then(function(rows){
+    if (!rows || !rows.length) return;
+    var d = rows[0];
+    // Overview
+    renderOverviewView(d);
+    document.getElementById('input-company-desc') && (document.getElementById('input-company-desc').value = d.company_description || '');
+    document.getElementById('input-year-established') && (document.getElementById('input-year-established').value = d.year_established || '');
+    document.getElementById('input-website') && (document.getElementById('input-website').value = d.website || '');
+    document.getElementById('input-home-base') && (document.getElementById('input-home-base').value = d.home_base || '');
+    document.getElementById('input-other-bases') && (document.getElementById('input-other-bases').value = d.other_bases || '');
+    document.getElementById('input-sales-email') && (document.getElementById('input-sales-email').value = d.sales_email || '');
+    document.getElementById('input-sales-phone') && (document.getElementById('input-sales-phone').value = d.sales_phone || '');
+    document.getElementById('input-ops-phone') && (document.getElementById('input-ops-phone').value = d.ops_phone || '');
+    // Operations
+    setText('view-regions', d.regions_served || '—');
+    setText('view-max-range', d.max_range_nm ? d.max_range_nm + ' nm' : '—');
+    setText('view-ops-hours', d.ops_hours || '—');
+    setText('view-min-notice', d.min_notice_period || '—');
+    document.getElementById('input-max-range') && (document.getElementById('input-max-range').value = d.max_range_nm || '');
+    document.getElementById('input-ops-hours') && (document.getElementById('input-ops-hours').value = d.ops_hours || '');
+    document.getElementById('input-min-notice') && (document.getElementById('input-min-notice').value = d.min_notice_period || '');
+    if (d.regions_served) {
+      var regions = d.regions_served.split(',').map(function(r){ return r.trim(); });
+      document.querySelectorAll('[name="region"]').forEach(function(cb){ cb.checked = regions.includes(cb.value); });
+    }
+    // Certifications
+    setText('view-dgca-licence', d.dgca_licence || '—');
+    setText('view-aop-expiry', d.aop_expiry ? fmtDate(d.aop_expiry) : '—');
+    setText('view-argus', d.argus_rating || '—');
+    setText('view-wyvern', d.wyvern_rating || '—');
+    setText('view-isbao', d.isbao_stage || '—');
+    renderCertBadges(d);
+    document.getElementById('input-dgca-licence') && (document.getElementById('input-dgca-licence').value = d.dgca_licence || '');
+    document.getElementById('input-aop-expiry') && (document.getElementById('input-aop-expiry').value = d.aop_expiry || '');
+    document.getElementById('input-argus') && (document.getElementById('input-argus').value = d.argus_rating || '');
+    document.getElementById('input-wyvern') && (document.getElementById('input-wyvern').value = d.wyvern_rating || '');
+    document.getElementById('input-isbao') && (document.getElementById('input-isbao').value = d.isbao_stage || '');
+    // AOP doc
+    if (d.aop_url) {
+      var aopBtn = document.getElementById('view-aop-btn');
+      var aopNone = document.getElementById('view-aop-none');
+      if (aopBtn) { aopBtn.dataset.url = d.aop_url; aopBtn.style.display = 'inline-block'; }
+      if (aopNone) aopNone.style.display = 'none';
+      var fname = document.getElementById('aop-file-name');
+      if (fname) fname.textContent = 'Document on file';
+    }
+    // Company basic info
+    setText('view-company-name', d.company_name || '—');
+    setText('view-company-email', d.company_email || '—');
+    setText('view-company-phone', d.company_phone || '—');
+    setText('view-owner-name', d.owner_name || '—');
+    setText('view-owner-email', d.owner_email || '—');
+    setText('view-owner-phone', d.owner_phone || '—');
+    document.getElementById('input-company-name') && (document.getElementById('input-company-name').value = d.company_name || '');
+    document.getElementById('input-company-email') && (document.getElementById('input-company-email').value = d.company_email || '');
+    document.getElementById('input-company-phone') && (document.getElementById('input-company-phone').value = d.company_phone || '');
+    document.getElementById('input-owner-name') && (document.getElementById('input-owner-name').value = d.owner_name || '');
+    document.getElementById('input-owner-email') && (document.getElementById('input-owner-email').value = d.owner_email || '');
+    document.getElementById('input-owner-phone') && (document.getElementById('input-owner-phone').value = d.owner_phone || '');
+    // Fleet stats
+    var fleetCount = document.querySelectorAll('#fleet-content .aircraft-card').length;
+    setText('profile-stat-fleet', fleetCount || (d.fleet_count || '—'));
+    // Logo
+    if (d.logo_url) {
+      var img = document.getElementById('profile-logo-img');
+      var init = document.getElementById('profile-logo-initials');
+      if (img) { img.src = d.logo_url; img.style.display = 'block'; }
+      if (init) init.style.display = 'none';
+    }
+    // Cover
+    if (d.cover_url) {
+      var bg = document.getElementById('profile-cover-bg');
+      if (bg) bg.style.backgroundImage = 'url(' + d.cover_url + ')';
+    }
+  }).catch(function(e){ console.error('Extended profile load error:', e); });
+}
+
+// ---- Profile edit mode toggler (extended) ----
+var _origProfileEditMode = typeof profileEditMode === 'function' ? profileEditMode : null;
+function profileEditMode(section) {
+  var validSections = ['overview', 'ops', 'certs', 'company', 'personal'];
+  if (validSections.includes(section)) {
+    var view = document.getElementById('profile-' + section + '-view');
+    var form = document.getElementById('profile-' + section + '-form');
+    var editBtn = document.getElementById('profile-' + section + '-edit-btn');
+    if (view) view.style.display = 'none';
+    if (form) form.style.display = 'block';
+    if (editBtn) editBtn.style.display = 'none';
+  } else if (_origProfileEditMode) {
+    _origProfileEditMode(section);
+  }
+}
+
+function profileCancelEdit(section) {
+  var view = document.getElementById('profile-' + section + '-view');
+  var form = document.getElementById('profile-' + section + '-form');
+  var editBtn = document.getElementById('profile-' + section + '-edit-btn');
+  if (view) view.style.display = 'block';
+  if (form) form.style.display = 'none';
+  if (editBtn) editBtn.style.display = 'flex';
+}
