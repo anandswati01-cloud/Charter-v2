@@ -308,12 +308,34 @@ async function loadAllData(){
 
 /* ============ RENDER LISTS ============ */
 
+function getTimerBar(expiresAt) {
+  if (!expiresAt) return '';
+  var totalMs = 60 * 60 * 1000;
+  var now = new Date();
+  var expires = new Date(expiresAt);
+  var elapsed = now - (expires.getTime() - totalMs);
+  var pct = Math.min(Math.max((elapsed / totalMs) * 100, 0), 100);
+  var remaining = expires - now;
+  var isUrgent = remaining > 0 && remaining < 10 * 60 * 1000;
+  var isExpired = remaining <= 0;
+  var barColor = isExpired ? 'var(--red)' : isUrgent ? 'var(--amber)' : 'var(--gold)';
+  var mins = remaining > 0 ? Math.floor(remaining / 60000) : 0;
+  var secs = remaining > 0 ? Math.floor((remaining % 60000) / 1000) : 0;
+  var label = isExpired ? 'Window closed' : mins + 'm ' + String(secs).padStart(2,'0') + 's remaining';
+  return '<div class="query-timer-wrap" data-expires="' + expiresAt + '">'
+    + '<div class="query-timer-row">'
+    + '<span class="query-timer-label" style="color:' + barColor + ';">' + label + '</span>'
+    + '<span class="query-timer-pct" style="color:' + barColor + ';">' + (isExpired ? '100' : Math.round(pct)) + '%</span>'
+    + '</div>'
+    + '<div class="query-timer-bar"><div class="query-timer-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>'
+    + '</div>';
+}
+
 function renderActiveList(queries){
   var el=document.getElementById('list-active');
   if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No active queries</div><div class="empty-sub">New client queries will appear here</div></div>';return;}
   el.innerHTML=queries.map(function(q){
     var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+'  →  '+escapeHtml(q.destination||'-');
-    var timer=q.expires_at?timeRemaining(q.expires_at):'';
     var claim=getClaimFor(q.id);
     var lockedBySomeoneElse=claim&&claim.claimed_by!==currentUser.id;
     var lockedByMe=claim&&claim.claimed_by===currentUser.id;
@@ -332,7 +354,7 @@ function renderActiveList(queries){
       +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
       +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
       +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
-      +(timer?'<div class="query-timer">Window: '+timer+' remaining</div>':'')
+      +(q.expires_at ? getTimerBar(q.expires_at) : '')
       +lockInfo
       +'<div class="query-actions"><button class="btn-sm btn-blue" '+btnDisabled+' onclick="openQuoteModal(\''+escapeHtml(q.id)+'\')">'+btnTxt+'</button>'+(claim&&claim.claimed_by===currentUser.id?'<button class="btn-sm btn-red" onclick="declineQuery(\''+escapeHtml(q.id)+'\',\''+escapeHtml(claim.id)+'\')" style="margin-left:6px">Decline</button>':'')+'</div></div>';
   }).join('');
@@ -422,11 +444,29 @@ function renderExpiredList(queries){
       +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
       +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
       +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
+      +(q.expires_at ? getTimerBar(q.expires_at) : '')
       +'</div>';
   }).join('');
 }
 
 function updateClaimTimers(){
+  document.querySelectorAll('.query-timer-wrap').forEach(function(wrap){
+    var expiresAt=wrap.getAttribute('data-expires');if(!expiresAt)return;
+    var totalMs=60*60*1000;
+    var now=new Date();var expires=new Date(expiresAt);
+    var elapsed=now-(expires.getTime()-totalMs);
+    var pct=Math.min(Math.max((elapsed/totalMs)*100,0),100);
+    var remaining=expires-now;
+    var isUrgent=remaining>0&&remaining<10*60*1000;
+    var isExpired=remaining<=0;
+    var barColor=isExpired?'var(--red)':isUrgent?'var(--amber)':'var(--gold)';
+    var mins=remaining>0?Math.floor(remaining/60000):0;
+    var secs=remaining>0?Math.floor((remaining%60000)/1000):0;
+    var label=isExpired?'Window closed':mins+'m '+String(secs).padStart(2,'0')+'s remaining';
+    var bar=wrap.querySelector('.query-timer-fill');if(bar){bar.style.width=pct+'%';bar.style.background=barColor;}
+    var labelEl=wrap.querySelector('.query-timer-label');if(labelEl){labelEl.textContent=label;labelEl.style.color=barColor;}
+    var pctEl=wrap.querySelector('.query-timer-pct');if(pctEl){pctEl.textContent=(isExpired?'100':Math.round(pct))+'%';pctEl.style.color=barColor;}
+  });
   document.querySelectorAll('.query-lock-info').forEach(function(el){
     var exp=el.getAttribute('data-expires');if(!exp)return;
     var rem=claimRemaining(exp);
