@@ -262,7 +262,6 @@ async function loadAllData(){
   allActiveClaims=results[2].ok?results[2].data:[];
   allOperatorUsers=results[3].ok?results[3].data:[];
   var expiredQueries=results[4].ok?results[4].data:[];
-  // filter expired: open status + timer expired + not booked
   var bookedQueryIds=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';}).map(function(q){return q.query_id;});
   expiredQueries=expiredQueries.filter(function(q){return!bookedQueryIds.includes(q.id);});
   var quotedQueryIds=allMyOperatorQuotes.map(function(q){return q.query_id;});
@@ -293,8 +292,7 @@ function getTimerBar(expiresAt) {
   var totalMs = 60 * 60 * 1000;
   var now = new Date();
   var expires = new Date(expiresAt);
-  var created = new Date(expires.getTime() - totalMs);
-  var elapsed = now - created;
+  var elapsed = now - (expires.getTime() - totalMs);
   var pct = Math.min(Math.max((elapsed / totalMs) * 100, 0), 100);
   var remaining = expires - now;
   var isUrgent = remaining > 0 && remaining < 10 * 60 * 1000;
@@ -303,12 +301,12 @@ function getTimerBar(expiresAt) {
   var mins = remaining > 0 ? Math.floor(remaining / 60000) : 0;
   var secs = remaining > 0 ? Math.floor((remaining % 60000) / 1000) : 0;
   var label = isExpired ? 'Window closed' : mins + 'm ' + String(secs).padStart(2,'0') + 's remaining';
-  return '<div class="query-timer-wrap" data-expires="'+expiresAt+'">'
+  return '<div class="query-timer-wrap" data-expires="' + expiresAt + '">'
     + '<div class="query-timer-row">'
-    + '<span class="query-timer-label" style="color:'+barColor+';">' + label + '</span>'
-    + '<span class="query-timer-pct" style="color:'+barColor+';">' + (isExpired ? '100' : Math.round(pct)) + '%</span>'
+    + '<span class="query-timer-label" style="color:' + barColor + ';">' + label + '</span>'
+    + '<span class="query-timer-pct" style="color:' + barColor + ';">' + (isExpired ? '100' : Math.round(pct)) + '%</span>'
     + '</div>'
-    + '<div class="query-timer-bar"><div class="query-timer-fill" style="width:'+pct+'%;background:'+barColor+';"></div></div>'
+    + '<div class="query-timer-bar"><div class="query-timer-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>'
     + '</div>';
 }
 
@@ -321,12 +319,8 @@ function renderActiveList(queries){
     var lockedBySomeoneElse=claim&&claim.claimed_by!==currentUser.id;
     var lockedByMe=claim&&claim.claimed_by===currentUser.id;
     var lockInfo='';
-    if(lockedBySomeoneElse){
-      var rem=claimRemaining(claim.expires_at);
-      lockInfo='<div class="query-lock-info" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">Locked by '+escapeHtml(claim.claimed_by_name||'teammate')+' · '+(rem||'expiring')+'</div>';
-    }else if(lockedByMe){
-      lockInfo='<div class="query-lock-info" style="color:var(--green-light);" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">You have this locked · '+(claimRemaining(claim.expires_at)||'expiring')+'</div>';
-    }
+    if(lockedBySomeoneElse){var rem=claimRemaining(claim.expires_at);lockInfo='<div class="query-lock-info" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">Locked by '+escapeHtml(claim.claimed_by_name||'teammate')+' · '+(rem||'expiring')+'</div>';}
+    else if(lockedByMe){lockInfo='<div class="query-lock-info" style="color:var(--green-light);" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">You have this locked · '+(claimRemaining(claim.expires_at)||'expiring')+'</div>';}
     var btnTxt=lockedBySomeoneElse?'Locked':'Submit quote';
     var btnDisabled=lockedBySomeoneElse?'disabled':'';
     return '<div class="query-card '+(lockedBySomeoneElse?'locked':'')+'">'
@@ -431,22 +425,11 @@ function renderConfirmedList(quotes){
 }
 
 function updateClaimTimers(){
-  document.querySelectorAll('.query-lock-info').forEach(function(el){
-    var exp=el.getAttribute('data-expires');if(!exp)return;
-    var rem=claimRemaining(exp);
-    if(!rem){el.remove();return;}
-    var parts=el.textContent.split('\xb7');
-    el.textContent=(parts[0]||'').trim()+' \xb7 '+rem;
-  });
-  // Update all progress bars live
-  document.querySelectorAll('.query-timer-fill').forEach(function(bar){
-    var wrap=bar.closest('.query-timer-wrap');if(!wrap)return;
-    var card=bar.closest('.query-card');if(!card)return;
+  document.querySelectorAll('.query-timer-wrap').forEach(function(wrap){
     var expiresAt=wrap.getAttribute('data-expires');if(!expiresAt)return;
     var totalMs=60*60*1000;
     var now=new Date();var expires=new Date(expiresAt);
-    var created=new Date(expires.getTime()-totalMs);
-    var elapsed=now-created;
+    var elapsed=now-(expires.getTime()-totalMs);
     var pct=Math.min(Math.max((elapsed/totalMs)*100,0),100);
     var remaining=expires-now;
     var isUrgent=remaining>0&&remaining<10*60*1000;
@@ -455,10 +438,16 @@ function updateClaimTimers(){
     var mins=remaining>0?Math.floor(remaining/60000):0;
     var secs=remaining>0?Math.floor((remaining%60000)/1000):0;
     var label=isExpired?'Window closed':mins+'m '+String(secs).padStart(2,'0')+'s remaining';
-    bar.style.width=pct+'%';
-    bar.style.background=barColor;
+    var bar=wrap.querySelector('.query-timer-fill');if(bar){bar.style.width=pct+'%';bar.style.background=barColor;}
     var labelEl=wrap.querySelector('.query-timer-label');if(labelEl){labelEl.textContent=label;labelEl.style.color=barColor;}
     var pctEl=wrap.querySelector('.query-timer-pct');if(pctEl){pctEl.textContent=(isExpired?'100':Math.round(pct))+'%';pctEl.style.color=barColor;}
+  });
+  document.querySelectorAll('.query-lock-info').forEach(function(el){
+    var exp=el.getAttribute('data-expires');if(!exp)return;
+    var rem=claimRemaining(exp);
+    if(!rem){el.remove();return;}
+    var prefix=el.textContent.split(' ÃÂ· ')[0];
+    el.textContent=prefix+' ÃÂ· '+rem;
   });
 }
 
@@ -1813,15 +1802,15 @@ function profileSaveOverview() {
 }
 
 function renderOverviewView(d) {
-  setText('view-company-desc', d.company_description || ' - ');
-  setText('view-year-established', d.year_established || ' - ');
+  setText('view-company-desc', d.company_description || '—');
+  setText('view-year-established', d.year_established || '—');
   var websiteEl = document.getElementById('view-website');
-  if (websiteEl) websiteEl.innerHTML = d.website ? '<a href="' + escapeHtml(d.website) + '" target="_blank" rel="noopener">' + escapeHtml(d.website) + '</a>' : ' - ';
-  setText('view-home-base', d.home_base || ' - ');
-  setText('view-other-bases', d.other_bases || ' - ');
-  setText('view-sales-email', d.sales_email || ' - ');
-  setText('view-sales-phone', d.sales_phone || ' - ');
-  setText('view-ops-phone', d.ops_phone || ' - ');
+  if (websiteEl) websiteEl.innerHTML = d.website ? '<a href="' + escapeHtml(d.website) + '" target="_blank" rel="noopener">' + escapeHtml(d.website) + '</a>' : '—';
+  setText('view-home-base', d.home_base || '—');
+  setText('view-other-bases', d.other_bases || '—');
+  setText('view-sales-email', d.sales_email || '—');
+  setText('view-sales-phone', d.sales_phone || '—');
+  setText('view-ops-phone', d.ops_phone || '—');
   if (d.home_base) setText('profile-hero-base', d.home_base);
   if (d.company_description) setText('profile-hero-tagline', d.company_description.substring(0,80) + (d.company_description.length > 80 ? '...' : ''));
 }
@@ -1842,10 +1831,10 @@ function profileSaveOps() {
         Object.assign(currentOperator, data);
         localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('ops','Operational details saved.','success');
-        setText('view-regions', data.regions_served || ' - ');
-        setText('view-max-range', data.max_range_nm ? data.max_range_nm + ' nm' : ' - ');
-        setText('view-ops-hours', data.ops_hours || ' - ');
-        setText('view-min-notice', data.min_notice_period || ' - ');
+        setText('view-regions', data.regions_served || '—');
+        setText('view-max-range', data.max_range_nm ? data.max_range_nm + ' nm' : '—');
+        setText('view-ops-hours', data.ops_hours || '—');
+        setText('view-min-notice', data.min_notice_period || '—');
         profileCancelEdit('ops');
       } else {
         profileMsg('ops','Save failed.','error');
@@ -1869,11 +1858,11 @@ function profileSaveCerts() {
         Object.assign(currentOperator, data);
         localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('certs','Certifications saved.','success');
-        setText('view-dgca-licence', data.dgca_licence_no || ' - ');
-        setText('view-aop-expiry', data.aop_expiry_date ? fmtDate(data.aop_expiry_date) : ' - ');
-        setText('view-argus', data.argus_rating || ' - ');
-        setText('view-wyvern', data.wyvern_rating || ' - ');
-        setText('view-isbao', data.isbao_stage || ' - ');
+        setText('view-dgca-licence', data.dgca_licence_no || '—');
+        setText('view-aop-expiry', data.aop_expiry_date ? fmtDate(data.aop_expiry_date) : '—');
+        setText('view-argus', data.argus_rating || '—');
+        setText('view-wyvern', data.wyvern_rating || '—');
+        setText('view-isbao', data.isbao_stage || '—');
         renderCertBadges({argus_rating:data.argus_rating,wyvern_rating:data.wyvern_rating,isbao_stage:data.isbao_stage});
         profileCancelEdit('certs');
       } else {
@@ -1910,12 +1899,12 @@ function profileSaveCompany() {
         Object.assign(currentOperator, data);
         localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('company','Company info saved.','success');
-        setText('view-company-name', data.company_name || ' - ');
-        setText('view-company-email', data.email || ' - ');
-        setText('view-company-phone', data.phone || ' - ');
-        setText('view-owner-name', data.owner_name || ' - ');
-        setText('view-owner-email', data.owner_email || ' - ');
-        setText('view-owner-phone', data.owner_phone || ' - ');
+        setText('view-company-name', data.company_name || '—');
+        setText('view-company-email', data.email || '—');
+        setText('view-company-phone', data.phone || '—');
+        setText('view-owner-name', data.owner_name || '—');
+        setText('view-owner-email', data.owner_email || '—');
+        setText('view-owner-phone', data.owner_phone || '—');
         if (data.company_name) { setText('profile-hero-company', data.company_name); var _or=document.getElementById('op-role');if(_or)_or.textContent=data.company_name; }
         profileCancelEdit('company');
       } else {
@@ -2019,10 +2008,10 @@ function loadExtendedProfile(operatorId) {
     document.getElementById('input-sales-phone') && (document.getElementById('input-sales-phone').value = d.sales_phone || '');
     document.getElementById('input-ops-phone') && (document.getElementById('input-ops-phone').value = d.ops_phone || '');
     // Operations
-    setText('view-regions', d.regions_served || ' - ');
-    setText('view-max-range', d.max_range_nm ? d.max_range_nm + ' nm' : ' - ');
-    setText('view-ops-hours', d.ops_hours || ' - ');
-    setText('view-min-notice', d.min_notice_period || ' - ');
+    setText('view-regions', d.regions_served || '—');
+    setText('view-max-range', d.max_range_nm ? d.max_range_nm + ' nm' : '—');
+    setText('view-ops-hours', d.ops_hours || '—');
+    setText('view-min-notice', d.min_notice_period || '—');
     document.getElementById('input-max-range') && (document.getElementById('input-max-range').value = d.max_range_nm || '');
     document.getElementById('input-ops-hours') && (document.getElementById('input-ops-hours').value = d.ops_hours || '');
     document.getElementById('input-min-notice') && (document.getElementById('input-min-notice').value = d.min_notice_period || '');
@@ -2031,11 +2020,11 @@ function loadExtendedProfile(operatorId) {
       document.querySelectorAll('[name="region"]').forEach(function(cb){ cb.checked = regions.includes(cb.value); });
     }
     // Certifications
-    setText('view-dgca-licence', d.dgca_licence || ' - ');
-    setText('view-aop-expiry', d.aop_expiry ? fmtDate(d.aop_expiry) : ' - ');
-    setText('view-argus', d.argus_rating || ' - ');
-    setText('view-wyvern', d.wyvern_rating || ' - ');
-    setText('view-isbao', d.isbao_stage || ' - ');
+    setText('view-dgca-licence', d.dgca_licence || '—');
+    setText('view-aop-expiry', d.aop_expiry ? fmtDate(d.aop_expiry) : '—');
+    setText('view-argus', d.argus_rating || '—');
+    setText('view-wyvern', d.wyvern_rating || '—');
+    setText('view-isbao', d.isbao_stage || '—');
     renderCertBadges(d);
     document.getElementById('input-dgca-licence') && (document.getElementById('input-dgca-licence').value = d.dgca_licence || '');
     document.getElementById('input-aop-expiry') && (document.getElementById('input-aop-expiry').value = d.aop_expiry || '');
@@ -2054,15 +2043,15 @@ function loadExtendedProfile(operatorId) {
       if (aopNone) aopNone.style.display = '';
     }
     // Certs view
-    setText('view-dgca-licence', d.dgca_licence_no || d.dgca_licence || ' - ');
-    setText('view-aop-expiry', (d.aop_expiry_date || d.aop_expiry) ? fmtDate(d.aop_expiry_date || d.aop_expiry) : ' - ');
+    setText('view-dgca-licence', d.dgca_licence_no || d.dgca_licence || '—');
+    setText('view-aop-expiry', (d.aop_expiry_date || d.aop_expiry) ? fmtDate(d.aop_expiry_date || d.aop_expiry) : '—');
     // Company basic info (operators table uses email/phone, not company_email/company_phone)
-    setText('view-company-name', d.company_name || ' - ');
-    setText('view-company-email', d.email || d.company_email || ' - ');
-    setText('view-company-phone', d.phone || d.company_phone || ' - ');
-    setText('view-owner-name', d.owner_name || ' - ');
-    setText('view-owner-email', d.owner_email || ' - ');
-    setText('view-owner-phone', d.owner_phone || ' - ');
+    setText('view-company-name', d.company_name || '—');
+    setText('view-company-email', d.email || d.company_email || '—');
+    setText('view-company-phone', d.phone || d.company_phone || '—');
+    setText('view-owner-name', d.owner_name || '—');
+    setText('view-owner-email', d.owner_email || '—');
+    setText('view-owner-phone', d.owner_phone || '—');
     document.getElementById('input-company-name') && (document.getElementById('input-company-name').value = d.company_name || '');
     document.getElementById('input-company-email') && (document.getElementById('input-company-email').value = d.email || d.company_email || '');
     document.getElementById('input-company-phone') && (document.getElementById('input-company-phone').value = d.phone || d.company_phone || '');
@@ -2071,7 +2060,7 @@ function loadExtendedProfile(operatorId) {
     document.getElementById('input-owner-phone') && (document.getElementById('input-owner-phone').value = d.owner_phone || '');
     // Fleet stats
     var fleetCount = document.querySelectorAll('#fleet-content .aircraft-card').length;
-    setText('profile-stat-fleet', fleetCount > 0 ? String(fleetCount) : (d.fleet_count ? String(d.fleet_count) : ' - '));
+    setText('profile-stat-fleet', fleetCount > 0 ? String(fleetCount) : (d.fleet_count ? String(d.fleet_count) : '—'));
     // Logo
     if (d.logo_url) {
       var img = document.getElementById('profile-logo-img');
