@@ -92,7 +92,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--white);min-heigh
 .btn-logout:hover{border-color:var(--red);color:var(--red);}
 
 /* ââ Main Content Area ââ */
-.main{flex:1;overflow-y:auto;display:flex;flex-direction:column;background:radial-gradient(ellipse 80% 60% at 70% 10%,rgba(251,191,36,0.035) 0%,transparent 70%),var(--navy);}
+.main{flex:1;overflow-y:auto;display:flex;flex-direction:row;background:radial-gradient(ellipse 80% 60% at 70% 10%,rgba(251,191,36,0.035) 0%,transparent 70%),var(--navy);}
 .main-header{padding:20px 28px 0;border-bottom:0.5px solid var(--white-10);background:rgba(12,19,36,0.45);backdrop-filter:blur(12px);position:sticky;top:0;z-index:10;}
 .main-topbar{display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;}
 .breadcrumb{font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--white-30);}
