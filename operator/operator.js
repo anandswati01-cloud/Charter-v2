@@ -1,6 +1,6 @@
 var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
 
-/* ── XSS protection: escape all user-supplied strings before inserting into innerHTML ── */
+/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ XSS protection: escape all user-supplied strings before inserting into innerHTML ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
 function escapeHtml(str){
   if(str==null)return'';
   return String(str)
@@ -9,7 +9,7 @@ function escapeHtml(str){
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
-
+}
 
 var currentUser=null,currentOperator=null,currentQueryId=null,currentClaimId=null;
 
@@ -45,18 +45,17 @@ async function doLogin(){
   if(!username||!password){errEl.textContent='Please enter username or email and password';errEl.classList.add('show');return;}
   var btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='Signing in...';
   try{
-    var queryField=username.includes('@')?'email':'username';
-    var userRes=await sbFetch('operator_users?'+queryField+'=eq.'+encodeURIComponent(username.toLowerCase()));
-    if(!userRes.ok||!userRes.data||!userRes.data.length){
+    /* Ã¢ÂÂÃ¢ÂÂ Secure server-side login via verify_operator_login RPC Ã¢ÂÂÃ¢ÂÂ
+     * Password is verified server-side using bcrypt; hash is NEVER sent to the client.
+     * The old client-side comparison (password_hash === password) has been removed. */
+    var rpcRes=await sbFetch('rpc/verify_operator_login',{method:'POST',body:{p_username:username.toLowerCase(),p_password:password}});
+    if(!rpcRes.ok||!rpcRes.data||!rpcRes.data.length){
       errEl.textContent='Invalid username or password';errEl.classList.add('show');return;
     }
-    var user=userRes.data[0];
+    var user=rpcRes.data[0];
     if(!user.is_active){
       errEl.textContent='This account has been deactivated. Please contact your administrator.';
       errEl.classList.add('show');return;
-    }
-    if((user.password_hash||'').trim()!==(password||'').trim()){
-      errEl.textContent='Invalid username or password';errEl.classList.add('show');return;
     }
     if(user.role==='employee'&&user.is_approved===false){
       errEl.textContent='Your account is pending approval from SkyVayu. Please wait.';
@@ -77,24 +76,22 @@ async function doLogin(){
       errEl.textContent='Your registration was not approved. Please contact SkyVayu.';
       errEl.classList.add('show');return;
     }
-    currentUser=user;currentOperator=op;sessionStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
-    /* Fire-and-forget last_login update — don't block on it */
+    currentUser=user;currentOperator=op;localStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
+    /* Fire-and-forget last_login update ÃÂ¢ don't block on it */
     sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
-    document.getElementById('page-dashboard').classList.add('active');
-    document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
-    document.getElementById('sidebar-role').textContent=currentOperator.company_name;
-    var rt=document.getElementById('sidebar-role-tag');
-    rt.textContent=isOwner()?'Admin':'Employee';
-    rt.className='role-tag '+(isOwner()?'':'employee');
+    document.getElementById('page-dashboard').style.display='';document.getElementById('page-dashboard').classList.add('active');
+    var _on=document.getElementById('op-name');if(_on)_on.textContent=currentUser.full_name||currentUser.username;
+    var _or=document.getElementById('op-role');if(_or)_or.textContent=currentOperator.company_name;
+    var rt=document.getElementById('op-role-tag');
+    if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
     applyRoleRestrictions();
     showSection('queries');
     await loadAllData();
-  populateCategoryCheckboxes();
     refreshInterval=setInterval(loadAllData,5000);
     claimRefreshInterval=setInterval(updateClaimTimers,1000);
   }catch(e){
-    console.error('Login error:', e);
+    
     errEl.textContent='An error occurred. Please try again.';
     errEl.classList.add('show');
   }finally{
@@ -106,37 +103,43 @@ function doLogout(){
   if(refreshInterval){clearInterval(refreshInterval);refreshInterval=null;}
   if(claimRefreshInterval){clearInterval(claimRefreshInterval);claimRefreshInterval=null;}
   if(currentClaimId)releaseClaim(currentClaimId);
-  currentUser=null;currentOperator=null;currentClaimId=null;sessionStorage.removeItem('opSession');
+  currentUser=null;currentOperator=null;currentClaimId=null;localStorage.removeItem('opSession');
+  document.getElementById('page-dashboard').style.display='none';
   document.getElementById('page-dashboard').classList.remove('active');
+  document.getElementById('page-login').style.display='flex';
   document.getElementById('login-username').value='';
   document.getElementById('login-password').value='';
 }
 
 function applyRoleRestrictions(){
   var adminSection=document.getElementById('nav-admin-section');
-  adminSection.style.display=isOwner()?'block':'none';
+  if(adminSection)adminSection.style.display=isOwner()?'block':'none';
   var addAcBtn=document.getElementById('btn-add-aircraft');
   if(addAcBtn)addAcBtn.style.display=isOwner()?'flex':'none';
   var sharedLabel=document.getElementById('stat-shared-label');
   var confLabel=document.getElementById('stat-confirmed-label');
-  if(!isOwner()){sharedLabel.textContent='My quotes shared';confLabel.textContent='My confirmed bookings';}
-  else{sharedLabel.textContent='Quotes shared';confLabel.textContent='Confirmed bookings';}
+  if(sharedLabel&&confLabel){
+    if(!isOwner()){sharedLabel.textContent='My quotes shared';confLabel.textContent='My confirmed bookings';}
+    else{sharedLabel.textContent='Quotes shared';confLabel.textContent='Confirmed bookings';}
+  }
 }
 
 /* ============ NAV ============ */
 
 function showSection(section){
-  ['queries','fleet','roster','employees','revenue'].forEach(function(s){
+  ['queries','fleet','roster','employees','revenue','profile'].forEach(function(s){
     var el=document.getElementById('section-'+s);if(el)el.style.display='none';
-    var nav=document.getElementById('nav-'+s);if(nav)nav.classList.remove('active');
+    var nav=document.querySelector('.nav-item[data-section="'+s+'"]');if(nav)nav.classList.remove('active');
   });
-  document.getElementById('section-'+section).style.display='block';
-  document.getElementById('nav-'+section).classList.add('active');
+  var sEl=document.getElementById('section-'+section);if(sEl)sEl.style.display='block';
+  var navEl=document.querySelector('.nav-item[data-section="'+section+'"]');if(navEl)navEl.classList.add('active');
   if(section==='fleet')loadFleet();
   if(section==='roster')loadRoster();
   if(section==='employees')loadEmployees();
   if(section==='revenue')loadRevenue();
   if(section==='queries')loadAllData();
+
+  if (section === 'profile') { loadProfileCategory(); loadProfileSection(); }
 }
 
 function showSubtab(tab){
@@ -150,7 +153,7 @@ function showSubtab(tab){
 
 /* ============ HELPERS ============ */
 
-function fmtDate(d){if(!d)return'—';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
+function fmtDate(d){if(!d)return'ÃÂ¢ÃÂÃÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
 function fmtDateShort(d){if(!d)return'';var parts=d.split('-');if(parts.length!==3)return d;return parts[2]+'-'+parts[1];}
 function fmtPrice(n){return'Rs.'+Number(n||0).toLocaleString('en-IN');}
 function fmtPriceShort(n){var v=Number(n||0);if(v>=10000000)return'Rs.'+(v/10000000).toFixed(1)+'Cr';if(v>=100000)return'Rs.'+(v/100000).toFixed(1)+'L';if(v>=1000)return'Rs.'+(v/1000).toFixed(0)+'K';return'Rs.'+v;}
@@ -262,14 +265,15 @@ async function loadAllData(){
   var confirmedAll=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';});
   var shared=isOwner()?sharedAll:sharedAll.filter(function(q){return q.submitted_by===currentUser.id;});
   var confirmed=isOwner()?confirmedAll:confirmedAll.filter(function(q){return q.submitted_by===currentUser.id;});
-  document.getElementById('stat-active').textContent=unquoted.length;
-  document.getElementById('stat-shared').textContent=shared.length;
-  document.getElementById('stat-confirmed').textContent=confirmed.length;
-  document.getElementById('count-active').textContent=unquoted.length;
-  document.getElementById('count-shared').textContent=shared.length;
-  document.getElementById('count-confirmed').textContent=confirmed.length;
-  document.getElementById('nav-badge-queries').textContent=unquoted.length+shared.length;
+  var _sa=document.getElementById('stat-active');if(_sa)_sa.textContent=unquoted.length;
+  var _sq=document.getElementById('stat-quotes');if(_sq)_sq.textContent=shared.length;
+  var _sb=document.getElementById('stat-bookings');if(_sb)_sb.textContent=confirmed.length;
+  var _ca=document.getElementById('count-active');if(_ca)_ca.textContent=unquoted.length;
+  var _cs=document.getElementById('count-shared');if(_cs)_cs.textContent=shared.length;
+  var _cc=document.getElementById('count-confirmed');if(_cc)_cc.textContent=confirmed.length;
+  var _qb=document.getElementById('queries-badge');if(_qb)_qb.textContent=unquoted.length+shared.length;
   renderActiveList(unquoted);
+  markQueriesViewed(unquoted.map(function(q){return q.id;}));
   renderSharedList(shared);
   renderConfirmedList(confirmed);
 }
@@ -280,7 +284,7 @@ function renderActiveList(queries){
   var el=document.getElementById('list-active');
   if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No active queries</div><div class="empty-sub">New client queries will appear here</div></div>';return;}
   el.innerHTML=queries.map(function(q){
-    var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+' → '+escapeHtml(q.destination||'-');
+    var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+' ÃÂ¢ÃÂÃÂ '+escapeHtml(q.destination||'-');
     var timer=q.expires_at?timeRemaining(q.expires_at):'';
     var claim=getClaimFor(q.id);
     var lockedBySomeoneElse=claim&&claim.claimed_by!==currentUser.id;
@@ -288,9 +292,9 @@ function renderActiveList(queries){
     var lockInfo='';
     if(lockedBySomeoneElse){
       var rem=claimRemaining(claim.expires_at);
-      lockInfo='<div class="query-lock-info" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">Locked by '+escapeHtml(claim.claimed_by_name||'teammate')+' · '+(rem||'expiring')+'</div>';
+      lockInfo='<div class="query-lock-info" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">Locked by '+escapeHtml(claim.claimed_by_name||'teammate')+' ÃÂÃÂ· '+(rem||'expiring')+'</div>';
     }else if(lockedByMe){
-      lockInfo='<div class="query-lock-info" style="color:var(--green-light);" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">You have this locked · '+(claimRemaining(claim.expires_at)||'expiring')+'</div>';
+      lockInfo='<div class="query-lock-info" style="color:var(--green-light);" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">You have this locked ÃÂÃÂ· '+(claimRemaining(claim.expires_at)||'expiring')+'</div>';
     }
     var btnTxt=lockedBySomeoneElse?'Locked':'Submit quote';
     var btnDisabled=lockedBySomeoneElse?'disabled':'';
@@ -306,7 +310,7 @@ function renderActiveList(queries){
   }).join('');
 }
 
-// ── View Shared Quote ────────────────────────────────────
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ View Shared Quote ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 var _viewQuoteData = null;
 
 function viewSharedQuote(quoteId) {
@@ -315,7 +319,7 @@ function viewSharedQuote(quoteId) {
   _viewQuoteData = q;
   var query = q.queries || {};
   var route = query.trip_type === 'multi' ? 'Multiple sectors'
-    : escapeHtml(query.departure || '-') + ' → ' + escapeHtml(query.destination || '-');
+    : escapeHtml(query.departure || '-') + ' ÃÂ¢ÃÂÃÂ ' + escapeHtml(query.destination || '-');
   var date = fmtDate(query.flight_date) + (query.flight_time ? ' at ' + escapeHtml(query.flight_time) : '');
   var base = Number(q.base_charge || 0);
   var handling = Number(q.handling_fee || 0);
@@ -360,9 +364,9 @@ function renderSharedList(quotes){
   if(!quotes.length){var msg=isOwner()?'No quotes shared yet':'You haven\'t shared any quotes yet';el.innerHTML='<div class="empty-state"><div class="empty-title">'+msg+'</div></div>';return;}
   el.innerHTML=quotes.map(function(q){
     var query=q.queries||{};
-    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+' → '+escapeHtml(query.destination||'-');
+    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+' ÃÂ¢ÃÂÃÂ '+escapeHtml(query.destination||'-');
     var empBadge='';
-    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card" style="cursor:pointer;" onclick="viewSharedQuote(\''+q.id+'\')">'+'<div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' · '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+escapeHtml(q.notes)+'</div>':'')+'</div>';
+    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card" style="cursor:pointer;" onclick="viewSharedQuote(\''+q.id+'\')">'+'<div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' ÃÂÃÂ· '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+escapeHtml(q.notes)+'</div>':'')+'</div>';
   }).join('');
   window._sharedQuotes = quotes;
 }
@@ -372,9 +376,9 @@ function renderConfirmedList(quotes){
   if(!quotes.length){var msg=isOwner()?'No confirmed bookings yet':'No confirmed bookings for you yet';el.innerHTML='<div class="empty-state"><div class="empty-title">'+msg+'</div></div>';return;}
   el.innerHTML=quotes.map(function(q){
     var query=q.queries||{};
-    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+' → '+escapeHtml(query.destination||'-');
+    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+' ÃÂ¢ÃÂÃÂ '+escapeHtml(query.destination||'-');
     var empBadge='';
-    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' · '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
+    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' ÃÂÃÂ· '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
   }).join('');
 }
 
@@ -383,8 +387,8 @@ function updateClaimTimers(){
     var exp=el.getAttribute('data-expires');if(!exp)return;
     var rem=claimRemaining(exp);
     if(!rem){el.remove();return;}
-    var prefix=el.textContent.split(' · ')[0];
-    el.textContent=prefix+' · '+rem;
+    var prefix=el.textContent.split(' ÃÂÃÂ· ')[0];
+    el.textContent=prefix+' ÃÂÃÂ· '+rem;
   });
 }
 
@@ -451,7 +455,7 @@ function getBusyAircraftMap(){
     dates.forEach(function(d){
       if(!map[q.aircraft_id])map[q.aircraft_id]={};
       var u=lookupUser(q.submitted_by);
-      map[q.aircraft_id][d]={by:u?(u.full_name||u.username):'operator',route:(query.departure||'-')+'→'+(query.destination||'-')};
+      map[q.aircraft_id][d]={by:u?(u.full_name||u.username):'operator',route:(query.departure||'-')+'ÃÂ¢ÃÂÃÂ'+(query.destination||'-')};
     });
   });
   return map;
@@ -481,7 +485,7 @@ async function openQuoteModal(queryId){
     showToast('Query not found. Please refresh.','error');
     return;
   }
-  var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'—')+' → '+escapeHtml(query.destination||'—');
+  var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'ÃÂ¢ÃÂÃÂ')+' ÃÂ¢ÃÂÃÂ '+escapeHtml(query.destination||'ÃÂ¢ÃÂÃÂ');
   document.getElementById('quote-query-info').innerHTML='<strong style="color:var(--text);">'+route+'</strong><br>'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' &nbsp;|&nbsp; '+escapeHtml(String(query.passengers))+' pax';
   var busyMap=getBusyAircraftMap();
   var expiredAcIds=getExpiredAircraftIds();
@@ -497,11 +501,11 @@ async function openQuoteModal(queryId){
       else if(returnDate&&busyMap[a.id][returnDate])conflict=returnDate;
     }
     var docExpired=expiredAcIds.indexOf(a.id)!==-1;
-    if(conflict){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  —  Booked on '+fmtDate(conflict)+'</option>';}
-    if(docExpired){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  —  Documents expired</option>';}
+    if(conflict){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  ÃÂ¢ÃÂÃÂ  Booked on '+fmtDate(conflict)+'</option>';}
+    if(docExpired){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  ÃÂ¢ÃÂÃÂ  Documents expired</option>';}
     return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'">'+a.aircraft_type+'  |  '+a.registration+'</option>';
   }).join('');
-  document.getElementById('quote-aircraft-help').textContent=anyConflict?'Some aircraft unavailable — booked or documents expired.':'';
+  document.getElementById('quote-aircraft-help').textContent=anyConflict?'Some aircraft unavailable ÃÂ¢ÃÂÃÂ booked or documents expired.':'';
   ['q-base','q-handling','q-crew','q-catering','q-notes'].forEach(function(id){document.getElementById(id).value='';});
   calcQuote();
   document.getElementById('quote-modal').classList.add('open');
@@ -624,14 +628,14 @@ function checkDocumentStatus(){
       if(days <= 0){
         notifications.push({
           type:'error',
-          msg:ac.registration+' — '+d.name+' has expired. This aircraft is unavailable until renewed.',
+          msg:ac.registration+' ÃÂ¢ÃÂÃÂ '+d.name+' has expired. This aircraft is unavailable until renewed.',
           btn:'Upload updated document',
           onclick:'openDocRenewModal(\''+ac.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\')'
         });
       } else if(days <= 30){
         notifications.push({
           type:'warn',
-          msg:ac.registration+' — '+d.name+' expires in '+days+' day'+(days===1?'':'s')+'.',
+          msg:ac.registration+' ÃÂ¢ÃÂÃÂ '+d.name+' expires in '+days+' day'+(days===1?'':'s')+'.',
           btn:'Upload updated document',
           onclick:'openDocRenewModal(\''+ac.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\')'
         });
@@ -712,9 +716,9 @@ async function loadFleet(){
         var days = daysUntil(a[d.expKey]);
         if(days === null) return;
         var col = days <= 0 ? 'var(--red)' : 'var(--amber)';
-        var label = days <= 0 ? '⚠ Expired' : ('⚠ '+days+'d left');
+        var label = days <= 0 ? 'ÃÂ¢ÃÂÃÂ  Expired' : ('ÃÂ¢ÃÂÃÂ  '+days+'d left');
         docStatusHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">'
-          +'<span style="font-size:10px;color:'+col+';">'+d.name+' — '+label+'</span>'
+          +'<span style="font-size:10px;color:'+col+';">'+d.name+' ÃÂ¢ÃÂÃÂ '+label+'</span>'
           +'<button onclick="openDocRenewModal(\''+a.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\') " '
           +'style="height:22px;padding:0 8px;background:transparent;border:0.5px solid '+col+';border-radius:4px;font-size:10px;color:'+col+';cursor:pointer;font-family:var(--font);white-space:nowrap;">'
           +'Upload updated document</button></div>';
@@ -728,12 +732,12 @@ async function loadFleet(){
   }
   if(pending.length){
     html += pending.map(function(a){
-      return '<div class="aircraft-card" style="opacity:.65;border-style:dashed;"><div style="position:absolute;top:8px;right:8px;font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Under review</div><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div>'+(a.seats?'<div class="aircraft-seats">'+escapeHtml(String(a.seats))+' seats</div>':'')+'<div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;">Documents submitted — awaiting SkyVayu approval</div></div>';
+      return '<div class="aircraft-card" style="opacity:.65;border-style:dashed;"><div style="position:absolute;top:8px;right:8px;font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Under review</div><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div>'+(a.seats?'<div class="aircraft-seats">'+escapeHtml(String(a.seats))+' seats</div>':'')+'<div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;">Documents submitted ÃÂ¢ÃÂÃÂ awaiting SkyVayu approval</div></div>';
     }).join('');
   }
   if(rejected.length){
     html += rejected.map(function(a){
-      return '<div class="aircraft-card" style="border-color:rgba(192,57,43,0.3);"><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div><div style="font-size:11px;color:var(--red);margin-top:6px;">Documents rejected'+(a.doc_rejection_reason?' — '+escapeHtml(a.doc_rejection_reason):'')+'</div><button class="btn-sm btn-outline-sm" style="margin-top:8px;font-size:11px;height:28px;" onclick="resubmitAircraft(\''+escapeHtml(a.id)+'\')">Re-upload documents</button></div>';
+      return '<div class="aircraft-card" style="border-color:rgba(192,57,43,0.3);"><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div><div style="font-size:11px;color:var(--red);margin-top:6px;">Documents rejected'+(a.doc_rejection_reason?' ÃÂ¢ÃÂÃÂ '+escapeHtml(a.doc_rejection_reason):'')+'</div><button class="btn-sm btn-outline-sm" style="margin-top:8px;font-size:11px;height:28px;" onclick="resubmitAircraft(\''+escapeHtml(a.id)+'\')">Re-upload documents</button></div>';
     }).join('');
   }
   if(!html){
@@ -750,7 +754,7 @@ function onAcDocSelected(input, key){
   if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
   acDocFiles[key] = file;
   var nameEl = document.getElementById(key+'-filename');
-  if(nameEl){ nameEl.textContent = '✓ '+file.name; nameEl.style.color='var(--gold)'; }
+  if(nameEl){ nameEl.textContent = 'ÃÂ¢ÃÂÃÂ '+file.name; nameEl.style.color='var(--gold)'; }
   var areaEl = document.getElementById(key+'-upload-area');
   if(areaEl) areaEl.style.borderColor = 'var(--gold)';
 }
@@ -789,6 +793,7 @@ async function saveAircraft(){
   var type = document.getElementById('ac-type').value.trim();
   var reg  = document.getElementById('ac-reg').value.trim();
   var seats= parseInt(document.getElementById('ac-seats').value)||null;
+  const amenities = {wifi:document.getElementById('am-wifi')?.checked||false,oven:document.getElementById('am-oven')?.checked||false,microwave:document.getElementById('am-microwave')?.checked||false,coffee:document.getElementById('am-coffee')?.checked||false,flatbed:document.getElementById('am-flatbed')?.checked||false,lavatory:document.getElementById('am-lavatory')?.checked||false,satphone:document.getElementById('am-satphone')?.checked||false,entertainment:document.getElementById('am-entertainment')?.checked||false,nonsmoking:document.getElementById('am-nonsmoking')?.checked||false};
   var errEl = document.getElementById('ac-save-error');
   errEl.style.display='none';
   if(!type||!reg){errEl.textContent='Please enter aircraft type and registration.';errEl.style.display='block';return;}
@@ -806,7 +811,7 @@ async function saveAircraft(){
   var btn = document.getElementById('btn-save-aircraft');
   btn.disabled=true;btn.textContent='Uploading...';
   var acRes = await sbFetch('aircraft',{method:'POST',prefer:'return=representation',body:{
-    operator_id:currentOperator.id, aircraft_type:type, registration:reg, seats:seats,
+    operator_id:currentOperator.id, aircraft_type:type, registration:reg, seats:seats,amenities:amenities,
     is_active:false, doc_status:'pending'
   }});
   if(!acRes.ok||!acRes.data||!acRes.data.length||!acRes.data[0]){
@@ -877,7 +882,7 @@ function onAopRenewFileSelected(input){
   if(!file) return;
   if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
   selectedAopRenewFile = file;
-  document.getElementById('aop-renew-filename').textContent = '✓ '+file.name;
+  document.getElementById('aop-renew-filename').textContent = 'ÃÂ¢ÃÂÃÂ '+file.name;
   document.getElementById('aop-renew-filename').style.color = 'var(--gold)';
   document.getElementById('aop-renew-upload-area').style.borderColor = 'var(--gold)';
 }
@@ -930,8 +935,8 @@ function openDocRenewModal(acId, docKey, docName, expKey, urlKey, nameKey){
   docRenewState = {acId:acId, docKey:docKey, docName:docName, expKey:expKey, urlKey:urlKey, nameKey:nameKey};
   var ac = aircraftList.find(function(a){return a.id===acId;});
   document.getElementById('doc-renew-title').textContent = 'Upload updated '+docName;
-  document.getElementById('doc-renew-aircraft-info').textContent = ac ? ac.aircraft_type+' · '+ac.registration : '';
-  document.getElementById('doc-renew-current-expiry').textContent = ac && ac[expKey] ? fmtDate(ac[expKey]) : '—';
+  document.getElementById('doc-renew-aircraft-info').textContent = ac ? ac.aircraft_type+' ÃÂÃÂ· '+ac.registration : '';
+  document.getElementById('doc-renew-current-expiry').textContent = ac && ac[expKey] ? fmtDate(ac[expKey]) : 'ÃÂ¢ÃÂÃÂ';
   document.getElementById('doc-renew-file-input').value = '';
   document.getElementById('doc-renew-filename').textContent = 'Upload PDF/JPG/PNG';
   document.getElementById('doc-renew-filename').style.color = '';
@@ -946,7 +951,7 @@ function onDocRenewFileSelected(input){
   if(!file) return;
   if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
   selectedDocRenewFile = file;
-  document.getElementById('doc-renew-filename').textContent = '✓ '+file.name;
+  document.getElementById('doc-renew-filename').textContent = 'ÃÂ¢ÃÂÃÂ '+file.name;
   document.getElementById('doc-renew-filename').style.color = 'var(--gold)';
   document.getElementById('doc-renew-upload-area').style.borderColor = 'var(--gold)';
 }
@@ -990,7 +995,7 @@ async function submitDocRenewal(){
 
 async function loadRoster(){
   if(!aircraftList.length)await loadFleet();
-  var container=document.getElementById('roster-grid');
+  var container=document.getElementById('roster-content');
   if(!aircraftList.length){container.innerHTML='<div class="empty-state"><div class="empty-title">No aircraft</div><div class="empty-sub">Add aircraft to your fleet to view the roster</div></div>';return;}
   var days=30;
   var today=new Date();today.setHours(0,0,0,0);
@@ -1007,6 +1012,7 @@ async function loadRoster(){
   });
   aircraftList.forEach(function(ac){
     html+='<div class="roster-cell-ac"><div class="ac-type">'+escapeHtml(ac.aircraft_type)+'</div><div class="ac-reg">'+escapeHtml(ac.registration)+'</div></div>';
+  ['am-wifi','am-oven','am-microwave','am-coffee','am-flatbed','am-lavatory','am-satphone','am-entertainment','am-nonsmoking'].forEach(function(id){var el=document.getElementById(id);if(el)el.checked=false;});
     dates.forEach(function(d,idx){
       var iso=toIso(d);
       var cls='roster-cell'+(idx===0?' today':'');
@@ -1019,9 +1025,9 @@ async function loadRoster(){
           isMine=!!mine;
         }
         var bClass=isOwner()?'booking':(isMine?'booking mine':'booking other-emp');
-        var bLabel=isOwner()?booking.by:(isMine?'You':'—');
-        var routeTxt=isOwner()||isMine?booking.route:'•';
-        cellContent='<div class="'+bClass+'" title="'+booking.route+' · by '+booking.by+'"><span class="b-route">'+routeTxt+'</span><span class="b-emp">'+bLabel+'</span></div>';
+        var bLabel=isOwner()?booking.by:(isMine?'You':'ÃÂ¢ÃÂÃÂ');
+        var routeTxt=isOwner()||isMine?booking.route:'ÃÂ¢ÃÂÃÂ¢';
+        cellContent='<div class="'+bClass+'" title="'+booking.route+' ÃÂÃÂ· by '+booking.by+'"><span class="b-route">'+routeTxt+'</span><span class="b-emp">'+bLabel+'</span></div>';
       }
       html+='<div class="'+cls+'">'+cellContent+'</div>';
     });
@@ -1052,20 +1058,20 @@ async function loadEmployees(){
     var s=stats[e.id];
     var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
     var online=e.last_login&&(new Date()-new Date(e.last_login))<1800000;
-    var lastSeen=e.last_login?new Date(e.last_login).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';
+    var lastSeen=e.last_login?new Date(e.last_login).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'ÃÂ¢ÃÂÃÂ';
     var isExpanded=expandedEmployeeId===e.id;
     var pendingBadge=e.is_approved===false?'<span style="font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:1px 6px;border-radius:3px;margin-left:6px;text-transform:uppercase;">Pending approval</span>':'';
-    var html='<tr onclick="toggleEmployee(\''+escapeHtml(e.id)+'\')"><td><span class="emp-avatar">'+escapeHtml(ini)+'</span><b>'+escapeHtml(e.full_name||e.username)+'</b>'+pendingBadge+'<br><span style="font-size:11px;color:var(--text-tertiary);">@'+escapeHtml(e.username)+(e.employee_id?' · ID: '+escapeHtml(e.employee_id):'')+'</span></td>'
+    var html='<tr onclick="toggleEmployee(\''+escapeHtml(e.id)+'\')"><td><span class="emp-avatar">'+escapeHtml(ini)+'</span><b>'+escapeHtml(e.full_name||e.username)+'</b>'+pendingBadge+'<br><span style="font-size:11px;color:var(--text-tertiary);">@'+escapeHtml(e.username)+(e.employee_id?' ÃÂÃÂ· ID: '+escapeHtml(e.employee_id):'')+'</span></td>'
       +'<td>'+s.shared+'</td><td>'+s.confirmed+'</td>'
       +'<td style="color:'+(online?'var(--green-light)':'var(--text-tertiary)')+';">'+(online?'Online':lastSeen)+'</td>'
       +'<td>'+fmtPriceShort(s.revenue)+'</td></tr>';
     if(isExpanded){
       var activityHtml=s.activity.slice(0,15).map(function(q){
         var qq=q.queries||{};
-        var route=escapeHtml(qq.departure||'-')+'→'+escapeHtml(qq.destination||'-');
+        var route=escapeHtml(qq.departure||'-')+'ÃÂ¢ÃÂÃÂ'+escapeHtml(qq.destination||'-');
         var when=new Date(q.created_at).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
         var statusLabel=q.status==='shared'?'shared quote':(q.status==='accepted'||q.status==='confirmed'||q.status==='booked'?'won booking':escapeHtml(q.status));
-        return'<div class="emp-log-row"><span class="emp-log-time">'+when+'</span><span class="emp-log-action"><b>'+statusLabel+'</b> · '+route+' · '+fmtPrice(q.price)+' · '+escapeHtml(q.aircraft_type||'')+'</span></div>';
+        return'<div class="emp-log-row"><span class="emp-log-time">'+when+'</span><span class="emp-log-action"><b>'+statusLabel+'</b> ÃÂÃÂ· '+route+' ÃÂÃÂ· '+fmtPrice(q.price)+' ÃÂÃÂ· '+escapeHtml(q.aircraft_type||'')+'</span></div>';
       }).join('');
       if(!s.activity.length)activityHtml='<div style="color:var(--text-tertiary);font-size:12px;padding:8px 0;">No activity yet.</div>';
       var deactivateBtn=e.is_active?'<button class="btn-sm btn-danger-sm" onclick="event.stopPropagation();toggleEmployeeActive(\''+escapeHtml(e.id)+'\',false)">Deactivate account</button>':'<button class="btn-sm btn-outline-sm" onclick="event.stopPropagation();toggleEmployeeActive(\''+escapeHtml(e.id)+'\',true)">Reactivate</button>';
@@ -1127,14 +1133,14 @@ function loadRevenue(){
   if(lastMonthRev>0){
     var pct=((thisMonthRev-lastMonthRev)/lastMonthRev*100);
     var cls=pct>=0?'up':'down';
-    delta='<div class="rev-delta '+cls+'">'+(pct>=0?'▲ ':'▼ ')+Math.abs(pct).toFixed(1)+'% vs last month</div>';
+    delta='<div class="rev-delta '+cls+'">'+(pct>=0?'ÃÂ¢ÃÂÃÂ² ':'ÃÂ¢ÃÂÃÂ¼ ')+Math.abs(pct).toFixed(1)+'% vs last month</div>';
   }
   var byEmp={};
   confirmed.forEach(function(q){
     var id=q.submitted_by||'unknown';
     if(!byEmp[id])byEmp[id]={name:'',count:0,rev:0};
     var u=lookupUser(id);
-    byEmp[id].name=u?(u.full_name||u.username):'—';
+    byEmp[id].name=u?(u.full_name||u.username):'ÃÂ¢ÃÂÃÂ';
     byEmp[id].count++;
     byEmp[id].rev+=Number(q.price||0);
   });
@@ -1145,7 +1151,7 @@ function loadRevenue(){
   var byAc={};
   confirmed.forEach(function(q){
     var id=q.aircraft_id||'unknown';
-    if(!byAc[id])byAc[id]={name:q.aircraft_type||'—',reg:q.aircraft_registration||'',count:0,rev:0};
+    if(!byAc[id])byAc[id]={name:q.aircraft_type||'ÃÂ¢ÃÂÃÂ',reg:q.aircraft_registration||'',count:0,rev:0};
     byAc[id].count++;
     byAc[id].rev+=Number(q.price||0);
   });
@@ -1173,7 +1179,7 @@ function onAopFileSelected(input){
     input.value = ''; return;
   }
   selectedAopFile = file;
-  document.getElementById('aop-file-name').textContent = '✓ ' + file.name;
+  document.getElementById('aop-file-name').textContent = 'ÃÂ¢ÃÂÃÂ ' + file.name;
   document.getElementById('aop-file-name').style.display = 'block';
   document.getElementById('aop-upload-label').style.display = 'none';
   document.getElementById('aop-upload-area').style.borderColor = 'var(--gold)';
@@ -1227,7 +1233,7 @@ async function submitRegistration(){
     btn.disabled=false;btn.textContent='Submit application';return;
   }
   var opId = opRes.data[0].id;
-  if(!opId){errEl.textContent='Registration failed — could not create account. Please try again.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Submit application';return;}
+  if(!opId){errEl.textContent='Registration failed ÃÂ¢ÃÂÃÂ could not create account. Please try again.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Submit application';return;}
   btn.textContent = 'Uploading document...';
   var uploadResult = await uploadAopDocument(opId, selectedAopFile);
   if(!uploadResult){
@@ -1278,17 +1284,17 @@ window.addEventListener('beforeunload',function(){
 });
 
 (function(){
-  var saved=sessionStorage.getItem('opSession');
+  var saved=localStorage.getItem('opSession');
   if(saved){
     try{
       var s=JSON.parse(saved);
       if(s&&s.user&&s.operator){
         currentUser=s.user;currentOperator=s.operator;
         document.getElementById('page-login').style.display='none';
-        document.getElementById('page-dashboard').classList.add('active');
-        document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
-        document.getElementById('sidebar-role').textContent=currentOperator.company_name;
-        var rt=document.getElementById('sidebar-role-tag');
+        document.getElementById('page-dashboard').style.display='';document.getElementById('page-dashboard').classList.add('active');
+        var _on=document.getElementById('op-name');if(_on)_on.textContent=currentUser.full_name||currentUser.username;
+        var _or=document.getElementById('op-role');if(_or)_or.textContent=currentOperator.company_name;
+        var rt=document.getElementById('op-role-tag');
         if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
         applyRoleRestrictions();
         showSection('queries');
@@ -1297,15 +1303,15 @@ window.addEventListener('beforeunload',function(){
         claimRefreshInterval=setInterval(updateClaimTimers,1000);
         return;
       }
-    }catch(e){sessionStorage.removeItem('opSession');}
+    }catch(e){localStorage.removeItem('opSession');}
   }
   document.getElementById('page-login').style.display='flex';
 })();
 
 
 function saveCategorySettings(){
-  var fixedEl = document.getElementById('cat-fixed');
-  var heliEl = document.getElementById('cat-heli');
+  var fixedEl = document.getElementById('cat-fixed-wing');
+  var heliEl = document.getElementById('cat-helicopter');
   if(!fixedEl && !heliEl){ showToast('Category checkboxes not found.','error'); return; }
   var fixedChecked = fixedEl && fixedEl.checked;
   var heliChecked = heliEl && heliEl.checked;
@@ -1324,11 +1330,719 @@ function saveCategorySettings(){
     });
 }
 
+function loadProfileCategory() {
+  if (!currentOperator) return;
+  var cats = currentOperator.aircraft_category || [];
+  var fixedEl = document.getElementById('cat-fixed-wing');
+  var heliEl = document.getElementById('cat-helicopter');
+  if (fixedEl) fixedEl.checked = cats.indexOf('fixed') !== -1;
+  if (heliEl) heliEl.checked = cats.indexOf('heli') !== -1;
+}
+
+function saveProfileCategory() {
+  var cats = [];
+  if (document.getElementById('cat-fixed-wing') && document.getElementById('cat-fixed-wing').checked) cats.push('fixed');
+  if (document.getElementById('cat-helicopter') && document.getElementById('cat-helicopter').checked) cats.push('heli');
+  var btn = document.getElementById('profile-cat-save-btn');
+  var msg = document.getElementById('profile-cat-msg');
+  if (btn) btn.disabled = true;
+  sbFetch('operator_users?id=eq.' + currentOperator.id, 'PATCH', {aircraft_category: cats})
+    .then(function() {
+      currentOperator.aircraft_category = cats;
+      if (msg) { msg.style.display = 'block'; msg.style.color = '#4caf50'; msg.textContent = 'Saved successfully!'; }
+      if (btn) btn.disabled = false;
+      setTimeout(function(){ if(msg) msg.style.display = 'none'; }, 3000);
+    })
+    .catch(function(err) {
+      if (msg) { msg.style.display = 'block'; msg.style.color = '#f44336'; msg.textContent = 'Error saving. Please try again.'; }
+      if (btn) btn.disabled = false;
+    });
+}
+
 function populateCategoryCheckboxes(){
   if(!currentOperator) return;
   var cats = (currentOperator.aircraft_category || 'fixed_wing').split(',').map(function(s){ return s.trim(); });
-  var fixedEl = document.getElementById('cat-fixed');
-  var heliEl = document.getElementById('cat-heli');
+  var fixedEl = document.getElementById('cat-fixed-wing');
+  var heliEl = document.getElementById('cat-helicopter');
   if(fixedEl) fixedEl.checked = cats.indexOf('fixed_wing') !== -1;
   if(heliEl) heliEl.checked = cats.indexOf('helicopter') !== -1;
+}
+
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Track which operators have seen each query ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+async function markQueriesViewed(queryIds) {
+  if (!queryIds || !queryIds.length || !currentOperator) return;
+  // Use authenticated user JWT for RLS to pass
+  var sessionStr = localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token');
+  var jwt = sessionStr ? JSON.parse(sessionStr).access_token : SUPABASE_KEY;
+  var rows = queryIds.map(function(qid) {
+    return { query_id: qid, operator_id: currentOperator.id };
+  });
+  try {
+    // Insert each row individually to gracefully handle duplicates (409)
+    await Promise.all(rows.map(function(row) {
+      return fetch(SUPABASE_URL + '/rest/v1/query_views', {
+        method: 'POST',
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + jwt,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(row)
+      }).catch(function(){});
+    }));
+  } catch(e) {
+    console.warn('markQueriesViewed failed', e);
+  }
+}
+
+/* Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+   PROFILE SECTION
+Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ */
+
+async function loadProfileSection() {
+  if (!currentUser || !currentOperator) return;
+
+  // Ã¢ÂÂÃ¢ÂÂ Hero Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  var initials = (currentUser.full_name || currentUser.username || '?')
+    .split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();
+  var avatarEl = document.getElementById('profile-logo-initials');
+  if (avatarEl) avatarEl.textContent = initials;
+
+  var nameEl = document.getElementById('profile-hero-name');
+  if (nameEl) nameEl.textContent = escapeHtml(currentUser.full_name || currentUser.username || 'â');
+
+  var roleEl = document.getElementById('profile-hero-role');
+  if (roleEl) {
+    roleEl.textContent = currentUser.role === 'owner' ? 'Admin' : 'Employee';
+    roleEl.className = 'role-badge ' + (currentUser.role === 'owner' ? 'role-admin' : 'role-employee');
+  }
+
+  var companyEl = document.getElementById('profile-hero-company');
+  if (companyEl) companyEl.textContent = escapeHtml(currentOperator.company_name || 'â');
+
+  var sinceEl = document.getElementById('profile-stat-member');
+  if (sinceEl && currentUser.created_at) sinceEl.textContent = fmtDate(currentUser.created_at);
+
+  var loginEl = document.getElementById('profile-stat-login');
+  if (loginEl && currentUser.last_login) loginEl.textContent = fmtDate(currentUser.last_login);
+
+  var catEl = document.getElementById('profile-stat-cat');
+  if (catEl) {
+    var cats = [];
+    if (currentUser.aircraft_category) {
+      if (currentUser.aircraft_category.indexOf('fixed') > -1) cats.push('Fixed Wing');
+      if (currentUser.aircraft_category.indexOf('heli') > -1) cats.push('Helicopter');
+    }
+    catEl.textContent = cats.length ? cats.join(', ') : 'â';
+  }
+
+  // Ã¢ÂÂÃ¢ÂÂ Personal fields Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // Populate personal view spans and inputs
+  var setVal = function(id, val) { var el=document.getElementById(id); if(el)el.value=val||''; };
+  var setTxt = function(id, val) { var el=document.getElementById(id); if(el)el.textContent=val||'\u2014'; };
+  setTxt('view-full-name', currentUser.full_name);
+  setTxt('view-username', currentUser.username);
+  setTxt('view-email', currentUser.email);
+  setTxt('view-phone', currentUser.phone);
+  setTxt('view-employee-id', currentUser.employee_id);
+  setVal('input-full-name', currentUser.full_name);
+  setVal('input-username', currentUser.username);
+  setVal('input-email', currentUser.email);
+  setVal('input-phone', currentUser.phone);
+  setVal('input-employee-id', currentUser.employee_id);
+
+  // Company card (owner only)
+  var companyCard = document.getElementById('profile-company-card');
+  var overviewCard = document.getElementById('profile-overview-card');
+  var opsCard = document.getElementById('profile-ops-card');
+  var certsCard = document.getElementById('profile-certs-card');
+  if (currentUser.role === 'owner') {
+    if (companyCard) {
+      companyCard.style.display = '';
+      // Populate view spans
+      setTxt('view-company-name', currentOperator.company_name);
+      setTxt('view-company-email', currentOperator.email);
+      setTxt('view-company-phone', currentOperator.phone);
+      setTxt('view-owner-name', currentOperator.owner_name);
+      setTxt('view-owner-email', currentOperator.owner_email);
+      setTxt('view-owner-phone', currentOperator.owner_phone);
+      // Populate inputs
+      setVal('input-company-name', currentOperator.company_name);
+      setVal('input-company-email', currentOperator.email);
+      setVal('input-company-phone', currentOperator.phone);
+      setVal('input-owner-name', currentOperator.owner_name);
+      setVal('input-owner-email', currentOperator.owner_email);
+      setVal('input-owner-phone', currentOperator.owner_phone);
+    }
+    if (overviewCard) overviewCard.style.display = '';
+    if (opsCard) opsCard.style.display = '';
+    if (certsCard) {
+      certsCard.style.display = '';
+      // AOP document link
+      var aopBtn = document.getElementById('view-aop-btn');
+      var aopNone = document.getElementById('view-aop-none');
+      if (currentOperator.aop_document_url) {
+        if (aopBtn) { aopBtn.style.display = 'inline-block'; }
+        if (aopNone) aopNone.style.display = 'none';
+      } else {
+        if (aopBtn) aopBtn.style.display = 'none';
+        if (aopNone) aopNone.style.display = '';
+      }
+    }
+  } else {
+    if (companyCard) companyCard.style.display = 'none';
+    if (overviewCard) overviewCard.style.display = 'none';
+    if (opsCard) opsCard.style.display = 'none';
+    if (certsCard) certsCard.style.display = 'none';
+  }
+      }
+    } else {
+      companyCard.style.display = 'none';
+    }
+  }
+
+  // Ã¢ÂÂÃ¢ÂÂ Aircraft category checkboxes Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  var catFixed = document.getElementById('cat-fixed-wing');
+  var catHeli = document.getElementById('cat-helicopter');
+  if (catFixed && currentUser.aircraft_category) {
+    catFixed.checked = currentUser.aircraft_category.indexOf('fixed') > -1;
+  }
+  if (catHeli && currentUser.aircraft_category) {
+    catHeli.checked = currentUser.aircraft_category.indexOf('heli') > -1;
+  }
+}
+
+// Ã¢ÂÂÃ¢ÂÂ Edit mode toggle Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+function profileEditMode(section) {
+  // This definition is overridden below by the extended version; kept for reference only.
+  var actionsDiv = document.getElementById('profile-' + section + '-actions');
+  var editBtn = document.getElementById('profile-' + section + '-edit-btn');
+  if (actionsDiv) actionsDiv.style.display = 'flex';
+  if (editBtn) editBtn.style.display = 'none';
+}
+
+function profileCancelEdit(section) {
+  loadProfileSection();
+  var actionsDiv = document.getElementById('profile-' + section + '-actions');
+  var editBtn = document.getElementById('profile-' + section + '-edit-btn');
+  if (actionsDiv) actionsDiv.style.display = 'none';
+  if (editBtn) editBtn.style.display = '';
+  var msg = document.getElementById('profile-' + section + '-msg');
+  if (msg) { msg.textContent = ''; msg.className = 'profile-msg'; }
+}
+
+// Ã¢ÂÂÃ¢ÂÂ Save personal details Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+async function profileSavePersonal() {
+  var fullName = document.getElementById('input-full-name').value.trim();
+  var email = document.getElementById('input-email').value.trim();
+  var phone = document.getElementById('input-phone').value.trim();
+  var msg = document.getElementById('profile-personal-msg');
+  var btn = document.querySelector('#profile-personal-actions .btn-primary');
+
+  if (!fullName) { profileMsg('personal', 'Full name is required.', 'error'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  var res = await sbFetch('operator_users?id=eq.' + currentUser.id, {
+    method: 'PATCH',
+    body: { full_name: fullName, email: email || null, phone: phone || null }
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Save Changes'; }
+
+  if (res.ok) {
+    currentUser.full_name = fullName;
+    currentUser.email = email;
+    currentUser.phone = phone;
+    // Update session
+    localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    // Update sidebar name
+    var sidebarName = document.getElementById('op-name');
+    if (sidebarName) sidebarName.textContent = fullName;
+    profileMsg('personal', 'Personal details saved successfully.', 'success');
+    profileCancelEdit('personal');
+    loadProfileSection();
+  } else {
+    profileMsg('personal', 'Failed to save changes. Please try again.', 'error');
+  }
+}
+
+// Ã¢ÂÂÃ¢ÂÂ Save company details Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+async function profileSaveCompany() {
+  var companyName = document.getElementById('input-company-name').value.trim();
+  var companyEmail = document.getElementById('input-company-email').value.trim();
+  var companyPhone = document.getElementById('input-company-phone').value.trim();
+  var ownerName = document.getElementById('input-owner-name').value.trim();
+  var ownerEmail = document.getElementById('input-owner-email').value.trim();
+  var ownerPhone = document.getElementById('input-owner-phone').value.trim();
+  var dgca = document.getElementById('input-dgca-licence').value.trim();
+  var aopExpiry = document.getElementById('input-aop-expiry').value;
+  var btn = document.querySelector('#profile-company-actions .btn-primary');
+
+  if (!companyName) { profileMsg('company', 'Company name is required.', 'error'); return; }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  var patchData = {
+    company_name: companyName,
+    email: companyEmail || null,
+    phone: companyPhone || null,
+    owner_name: ownerName || null,
+    owner_email: ownerEmail || null,
+    owner_phone: ownerPhone || null,
+    dgca_licence_no: dgca || null,
+    aop_expiry_date: aopExpiry || null
+  };
+
+  var res = await sbFetch('operators?id=eq.' + currentOperator.id, {
+    method: 'PATCH',
+    body: patchData
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Save Changes'; }
+
+  if (res.ok) {
+    Object.assign(currentOperator, patchData);
+    localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    // Update sidebar company
+    var sidebarComp = document.getElementById('op-role');
+    if (sidebarComp) sidebarComp.textContent = companyName;
+    profileMsg('company', 'Company details saved successfully.', 'success');
+    profileCancelEdit('company');
+    loadProfileSection();
+  } else {
+    profileMsg('company', 'Failed to save changes. Please try again.', 'error');
+  }
+}
+
+// Ã¢ÂÂÃ¢ÂÂ Change password Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+async function profileChangePassword() {
+  var current = document.getElementById('input-current-pw').value;
+  var newPw = document.getElementById('input-new-pw').value;
+  var confirm = document.getElementById('input-confirm-pw').value;
+  var btn = document.querySelector('#section-profile .card:last-child .btn-primary');
+
+  if (!current || !newPw || !confirm) {
+    profileMsg('pw', 'All password fields are required.', 'error'); return;
+  }
+  if (newPw.length < 8) {
+    profileMsg('pw', 'New password must be at least 8 characters.', 'error'); return;
+  }
+  if (newPw !== confirm) {
+    profileMsg('pw', 'New passwords do not match.', 'error'); return;
+  }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Updating...'; }
+
+  var res = await sbFetch('rpc/update_operator_password', {
+    method: 'POST',
+    body: { p_user_id: currentUser.id, p_current_password: current, p_new_password: newPw }
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Update Password'; }
+
+  if (res.ok && res.data) {
+    var result = Array.isArray(res.data) ? res.data[0] : res.data;
+    if (result && result.success) {
+      profileMsg('pw', 'Password updated successfully.', 'success');
+      document.getElementById('input-current-pw').value = '';
+      document.getElementById('input-new-pw').value = '';
+      document.getElementById('input-confirm-pw').value = '';
+      var _ps=document.getElementById('profile-pw-strength');if(_ps)_ps.className='profile-pw-strength';
+    } else {
+      profileMsg('pw', (result && result.message) || 'Current password is incorrect.', 'error');
+    }
+  } else {
+    profileMsg('pw', 'Failed to update password. Please try again.', 'error');
+  }
+}
+
+// Ã¢ÂÂÃ¢ÂÂ Save aircraft category Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+async function saveProfileCategory() {
+  var fixed = document.getElementById('cat-fixed-wing') ? document.getElementById('cat-fixed-wing').checked : false;
+  var heli = document.getElementById('cat-helicopter') ? document.getElementById('cat-helicopter').checked : false;
+  var btn = document.getElementById('profile-cat-save-btn');
+  var parts = [];
+  if (fixed) parts.push('fixed');
+  if (heli) parts.push('heli');
+  var cat = parts.join(',');
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Saving...'; }
+
+  var res = await sbFetch('operator_users?id=eq.' + currentUser.id, {
+    method: 'PATCH',
+    body: { aircraft_category: cat || null }
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Save Category'; }
+
+  if (res.ok) {
+    currentUser.aircraft_category = cat;
+    localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    profileMsg('category', 'Aircraft category saved.', 'success');
+    loadProfileSection();
+  } else {
+    profileMsg('category', 'Failed to save. Please try again.', 'error');
+  }
+}
+
+// Ã¢ÂÂÃ¢ÂÂ Password strength indicator Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+(function() {
+  document.addEventListener('input', function(e) {
+    if (e.target && (e.target.id === 'profile-pw-new' || e.target.id === 'input-new-pw')) {
+      var val = e.target.value;
+      var strengthEl = document.getElementById('profile-pw-strength');
+      if (!strengthEl) return;
+      if (!val) { strengthEl.className = 'profile-pw-strength'; return; }
+      var score = 0;
+      if (val.length >= 8) score++;
+      if (/[A-Z]/.test(val)) score++;
+      if (/[0-9]/.test(val)) score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      strengthEl.className = 'profile-pw-strength ' + (score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong');
+    }
+  });
+})();
+
+// Ã¢ÂÂÃ¢ÂÂ Helper: show message Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+function profileMsg(section, text, type) {
+  var el = document.getElementById('profile-' + section + '-msg');
+  if (!el) return;
+  el.textContent = text;
+  el.className = 'profile-msg ' + (type || '');
+  setTimeout(function() {
+    if (el.textContent === text) { el.textContent = ''; el.className = 'profile-msg'; }
+  }, 5000);
+}
+
+// ============================================================
+// AVINODE-STYLE PROFILE EXTENSIONS
+// ============================================================
+
+// ---- Company Overview ----
+function profileSaveOverview() {
+  if (!currentOperator) { profileMsg('overview','Not logged in.','error'); return; }
+  var data = {
+    company_description: document.getElementById('input-company-desc').value.trim(),
+    year_established: document.getElementById('input-year-established').value.trim(),
+    website: document.getElementById('input-website').value.trim(),
+    home_base: document.getElementById('input-home-base').value.trim(),
+    other_bases: document.getElementById('input-other-bases').value.trim(),
+    sales_email: document.getElementById('input-sales-email').value.trim(),
+    sales_phone: document.getElementById('input-sales-phone').value.trim(),
+    ops_phone: document.getElementById('input-ops-phone').value.trim()
+  };
+  sbFetch('operators?id=eq.' + currentOperator.id, { method: 'PATCH', body: data })
+    .then(function(res){
+      if (res.ok) {
+        Object.assign(currentOperator, data);
+        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        profileMsg('overview', 'Company overview saved.', 'success');
+        renderOverviewView(data);
+        profileCancelEdit('overview');
+      } else {
+        profileMsg('overview', 'Save failed.', 'error');
+      }
+    }).catch(function(){ profileMsg('overview','Network error.','error'); });
+}
+
+function renderOverviewView(d) {
+  setText('view-company-desc', d.company_description || '—');
+  setText('view-year-established', d.year_established || '—');
+  var websiteEl = document.getElementById('view-website');
+  if (websiteEl) websiteEl.innerHTML = d.website ? '<a href="' + escapeHtml(d.website) + '" target="_blank" rel="noopener">' + escapeHtml(d.website) + '</a>' : '—';
+  setText('view-home-base', d.home_base || '—');
+  setText('view-other-bases', d.other_bases || '—');
+  setText('view-sales-email', d.sales_email || '—');
+  setText('view-sales-phone', d.sales_phone || '—');
+  setText('view-ops-phone', d.ops_phone || '—');
+  if (d.home_base) setText('profile-hero-base', d.home_base);
+  if (d.company_description) setText('profile-hero-tagline', d.company_description.substring(0,80) + (d.company_description.length > 80 ? '...' : ''));
+}
+
+// ---- Operational Details ----
+function profileSaveOps() {
+  if (!currentOperator) { profileMsg('ops','Not logged in.','error'); return; }
+  var regions = Array.from(document.querySelectorAll('[name="region"]:checked')).map(function(c){ return c.value; }).join(', ');
+  var data = {
+    regions_served: regions,
+    max_range_nm: document.getElementById('input-max-range').value.trim(),
+    ops_hours: document.getElementById('input-ops-hours').value.trim(),
+    min_notice_period: document.getElementById('input-min-notice').value
+  };
+  sbFetch('operators?id=eq.' + currentOperator.id, { method: 'PATCH', body: data })
+    .then(function(res){
+      if (res.ok) {
+        Object.assign(currentOperator, data);
+        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        profileMsg('ops','Operational details saved.','success');
+        setText('view-regions', data.regions_served || '—');
+        setText('view-max-range', data.max_range_nm ? data.max_range_nm + ' nm' : '—');
+        setText('view-ops-hours', data.ops_hours || '—');
+        setText('view-min-notice', data.min_notice_period || '—');
+        profileCancelEdit('ops');
+      } else {
+        profileMsg('ops','Save failed.','error');
+      }
+    }).catch(function(){ profileMsg('ops','Network error.','error'); });
+}
+
+// ---- Safety & Certifications ----
+function profileSaveCerts() {
+  if (!currentOperator) { profileMsg('certs','Not logged in.','error'); return; }
+  var data = {
+    dgca_licence_no: document.getElementById('input-dgca-licence').value.trim(),
+    aop_expiry_date: document.getElementById('input-aop-expiry').value || null,
+    argus_rating: document.getElementById('input-argus').value,
+    wyvern_rating: document.getElementById('input-wyvern').value,
+    isbao_stage: document.getElementById('input-isbao').value
+  };
+  sbFetch('operators?id=eq.' + currentOperator.id, { method: 'PATCH', body: data })
+    .then(function(res){
+      if (res.ok) {
+        Object.assign(currentOperator, data);
+        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        profileMsg('certs','Certifications saved.','success');
+        setText('view-dgca-licence', data.dgca_licence_no || '—');
+        setText('view-aop-expiry', data.aop_expiry_date ? fmtDate(data.aop_expiry_date) : '—');
+        setText('view-argus', data.argus_rating || '—');
+        setText('view-wyvern', data.wyvern_rating || '—');
+        setText('view-isbao', data.isbao_stage || '—');
+        renderCertBadges({argus_rating:data.argus_rating,wyvern_rating:data.wyvern_rating,isbao_stage:data.isbao_stage});
+        profileCancelEdit('certs');
+      } else {
+        profileMsg('certs','Save failed.','error');
+      }
+    }).catch(function(){ profileMsg('certs','Network error.','error'); });
+}
+
+function renderCertBadges(d) {
+  var container = document.getElementById('view-cert-badges');
+  if (!container) return;
+  var badges = [];
+  if (d.argus_rating) badges.push('<span class="cert-badge cert-argus">' + escapeHtml(d.argus_rating) + '</span>');
+  if (d.wyvern_rating) badges.push('<span class="cert-badge cert-wyvern">' + escapeHtml(d.wyvern_rating) + '</span>');
+  if (d.isbao_stage) badges.push('<span class="cert-badge cert-isbao">' + escapeHtml(d.isbao_stage) + '</span>');
+  container.innerHTML = badges.join('');
+}
+
+// ---- Company Basic Info ----
+function profileSaveCompany() {
+  if (!currentOperator) { profileMsg('company','Not logged in.','error'); return; }
+  var data = {
+    company_name: document.getElementById('input-company-name').value.trim(),
+    email: document.getElementById('input-company-email').value.trim() || null,
+    phone: document.getElementById('input-company-phone').value.trim() || null,
+    owner_name: document.getElementById('input-owner-name').value.trim() || null,
+    owner_email: document.getElementById('input-owner-email').value.trim() || null,
+    owner_phone: document.getElementById('input-owner-phone').value.trim() || null
+  };
+  if (!data.company_name) { profileMsg('company','Company name is required.','error'); return; }
+  sbFetch('operators?id=eq.' + currentOperator.id, { method: 'PATCH', body: data })
+    .then(function(res){
+      if (res.ok) {
+        Object.assign(currentOperator, data);
+        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        profileMsg('company','Company info saved.','success');
+        setText('view-company-name', data.company_name || '—');
+        setText('view-company-email', data.email || '—');
+        setText('view-company-phone', data.phone || '—');
+        setText('view-owner-name', data.owner_name || '—');
+        setText('view-owner-email', data.owner_email || '—');
+        setText('view-owner-phone', data.owner_phone || '—');
+        if (data.company_name) { setText('profile-hero-company', data.company_name); var _or=document.getElementById('op-role');if(_or)_or.textContent=data.company_name; }
+        profileCancelEdit('company');
+      } else {
+        profileMsg('company','Save failed.','error');
+      }
+    }).catch(function(){ profileMsg('company','Network error.','error'); });
+}
+
+// ---- Logo & Cover Photo ----
+function triggerLogoUpload() {
+  var inp = document.getElementById('logo-upload-input');
+  if (inp) inp.click();
+}
+
+function triggerCoverUpload() {
+  var inp = document.getElementById('cover-upload-input');
+  if (inp) inp.click();
+}
+
+function uploadCompanyLogo(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var companyId = currentUser && currentUser.company_id;
+  if (!companyId) return;
+  var formData = new FormData();
+  formData.append('file', file);
+  var path = 'company-logos/' + companyId + '/' + Date.now() + '_logo.' + file.name.split('.').pop();
+  fetch(SUPABASE_URL + '/storage/v1/object/operator-assets/' + path, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken },
+    body: formData
+  }).then(function(r){ return r.json(); }).then(function(res){
+    if (res && res.Key) {
+      var logoUrl = SUPABASE_URL + '/storage/v1/object/public/operator-assets/' + path;
+      var img = document.getElementById('profile-logo-img');
+      var initials = document.getElementById('profile-logo-initials');
+      if (img) { img.src = logoUrl; img.style.display = 'block'; }
+      if (initials) initials.style.display = 'none';
+      // Save URL to company record
+      fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ logo_url: logoUrl })
+      });
+    }
+  }).catch(function(e){ console.error('Logo upload error:', e); });
+}
+
+function uploadCoverPhoto(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var bg = document.getElementById('profile-cover-bg');
+    if (bg) bg.style.backgroundImage = 'url(' + e.target.result + ')';
+  };
+  reader.readAsDataURL(file);
+  // Also upload to storage
+  var companyId = currentUser && currentUser.company_id;
+  if (!companyId) return;
+  var formData = new FormData();
+  formData.append('file', file);
+  var path = 'company-covers/' + companyId + '/' + Date.now() + '_cover.' + file.name.split('.').pop();
+  fetch(SUPABASE_URL + '/storage/v1/object/operator-assets/' + path, {
+    method: 'POST',
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken },
+    body: formData
+  }).then(function(r){ return r.json(); }).then(function(res){
+    if (res && res.Key) {
+      var coverUrl = SUPABASE_URL + '/storage/v1/object/public/operator-assets/' + path;
+      fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
+        method: 'PATCH',
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cover_url: coverUrl })
+      });
+    }
+  });
+}
+
+// ---- Helper: set text content safely ----
+function setText(id, text) {
+  var el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+// ---- Load extended company profile on profile section open ----
+function loadExtendedProfile(operatorId) {
+  if (!operatorId || !currentOperator) return;
+  // Use currentOperator data (already loaded at login from operators table)
+  var d = currentOperator;
+  (function(){
+    if (!d) return;
+    // Overview
+    renderOverviewView(d);
+    document.getElementById('input-company-desc') && (document.getElementById('input-company-desc').value = d.company_description || '');
+    document.getElementById('input-year-established') && (document.getElementById('input-year-established').value = d.year_established || '');
+    document.getElementById('input-website') && (document.getElementById('input-website').value = d.website || '');
+    document.getElementById('input-home-base') && (document.getElementById('input-home-base').value = d.home_base || '');
+    document.getElementById('input-other-bases') && (document.getElementById('input-other-bases').value = d.other_bases || '');
+    document.getElementById('input-sales-email') && (document.getElementById('input-sales-email').value = d.sales_email || '');
+    document.getElementById('input-sales-phone') && (document.getElementById('input-sales-phone').value = d.sales_phone || '');
+    document.getElementById('input-ops-phone') && (document.getElementById('input-ops-phone').value = d.ops_phone || '');
+    // Operations
+    setText('view-regions', d.regions_served || '—');
+    setText('view-max-range', d.max_range_nm ? d.max_range_nm + ' nm' : '—');
+    setText('view-ops-hours', d.ops_hours || '—');
+    setText('view-min-notice', d.min_notice_period || '—');
+    document.getElementById('input-max-range') && (document.getElementById('input-max-range').value = d.max_range_nm || '');
+    document.getElementById('input-ops-hours') && (document.getElementById('input-ops-hours').value = d.ops_hours || '');
+    document.getElementById('input-min-notice') && (document.getElementById('input-min-notice').value = d.min_notice_period || '');
+    if (d.regions_served) {
+      var regions = d.regions_served.split(',').map(function(r){ return r.trim(); });
+      document.querySelectorAll('[name="region"]').forEach(function(cb){ cb.checked = regions.includes(cb.value); });
+    }
+    // Certifications
+    setText('view-dgca-licence', d.dgca_licence || '—');
+    setText('view-aop-expiry', d.aop_expiry ? fmtDate(d.aop_expiry) : '—');
+    setText('view-argus', d.argus_rating || '—');
+    setText('view-wyvern', d.wyvern_rating || '—');
+    setText('view-isbao', d.isbao_stage || '—');
+    renderCertBadges(d);
+    document.getElementById('input-dgca-licence') && (document.getElementById('input-dgca-licence').value = d.dgca_licence || '');
+    document.getElementById('input-aop-expiry') && (document.getElementById('input-aop-expiry').value = d.aop_expiry || '');
+    document.getElementById('input-argus') && (document.getElementById('input-argus').value = d.argus_rating || '');
+    document.getElementById('input-wyvern') && (document.getElementById('input-wyvern').value = d.wyvern_rating || '');
+    document.getElementById('input-isbao') && (document.getElementById('input-isbao').value = d.isbao_stage || '');
+    // AOP doc (operators table uses aop_document_url)
+    var _aopUrl = d.aop_document_url || d.aop_url;
+    var aopBtn = document.getElementById('view-aop-btn');
+    var aopNone = document.getElementById('view-aop-none');
+    if (_aopUrl) {
+      if (aopBtn) { aopBtn.style.display = 'inline-block'; }
+      if (aopNone) aopNone.style.display = 'none';
+    } else {
+      if (aopBtn) aopBtn.style.display = 'none';
+      if (aopNone) aopNone.style.display = '';
+    }
+    // Certs view
+    setText('view-dgca-licence', d.dgca_licence_no || d.dgca_licence || '—');
+    setText('view-aop-expiry', (d.aop_expiry_date || d.aop_expiry) ? fmtDate(d.aop_expiry_date || d.aop_expiry) : '—');
+    // Company basic info (operators table uses email/phone, not company_email/company_phone)
+    setText('view-company-name', d.company_name || '—');
+    setText('view-company-email', d.email || d.company_email || '—');
+    setText('view-company-phone', d.phone || d.company_phone || '—');
+    setText('view-owner-name', d.owner_name || '—');
+    setText('view-owner-email', d.owner_email || '—');
+    setText('view-owner-phone', d.owner_phone || '—');
+    document.getElementById('input-company-name') && (document.getElementById('input-company-name').value = d.company_name || '');
+    document.getElementById('input-company-email') && (document.getElementById('input-company-email').value = d.email || d.company_email || '');
+    document.getElementById('input-company-phone') && (document.getElementById('input-company-phone').value = d.phone || d.company_phone || '');
+    document.getElementById('input-owner-name') && (document.getElementById('input-owner-name').value = d.owner_name || '');
+    document.getElementById('input-owner-email') && (document.getElementById('input-owner-email').value = d.owner_email || '');
+    document.getElementById('input-owner-phone') && (document.getElementById('input-owner-phone').value = d.owner_phone || '');
+    // Fleet stats
+    var fleetCount = document.querySelectorAll('#fleet-content .aircraft-card').length;
+    setText('profile-stat-fleet', fleetCount > 0 ? String(fleetCount) : (d.fleet_count ? String(d.fleet_count) : '—'));
+    // Logo
+    if (d.logo_url) {
+      var img = document.getElementById('profile-logo-img');
+      var init = document.getElementById('profile-logo-initials');
+      if (img) { img.src = d.logo_url; img.style.display = 'block'; }
+      if (init) init.style.display = 'none';
+    }
+    // Cover
+    if (d.cover_url) {
+      var bg = document.getElementById('profile-cover-bg');
+      if (bg) bg.style.backgroundImage = 'url(' + d.cover_url + ')';
+    }
+  })();
+}
+
+// ---- Profile edit mode toggler (extended) ----
+var _origProfileEditMode = typeof profileEditMode === 'function' ? profileEditMode : null;
+function profileEditMode(section) {
+  var validSections = ['overview', 'ops', 'certs', 'company', 'personal'];
+  if (validSections.includes(section)) {
+    var view = document.getElementById('profile-' + section + '-view');
+    var form = document.getElementById('profile-' + section + '-form');
+    var editBtn = document.getElementById('profile-' + section + '-edit-btn');
+    if (view) view.style.display = 'none';
+    if (form) form.style.display = 'block';
+    if (editBtn) editBtn.style.display = 'none';
+  } else if (_origProfileEditMode) {
+    _origProfileEditMode(section);
+  }
+}
+
+function profileCancelEdit(section) {
+  var view = document.getElementById('profile-' + section + '-view');
+  var form = document.getElementById('profile-' + section + '-form');
+  var editBtn = document.getElementById('profile-' + section + '-edit-btn');
+  if (view) view.style.display = 'block';
+  if (form) form.style.display = 'none';
+  if (editBtn) editBtn.style.display = 'flex';
 }
