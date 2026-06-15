@@ -273,16 +273,35 @@ async function loadAllData(){
   var _cc=document.getElementById('count-confirmed');if(_cc)_cc.textContent=confirmed.length;
   var _qb=document.getElementById('queries-badge');if(_qb)_qb.textContent=unquoted.length+shared.length;
   var cat=currentOperator.aircraft_category||'fixed_wing';
-  sbFetch('queries?status=eq.open&aircraft_category=in.('+cat+')&expires_at=lt.'+encodeURIComponent(nowIso())+'&order=expires_at.desc&limit=50')
+  sbFetch('queries?status=eq.open&aircraft_category=in.('+cat+')&expires_at=lt.'+encodeURIComponent(nowIso())+'&order=expires_at.desc&limit=100')
     .then(function(res){
-      var expired=res.ok?res.data:[];
+      var expiredQueries=res.ok?res.data:[];
       var bookedIds=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';}).map(function(q){return q.query_id;});
-      expired=expired.filter(function(q){return!bookedIds.includes(q.id);});
-      var ce=document.getElementById('count-expired');if(ce)ce.textContent=expired.length;
-      renderExpiredList(expired);
+      // Expired = timer ran out AND not booked (includes both unquoted and quote-shared-but-unaccepted)
+      expiredQueries=expiredQueries.filter(function(q){return!bookedIds.includes(q.id);});
+      // Also add our shared quotes whose query timer has expired but weren't accepted
+      var expiredShared=allMyOperatorQuotes.filter(function(q){
+        return q.status==='shared' && q.queries && q.queries.expires_at && new Date(q.queries.expires_at)<new Date();
+      });
+      // Merge: deduplicate by query_id
+      var expiredQueryIds=expiredQueries.map(function(q){return q.id;});
+      expiredShared.forEach(function(q){
+        if(!expiredQueryIds.includes(q.query_id) && q.queries){
+          expiredQueries.push(q.queries);
+          expiredQueryIds.push(q.query_id);
+        }
+      });
+      // Remove from shared tab too — move expired shared quotes out of shared list
+      var nowExpiredQueryIds=expiredQueries.map(function(q){return q.id;});
+      var activeShared=shared.filter(function(q){return!nowExpiredQueryIds.includes(q.query_id);});
+      var _cs=document.getElementById('count-shared');if(_cs)_cs.textContent=activeShared.length;
+      renderSharedList(activeShared);
+      var ce=document.getElementById('count-expired');if(ce)ce.textContent=expiredQueries.length;
+      renderExpiredList(expiredQueries);
     });
   renderActiveList(unquoted);
   markQueriesViewed(unquoted.map(function(q){return q.id;}));
+  // Initial render of shared — may be updated again above once expired are known
   renderSharedList(shared);
   renderConfirmedList(confirmed);
 }
