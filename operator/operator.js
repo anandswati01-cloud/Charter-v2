@@ -354,7 +354,9 @@ function renderActiveList(queries){
       +(lockedBySomeoneElse?'<span class="badge badge-locked">Locked</span>':'<span class="badge badge-active">Active</span>')+'</div>'
       +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
       +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
-      +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
+      +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')
+      +(q.vip?'<div class="query-detail"><span>VIP</span>Yes</div>':'')
+      +(q.infants?'<div class="query-detail"><span>Infants</span>Yes</div>':'')+'</div>'
       +(q.created_at ? getTimerBar(q.created_at) : '')
       +lockInfo
       +'<div class="query-actions"><button class="btn-sm btn-blue" '+btnDisabled+' onclick="openQuoteModal(\''+escapeHtml(q.id)+'\')">'+btnTxt+'</button>'+(claim&&claim.claimed_by===currentUser.id?'<button class="btn-sm btn-red" onclick="declineQuery(\''+escapeHtml(q.id)+'\',\''+escapeHtml(claim.id)+'\')" style="margin-left:6px">Decline</button>':'')+'</div></div>';
@@ -460,7 +462,9 @@ function renderExpiredList(queries){
       +'<span class="badge badge-expired">Expired</span></div>'
       +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
       +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
-      +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
+      +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')
+      +(q.vip?'<div class="query-detail"><span>VIP</span>Yes</div>':'')
+      +(q.infants?'<div class="query-detail"><span>Infants</span>Yes</div>':'')+'</div>'
       +(q.created_at ? getTimerBar(q.created_at) : '')
       +'</div>';
   }).join('');
