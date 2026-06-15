@@ -180,6 +180,11 @@ main.main-content{flex:1;overflow-y:auto;min-width:0;}
 .badge-accepted{background:var(--green-faint);color:var(--green-light);border:0.5px solid rgba(59,109,17,0.3);}
 .badge-locked{background:var(--red-faint);color:var(--red);border:0.5px solid rgba(226,75,74,0.25);}
 .badge-expired{background:var(--red-faint);color:var(--red);border:0.5px solid rgba(226,75,74,0.25);}
+.badge-winning{background:rgba(59,109,17,0.2);color:var(--green-light);border:0.5px solid rgba(59,109,17,0.35);}
+.badge-outbid{background:var(--red-faint);color:var(--red);border:0.5px solid rgba(226,75,74,0.25);}
+.bid-status{margin-top:10px;padding:8px 12px;border-radius:var(--radius);font-family:var(--font-mono);font-size:11px;letter-spacing:.3px;}
+.bid-winning{background:rgba(59,109,17,0.12);color:var(--green-light);border:0.5px solid rgba(59,109,17,0.25);}
+.bid-outbid{background:var(--red-faint);color:var(--red);border:0.5px solid rgba(226,75,74,0.2);}
 .badge-by{background:rgba(255,255,255,0.06);color:var(--white-30);border:0.5px solid var(--white-10);margin-left:8px;font-size:8px;}
 
 /* ââ Buttons ââ */

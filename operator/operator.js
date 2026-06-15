@@ -402,6 +402,22 @@ function viewSharedQuote(quoteId) {
     if(u) { byEl.style.display = ''; document.getElementById('vq-by').textContent = escapeHtml(u.full_name || u.username); }
     else { byEl.style.display = 'none'; }
   } else { byEl.style.display = 'none'; }
+  // Show bid status
+  fetchBids(query.id || q.query_id).then(function(bids){
+    var statusEl = document.getElementById('vq-bid-status');
+    var reviseBtn = document.getElementById('btn-revise-quote');
+    if (!statusEl || !bids.length) return;
+    var lowest = bids[0].price;
+    var isWinning = q.price <= lowest;
+    var windowOpen = query.created_at && new Date(query.created_at) > new Date(Date.now()-60*60*1000);
+    statusEl.textContent = isWinning
+      ? 'You have the lowest bid at ' + fmtPrice(q.price) + ' (' + bids.length + ' bid' + (bids.length>1?'s':'')+' total)'
+      : 'You are outbid. Current lowest: ' + fmtPrice(lowest);
+    statusEl.style.background = isWinning ? 'rgba(59,109,17,0.15)' : 'rgba(226,75,74,0.1)';
+    statusEl.style.color = isWinning ? 'var(--green-light)' : 'var(--red)';
+    statusEl.style.display = 'block';
+    if (reviseBtn && windowOpen) reviseBtn.style.display = '';
+  });
   document.getElementById('view-quote-modal').classList.add('open');
 }
 
@@ -549,7 +565,69 @@ function getBusyAircraftMap(){
 
 /* ============ QUOTE MODAL ============ */
 
-async function openQuoteModal(queryId){
+// ============ REVERSE AUCTION BIDDING ============
+
+async function fetchBids(queryId) {
+  var res = await sbFetch('quotes?query_id=eq.' + queryId + '&status=eq.shared&select=price,aircraft_type,aircraft_registration,operator_id&order=price.asc');
+  return res.ok ? res.data : [];
+}
+
+function renderBidTable(bids, myOperatorId) {
+  var container = document.getElementById('live-bids-table');
+  var beatMsg = document.getElementById('bid-beat-msg');
+  if (!container) return;
+  if (!bids.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">No bids yet — be the first to quote.</div>';
+    if (beatMsg) beatMsg.style.display = 'none';
+    return;
+  }
+  var myBid = bids.find(function(b){ return b.operator_id === myOperatorId; });
+  var lowest = bids[0].price;
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+  html += '<tr style="color:var(--text-tertiary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;"><th style="text-align:left;padding:4px 0;">Rank</th><th style="text-align:left;padding:4px 8px;">Aircraft</th><th style="text-align:right;padding:4px 0;">Quote</th></tr>';
+  bids.forEach(function(b, i) {
+    var isMe = b.operator_id === myOperatorId;
+    var isLowest = i === 0;
+    var color = isLowest ? 'var(--green-light)' : isMe ? 'var(--gold)' : 'var(--text-secondary)';
+    var rank = '#' + (i + 1);
+    if (isLowest) rank = '#1 Lowest';
+    html += '<tr style="border-top:0.5px solid var(--border);">';
+    html += '<td style="padding:6px 0;color:' + color + ';font-family:var(--font-mono);font-size:11px;">' + rank + (isMe ? ' (you)' : '') + '</td>';
+    html += '<td style="padding:6px 8px;color:' + color + ';">' + escapeHtml(b.aircraft_type || '') + (b.aircraft_registration ? ' <span style="color:var(--text-tertiary);">(' + escapeHtml(b.aircraft_registration) + ')</span>' : '') + '</td>';
+    html += '<td style="padding:6px 0;text-align:right;color:' + color + ';font-weight:' + (isLowest ? '600' : '400') + ';">' + fmtPrice(b.price) + '</td>';
+    html += '</tr>';
+  });
+  html += '</table>';
+  container.innerHTML = html;
+  if (beatMsg) {
+    if (myBid && myBid.price > lowest) {
+      beatMsg.textContent = 'You are outbid. Beat the lowest of ' + fmtPrice(lowest) + ' to win.';
+      beatMsg.style.display = 'block';
+      beatMsg.style.color = 'var(--red)';
+    } else if (!myBid && bids.length > 0) {
+      beatMsg.textContent = 'Beat the lowest bid of ' + fmtPrice(lowest) + ' to lead.';
+      beatMsg.style.display = 'block';
+      beatMsg.style.color = 'var(--amber)';
+    } else if (myBid && myBid.price === lowest) {
+      beatMsg.textContent = 'You have the lowest bid — you are winning.';
+      beatMsg.style.display = 'block';
+      beatMsg.style.color = 'var(--green-light)';
+    } else {
+      beatMsg.style.display = 'none';
+    }
+  }
+}
+
+async function reviseQuote(target) {
+  var q = target || _viewQuoteData || window._reviseTarget;
+  if (!q) return;
+  window._reviseTarget = null;
+  closeViewQuoteModal();
+  await openQuoteModal(q.query_id, q.id);
+}
+
+var _revisingQuoteId = null;
+async function openQuoteModal(queryId, existingQuoteId){
   if(isAopExpired()){
     showToast('Your AOP has expired. Renew it before submitting quotes.','error');
     return;
@@ -561,6 +639,7 @@ async function openQuoteModal(queryId){
     return;
   }
   currentQueryId=queryId;
+  _revisingQuoteId = existingQuoteId || null;
   currentClaimId=claimRes.claim&&claimRes.claim.id?claimRes.claim.id:null;
   sendEmail('new_query_assigned',{query_id:queryId,operator_id:currentOperator.id});
   var res=await sbFetch('queries?id=eq.'+queryId);
@@ -594,6 +673,10 @@ async function openQuoteModal(queryId){
   document.getElementById('quote-aircraft-help').textContent=anyConflict?'Some aircraft unavailable ÃÂ¢ÃÂÃÂ booked or documents expired.':'';
   ['q-base','q-handling','q-crew','q-catering','q-notes'].forEach(function(id){document.getElementById(id).value='';});
   calcQuote();
+  // Load live bids for reverse auction display
+  var titleEl = document.getElementById('quote-modal-title');
+  if (titleEl) titleEl.textContent = 'Submit Quote';
+  fetchBids(queryId).then(function(bids) { renderBidTable(bids, currentOperator.id); });
   document.getElementById('quote-modal').classList.add('open');
 }
 
@@ -638,11 +721,19 @@ async function submitQuote(){
   var s=b+h+c+ca;var g=Math.round(s*0.18);var t=s+g;
   var sel=document.getElementById('quote-aircraft');var opt=sel.options[sel.selectedIndex];
   var at=opt.dataset.type;var ar=opt.dataset.reg;
-  var qRes=await sbFetch('quotes',{method:'POST',prefer:'return=representation',body:{
-    query_id:currentQueryId,operator_id:currentOperator.id,operator_name:currentOperator.company_name,
-    aircraft_id:aircraftId,aircraft_type:at,aircraft_registration:ar,
-    price:t,notes:notes,status:'shared',submitted_by:currentUser.id
-  }});
+  var qRes;
+  if (_revisingQuoteId) {
+    qRes=await sbFetch('quotes?id=eq.'+_revisingQuoteId,{method:'PATCH',prefer:'return=representation',body:{
+      aircraft_id:aircraftId,aircraft_type:at,aircraft_registration:ar,
+      price:t,notes:notes
+    }});
+  } else {
+    qRes=await sbFetch('quotes',{method:'POST',prefer:'return=representation',body:{
+      query_id:currentQueryId,operator_id:currentOperator.id,operator_name:currentOperator.company_name,
+      aircraft_id:aircraftId,aircraft_type:at,aircraft_registration:ar,
+      price:t,notes:notes,status:'shared',submitted_by:currentUser.id
+    }});
+  }
   if(!qRes.ok){
     if(qRes.status===409){showToast('Your team already submitted a quote for this query.','error');}
     else{showToast('Failed to submit quote. Please try again.','error');}

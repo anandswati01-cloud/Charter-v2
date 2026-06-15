@@ -1,612 +1,592 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-    <title>SkyVayu | Operator Portal</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <script src="../js/config.js"></script>
-    <script src="../js/supabase.js"></script>
-    <link rel="stylesheet" href="operator.css"/>
-    <script src="operator.js" defer></script>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SkyVayu | Operator Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="../js/config.js"></script>
+<link rel="stylesheet" href="operator.css"/>
+<script src="operator.js" defer></script>
 </head>
 <body>
-<!-- =================== LOGIN =================== -->
+
+<!-- ================= LOGIN ================= -->
 <div id="page-login">
-    <div class="login-box">
-        <div class="login-logo"><span class="brand-logo">SkyVayu</span></div>
-        <h2>Operator Portal</h2>
-        <p class="login-sub">Sign in to manage your queries and quotes</p>
-        <div id="login-error" class="login-error" style="display:none;">Invalid username or password</div>
-        <label class="field-label">USERNAME OR EMAIL</label>
-        <input type="text" id="login-username" class="field-input" placeholder="Enter your username or email"/>
-        <label class="field-label">PASSWORD</label>
-        <div class="password-wrapper">
-            <input type="password" id="login-password" class="field-input" placeholder="Enter your password"/>
-            <button class="eye-toggle" id="eye-toggle" type="button" onclick="togglePasswordVisibility()">
-                <svg id="eye-icon-show" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                <svg id="eye-icon-hide" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display:none;"><path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a9.956 9.956 0 012.293-3.95M6.343 6.343A9.956 9.956 0 0112 5c4.477 0 8.268 2.943 9.542 7a9.956 9.956 0 01-2.006 3.566M6.343 6.343L3 3m3.343 3.343l11.314 11.314M17.657 17.657L21 21"/></svg>
-            </button>
-        </div>
-        <button class="btn-primary" id="login-btn" onclick="doLogin()">SIGN IN</button>
-        <p class="forgot-password-link"><a href="#" onclick="showForgotPassword()">Forgot password?</a></p>
-        <p class="login-register">New operator? <a href="/register">Register your company</a></p>
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="brand-wordmark"><span class="brand-sky">Sky</span><span class="brand-vayu">Vayu</span></div>
     </div>
+    <h2>Operator Portal</h2>
+    <p class="login-sub">Sign in to manage your queries and quotes</p>
+    <div class="login-error" id="login-error">Invalid username or password</div>
+    <div class="field-group">
+      <label class="field-label">Username or Email</label>
+      <input type="text" class="field-input" id="login-username" placeholder="Enter your username or email" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label">Password</label>
+      <div class="password-wrapper">
+        <input type="password" class="field-input" id="login-password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/>
+        <button type="button" class="eye-toggle" id="eye-toggle" onclick="togglePasswordVisibility()">
+          <svg id="eye-icon-show" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg id="eye-icon-hide" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+      </div>
+    </div>
+    <button class="btn-primary" id="login-btn" onclick="doLogin()">Sign in</button>
+    <div style="text-align:right;margin-top:-8px;margin-bottom:4px;">
+      <a href="#" class="forgot-password-link" onclick="showForgotPassword();return false;">Forgot password?</a>
+    </div>
+    <div style="text-align:center;margin-top:16px;">
+      <button onclick="document.getElementById('register-modal').classList.add('open')" style="background:none;border:none;color:var(--white-30);font-size:12px;cursor:pointer;">New operator? <span style="color:var(--gold);text-decoration:underline;">Register your company</span></button>
+    </div>
+  </div>
 </div>
 
-<!-- =================== FORGOT PASSWORD MODAL =================== -->
-<div id="forgot-password-modal" class="modal-overlay" style="display:none;">
-    <div class="modal">
-        <div class="modal-header"><h3>Reset Password</h3><button class="modal-close" onclick="closeForgotPassword()">✕</button></div>
-        <p>Enter your registered email and we'll send you a password reset link.</p>
-        <label class="field-label">Email Address</label>
-        <input type="email" id="forgot-email" class="field-input" placeholder="your@email.com"/>
-        <div id="forgot-error" class="login-error" style="display:none;"></div>
-        <div id="forgot-success" class="success" style="display:none;">Password reset link sent! Check your email.</div>
-        <div class="modal-actions">
-            <button class="btn-ghost" onclick="closeForgotPassword()">Cancel</button>
-            <button class="btn-primary" id="forgot-submit-btn" onclick="doForgotPassword()">Send Reset Link</button>
-        </div>
+<!-- ================= FORGOT PASSWORD ================= -->
+<div class="modal-overlay" id="forgot-password-modal" style="display:none;" onclick="if(event.target===this)closeForgotPassword()">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-header"><span class="modal-title">Reset Password</span><button class="modal-close" onclick="closeForgotPassword()">&#x2715;</button></div>
+    <div class="modal-body">
+      <p style="color:var(--text-secondary);font-size:14px;margin-bottom:20px;">Enter your registered email and we'll send you a password reset link.</p>
+      <div class="field-group"><label class="field-label">Email Address</label><input type="email" class="field-input" id="forgot-email" placeholder="Enter your registered email" onkeydown="if(event.key==='Enter')doForgotPassword()"/></div>
+      <div id="forgot-error" style="color:var(--red);font-size:13px;margin-top:8px;display:none;"></div>
+      <div id="forgot-success" style="color:var(--green-light);font-size:13px;margin-top:8px;display:none;">Password reset link sent! Check your email.</div>
     </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline-sm" onclick="closeForgotPassword()">Cancel</button>
+      <button class="btn-sm btn-blue" id="forgot-submit-btn" onclick="doForgotPassword()">Send Reset Link</button>
+    </div>
+  </div>
 </div>
 
-<!-- =================== AOP UPLOAD MODAL =================== -->
-<div id="aop-upload-modal" class="modal-overlay" style="display:none;">
-    <div class="modal">
-        <div class="modal-header"><h3>Upload updated document</h3><button class="modal-close" onclick="closeModal()">✕</button></div>
-        <input type="file" id="aop-file-input" accept=".pdf,.jpg,.jpeg,.png"/>
-        <div class="modal-actions">
-            <button class="btn-ghost" onclick="closeModal()">Cancel</button>
-            <button class="btn-primary" onclick="uploadAopDocument()">Upload</button>
-        </div>
-    </div>
+<!-- ================= PENDING PAGE ================= -->
+<div id="page-pending" style="display:none;min-height:100vh;align-items:center;justify-content:center;background:var(--navy);padding:24px;">
+  <div style="text-align:center;max-width:400px;">
+    <div style="font-family:var(--font-display);font-size:28px;color:var(--gold);margin-bottom:12px;">Registration submitted</div>
+    <div style="font-size:14px;color:var(--text-secondary);line-height:1.7;margin-bottom:24px;">Your company registration is under review. You will be able to log in once approved.</div>
+    <button class="btn-primary" style="width:auto;padding:0 24px;" onclick="document.getElementById('page-pending').style.display='none';document.getElementById('page-login').style.display='flex';">Back to login</button>
+  </div>
 </div>
 
-<!-- =================== DASHBOARD =================== -->
+<!-- ================= DASHBOARD ================= -->
 <div id="page-dashboard" style="display:none;">
-<div class="main">
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-    <div class="sidebar-logo">
+  <!-- Notification bars -->
+  <div id="doc-notification-bar" style="display:none;"></div>
+  <div id="aop-expired-banner" style="display:none;background:rgba(226,75,74,0.1);border-bottom:0.5px solid rgba(226,75,74,0.3);padding:12px 28px;font-size:13px;color:var(--red);align-items:center;gap:12px;">
+    <span id="aop-expired-msg" style="flex:1;"></span>
+    <button id="aop-renew-btn" onclick="openAopRenewModal()" style="display:none;height:28px;padding:0 14px;background:rgba(226,75,74,0.1);border:0.5px solid rgba(226,75,74,0.4);border-radius:6px;font-size:12px;font-weight:500;color:var(--red);cursor:pointer;font-family:var(--font);white-space:nowrap;">Upload updated document</button>
+  </div>
+
+  <div class="main">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
         <div class="brand-wordmark"><span class="brand-sky">Sky</span><span class="brand-vayu">Vayu</span></div>
         <span class="brand-sub">Operator Portal</span>
-    </div>
-    <div class="op-info" onclick="showSection('profile')" style="cursor:pointer;" title="View profile">
+      </div>
+      <div class="op-info" onclick="showSection('profile')" style="cursor:pointer;" title="View profile">
         <div class="op-avatar" id="op-avatar"></div>
-        <div class="op-info-text"><div class="op-name" id="op-name"></div><div class="op-role" id="op-role"></div></div>
-    </div>
-    <nav class="sidebar-nav">
+        <div class="op-info-text">
+          <div class="op-name" id="op-name"></div>
+          <div class="op-role" id="op-role"></div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
         <a class="nav-item active" data-section="queries" onclick="showSection('queries')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-            Queries <span class="nav-badge" id="queries-badge">0</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+          Queries <span class="nav-badge" id="queries-badge">0</span>
         </a>
         <a class="nav-item" data-section="fleet" onclick="showSection('fleet')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/></svg>
-            Fleet
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/></svg>
+          Fleet
         </a>
         <a class="nav-item" data-section="roster" onclick="showSection('roster')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-            Roster
-        </a>
-        <a class="nav-item" data-section="administration" onclick="showSection('administration')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            Administration
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          Roster
         </a>
         <div id="nav-admin-section">
-            <a class="nav-item" data-section="employees" onclick="showSection('employees')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                Employees
-            </a>
-            <a class="nav-item" data-section="revenue" onclick="showSection('revenue')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Revenue
-            </a>
+          <a class="nav-item" data-section="employees" onclick="showSection('employees')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Employees
+          </a>
+          <a class="nav-item" data-section="revenue" onclick="showSection('revenue')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Revenue
+          </a>
         </div>
-    </nav>
-    <div class="sidebar-footer">
+      </nav>
+      <div class="sidebar-footer">
         <button class="btn-signout" onclick="doLogout()">Sign out</button>
-    </div>
-</aside>
+      </div>
+    </aside>
 
-<!-- MAIN CONTENT AREA -->
-<main class="main-content">
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
 
-<!-- QUERIES SECTION -->
-<div id="section-queries" style="display:none;">
-    <div class="main-header">
-        <div class="main-header-top">
-            <div class="page-title">Queries</div>
-        </div>
-        <div class="subtabs">
+      <!-- QUERIES SECTION -->
+      <div id="section-queries" style="display:none;">
+        <div class="main-header">
+          <div class="main-header-top"><div class="page-title">Queries</div></div>
+          <div class="subtabs">
             <div class="subtab active" data-subtab="active" onclick="showSubtab('active')">Active <span class="subtab-count" id="count-active">0</span></div>
             <div class="subtab" data-subtab="shared" onclick="showSubtab('shared')">Quote Shared <span class="subtab-count" id="count-shared">0</span></div>
             <div class="subtab" data-subtab="confirmed" onclick="showSubtab('confirmed')">Confirmed <span class="subtab-count" id="count-confirmed">0</span></div>
             <div class="subtab" data-subtab="expired" onclick="showSubtab('expired')">Expired <span class="subtab-count" id="count-expired" style="background:rgba(226,75,74,0.15);color:var(--red);">0</span></div>
+          </div>
         </div>
-    </div>
-    <div class="section-body">
-        <div id="list-active"></div>
-        <div id="list-shared" style="display:none;"></div>
-        <div id="list-confirmed" style="display:none;"></div>
-        <div id="list-expired" style="display:none;"></div>
-    </div>
-</div>
+        <div class="section-body">
+          <div id="list-active"><div class="loading">Loading...</div></div>
+          <div id="list-shared" style="display:none;"><div class="loading">Loading...</div></div>
+          <div id="list-confirmed" style="display:none;"><div class="loading">Loading...</div></div>
+          <div id="list-expired" style="display:none;"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
 
-<!-- FLEET SECTION -->
-<div id="section-fleet" style="display:none;">
-    <div class="main-header">
-        <div class="main-header-top">
+      <!-- FLEET SECTION -->
+      <div id="section-fleet" style="display:none;">
+        <div class="main-header">
+          <div class="main-header-top">
             <div class="page-title">Fleet</div>
-            <button class="btn-sm btn-blue" id="btn-add-aircraft" onclick="openAircraftModal(null)">+ Add aircraft</button>
+            <button class="btn-sm btn-blue" id="btn-add-aircraft" onclick="openAircraftModal()">+ Add aircraft</button>
+          </div>
         </div>
-    </div>
-    <div class="section-body" id="fleet-content"><div class="loading">Loading...</div></div>
-</div>
+        <div class="section-body">
+          <div class="aircraft-grid" id="aircraft-grid"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
 
-<!-- ROSTER SECTION -->
-<div id="section-roster" style="display:none;">
-    <div class="main-header"><div class="main-header-top"><div class="page-title">Roster</div></div></div>
-    <div class="section-body">
-        <p class="roster-desc">Aircraft availability, next 30 days.</p>
-        <div id="roster-content"><div class="loading">Loading...</div></div>
-    </div>
-</div>
+      <!-- ROSTER SECTION -->
+      <div id="section-roster" style="display:none;">
+        <div class="main-header"><div class="main-header-top"><div class="page-title">Roster</div></div></div>
+        <div class="section-body">
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">Aircraft availability, next 30 days.</div>
+          <div id="roster-content" class="roster-wrap"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
 
-<!-- ADMINISTRATION SECTION -->
-<div id="section-administration" style="display:none;">
-    <div class="main-header"><div class="main-header-top"><div class="page-title">Administration</div></div></div>
-    <div class="section-body" id="admin-content"><div class="loading">Loading...</div></div>
-</div>
-
-<!-- EMPLOYEES SECTION -->
-<div id="section-employees" style="display:none;">
-    <div class="main-header">
-        <div class="main-header-top">
-            <div class="page-title">Team</div>
+      <!-- EMPLOYEES SECTION -->
+      <div id="section-employees" style="display:none;">
+        <div class="main-header">
+          <div class="main-header-top">
+            <div class="page-title">Employees</div>
             <button class="btn-sm btn-blue" onclick="openEmployeeModal()">+ Add employee</button>
+          </div>
         </div>
-    </div>
-    <div class="section-body">
-        <div id="employees-list"><div class="loading">Loading...</div></div>
-    </div>
-</div>
+        <div class="section-body">
+          <div id="employees-list"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
 
-<!-- REVENUE SECTION -->
-<div id="section-revenue" style="display:none;">
-    <div class="main-header"><div class="main-header-top"><div class="page-title">Revenue</div></div></div>
-    <div class="section-body" id="revenue-content"><div class="loading">Loading...</div></div>
-</div>
+      <!-- REVENUE SECTION -->
+      <div id="section-revenue" style="display:none;">
+        <div class="main-header"><div class="main-header-top"><div class="page-title">Revenue</div></div></div>
+        <div class="section-body" id="revenue-content"><div class="loading">Loading...</div></div>
+      </div>
 
-<!-- =================== PROFILE SECTION =================== -->
-<div id="section-profile" style="display:none;">
-    <div class="main-header">
-        <div class="page-title">Profile</div>
-    </div>
-    <div class="main-content">
-
-        <!-- PROFILE HERO BANNER -->
-        <div class="profile-hero card">
+      <!-- PROFILE SECTION -->
+      <div id="section-profile" style="display:none;">
+        <div class="main-header"><div class="main-header-top"><div class="page-title">Profile</div></div></div>
+        <div class="section-body">
+          <div class="profile-hero card">
             <div class="profile-hero-cover" id="profile-cover-bg">
-                <button class="profile-cover-edit" id="profile-cover-edit-btn" onclick="triggerCoverUpload()" title="Change cover photo">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    Edit cover
-                </button>
-                <input type="file" id="cover-upload-input" accept="image/*" style="display:none;" onchange="uploadCoverPhoto(this)"/>
+              <button class="profile-cover-edit" onclick="triggerCoverUpload()" title="Change cover photo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                Edit cover
+              </button>
+              <input type="file" id="cover-upload-input" accept="image/*" style="display:none;" onchange="uploadCoverPhoto(this)"/>
             </div>
             <div class="profile-hero-body">
-                <div class="profile-logo-wrap">
-                    <div class="profile-logo-circle" id="profile-logo-circle">
-                        <span id="profile-logo-initials"></span>
-                        <img id="profile-logo-img" src="" alt="" style="display:none;"/>
-                    </div>
-                    <button class="profile-logo-upload-btn" onclick="triggerLogoUpload()" title="Upload company logo">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
-                    </button>
-                    <input type="file" id="logo-upload-input" accept="image/*" style="display:none;" onchange="uploadCompanyLogo(this)"/>
+              <div class="profile-logo-wrap">
+                <div class="profile-logo-circle" id="profile-logo-circle">
+                  <span id="profile-logo-initials"></span>
+                  <img id="profile-logo-img" src="" alt="" style="display:none;"/>
                 </div>
-                <div class="profile-hero-info">
-                    <div class="profile-hero-name" id="profile-hero-name">&mdash;</div>
-                    <div class="profile-hero-meta">
-                        <span class="role-badge" id="profile-hero-role">&mdash;</span>
-                        <span class="profile-hero-company" id="profile-hero-company">&mdash;</span>
-                        <span class="profile-hero-base" id="profile-hero-base"></span>
-                    </div>
-                    <div class="profile-hero-tagline" id="profile-hero-tagline"></div>
+                <button class="profile-logo-upload-btn" onclick="triggerLogoUpload()" title="Upload company logo">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                </button>
+                <input type="file" id="logo-upload-input" accept="image/*" style="display:none;" onchange="uploadCompanyLogo(this)"/>
+              </div>
+              <div class="profile-hero-info">
+                <div class="profile-hero-name" id="profile-hero-name"></div>
+                <div class="profile-hero-meta">
+                  <span class="role-badge" id="profile-hero-role"></span>
+                  <span class="profile-hero-company" id="profile-hero-company"></span>
+                  <span class="profile-hero-base" id="profile-hero-base"></span>
                 </div>
-                <div class="profile-hero-stats">
-                    <div class="profile-stat"><span class="profile-stat-label">Member since</span><span class="profile-stat-value" id="profile-stat-member"></span></div>
-                    <div class="profile-stat"><span class="profile-stat-label">Last login</span><span class="profile-stat-value" id="profile-stat-login"></span></div>
-                    <div class="profile-stat"><span class="profile-stat-label">Fleet size</span><span class="profile-stat-value" id="profile-stat-fleet"></span></div>
-                    <div class="profile-stat"><span class="profile-stat-label">Account status</span><span class="profile-stat-value profile-stat-active" id="profile-stat-status">Active</span></div>
-                </div>
+                <div class="profile-hero-tagline" id="profile-hero-tagline"></div>
+              </div>
+              <div class="profile-hero-stats">
+                <div class="profile-stat"><span class="profile-stat-label">Member since</span><span class="profile-stat-value" id="profile-stat-member"></span></div>
+                <div class="profile-stat"><span class="profile-stat-label">Last login</span><span class="profile-stat-value" id="profile-stat-login"></span></div>
+                <div class="profile-stat"><span class="profile-stat-label">Fleet size</span><span class="profile-stat-value" id="profile-stat-fleet"></span></div>
+                <div class="profile-stat"><span class="profile-stat-label">Status</span><span class="profile-stat-value profile-stat-active" id="profile-stat-status">Active</span></div>
+              </div>
             </div>
-        </div>
-
-        <!-- PROFILE GRID -->
-        <div class="profile-grid">
-
-            <!-- ✈ COMPANY OVERVIEW (owner only) -->
+          </div>
+          <div class="profile-grid">
             <div class="card profile-card profile-full-width" id="profile-overview-card" style="display:none;">
-                <div class="card-header">
-                    <h3>Company Overview</h3>
-                    <button class="btn-icon" id="profile-overview-edit-btn" onclick="profileEditMode('overview')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        Edit
-                    </button>
+              <div class="card-header"><h3>Company Overview</h3><button class="btn-icon" id="profile-overview-edit-btn" onclick="profileEditMode('overview')">Edit</button></div>
+              <div class="card-body">
+                <div class="profile-view" id="profile-overview-view">
+                  <div class="profile-info-grid">
+                    <div class="profile-info-item"><span class="profile-info-label">Company Description</span><span class="profile-info-value" id="view-company-desc"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Year Established</span><span class="profile-info-value" id="view-year-established"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Website</span><span class="profile-info-value" id="view-website"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Home Base</span><span class="profile-info-value" id="view-home-base"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Other Bases</span><span class="profile-info-value" id="view-other-bases"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Sales Email</span><span class="profile-info-value" id="view-sales-email"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Sales Phone</span><span class="profile-info-value" id="view-sales-phone"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Ops Phone</span><span class="profile-info-value" id="view-ops-phone"></span></div>
+                  </div>
                 </div>
-                <div class="card-body">
-                    <div class="profile-view" id="profile-overview-view">
-                        <div class="profile-info-grid">
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Company Description</span>
-                                <span class="profile-info-value" id="view-company-desc">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Year Established</span>
-                                <span class="profile-info-value" id="view-year-established">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Company Website</span>
-                                <span class="profile-info-value" id="view-website">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Home Base Airport</span>
-                                <span class="profile-info-value" id="view-home-base">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Additional Base Airports</span>
-                                <span class="profile-info-value" id="view-other-bases">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Sales Email</span>
-                                <span class="profile-info-value" id="view-sales-email">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Sales Phone</span>
-                                <span class="profile-info-value" id="view-sales-phone">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">24/7 Ops Phone</span>
-                                <span class="profile-info-value" id="view-ops-phone">—</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="profile-edit" id="profile-overview-form" style="display:none;">
-                        <div class="form-grid">
-                            <div class="form-group form-group-full">
-                                <label class="field-label">Company Description</label>
-                                <textarea id="input-company-desc" class="form-input form-textarea" rows="3" placeholder="Describe your company, specialties, service areas..."></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Year Established</label>
-                                <input type="number" id="input-year-established" class="field-input" placeholder="e.g. 2010" min="1900" max="2099"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Company Website</label>
-                                <input type="url" id="input-website" class="field-input" placeholder="https://yourcompany.com"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Home Base Airport (ICAO/IATA)</label>
-                                <input type="text" id="input-home-base" class="field-input" placeholder="e.g. VIDP / DEL"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Additional Base Airports</label>
-                                <input type="text" id="input-other-bases" class="field-input" placeholder="e.g. VABB, VOMM"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Sales Email</label>
-                                <input type="email" id="input-sales-email" class="field-input" placeholder="sales@yourcompany.com"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Sales Phone</label>
-                                <input type="tel" id="input-sales-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">24/7 Ops Phone</label>
-                                <input type="tel" id="input-ops-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/>
-                            </div>
-                        </div>
-                        <div class="profile-actions" id="profile-overview-actions">
-                            <button class="btn-primary" onclick="profileSaveOverview()">Save Changes</button>
-                            <button class="btn-ghost" onclick="profileCancelEdit('overview')">Cancel</button>
-                        </div>
-                        <div class="profile-msg" id="profile-overview-msg"></div>
-                    </div>
+                <div class="profile-edit" id="profile-overview-form" style="display:none;">
+                  <div class="form-grid">
+                    <div class="form-group form-group-full"><label class="field-label">Company Description</label><textarea id="input-company-desc" class="field-input form-textarea" rows="3" placeholder="Describe your company..."></textarea></div>
+                    <div class="form-group"><label class="field-label">Year Established</label><input type="number" id="input-year-established" class="field-input" placeholder="e.g. 2010"/></div>
+                    <div class="form-group"><label class="field-label">Website</label><input type="url" id="input-website" class="field-input" placeholder="https://yourcompany.com"/></div>
+                    <div class="form-group"><label class="field-label">Home Base (ICAO/IATA)</label><input type="text" id="input-home-base" class="field-input" placeholder="e.g. VIDP"/></div>
+                    <div class="form-group"><label class="field-label">Other Bases</label><input type="text" id="input-other-bases" class="field-input" placeholder="e.g. VABB, VOMM"/></div>
+                    <div class="form-group"><label class="field-label">Sales Email</label><input type="email" id="input-sales-email" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Sales Phone</label><input type="tel" id="input-sales-phone" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Ops Phone</label><input type="tel" id="input-ops-phone" class="field-input"/></div>
+                  </div>
+                  <div class="profile-actions" id="profile-overview-actions"><button class="btn-primary" onclick="profileSaveOverview()">Save Changes</button><button class="btn-ghost" onclick="profileCancelEdit('overview')">Cancel</button></div>
+                  <div class="profile-msg" id="profile-overview-msg"></div>
                 </div>
+              </div>
             </div>
-
-            <!-- ✈ OPERATIONAL DETAILS (owner only) -->
             <div class="card profile-card" id="profile-ops-card" style="display:none;">
-                <div class="card-header">
-                    <h3>Operational Details</h3>
-                    <button class="btn-icon" id="profile-ops-edit-btn" onclick="profileEditMode('ops')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        Edit
-                    </button>
+              <div class="card-header"><h3>Operational Details</h3><button class="btn-icon" id="profile-ops-edit-btn" onclick="profileEditMode('ops')">Edit</button></div>
+              <div class="card-body">
+                <div class="profile-view" id="profile-ops-view">
+                  <div class="profile-info-grid">
+                    <div class="profile-info-item"><span class="profile-info-label">Regions Served</span><span class="profile-info-value" id="view-regions"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Max Range (nm)</span><span class="profile-info-value" id="view-max-range"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Hours of Operation</span><span class="profile-info-value" id="view-ops-hours"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Min Notice Period</span><span class="profile-info-value" id="view-min-notice"></span></div>
+                  </div>
                 </div>
-                <div class="card-body">
-                    <div class="profile-view" id="profile-ops-view">
-                        <div class="profile-info-grid">
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Regions Served</span>
-                                <span class="profile-info-value" id="view-regions">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Max Range (nm)</span>
-                                <span class="profile-info-value" id="view-max-range">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Hours of Operation</span>
-                                <span class="profile-info-value" id="view-ops-hours">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Minimum Notice Period</span>
-                                <span class="profile-info-value" id="view-min-notice">—</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="profile-edit" id="profile-ops-form" style="display:none;">
-                        <div class="form-grid">
-                            <div class="form-group form-group-full">
-                                <label class="field-label">Regions Served</label>
-                                <div class="checkbox-group">
-                                    <label class="checkbox-label"><input type="checkbox" name="region" value="Domestic India"/> Domestic India</label>
-                                    <label class="checkbox-label"><input type="checkbox" name="region" value="South Asia (SAARC)"/> South Asia (SAARC)</label>
-                                    <label class="checkbox-label"><input type="checkbox" name="region" value="Middle East"/> Middle East</label>
-                                    <label class="checkbox-label"><input type="checkbox" name="region" value="Southeast Asia"/> Southeast Asia</label>
-                                    <label class="checkbox-label"><input type="checkbox" name="region" value="Central Asia"/> Central Asia</label>
-                                    <label class="checkbox-label"><input type="checkbox" name="region" value="Europe"/> Europe</label>
-                                    <label class="checkbox-label"><input type="checkbox" name="region" value="Worldwide"/> Worldwide</label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Maximum Range (nautical miles)</label>
-                                <input type="number" id="input-max-range" class="field-input" placeholder="e.g. 3000"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Hours of Operation</label>
-                                <input type="text" id="input-ops-hours" class="field-input" placeholder="e.g. 24/7 or 0600–2200 IST"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Minimum Notice Period</label>
-                                <select id="input-min-notice" class="form-input form-select">
-                                    <option value="">Select...</option>
-                                    <option value="2 hours">2 hours</option>
-                                    <option value="4 hours">4 hours</option>
-                                    <option value="6 hours">6 hours</option>
-                                    <option value="12 hours">12 hours</option>
-                                    <option value="24 hours">24 hours</option>
-                                    <option value="48 hours">48 hours</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="profile-actions" id="profile-ops-actions">
-                            <button class="btn-primary" onclick="profileSaveOps()">Save Changes</button>
-                            <button class="btn-ghost" onclick="profileCancelEdit('ops')">Cancel</button>
-                        </div>
-                        <div class="profile-msg" id="profile-ops-msg"></div>
-                    </div>
+                <div class="profile-edit" id="profile-ops-form" style="display:none;">
+                  <div class="form-grid">
+                    <div class="form-group form-group-full"><label class="field-label">Regions Served</label><div class="checkbox-group"><label class="checkbox-label"><input type="checkbox" name="region" value="Domestic India"/> Domestic India</label><label class="checkbox-label"><input type="checkbox" name="region" value="South Asia (SAARC)"/> South Asia</label><label class="checkbox-label"><input type="checkbox" name="region" value="Middle East"/> Middle East</label><label class="checkbox-label"><input type="checkbox" name="region" value="Southeast Asia"/> Southeast Asia</label><label class="checkbox-label"><input type="checkbox" name="region" value="Europe"/> Europe</label><label class="checkbox-label"><input type="checkbox" name="region" value="Worldwide"/> Worldwide</label></div></div>
+                    <div class="form-group"><label class="field-label">Max Range (nm)</label><input type="number" id="input-max-range" class="field-input" placeholder="e.g. 3000"/></div>
+                    <div class="form-group"><label class="field-label">Hours of Operation</label><input type="text" id="input-ops-hours" class="field-input" placeholder="e.g. 24/7"/></div>
+                    <div class="form-group"><label class="field-label">Min Notice Period</label><select id="input-min-notice" class="field-input form-select"><option value="">Select...</option><option value="2 hours">2 hours</option><option value="4 hours">4 hours</option><option value="6 hours">6 hours</option><option value="12 hours">12 hours</option><option value="24 hours">24 hours</option><option value="48 hours">48 hours</option></select></div>
+                  </div>
+                  <div class="profile-actions" id="profile-ops-actions"><button class="btn-primary" onclick="profileSaveOps()">Save Changes</button><button class="btn-ghost" onclick="profileCancelEdit('ops')">Cancel</button></div>
+                  <div class="profile-msg" id="profile-ops-msg"></div>
                 </div>
+              </div>
             </div>
-
-            <!-- ✈ SAFETY & CERTIFICATIONS (owner only) -->
             <div class="card profile-card" id="profile-certs-card" style="display:none;">
-                <div class="card-header">
-                    <h3>Safety &amp; Certifications</h3>
-                    <button class="btn-icon" id="profile-certs-edit-btn" onclick="profileEditMode('certs')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        Edit
-                    </button>
+              <div class="card-header"><h3>Safety &amp; Certifications</h3><button class="btn-icon" id="profile-certs-edit-btn" onclick="profileEditMode('certs')">Edit</button></div>
+              <div class="card-body">
+                <div class="profile-view" id="profile-certs-view">
+                  <div class="cert-badges" id="view-cert-badges"></div>
+                  <div class="profile-info-grid">
+                    <div class="profile-info-item"><span class="profile-info-label">DGCA Licence No.</span><span class="profile-info-value" id="view-dgca-licence"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">AOP Expiry</span><span class="profile-info-value" id="view-aop-expiry"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Air Operator Certificate</span><span class="profile-info-value" id="view-aop-doc"><button class="btn-link" id="view-aop-btn" style="display:none;" onclick="if(window.currentOperator&&currentOperator.aop_document_url){window.open(currentOperator.aop_document_url,'_blank')}">View AOP Document</button><span id="view-aop-none">Not uploaded</span></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">ARGUS Rating</span><span class="profile-info-value" id="view-argus"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Wyvern Rating</span><span class="profile-info-value" id="view-wyvern"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">IS-BAO Stage</span><span class="profile-info-value" id="view-isbao"></span></div>
+                  </div>
                 </div>
-                <div class="card-body">
-                    <div class="profile-view" id="profile-certs-view">
-                        <div class="cert-badges" id="view-cert-badges"></div>
-                        <div class="profile-info-grid">
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">DGCA Licence No.</span>
-                                <span class="profile-info-value" id="view-dgca-licence">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">AOP Expiry Date</span>
-                                <span class="profile-info-value" id="view-aop-expiry">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Air Operator Certificate</span>
-                                <span class="profile-info-value" id="view-aop-doc">
-                                    <button class="btn-link" id="view-aop-btn" style="display:none;" onclick="if(window.currentOperator&&currentOperator.aop_document_url){window.open(currentOperator.aop_document_url,'_blank')}">View AOP Document</button>
-                                    <span id="view-aop-none">Not uploaded</span>
-                                </span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">ARGUS Rating</span>
-                                <span class="profile-info-value" id="view-argus">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">Wyvern Rating</span>
-                                <span class="profile-info-value" id="view-wyvern">—</span>
-                            </div>
-                            <div class="profile-info-item">
-                                <span class="profile-info-label">IS-BAO Stage</span>
-                                <span class="profile-info-value" id="view-isbao">—</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="profile-edit" id="profile-certs-form" style="display:none;">
-                        <div class="form-grid">
-                            <div class="form-group">
-                                <label class="field-label">DGCA Licence No.</label>
-                                <input type="text" id="input-dgca-licence" class="field-input" placeholder="e.g. AOC/HQ/123/2020"/>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">AOP Expiry Date</label>
-                                <input type="date" id="input-aop-expiry" class="field-input"/>
-                            </div>
-                            <div class="form-group form-group-full">
-                                <label class="field-label">Air Operator Certificate (PDF/Image)</label>
-                                <div class="file-upload-area">
-                                    <button class="btn-sm btn-ghost" onclick="openAopRenewModal()">Upload / Replace Document</button>
-                                    <span class="file-upload-note" id="aop-file-name"></span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">ARGUS Safety Rating</label>
-                                <select id="input-argus" class="form-input form-select">
-                                    <option value="">Not rated</option>
-                                    <option value="ARGUS Gold">ARGUS Gold</option>
-                                    <option value="ARGUS Platinum">ARGUS Platinum</option>
-                                    <option value="ARGUS Charter">ARGUS Charter</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">Wyvern Safety Rating</label>
-                                <select id="input-wyvern" class="form-input form-select">
-                                    <option value="">Not rated</option>
-                                    <option value="Wyvern PASS">Wyvern PASS</option>
-                                    <option value="Wyvern WINGMAN">Wyvern WINGMAN</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="field-label">IS-BAO Stage</label>
-                                <select id="input-isbao" class="form-input form-select">
-                                    <option value="">Not certified</option>
-                                    <option value="IS-BAO Stage 1">IS-BAO Stage 1</option>
-                                    <option value="IS-BAO Stage 2">IS-BAO Stage 2</option>
-                                    <option value="IS-BAO Stage 3">IS-BAO Stage 3</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="profile-actions" id="profile-certs-actions">
-                            <button class="btn-primary" onclick="profileSaveCerts()">Save Changes</button>
-                            <button class="btn-ghost" onclick="profileCancelEdit('certs')">Cancel</button>
-                        </div>
-                        <div class="profile-msg" id="profile-certs-msg"></div>
-                    </div>
+                <div class="profile-edit" id="profile-certs-form" style="display:none;">
+                  <div class="form-grid">
+                    <div class="form-group"><label class="field-label">DGCA Licence No.</label><input type="text" id="input-dgca-licence" class="field-input" placeholder="e.g. AOC/HQ/123/2020"/></div>
+                    <div class="form-group"><label class="field-label">AOP Expiry Date</label><input type="date" id="input-aop-expiry" class="field-input"/></div>
+                    <div class="form-group form-group-full"><label class="field-label">Air Operator Certificate</label><div class="file-upload-area"><button class="btn-sm btn-ghost" onclick="openAopRenewModal()">Upload / Replace Document</button><span class="file-upload-note" id="aop-file-name"></span></div></div>
+                    <div class="form-group"><label class="field-label">ARGUS Rating</label><select id="input-argus" class="field-input form-select"><option value="">Not rated</option><option value="ARGUS Gold">ARGUS Gold</option><option value="ARGUS Platinum">ARGUS Platinum</option></select></div>
+                    <div class="form-group"><label class="field-label">Wyvern Rating</label><select id="input-wyvern" class="field-input form-select"><option value="">Not rated</option><option value="Wyvern PASS">Wyvern PASS</option><option value="Wyvern WINGMAN">Wyvern WINGMAN</option></select></div>
+                    <div class="form-group"><label class="field-label">IS-BAO Stage</label><select id="input-isbao" class="field-input form-select"><option value="">Not certified</option><option value="IS-BAO Stage 1">IS-BAO Stage 1</option><option value="IS-BAO Stage 2">IS-BAO Stage 2</option><option value="IS-BAO Stage 3">IS-BAO Stage 3</option></select></div>
+                  </div>
+                  <div class="profile-actions" id="profile-certs-actions"><button class="btn-primary" onclick="profileSaveCerts()">Save Changes</button><button class="btn-ghost" onclick="profileCancelEdit('certs')">Cancel</button></div>
+                  <div class="profile-msg" id="profile-certs-msg"></div>
                 </div>
+              </div>
             </div>
-
-            <!-- ✈ COMPANY INFORMATION (owner only) - Basic Details -->
             <div class="card profile-card" id="profile-company-card" style="display:none;">
-                <div class="card-header">
-                    <h3>Company Information</h3>
-                    <button class="btn-icon" id="profile-company-edit-btn" onclick="profileEditMode('company')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        Edit
-                    </button>
+              <div class="card-header"><h3>Company Information</h3><button class="btn-icon" id="profile-company-edit-btn" onclick="profileEditMode('company')">Edit</button></div>
+              <div class="card-body">
+                <div class="profile-view" id="profile-company-view">
+                  <div class="profile-info-grid">
+                    <div class="profile-info-item"><span class="profile-info-label">Company Name</span><span class="profile-info-value" id="view-company-name"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Company Email</span><span class="profile-info-value" id="view-company-email"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Company Phone</span><span class="profile-info-value" id="view-company-phone"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Owner Name</span><span class="profile-info-value" id="view-owner-name"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Owner Email</span><span class="profile-info-value" id="view-owner-email"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Owner Phone</span><span class="profile-info-value" id="view-owner-phone"></span></div>
+                  </div>
                 </div>
-                <div class="card-body">
-                    <div class="profile-view" id="profile-company-view">
-                        <div class="profile-info-grid">
-                            <div class="profile-info-item"><span class="profile-info-label">Company Name</span><span class="profile-info-value" id="view-company-name">—</span></div>
-                            <div class="profile-info-item"><span class="profile-info-label">Company Email</span><span class="profile-info-value" id="view-company-email">—</span></div>
-                            <div class="profile-info-item"><span class="profile-info-label">Company Phone</span><span class="profile-info-value" id="view-company-phone">—</span></div>
-                            <div class="profile-info-item"><span class="profile-info-label">Owner Name</span><span class="profile-info-value" id="view-owner-name">—</span></div>
-                            <div class="profile-info-item"><span class="profile-info-label">Owner Email</span><span class="profile-info-value" id="view-owner-email">—</span></div>
-                            <div class="profile-info-item"><span class="profile-info-label">Owner Phone</span><span class="profile-info-value" id="view-owner-phone">—</span></div>
-                        </div>
-                    </div>
-                    <div class="profile-edit" id="profile-company-form" style="display:none;">
-                        <div class="form-grid">
-                            <div class="form-group"><label class="field-label">Company Name</label><input type="text" id="input-company-name" class="field-input" placeholder="Your Company Pvt. Ltd."/></div>
-                            <div class="form-group"><label class="field-label">Company Email</label><input type="email" id="input-company-email" class="field-input" placeholder="info@yourcompany.com"/></div>
-                            <div class="form-group"><label class="field-label">Company Phone</label><input type="tel" id="input-company-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/></div>
-                            <div class="form-group"><label class="field-label">Owner Name</label><input type="text" id="input-owner-name" class="field-input" placeholder="Full name"/></div>
-                            <div class="form-group"><label class="field-label">Owner Email</label><input type="email" id="input-owner-email" class="field-input" placeholder="owner@yourcompany.com"/></div>
-                            <div class="form-group"><label class="field-label">Owner Phone</label><input type="tel" id="input-owner-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/></div>
-                        </div>
-                        <div class="profile-actions" id="profile-company-actions">
-                            <button class="btn-primary" onclick="profileSaveCompany()">Save Changes</button>
-                            <button class="btn-ghost" onclick="profileCancelEdit('company')">Cancel</button>
-                        </div>
-                        <div class="profile-msg" id="profile-company-msg"></div>
-                    </div>
+                <div class="profile-edit" id="profile-company-form" style="display:none;">
+                  <div class="form-grid">
+                    <div class="form-group"><label class="field-label">Company Name</label><input type="text" id="input-company-name" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Company Email</label><input type="email" id="input-company-email" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Company Phone</label><input type="tel" id="input-company-phone" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Owner Name</label><input type="text" id="input-owner-name" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Owner Email</label><input type="email" id="input-owner-email" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Owner Phone</label><input type="tel" id="input-owner-phone" class="field-input"/></div>
+                  </div>
+                  <div class="profile-actions" id="profile-company-actions"><button class="btn-primary" onclick="profileSaveCompany()">Save Changes</button><button class="btn-ghost" onclick="profileCancelEdit('company')">Cancel</button></div>
+                  <div class="profile-msg" id="profile-company-msg"></div>
                 </div>
+              </div>
             </div>
-
-            <!-- ✈ AIRCRAFT CATEGORY -->
             <div class="card profile-card">
-                <div class="card-header"><h3>Aircraft Category</h3></div>
-                <div class="card-body">
-                    <p class="form-helper">Select the aircraft types your organisation operates.</p>
-                    <div class="category-options">
-                        <label class="category-option">
-                            <input type="checkbox" id="cat-fixed-wing" name="aircraft-category" value="fixed_wing"/>
-                            <div class="category-option-inner">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/></svg>
-                                <span>Fixed Wing</span>
-                            </div>
-                        </label>
-                        <label class="category-option">
-                            <input type="checkbox" id="cat-helicopter" name="aircraft-category" value="helicopter"/>
-                            <div class="category-option-inner">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M12 3v18"/></svg>
-                                <span>Helicopter</span>
-                            </div>
-                        </label>
-                    </div>
-                    <button class="btn-primary" style="margin-top:16px;" onclick="saveProfileCategory()">Save Category</button>
-                    <div class="profile-msg" id="profile-category-msg"></div>
+              <div class="card-header"><h3>Aircraft Category</h3></div>
+              <div class="card-body">
+                <p class="form-helper">Select the aircraft types your organisation operates.</p>
+                <div class="category-options">
+                  <label class="category-option"><input type="checkbox" id="cat-fixed-wing" name="aircraft-category" value="fixed_wing"/><div class="category-option-inner"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 3l14 9-14 9V3z"/></svg><span>Fixed Wing</span></div></label>
+                  <label class="category-option"><input type="checkbox" id="cat-helicopter" name="aircraft-category" value="helicopter"/><div class="category-option-inner"><svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18M12 3v18"/></svg><span>Helicopter</span></div></label>
                 </div>
+                <button class="btn-primary" style="margin-top:16px;" onclick="saveProfileCategory()">Save Category</button>
+                <div class="profile-msg" id="profile-category-msg"></div>
+              </div>
             </div>
-
-            <!-- ✈ PERSONAL DETAILS -->
             <div class="card profile-card">
-                <div class="card-header">
-                    <h3>Personal Details</h3>
-                    <button class="btn-icon" id="profile-personal-edit-btn" onclick="profileEditMode('personal')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
-                        Edit
-                    </button>
+              <div class="card-header"><h3>Personal Details</h3><button class="btn-icon" id="profile-personal-edit-btn" onclick="profileEditMode('personal')">Edit</button></div>
+              <div class="card-body">
+                <div class="profile-view" id="profile-personal-view">
+                  <div class="profile-info-grid">
+                    <div class="profile-info-item"><span class="profile-info-label">Full Name</span><span class="profile-info-value" id="view-full-name"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Username</span><span class="profile-info-value" id="view-username"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Email</span><span class="profile-info-value" id="view-email"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Phone</span><span class="profile-info-value" id="view-phone"></span></div>
+                    <div class="profile-info-item"><span class="profile-info-label">Employee ID</span><span class="profile-info-value" id="view-employee-id"></span></div>
+                  </div>
                 </div>
-                <div class="card-body">
-                    <div class="profile-view" id="profile-personal-view">
-                        <div class="profile-info-grid">
-                            <div class="profile-info-item"><span class="profile-info-label">Full Name</span><span class="profile-info-value" id="view-full-name">—</span></div>
-                            <div class="profile-info-item"><span class="profile-info-label">Username</span><span class="profile-info-value" id="view-username">—</span></div>
-                            <div class="profile-info-item"><span class="profile-info-label">Email Address</span><span class="profile-info-value" id="view-email">—</span></div>
-                            <div class="profile-info-item"><span class="profile-info-label">Phone Number</span><span class="profile-info-value" id="view-phone">—</span></div>
-                            <div class="profile-info-item"><span class="profile-info-label">Employee ID</span><span class="profile-info-value" id="view-employee-id">—</span></div>
-                        </div>
-                    </div>
-                    <div class="profile-edit" id="profile-personal-form" style="display:none;">
-                        <div class="form-grid">
-                            <div class="form-group"><label class="field-label">Full Name</label><input type="text" id="input-full-name" class="field-input" placeholder="Your full name"/></div>
-                            <div class="form-group"><label class="field-label">Username</label><input type="text" id="input-username" class="field-input" placeholder="username"/></div>
-                            <div class="form-group"><label class="field-label">Email Address</label><input type="email" id="input-email" class="field-input" placeholder="you@email.com"/></div>
-                            <div class="form-group"><label class="field-label">Phone Number</label><input type="tel" id="input-phone" class="field-input" placeholder="+91 XXXXX XXXXX"/></div>
-                            <div class="form-group"><label class="field-label">Employee ID</label><input type="text" id="input-employee-id" class="field-input" placeholder="EMP-001" readonly/></div>
-                        </div>
-                        <div class="profile-actions" id="profile-personal-actions">
-                            <button class="btn-primary" onclick="profileSavePersonal()">Save Changes</button>
-                            <button class="btn-ghost" onclick="profileCancelEdit('personal')">Cancel</button>
-                        </div>
-                        <div class="profile-msg" id="profile-personal-msg"></div>
-                    </div>
+                <div class="profile-edit" id="profile-personal-form" style="display:none;">
+                  <div class="form-grid">
+                    <div class="form-group"><label class="field-label">Full Name</label><input type="text" id="input-full-name" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Username</label><input type="text" id="input-username" class="field-input" readonly/></div>
+                    <div class="form-group"><label class="field-label">Email</label><input type="email" id="input-email" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Phone</label><input type="tel" id="input-phone" class="field-input"/></div>
+                    <div class="form-group"><label class="field-label">Employee ID</label><input type="text" id="input-employee-id" class="field-input" readonly/></div>
+                  </div>
+                  <div class="profile-actions" id="profile-personal-actions"><button class="btn-primary" onclick="profileSavePersonal()">Save Changes</button><button class="btn-ghost" onclick="profileCancelEdit('personal')">Cancel</button></div>
+                  <div class="profile-msg" id="profile-personal-msg"></div>
                 </div>
+              </div>
             </div>
-
-            <!-- ✈ CHANGE PASSWORD -->
             <div class="card profile-card">
-                <div class="card-header"><h3>Change Password</h3></div>
-                <div class="card-body">
-                    <div class="form-grid">
-                        <div class="form-group"><label class="field-label">Current Password</label><input type="password" id="input-current-pw" class="field-input" placeholder="Current password"/></div>
-                        <div class="form-group"><label class="field-label">New Password</label><input type="password" id="input-new-pw" class="field-input" placeholder="New password"/></div>
-                        <div class="form-group"><label class="field-label">Confirm New Password</label><input type="password" id="input-confirm-pw" class="field-input" placeholder="Confirm new password"/></div>
-                    </div>
-                    <button class="btn-primary" style="margin-top:16px;" onclick="profileChangePassword()">Update Password</button>
-                    <div class="profile-msg" id="profile-pw-msg"></div>
+              <div class="card-header"><h3>Change Password</h3></div>
+              <div class="card-body">
+                <div class="form-grid">
+                  <div class="form-group"><label class="field-label">Current Password</label><input type="password" id="input-current-pw" class="field-input"/></div>
+                  <div class="form-group"><label class="field-label">New Password</label><input type="password" id="input-new-pw" class="field-input"/></div>
+                  <div class="form-group"><label class="field-label">Confirm New Password</label><input type="password" id="input-confirm-pw" class="field-input"/></div>
                 </div>
+                <button class="btn-primary" style="margin-top:16px;" onclick="profileChangePassword()">Update Password</button>
+                <div class="profile-msg" id="profile-pw-msg"></div>
+              </div>
             </div>
+          </div>
+        </div>
+      </div>
 
-        </div><!-- /profile-grid -->
-    </div><!-- /main-content -->
-</div><!-- /section-profile -->
+    </main>
+  </div>
+</div>
 
-</main><!-- /main-area -->
-</div><!-- /app-layout -->
-</div><!-- /page-dashboard -->
+<!-- ================= MODALS ================= -->
+
+<!-- QUOTE MODAL (with live bid table) -->
+<div class="modal-overlay" id="quote-modal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header"><span class="modal-title" id="quote-modal-title">Submit Quote</span><button class="modal-close" onclick="closeQuoteModal()">&times;</button></div>
+    <div class="modal-body">
+      <div id="quote-query-info" style="background:rgba(255,255,255,0.04);border-radius:var(--radius);padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--text-secondary);"></div>
+      <!-- LIVE BID TABLE -->
+      <div id="live-bids-section" style="margin-bottom:20px;">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">Live bids from all operators</div>
+        <div id="live-bids-table"><div style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">Loading bids...</div></div>
+        <div id="bid-beat-msg" style="margin-top:8px;font-size:12px;font-family:var(--font-mono);color:var(--amber);display:none;"></div>
+      </div>
+      <div class="field-group"><label class="field-label">Select aircraft</label><select class="select-input" id="quote-aircraft" onchange="onAircraftChange()"><option value="">Choose aircraft...</option></select><div id="quote-aircraft-help" style="font-size:11px;color:var(--text-tertiary);margin-top:4px;"></div></div>
+      <div class="charge-grid">
+        <div class="field-group"><label class="field-label">Base charge (Rs.)</label><input type="number" class="field-input" id="q-base" placeholder="0" oninput="calcQuote()"/></div>
+        <div class="field-group"><label class="field-label">Handling fee (Rs.)</label><input type="number" class="field-input" id="q-handling" placeholder="0" oninput="calcQuote()"/></div>
+        <div class="field-group"><label class="field-label">Crew accommodation (Rs.)</label><input type="number" class="field-input" id="q-crew" placeholder="0" oninput="calcQuote()"/></div>
+        <div class="field-group"><label class="field-label">Catering (Rs.)</label><input type="number" class="field-input" id="q-catering" placeholder="0" oninput="calcQuote()"/></div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border-radius:var(--radius);padding:14px 16px;border:0.5px solid var(--border);">
+        <div class="charge-row"><span class="charge-label">Subtotal</span><span class="charge-value" id="q-subtotal">Rs.0</span></div>
+        <div class="charge-row"><span class="charge-label">GST (18%)</span><span class="charge-value" id="q-gst">Rs.0</span></div>
+        <div class="total-row"><span class="total-label">Total quote</span><span class="total-value" id="q-total">Rs.0</span></div>
+      </div>
+      <div class="field-group" style="margin-top:16px;"><label class="field-label">Notes to client (optional)</label><textarea class="field-input" id="q-notes" placeholder="Any additional information..." style="height:72px;resize:vertical;"></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline-sm" onclick="closeQuoteModal()">Cancel</button>
+      <button class="btn-sm btn-blue" id="btn-submit-quote" onclick="submitQuote()">Share quote with client</button>
+    </div>
+  </div>
+</div>
+
+<!-- VIEW QUOTE MODAL -->
+<div class="modal-overlay" id="view-quote-modal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Quote details</span><button class="modal-close" onclick="closeViewQuoteModal()">&times;</button></div>
+    <div class="modal-body">
+      <div style="margin-bottom:16px;"><div id="vq-route" style="font-family:var(--font-display);font-size:18px;color:var(--gold);"></div><div id="vq-date" style="font-size:13px;color:var(--text-secondary);margin-top:4px;"></div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;font-size:13px;">
+        <div><span style="color:var(--text-tertiary);">Aircraft</span><div id="vq-aircraft" style="margin-top:2px;"></div></div>
+        <div><span style="color:var(--text-tertiary);">Passengers</span><div id="vq-pax" style="margin-top:2px;"></div></div>
+      </div>
+      <div style="background:rgba(255,255,255,0.04);border-radius:var(--radius);padding:14px 16px;border:0.5px solid var(--border);">
+        <div class="charge-row"><span class="charge-label">Base charge</span><span class="charge-value" id="vq-base"></span></div>
+        <div class="charge-row"><span class="charge-label">Handling fee</span><span class="charge-value" id="vq-handling"></span></div>
+        <div class="charge-row"><span class="charge-label">Crew accommodation</span><span class="charge-value" id="vq-crew"></span></div>
+        <div class="charge-row"><span class="charge-label">Catering</span><span class="charge-value" id="vq-catering"></span></div>
+        <div class="charge-row"><span class="charge-label">Subtotal</span><span class="charge-value" id="vq-subtotal"></span></div>
+        <div class="charge-row"><span class="charge-label">GST (18%)</span><span class="charge-value" id="vq-gst"></span></div>
+        <div class="total-row"><span class="total-label">Total</span><span class="total-value" id="vq-total"></span></div>
+      </div>
+      <div id="vq-notes-row" style="margin-top:12px;font-size:13px;display:none;"><span style="color:var(--text-tertiary);">Notes: </span><span id="vq-notes"></span></div>
+      <div id="vq-by-row" style="margin-top:8px;font-size:12px;color:var(--text-tertiary);display:none;">Submitted by: <span id="vq-by"></span></div>
+      <!-- Bid status in view modal -->
+      <div id="vq-bid-status" style="margin-top:16px;padding:10px 14px;border-radius:var(--radius);font-size:13px;font-family:var(--font-mono);display:none;"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-sm btn-outline-sm" onclick="closeViewQuoteModal()">Close</button>
+      <button class="btn-sm btn-blue" id="btn-revise-quote" onclick="reviseQuote()" style="display:none;">Revise Quote</button>
+    </div>
+  </div>
+</div>
+
+<!-- AIRCRAFT MODAL -->
+<div class="modal-overlay" id="aircraft-modal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-header"><span class="modal-title">Add aircraft</span><button class="modal-close" onclick="closeModal('aircraft-modal')">&times;</button></div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:4px;">
+        <div class="field-group"><label class="field-label">Aircraft type</label><input type="text" class="field-input" id="ac-type" placeholder="e.g. Citation XLS"/></div>
+        <div class="field-group"><label class="field-label">Registration (VT-XXX)</label><input type="text" class="field-input" id="ac-reg" placeholder="e.g. VT-ABC"/></div>
+        <div class="field-group"><label class="field-label">Seats</label><input type="number" class="field-input" id="ac-seats" placeholder="e.g. 8" min="1" max="50"/></div>
+      </div>
+      <div style="font-size:11px;font-weight:500;color:var(--text-tertiary);letter-spacing:.08em;text-transform:uppercase;margin:16px 0 12px;padding-top:12px;border-top:0.5px solid var(--border);">Required documents</div>
+      <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:14px;">All 4 documents are required. Aircraft will be reviewed before use.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius);border:0.5px solid var(--border);">
+        <div><div style="font-size:11px;font-weight:500;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Certificate of Registration (C of R)</div><div id="cor-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;font-size:12px;color:var(--text-tertiary);" onclick="document.getElementById('cor-file').click()"><span id="cor-filename">Upload PDF/JPG/PNG</span></div><input type="file" id="cor-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAcDocSelected(this,'cor')"/></div>
+        <div class="field-group" style="margin:0;"><label class="field-label">Expiry date</label><input type="date" class="field-input" id="cor-expiry"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius);border:0.5px solid var(--border);">
+        <div><div style="font-size:11px;font-weight:500;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Certificate of Airworthiness (C of A)</div><div id="coa-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;font-size:12px;color:var(--text-tertiary);" onclick="document.getElementById('coa-file').click()"><span id="coa-filename">Upload PDF/JPG/PNG</span></div><input type="file" id="coa-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAcDocSelected(this,'coa')"/></div>
+        <div class="field-group" style="margin:0;"><label class="field-label">Expiry date</label><input type="date" class="field-input" id="coa-expiry"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius);border:0.5px solid var(--border);">
+        <div><div style="font-size:11px;font-weight:500;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Airworthiness Review Certificate (ARC)</div><div id="arc-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;font-size:12px;color:var(--text-tertiary);" onclick="document.getElementById('arc-file').click()"><span id="arc-filename">Upload PDF/JPG/PNG</span></div><input type="file" id="arc-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAcDocSelected(this,'arc')"/></div>
+        <div class="field-group" style="margin:0;"><label class="field-label">Expiry date</label><input type="date" class="field-input" id="arc-expiry"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;padding:12px;background:rgba(255,255,255,0.03);border-radius:var(--radius);border:0.5px solid var(--border);">
+        <div><div style="font-size:11px;font-weight:500;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">Insurance Certificate</div><div id="ins-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:10px;text-align:center;cursor:pointer;font-size:12px;color:var(--text-tertiary);" onclick="document.getElementById('ins-file').click()"><span id="ins-filename">Upload PDF/JPG/PNG</span></div><input type="file" id="ins-file" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAcDocSelected(this,'ins')"/></div>
+        <div class="field-group" style="margin:0;"><label class="field-label">Expiry date</label><input type="date" class="field-input" id="ins-expiry"/></div>
+      </div>
+      <div id="ac-save-error" style="font-size:12px;color:var(--red);margin-top:10px;display:none;"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('aircraft-modal')">Cancel</button><button class="btn-sm btn-blue" id="btn-save-aircraft" onclick="saveAircraft()">Submit for review</button></div>
+  </div>
+</div>
+
+<!-- EMPLOYEE MODAL -->
+<div class="modal-overlay" id="employee-modal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Add employee</span><button class="modal-close" onclick="closeModal('employee-modal')">&times;</button></div>
+    <div class="modal-body">
+      <div class="field-group"><label class="field-label">Full name</label><input type="text" class="field-input" id="emp-name" placeholder="Employee full name"/></div>
+      <div class="field-group"><label class="field-label">Employee ID</label><input type="text" class="field-input" id="emp-id" placeholder="e.g. EMP-001"/></div>
+      <div class="field-group"><label class="field-label">Username</label><input type="text" class="field-input" id="emp-username" placeholder="Choose a username"/></div>
+      <div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="emp-password" placeholder="Set a password"/></div>
+      <div style="background:rgba(24,95,165,0.1);border:0.5px solid rgba(133,183,235,0.2);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-secondary);">This employee will need SkyVayu approval before they can log in.</div>
+    </div>
+    <div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('employee-modal')">Cancel</button><button class="btn-sm btn-blue" onclick="saveEmployee()">Submit for approval</button></div>
+  </div>
+</div>
+
+<!-- REGISTER MODAL -->
+<div class="modal-overlay" id="register-modal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header"><span class="modal-title">Register your company</span><button class="modal-close" onclick="closeModal('register-modal')">&times;</button></div>
+    <div class="modal-body">
+      <div class="field-group"><label class="field-label">Company name</label><input type="text" class="field-input" id="reg-company" placeholder="e.g. Club One Air Pvt Ltd"/></div>
+      <div class="field-group"><label class="field-label">Owner / Director name</label><input type="text" class="field-input" id="reg-name" placeholder="Full name"/></div>
+      <div class="field-group"><label class="field-label">Email</label><input type="email" class="field-input" id="reg-email" placeholder="company@example.com"/></div>
+      <div class="field-group"><label class="field-label">Phone</label><input type="text" class="field-input" id="reg-phone" placeholder="10-digit mobile"/></div>
+      <div class="field-group"><label class="field-label">Username</label><input type="text" class="field-input" id="reg-username" placeholder="Used to log in"/></div>
+      <div class="field-group"><label class="field-label">Password</label><input type="password" class="field-input" id="reg-password" placeholder="Set a password"/></div>
+      <div class="field-group">
+        <label class="field-label">Air Operator's Permit (AOP) <span style="color:var(--red);">*</span></label>
+        <div id="aop-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:18px;text-align:center;cursor:pointer;background:rgba(255,255,255,0.02);" onclick="document.getElementById('aop-file-input').click()">
+          <div id="aop-upload-label" style="font-size:13px;color:var(--text-tertiary);">Click to upload PDF, JPG or PNG &middot; Max 10MB</div>
+          <div id="aop-file-name" style="font-size:12px;color:var(--gold);margin-top:4px;display:none;"></div>
+        </div>
+        <input type="file" id="aop-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAopFileSelected(this)"/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Aircraft Category <span style="color:var(--red);">*</span></label>
+        <div style="display:flex;gap:20px;margin-top:4px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;"><input type="checkbox" id="reg-cat-fixed" value="fixed_wing" style="width:15px;height:15px;accent-color:var(--gold);"> Fixed Wing</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;"><input type="checkbox" id="reg-cat-heli" value="helicopter" style="width:15px;height:15px;accent-color:var(--gold);"> Helicopter</label>
+        </div>
+      </div>
+      <div id="reg-error" class="login-error"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('register-modal')">Cancel</button><button class="btn-sm btn-blue" id="reg-submit-btn" onclick="submitRegistration()">Submit application</button></div>
+  </div>
+</div>
+
+<!-- AOP RENEW MODAL -->
+<div class="modal-overlay" id="aop-renew-modal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header"><span class="modal-title">Upload renewed AOP</span><button class="modal-close" onclick="closeModal('aop-renew-modal')">&times;</button></div>
+    <div class="modal-body">
+      <div style="background:rgba(255,255,255,0.04);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-secondary);margin-bottom:16px;">Upload your renewed Air Operator's Permit. SkyVayu will review and approve before your account is unblocked.</div>
+      <div class="field-group">
+        <label class="field-label">Renewed AOP document <span style="color:var(--red);">*</span></label>
+        <div id="aop-renew-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:18px;text-align:center;cursor:pointer;background:rgba(255,255,255,0.02);" onclick="document.getElementById('aop-renew-file-input').click()">
+          <span id="aop-renew-filename" style="font-size:13px;color:var(--text-tertiary);">Upload PDF/JPG/PNG</span>
+        </div>
+        <input type="file" id="aop-renew-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onAopRenewFileSelected(this)"/>
+      </div>
+      <div class="field-group"><label class="field-label">New expiry date <span style="color:var(--red);">*</span></label><input type="date" class="field-input" id="aop-renew-expiry"/></div>
+      <div id="aop-renew-error" style="font-size:12px;color:var(--red);margin-top:4px;display:none;"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('aop-renew-modal')">Cancel</button><button class="btn-sm btn-blue" id="btn-submit-aop-renew" onclick="submitAopRenewal()">Submit for approval</button></div>
+  </div>
+</div>
+
+<!-- DOC RENEW MODAL -->
+<div class="modal-overlay" id="doc-renew-modal">
+  <div class="modal" style="max-width:480px;">
+    <div class="modal-header"><span class="modal-title" id="doc-renew-title">Upload updated document</span><button class="modal-close" onclick="closeModal('doc-renew-modal')">&times;</button></div>
+    <div class="modal-body">
+      <div style="background:rgba(255,255,255,0.04);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-secondary);margin-bottom:4px;"><span id="doc-renew-aircraft-info" style="font-weight:500;"></span></div>
+      <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:16px;margin-top:6px;">Current expiry: <span id="doc-renew-current-expiry" style="font-weight:500;color:var(--text);"></span></div>
+      <div class="field-group">
+        <label class="field-label">Updated document <span style="color:var(--red);">*</span></label>
+        <div id="doc-renew-upload-area" style="border:0.5px dashed var(--border-hover);border-radius:var(--radius);padding:18px;text-align:center;cursor:pointer;background:rgba(255,255,255,0.02);" onclick="document.getElementById('doc-renew-file-input').click()">
+          <span id="doc-renew-filename" style="font-size:13px;color:var(--text-tertiary);">Upload PDF/JPG/PNG</span>
+        </div>
+        <input type="file" id="doc-renew-file-input" accept=".pdf,.jpg,.jpeg,.png" style="display:none;" onchange="onDocRenewFileSelected(this)"/>
+      </div>
+      <div class="field-group"><label class="field-label">New expiry date <span style="color:var(--red);">*</span></label><input type="date" class="field-input" id="doc-renew-expiry"/></div>
+      <div style="background:rgba(251,191,36,0.06);border:0.5px solid rgba(251,191,36,0.2);border-radius:var(--radius);padding:10px 14px;font-size:12px;color:var(--text-secondary);margin-top:4px;">This aircraft will be set to pending review until SkyVayu approves the updated document.</div>
+      <div id="doc-renew-error" style="font-size:12px;color:var(--red);margin-top:8px;display:none;"></div>
+    </div>
+    <div class="modal-footer"><button class="btn-sm btn-outline-sm" onclick="closeModal('doc-renew-modal')">Cancel</button><button class="btn-sm btn-blue" id="btn-submit-doc-renew" onclick="submitDocRenewal()">Submit for approval</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="../js/supabase.js"></script>
+
 </body>
 </html>
