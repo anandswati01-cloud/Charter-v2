@@ -1,30 +1,29 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-    /* Backgrounds — match main site */
-    --navy:#0C1E36;--navy-mid:#0E2040;--navy-light:#132B4A;
-    /* Gold — match main site warm gold */
-    --gold:#E8D8A0;--gold-light:#f0e4b8;--gold-dim:rgba(232,216,160,0.6);--gold-faint:rgba(232,216,160,0.08);--gold-border:rgba(232,216,160,0.2);
-    /* Blue accent — match main site */
+    /* Exact match to skyvayu.com homepage */
+    --navy:#0c1324;--navy-mid:#0f1a30;--navy-light:#162040;
+    --gold:#fbbf24;--gold-light:#fcd34d;--gold-dim:rgba(251,191,36,0.6);--gold-faint:rgba(251,191,36,0.08);--gold-border:rgba(251,191,36,0.2);
+    /* Blue accent for buttons/focus */
     --blue:#185FA5;--blue-light:#85B7EB;--blue-faint:rgba(24,95,165,0.15);--blue-border:rgba(133,183,235,0.2);
-    /* Status colours */
+    /* Status */
     --green:#3B6D11;--green-light:#97C459;--green-faint:rgba(59,109,17,0.2);
     --red:#E24B4A;--red-faint:rgba(226,75,74,0.1);
     --amber:#EF9F27;--amber-faint:rgba(239,159,39,0.1);
-    /* Text — match main site */
-    --text:#EEE8D5;--text-secondary:rgba(232,216,160,0.55);--text-tertiary:rgba(133,183,235,0.5);
-    --border:rgba(133,183,235,0.12);--border-hover:rgba(133,183,235,0.28);
-    /* White shades (for profile hero overlay text) */
+    /* Text — white like homepage */
+    --text:#ffffff;--text-secondary:rgba(255,255,255,0.6);--text-tertiary:rgba(255,255,255,0.3);
+    --border:rgba(255,255,255,0.1);--border-hover:rgba(255,255,255,0.3);
+    /* White shades */
     --white:#ffffff;--white-90:rgba(255,255,255,0.9);--white-70:rgba(255,255,255,0.7);--white-60:rgba(255,255,255,0.6);--white-50:rgba(255,255,255,0.5);--white-40:rgba(255,255,255,0.4);--white-30:rgba(255,255,255,0.3);
     --white-10:rgba(255,255,255,0.1);
     --radius:8px;--radius-lg:12px;
-    /* Fonts — match main site */
-    --font-display:'Cormorant Garamond',Georgia,'Times New Roman',serif;
+    /* Fonts — exact match */
+    --font-display:'Cormorant Garamond',Georgia,serif;
     --font-mono:'DM Mono','Courier New',monospace;
-    --font:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    --font-body:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --font:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
+    --font-body:'DM Sans',-apple-system,BlinkMacSystemFont,sans-serif;
 }
 html{scroll-behavior:smooth}
-body{font-family:var(--font);background:var(--navy);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+body{font-family:var(--font);background:var(--navy);color:var(--white);min-height:100vh;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased;}
 h1,h2,h3,h4{font-family:var(--font-display);font-weight:300;color:var(--gold);line-height:1.2;}
 h2{font-size:24px;margin-bottom:4px;}
 h3{font-size:18px;}
@@ -53,8 +52,8 @@ a:hover{text-decoration:underline;}
 .forgot-password-link{color:var(--white-60);font-size:12px;text-decoration:none;letter-spacing:0.5px;transition:color .2s;display:block;text-align:right;}
 .forgot-password-link:hover{color:var(--gold);}
 
-.field-input:focus{border-color:var(--blue-light);box-shadow:0 0 0 3px rgba(133,183,235,0.1);}
-.field-input::placeholder{color:rgba(133,183,235,0.3);}
+.field-input:focus{border-color:var(--gold-border);box-shadow:0 0 0 3px var(--gold-faint);}
+.field-input::placeholder{color:rgba(255,255,255,0.25);}
 .btn-primary{width:100%;height:46px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;transition:background .2s;margin-top:8px;margin-bottom:14px;}
 .btn-primary:hover{background:#1a6dbb;}
 .btn-primary:disabled{background:rgba(24,95,165,0.3);cursor:not-allowed;color:rgba(255,255,255,0.4);}
@@ -74,9 +73,9 @@ main.main-content{flex:1;overflow-y:auto;min-width:0;}
 /* Sidebar logo */
 .sidebar-logo{padding:20px 18px 16px;border-bottom:0.5px solid var(--border);display:flex;flex-direction:column;gap:2px;}
 .brand-wordmark{display:flex;align-items:baseline;gap:0;}
-.brand-sky{font-family:var(--font);font-weight:300;font-size:11px;letter-spacing:3px;color:var(--blue-light);text-transform:uppercase;}
-.brand-vayu{font-family:var(--font-display);font-weight:500;font-size:22px;color:var(--gold);letter-spacing:0.5px;}
-.brand-sub{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-tertiary);display:block;margin-top:3px;}
+.brand-sky{font-family:var(--font-display);font-style:italic;font-weight:400;font-size:22px;color:var(--gold);letter-spacing:-0.5px;}
+.brand-vayu{font-family:var(--font-display);font-style:italic;font-weight:400;font-size:22px;color:var(--gold);letter-spacing:-0.5px;}
+.brand-sub{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--white-30);display:block;margin-top:3px;}
 
 .sidebar-logo .portal-tag{font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--white-30);margin-top:6px;}
 
@@ -98,7 +97,7 @@ main.main-content{flex:1;overflow-y:auto;min-width:0;}
 .nav-label{font-family:var(--font-mono);font-size:9px;font-weight:500;color:var(--white-30);letter-spacing:.12em;text-transform:uppercase;padding:8px 22px 4px;}
 .nav-item{display:flex;align-items:center;gap:11px;padding:10px 22px;cursor:pointer;transition:background .15s,color .15s;color:var(--text-secondary);font-size:13px;}
 .nav-item svg,.nav-item .nav-icon{width:16px;height:16px;flex-shrink:0;opacity:0.5;transition:opacity .15s;}
-.nav-item:hover{background:rgba(133,183,235,0.06);color:var(--text);}
+.nav-item:hover{background:rgba(251,191,36,0.06);color:var(--white);}
 .nav-item:hover .nav-icon{opacity:0.8;}
 .nav-item.active{background:var(--gold-faint);color:var(--gold);border-right:2px solid var(--gold);}
 .nav-item.active .nav-icon{opacity:1;color:var(--gold);}
