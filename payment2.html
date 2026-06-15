@@ -413,16 +413,25 @@ document.getElementById('p2-aircraft').textContent = (q.aircraft_type || q.aircr
     points = points.filter(function(p, i) { return i === 0 || p !== points[i-1]; });
     routeStr = points.join(' → ');
   } else {
-    // Single-sector fallback: use q.route or queryData.rs_route
-    var raw = q.route || queryData.rs_route || '';
-    if (raw) { routeStr = String(raw).replace(/-/g, ' → '); }
+    // Single-sector: build from departure/destination in sv_query
+    var dep = queryData.departure || '';
+    var dest = queryData.destination || '';
+    var raw = q.route || queryData.rs_route || (dep && dest ? dep + ' \u2192 ' + dest : '');
+    if (raw) { routeStr = String(raw); }
   }
   var routeEl = document.getElementById('p2-route');
   if (routeEl) routeEl.textContent = routeStr || '—';
   var dateEl = document.getElementById('p2-date');
   if (dateEl) {
-    var d = queryData.rs_date || queryData.flight_date || '';
-    dateEl.textContent = d ? new Date(d).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : '';
+    var d = queryData.flight_date || queryData.rs_date || '';
+    var t = queryData.flight_time || '';
+    var dateDisplay = '';
+    if (d) {
+      try { dateDisplay = new Date(d).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}); }
+      catch(e) { dateDisplay = d; }
+      if (t) dateDisplay += ', ' + t;
+    }
+    dateEl.textContent = dateDisplay;
   }
 })();
 document.getElementById('p2-charter').textContent = fmt(charter);
@@ -505,9 +514,9 @@ async function confirmBooking() {
     client_phone:  traveller.phone || '',
     operator_name: q.operator_name || q.name || '',
     aircraft:      q.aircraft_type || q.aircraft || null,
-    route:         q.route || queryData.rs_route || null,
-    flight_date:   queryData.rs_date || null,
-    passengers:    parseInt(queryData.rs_pax) || null,
+    route:         q.route || queryData.rs_route || (queryData.departure && queryData.destination ? queryData.departure + ' \u2192 ' + queryData.destination : null),
+    flight_date:   queryData.flight_date || queryData.rs_date || null,
+    passengers:    parseInt(queryData.passengers || queryData.rs_pax) || null,
     total_amount:  price,
     platform_fee:  landing,
     status:        'confirmed',

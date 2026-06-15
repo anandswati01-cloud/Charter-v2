@@ -21,27 +21,38 @@ document.addEventListener('DOMContentLoaded', function() {
     // Populate subtitle
     setText('pay-subtitle', 'Complete your booking with ' + (q.operator_name || q.name || 'operator'));
 
-    // Route short (e.g. BOM → DXB) — parse from route string
-    var route = q.route || queryData.rs_route || '—';
-    var routeParts = route.split(/→|⇄/).map(function(s){ return s.trim(); });
-    var depCode = routeParts[0] ? (routeParts[0].match(/\(([^)]+)\)/) || ['',''])[1] || routeParts[0].substring(0,3).toUpperCase() : '—';
-    var destCode = routeParts[1] ? (routeParts[1].match(/\(([^)]+)\)/) || ['',''])[1] || routeParts[1].substring(0,3).toUpperCase() : '—';
-    setText('pay-route-short', depCode + ' → ' + destCode);
+    // Build route from query data (departure/destination) or fallback to quote route string
+    var dep = queryData.departure || '';
+    var dest = queryData.destination || '';
+    var route = q.route || queryData.rs_route || (dep && dest ? dep + ' \u2192 ' + dest : '—');
+    var routeParts = route.split(/\u2192|\u21c4|→|⇄/).map(function(s){ return s.trim(); });
+    function getCode(s) { var m = (s||'').match(/\(([^)]+)\)/); return m ? m[1] : (s||'').substring(0,3).toUpperCase() || '—'; }
+    setText('pay-route-short', getCode(routeParts[0]) + ' \u2192 ' + getCode(routeParts[1] || ''));
+    setText('pay-route', route);
 
-    // Aircraft name in cyan header
+    // Aircraft
     setText('pay-aircraft', q.aircraft_type || q.aircraft || '—');
     setText('pay-aircraft-full', q.aircraft_type || q.aircraft || '—');
 
-    // Date
-    var dateStr = queryData.rs_date || q.date || '—';
+    // Date — read from sv_query flight_date + flight_time
+    var flightDate = queryData.flight_date || queryData.rs_date || q.date || '';
+    var flightTime = queryData.flight_time || '';
+    var dateStr = '—';
+    if (flightDate) {
+      try {
+        var d = new Date(flightDate);
+        dateStr = d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+        if (flightTime) dateStr += ', ' + flightTime;
+      } catch(e) { dateStr = flightDate + (flightTime ? ', ' + flightTime : ''); }
+    }
     setText('pay-date', dateStr);
     setText('pay-datetime', dateStr);
 
-    // Other fields
+    // Operator
     setText('pay-op', q.operator_name || q.name || '—');
-    setText('pay-route', route);
 
-    var pax = queryData.rs_pax || q.pax || '—';
+    // Passengers
+    var pax = queryData.passengers || queryData.rs_pax || q.pax || '—';
     setText('pay-pax', pax + ' Passenger' + (parseInt(pax) !== 1 ? 's' : ''));
 
     // Price breakdown — use quote price, estimate platform fee as ~10%
