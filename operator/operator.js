@@ -442,8 +442,6 @@ function updateClaimTimers(){
   document.querySelectorAll('.query-timer-fill').forEach(function(bar){
     var wrap=bar.closest('.query-timer-wrap');if(!wrap)return;
     var card=bar.closest('.query-card');if(!card)return;
-    // Find expires_at from the card's data — recompute from current pct stored in style
-    // Instead recompute from the label text change — simpler: store expires_at on the wrap
     var expiresAt=wrap.getAttribute('data-expires');if(!expiresAt)return;
     var totalMs=60*60*1000;
     var now=new Date();var expires=new Date(expiresAt);
@@ -1815,15 +1813,15 @@ function profileSaveOverview() {
 }
 
 function renderOverviewView(d) {
-  setText('view-company-desc', d.company_description || '—');
-  setText('view-year-established', d.year_established || '—');
+  setText('view-company-desc', d.company_description || ' - ');
+  setText('view-year-established', d.year_established || ' - ');
   var websiteEl = document.getElementById('view-website');
-  if (websiteEl) websiteEl.innerHTML = d.website ? '<a href="' + escapeHtml(d.website) + '" target="_blank" rel="noopener">' + escapeHtml(d.website) + '</a>' : '—';
-  setText('view-home-base', d.home_base || '—');
-  setText('view-other-bases', d.other_bases || '—');
-  setText('view-sales-email', d.sales_email || '—');
-  setText('view-sales-phone', d.sales_phone || '—');
-  setText('view-ops-phone', d.ops_phone || '—');
+  if (websiteEl) websiteEl.innerHTML = d.website ? '<a href="' + escapeHtml(d.website) + '" target="_blank" rel="noopener">' + escapeHtml(d.website) + '</a>' : ' - ';
+  setText('view-home-base', d.home_base || ' - ');
+  setText('view-other-bases', d.other_bases || ' - ');
+  setText('view-sales-email', d.sales_email || ' - ');
+  setText('view-sales-phone', d.sales_phone || ' - ');
+  setText('view-ops-phone', d.ops_phone || ' - ');
   if (d.home_base) setText('profile-hero-base', d.home_base);
   if (d.company_description) setText('profile-hero-tagline', d.company_description.substring(0,80) + (d.company_description.length > 80 ? '...' : ''));
 }
@@ -1844,10 +1842,10 @@ function profileSaveOps() {
         Object.assign(currentOperator, data);
         localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('ops','Operational details saved.','success');
-        setText('view-regions', data.regions_served || '—');
-        setText('view-max-range', data.max_range_nm ? data.max_range_nm + ' nm' : '—');
-        setText('view-ops-hours', data.ops_hours || '—');
-        setText('view-min-notice', data.min_notice_period || '—');
+        setText('view-regions', data.regions_served || ' - ');
+        setText('view-max-range', data.max_range_nm ? data.max_range_nm + ' nm' : ' - ');
+        setText('view-ops-hours', data.ops_hours || ' - ');
+        setText('view-min-notice', data.min_notice_period || ' - ');
         profileCancelEdit('ops');
       } else {
         profileMsg('ops','Save failed.','error');
@@ -1871,11 +1869,11 @@ function profileSaveCerts() {
         Object.assign(currentOperator, data);
         localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('certs','Certifications saved.','success');
-        setText('view-dgca-licence', data.dgca_licence_no || '—');
-        setText('view-aop-expiry', data.aop_expiry_date ? fmtDate(data.aop_expiry_date) : '—');
-        setText('view-argus', data.argus_rating || '—');
-        setText('view-wyvern', data.wyvern_rating || '—');
-        setText('view-isbao', data.isbao_stage || '—');
+        setText('view-dgca-licence', data.dgca_licence_no || ' - ');
+        setText('view-aop-expiry', data.aop_expiry_date ? fmtDate(data.aop_expiry_date) : ' - ');
+        setText('view-argus', data.argus_rating || ' - ');
+        setText('view-wyvern', data.wyvern_rating || ' - ');
+        setText('view-isbao', data.isbao_stage || ' - ');
         renderCertBadges({argus_rating:data.argus_rating,wyvern_rating:data.wyvern_rating,isbao_stage:data.isbao_stage});
         profileCancelEdit('certs');
       } else {
@@ -1912,12 +1910,12 @@ function profileSaveCompany() {
         Object.assign(currentOperator, data);
         localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('company','Company info saved.','success');
-        setText('view-company-name', data.company_name || '—');
-        setText('view-company-email', data.email || '—');
-        setText('view-company-phone', data.phone || '—');
-        setText('view-owner-name', data.owner_name || '—');
-        setText('view-owner-email', data.owner_email || '—');
-        setText('view-owner-phone', data.owner_phone || '—');
+        setText('view-company-name', data.company_name || ' - ');
+        setText('view-company-email', data.email || ' - ');
+        setText('view-company-phone', data.phone || ' - ');
+        setText('view-owner-name', data.owner_name || ' - ');
+        setText('view-owner-email', data.owner_email || ' - ');
+        setText('view-owner-phone', data.owner_phone || ' - ');
         if (data.company_name) { setText('profile-hero-company', data.company_name); var _or=document.getElementById('op-role');if(_or)_or.textContent=data.company_name; }
         profileCancelEdit('company');
       } else {
@@ -2021,10 +2019,10 @@ function loadExtendedProfile(operatorId) {
     document.getElementById('input-sales-phone') && (document.getElementById('input-sales-phone').value = d.sales_phone || '');
     document.getElementById('input-ops-phone') && (document.getElementById('input-ops-phone').value = d.ops_phone || '');
     // Operations
-    setText('view-regions', d.regions_served || '—');
-    setText('view-max-range', d.max_range_nm ? d.max_range_nm + ' nm' : '—');
-    setText('view-ops-hours', d.ops_hours || '—');
-    setText('view-min-notice', d.min_notice_period || '—');
+    setText('view-regions', d.regions_served || ' - ');
+    setText('view-max-range', d.max_range_nm ? d.max_range_nm + ' nm' : ' - ');
+    setText('view-ops-hours', d.ops_hours || ' - ');
+    setText('view-min-notice', d.min_notice_period || ' - ');
     document.getElementById('input-max-range') && (document.getElementById('input-max-range').value = d.max_range_nm || '');
     document.getElementById('input-ops-hours') && (document.getElementById('input-ops-hours').value = d.ops_hours || '');
     document.getElementById('input-min-notice') && (document.getElementById('input-min-notice').value = d.min_notice_period || '');
@@ -2033,11 +2031,11 @@ function loadExtendedProfile(operatorId) {
       document.querySelectorAll('[name="region"]').forEach(function(cb){ cb.checked = regions.includes(cb.value); });
     }
     // Certifications
-    setText('view-dgca-licence', d.dgca_licence || '—');
-    setText('view-aop-expiry', d.aop_expiry ? fmtDate(d.aop_expiry) : '—');
-    setText('view-argus', d.argus_rating || '—');
-    setText('view-wyvern', d.wyvern_rating || '—');
-    setText('view-isbao', d.isbao_stage || '—');
+    setText('view-dgca-licence', d.dgca_licence || ' - ');
+    setText('view-aop-expiry', d.aop_expiry ? fmtDate(d.aop_expiry) : ' - ');
+    setText('view-argus', d.argus_rating || ' - ');
+    setText('view-wyvern', d.wyvern_rating || ' - ');
+    setText('view-isbao', d.isbao_stage || ' - ');
     renderCertBadges(d);
     document.getElementById('input-dgca-licence') && (document.getElementById('input-dgca-licence').value = d.dgca_licence || '');
     document.getElementById('input-aop-expiry') && (document.getElementById('input-aop-expiry').value = d.aop_expiry || '');
@@ -2056,15 +2054,15 @@ function loadExtendedProfile(operatorId) {
       if (aopNone) aopNone.style.display = '';
     }
     // Certs view
-    setText('view-dgca-licence', d.dgca_licence_no || d.dgca_licence || '—');
-    setText('view-aop-expiry', (d.aop_expiry_date || d.aop_expiry) ? fmtDate(d.aop_expiry_date || d.aop_expiry) : '—');
+    setText('view-dgca-licence', d.dgca_licence_no || d.dgca_licence || ' - ');
+    setText('view-aop-expiry', (d.aop_expiry_date || d.aop_expiry) ? fmtDate(d.aop_expiry_date || d.aop_expiry) : ' - ');
     // Company basic info (operators table uses email/phone, not company_email/company_phone)
-    setText('view-company-name', d.company_name || '—');
-    setText('view-company-email', d.email || d.company_email || '—');
-    setText('view-company-phone', d.phone || d.company_phone || '—');
-    setText('view-owner-name', d.owner_name || '—');
-    setText('view-owner-email', d.owner_email || '—');
-    setText('view-owner-phone', d.owner_phone || '—');
+    setText('view-company-name', d.company_name || ' - ');
+    setText('view-company-email', d.email || d.company_email || ' - ');
+    setText('view-company-phone', d.phone || d.company_phone || ' - ');
+    setText('view-owner-name', d.owner_name || ' - ');
+    setText('view-owner-email', d.owner_email || ' - ');
+    setText('view-owner-phone', d.owner_phone || ' - ');
     document.getElementById('input-company-name') && (document.getElementById('input-company-name').value = d.company_name || '');
     document.getElementById('input-company-email') && (document.getElementById('input-company-email').value = d.email || d.company_email || '');
     document.getElementById('input-company-phone') && (document.getElementById('input-company-phone').value = d.phone || d.company_phone || '');
@@ -2073,7 +2071,7 @@ function loadExtendedProfile(operatorId) {
     document.getElementById('input-owner-phone') && (document.getElementById('input-owner-phone').value = d.owner_phone || '');
     // Fleet stats
     var fleetCount = document.querySelectorAll('#fleet-content .aircraft-card').length;
-    setText('profile-stat-fleet', fleetCount > 0 ? String(fleetCount) : (d.fleet_count ? String(d.fleet_count) : '—'));
+    setText('profile-stat-fleet', fleetCount > 0 ? String(fleetCount) : (d.fleet_count ? String(d.fleet_count) : ' - '));
     // Logo
     if (d.logo_url) {
       var img = document.getElementById('profile-logo-img');
