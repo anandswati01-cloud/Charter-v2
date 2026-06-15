@@ -80,7 +80,7 @@ async function doLogin(){
     /* Fire-and-forget last_login update ÃÂÃÂ¢ don't block on it */
     sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
-    document.getElementById('page-dashboard').classList.add('active');
+    document.getElementById('page-dashboard').style.display='';document.getElementById('page-dashboard').classList.add('active');
     document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
     document.getElementById('sidebar-role').textContent=currentOperator.company_name;
     var rt=document.getElementById('sidebar-role-tag');
@@ -1287,7 +1287,7 @@ window.addEventListener('beforeunload',function(){
       if(s&&s.user&&s.operator){
         currentUser=s.user;currentOperator=s.operator;
         document.getElementById('page-login').style.display='none';
-        document.getElementById('page-dashboard').classList.add('active');
+        document.getElementById('page-dashboard').style.display='';document.getElementById('page-dashboard').classList.add('active');
         document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
         document.getElementById('sidebar-role').textContent=currentOperator.company_name;
         var rt=document.getElementById('sidebar-role-tag');
@@ -1775,7 +1775,7 @@ async function doLogin(){
     /* Fire-and-forget last_login update ÃÂ¢ don't block on it */
     sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
-    document.getElementById('page-dashboard').classList.add('active');
+    document.getElementById('page-dashboard').style.display='';document.getElementById('page-dashboard').classList.add('active');
     document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
     document.getElementById('sidebar-role').textContent=currentOperator.company_name;
     var rt=document.getElementById('sidebar-role-tag');
@@ -2981,7 +2981,7 @@ window.addEventListener('beforeunload',function(){
       if(s&&s.user&&s.operator){
         currentUser=s.user;currentOperator=s.operator;
         document.getElementById('page-login').style.display='none';
-        document.getElementById('page-dashboard').classList.add('active');
+        document.getElementById('page-dashboard').style.display='';document.getElementById('page-dashboard').classList.add('active');
         document.getElementById('sidebar-name').textContent=currentUser.full_name||currentUser.username;
         document.getElementById('sidebar-role').textContent=currentOperator.company_name;
         var rt=document.getElementById('sidebar-role-tag');
