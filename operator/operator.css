@@ -173,6 +173,7 @@ main.main-content{flex:1;overflow-y:auto;min-width:0;}
 .badge-shared{background:var(--amber-faint);color:var(--amber);border:0.5px solid rgba(239,159,39,0.3);}
 .badge-accepted{background:var(--green-faint);color:var(--green-light);border:0.5px solid rgba(59,109,17,0.3);}
 .badge-locked{background:var(--red-faint);color:var(--red);border:0.5px solid rgba(226,75,74,0.25);}
+.badge-expired{background:var(--red-faint);color:var(--red);border:0.5px solid rgba(226,75,74,0.25);}
 .badge-by{background:rgba(255,255,255,0.06);color:var(--white-30);border:0.5px solid var(--white-10);margin-left:8px;font-size:8px;}
 
 /* ââ Buttons ââ */

@@ -143,12 +143,12 @@ function showSection(section){
 }
 
 function showSubtab(tab){
-  ['active','shared','confirmed'].forEach(function(t){
-    document.getElementById('list-'+t).style.display='none';
-    document.querySelector('.subtab[data-subtab="'+t+'"]').classList.remove('active');
+  ['active','shared','confirmed','expired'].forEach(function(t){
+    var el=document.getElementById('list-'+t);if(el)el.style.display='none';
+    var nav=document.querySelector('.subtab[data-subtab="'+t+'"]');if(nav)nav.classList.remove('active');
   });
-  document.getElementById('list-'+tab).style.display='block';
-  document.querySelector('.subtab[data-subtab="'+tab+'"]').classList.add('active');
+  var el=document.getElementById('list-'+tab);if(el)el.style.display='block';
+  var nav=document.querySelector('.subtab[data-subtab="'+tab+'"]');if(nav)nav.classList.add('active');
 }
 
 /* ============ HELPERS ============ */
@@ -272,6 +272,15 @@ async function loadAllData(){
   var _cs=document.getElementById('count-shared');if(_cs)_cs.textContent=shared.length;
   var _cc=document.getElementById('count-confirmed');if(_cc)_cc.textContent=confirmed.length;
   var _qb=document.getElementById('queries-badge');if(_qb)_qb.textContent=unquoted.length+shared.length;
+  var cat=currentOperator.aircraft_category||'fixed_wing';
+  sbFetch('queries?status=eq.open&aircraft_category=in.('+cat+')&expires_at=lt.'+encodeURIComponent(nowIso())+'&order=expires_at.desc&limit=50')
+    .then(function(res){
+      var expired=res.ok?res.data:[];
+      var bookedIds=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';}).map(function(q){return q.query_id;});
+      expired=expired.filter(function(q){return!bookedIds.includes(q.id);});
+      var ce=document.getElementById('count-expired');if(ce)ce.textContent=expired.length;
+      renderExpiredList(expired);
+    });
   renderActiveList(unquoted);
   markQueriesViewed(unquoted.map(function(q){return q.id;}));
   renderSharedList(shared);
@@ -379,6 +388,22 @@ function renderConfirmedList(quotes){
     var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+'  →  '+escapeHtml(query.destination||'-');
     var empBadge='';
     if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' ÃÂ· '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
+  }).join('');
+}
+
+function renderExpiredList(queries){
+  var el=document.getElementById('list-expired');
+  if(!el)return;
+  if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No expired queries</div><div class="empty-sub">Queries where the 60-minute window closed with no booking</div></div>';return;}
+  el.innerHTML=queries.map(function(q){
+    var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+' to '+escapeHtml(q.destination||'-');
+    return '<div class="query-card" style="opacity:0.65;">'
+      +'<div class="query-top"><div><div class="query-route">'+r+'</div><div class="query-meta">'+fmtDate(q.flight_date)+(q.flight_time?' at '+escapeHtml(q.flight_time):'')+'</div></div>'
+      +'<span class="badge badge-expired">Expired</span></div>'
+      +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
+      +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
+      +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
+      +'</div>';
   }).join('');
 }
 
