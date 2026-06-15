@@ -11,8 +11,8 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0e0e10;
-  --card:rgba(31,31,33,0.6);
+  --bg:#0c1324;
+  --card:rgba(15,26,48,0.7);
   --border:rgba(143,144,151,0.12);
   --border-hover:rgba(143,144,151,0.25);
   --cyan:#fbbf24;
@@ -23,11 +23,12 @@
   --text:#e4e2e4;
   --text-dim:#c5c6cd;
   --text-muted:#8f9097;
-  --dark:#1b1b1d;
+  --dark:#0f1a30;
   --font:'Manrope',sans-serif;
   --font-serif:'Georgia','Times New Roman',serif;
   --font-mono:'Courier New',monospace;
 }
+[data-theme="dark"] body{background:#0c1324 !important;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5;}
 
@@ -71,7 +72,7 @@ nav{
 
 /* ── ROUTE CARD ── */
 .route-card{
-  background:rgba(28,28,30,0.8);
+  background:var(--card);
   border:1px solid var(--border);
   border-radius:8px;
   padding:20px;
@@ -86,7 +87,7 @@ nav{
 
 /* ── LIVE STATUS CARD ── */
 .live-card{
-  background:rgba(28,28,30,0.8);
+  background:var(--card);
   border:1px solid var(--border);
   border-radius:8px;
   padding:20px;
@@ -99,13 +100,12 @@ nav{
 .progress-fill{height:4px;background:var(--cyan);border-radius:4px;width:0%;transition:width 1s linear;position:absolute;top:0;left:0;}
 
 /* stats */
-.stats-bar{background:var(--dark);border-radius:4px;padding:10px 12px;display:flex;justify-content:space-between;margin-bottom:16px;}
-.stat-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.stat-num{font-size:15px;font-weight:700;color:var(--text);text-align:center;}
-.stat-num.cyan{color:var(--cyan);}
-.stat-label{font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);}
-
-/* notifications */
+.stats-bar{background:var(--dark);border-radius:4px;padding:14px 16px;margin-bottom:16px;font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);display:flex;flex-direction:column;gap:10px;}
+.stats-bar .cyan{color:var(--cyan);font-weight:700;}
+.stats-bar span{color:var(--text);font-weight:700;}
+.stat-item{display:flex;align-items:center;gap:8px;}
+.stat-number{font-size:16px;font-weight:700;color:var(--text);min-width:22px;}
+.stat-label{font-size:10px;letter-spacing:1px;color:var(--text-dim);}
 .notif-list{display:flex;flex-direction:column;gap:14px;position:relative;}
 .vert-line{position:absolute;left:11px;top:12px;bottom:4px;width:1px;background:rgba(68,71,77,0.35);}
 .notif-row{display:flex;gap:14px;align-items:flex-start;position:relative;z-index:1;}
@@ -213,8 +213,39 @@ nav{
 
 /* ── LOADING ── */
 .loading-state{text-align:center;padding:60px 24px;color:var(--text-dim);font-size:14px;}
-.spinner{display:inline-block;width:22px;height:22px;border:2px solid rgba(23,176,214,0.2);border-top-color:var(--cyan);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:12px;}
-
+.sky-anim{position:relative;width:320px;height:80px;margin:0 auto 16px;overflow:hidden;}
+.sky-track{position:absolute;inset:0;}
+/* clouds */
+.cloud{position:absolute;opacity:.45;}
+.cloud-1{top:8px;animation:cloud-drift 7s linear infinite;}
+.cloud-2{top:28px;animation:cloud-drift 11s linear infinite 3s;}
+.cloud-3{top:52px;animation:cloud-drift 9s linear infinite 1.5s;}
+/* plane flies across */
+.plane-wrap,.plane-wrap-2{position:absolute;top:50%;left:-80px;animation:plane-fly 5s linear infinite;}
+.plane-wrap-2{animation-delay:-2.5s;}
+/* rotor spins */
+.rotor{transform-origin:50% 50%;animation:rotor-spin .25s linear infinite;}
+@keyframes cloud-drift{from{transform:translateX(340px);}to{transform:translateX(-120px);}}
+@keyframes plane-fly{
+  from{transform:translateX(0) translateY(-50%);}
+  to{transform:translateX(480px) translateY(-50%);}
+}
+@keyframes rotor-spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+/* ── AVIATION FACTS ── */
+.facts-section{margin-top:48px;padding-top:40px;border-top:1px solid rgba(68,71,77,0.25);}
+.facts-label{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:28px;}
+.fact-card{position:relative;min-height:90px;}
+.fact-item{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  opacity:0;transition:opacity .6s ease;pointer-events:none;
+}
+.fact-item.visible{opacity:1;pointer-events:auto;}
+.fact-stat{font-family:var(--font-serif);font-size:52px;font-style:italic;line-height:1;color:var(--gold);letter-spacing:-1px;}
+.fact-text{font-family:var(--font-mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);max-width:340px;}
+.fact-dots{display:flex;gap:6px;justify-content:center;margin-top:20px;}
+.fact-dot{width:5px;height:5px;border-radius:50%;background:rgba(68,71,77,0.4);transition:background .3s;}
+.fact-dot.active{background:var(--gold);}
 /* ── FILTER DROPDOWN ── */
 .filter-dropdown{
   background:#1e1e20;border:1px solid var(--border);
@@ -244,6 +275,16 @@ nav{
   transition:color .15s;
 }
 .filter-reset:hover{color:#e06060;}
+.filter-pill-group{display:flex;gap:6px;}
+.filter-pill{
+  flex:1;padding:7px 0;text-align:center;
+  background:rgba(255,255,255,0.04);border:1px solid var(--border);
+  border-radius:6px;color:var(--text-dim);font-family:var(--font-mono);
+  font-size:11px;letter-spacing:.6px;cursor:pointer;
+  transition:background .15s,border-color .15s,color .15s;
+}
+.filter-pill:hover{background:rgba(255,255,255,0.08);border-color:rgba(100,180,220,0.4);color:var(--text);}
+.filter-pill.active{background:rgba(0,195,255,0.12);border-color:var(--cyan);color:var(--cyan);}
 
 @keyframes spin{to{transform:rotate(360deg);}}
 @keyframes slideIn{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
@@ -282,6 +323,7 @@ nav{
     background: rgba(251,191,36,0.07);
     border-color: var(--gold);
   }
+  [data-theme="light"] .view-queries-tab { background: #fff; border-color: rgba(13,27,42,0.12); }
 </style>
 <script src="js/theme.js"></script>
 </head>
@@ -341,47 +383,12 @@ nav{
 
       <div class="stats-bar">
         <div class="stat-item">
-          <div class="stat-num" id="stat-notified">—</div>
-          <div class="stat-label">Notified</div>
+          <span class="stat-number" id="stat-notified-txt">—</span>
+          <span class="stat-label">Operators Notified</span>
         </div>
         <div class="stat-item">
-          <div class="stat-num" id="stat-reviewing">—</div>
-          <div class="stat-label">Reviewing</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-num cyan" id="stat-received">0</div>
-          <div class="stat-label">Received</div>
-        </div>
-      </div>
-
-      <div class="notif-list">
-        <div class="vert-line"></div>
-        <div class="notif-row">
-          <div class="notif-dot active">
-            <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M3.325 7.01L0 3.69L0.831 2.858L3.325 5.352L8.677 0L9.508 0.831L3.325 7.01Z" fill="#342800"/></svg>
-          </div>
-          <div>
-            <div class="notif-label">New quote received</div>
-            <div class="notif-time">Just now</div>
-          </div>
-        </div>
-        <div class="notif-row">
-          <div class="notif-dot">
-            <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M4.054 7.904L7.35 4.608L6.519 3.777L4.054 6.242L2.829 5.017L1.998 5.848L4.054 7.904ZM4.667 11.667C3.315 11.326 2.2 10.551 1.32 9.341C.44 8.13 0 6.786 0 5.308V1.75L4.667 0L9.333 1.75V5.308C9.333 6.786 8.893 8.13 8.014 9.341C7.134 10.551 6.018 11.326 4.667 11.667Z" fill="#C5C6CD"/></svg>
-          </div>
-          <div>
-            <div class="notif-label">SkyVayu reviewed</div>
-            <div class="notif-time">12 mins ago</div>
-          </div>
-        </div>
-        <div class="notif-row" style="opacity:.5;">
-          <div class="notif-dot">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M4.083 7V2.246L2.567 3.763L1.75 2.917L4.667 0L7.583 2.917L6.767 3.763L5.25 2.246V7H4.083ZM1.167 9.333C.846 9.333.571 9.219.343 8.991.114 8.762 0 8.488 0 8.167V6.417H1.167V8.167H8.167V6.417H9.333V8.167C9.333 8.488 9.219 8.762 8.991 8.991C8.762 9.219 8.488 9.333 8.167 9.333H1.167Z" fill="#C5C6CD"/></svg>
-          </div>
-          <div>
-            <div class="notif-label">Request submitted</div>
-            <div class="notif-time">25 mins ago</div>
-          </div>
+          <span class="stat-number cyan" id="stat-received-txt">0</span>
+          <span class="stat-label">Quotes Received</span>
         </div>
       </div>
     </div>
@@ -412,18 +419,15 @@ nav{
         <div id="filter-panel" style="display:none;position:absolute;right:0;top:44px;z-index:200;">
       <div class="filter-dropdown">
         <div class="filter-section">
-          <div class="filter-section-title">Sort by</div>
-          <div class="filter-select-wrap">
-            <select class="filter-select" onchange="setSort(this.value)">
-              <option value="price">Lowest price first</option>
-              <option value="seats">Most seats first</option>
-            </select>
-            <svg class="select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1L6 6L11 1" stroke="#C5C6CD" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div class="filter-section-title">Price</div>
+          <div class="filter-pill-group">
+            <button class="filter-pill active" id="pill-price-asc" onclick="setPriceSort('asc')">Low → High</button>
+            <button class="filter-pill" id="pill-price-desc" onclick="setPriceSort('desc')">High → Low</button>
           </div>
         </div>
         <div class="filter-divider"></div>
         <div class="filter-section">
-          <div class="filter-section-title">Minimum seats</div>
+          <div class="filter-section-title">Seats</div>
           <div class="filter-select-wrap">
             <select class="filter-select" onchange="setMinSeats(parseInt(this.value))">
               <option value="0">Any number of seats</option>
@@ -431,20 +435,6 @@ nav{
               <option value="8">8 or more seats</option>
               <option value="12">12 or more seats</option>
               <option value="16">16 or more seats</option>
-            </select>
-            <svg class="select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1L6 6L11 1" stroke="#C5C6CD" stroke-width="1.5" stroke-linecap="round"/></svg>
-          </div>
-        </div>
-        <div class="filter-divider"></div>
-        <div class="filter-section">
-          <div class="filter-section-title">Maximum price</div>
-          <div class="filter-select-wrap">
-            <select class="filter-select" onchange="setMaxPrice(parseInt(this.value))">
-              <option value="0">Any price</option>
-              <option value="500000">Under ₹5 lakh</option>
-              <option value="1000000">Under ₹10 lakh</option>
-              <option value="2000000">Under ₹20 lakh</option>
-              <option value="5000000">Under ₹50 lakh</option>
             </select>
             <svg class="select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none"><path d="M1 1L6 6L11 1" stroke="#C5C6CD" stroke-width="1.5" stroke-linecap="round"/></svg>
           </div>
@@ -458,9 +448,60 @@ nav{
 
     <div id="quotes-container">
       <div class="loading-state">
-        <div class="spinner"></div>
+        <div class="sky-anim">
+          <div class="sky-track">
+            <!-- Cloud 1 (small) -->
+            <svg class="cloud cloud-1" width="48" height="22" viewBox="0 0 48 22" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 16c-2.8 0-5-2.2-5-5 0-2.5 1.8-4.5 4.2-4.9C5.8 3.3 8.2 1.5 11 1.5c1.5 0 2.9.5 3.9 1.4C16 1.7 17.7 1 19.5 1 23.1 1 26 3.9 26 7.5c0 .3 0 .6-.1.9H27c2.2 0 4 1.8 4 4s-1.8 4-4 4H6z" stroke="#17b0d6" stroke-width="1.2" fill="none"/></svg>
+            <!-- Cloud 2 (medium) -->
+            <svg class="cloud cloud-2" width="60" height="28" viewBox="0 0 60 28" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 20c-3.3 0-6-2.7-6-6 0-3 2.1-5.5 5-5.9C7.7 4.4 11 2 15 2c2.2 0 4.2.8 5.7 2.1C22.5 2.8 25 2 27.5 2 33.3 2 38 6.7 38 12.5c0 .3 0 .7-.1 1H40c2.8 0 5 2.2 5 5s-2.2 5-5 5H8z" stroke="#17b0d6" stroke-width="1.3" fill="none"/></svg>
+            <!-- Cloud 3 (tiny) -->
+            <svg class="cloud cloud-3" width="36" height="18" viewBox="0 0 36 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 13c-2.2 0-4-1.8-4-4 0-2 1.5-3.7 3.5-3.9C5 2.5 7.5 1 10.5 1c1.5 0 2.8.5 3.8 1.3C15.3 1.5 16.8 1 18.5 1 22 1 25 4 25 7.5c0 .2 0 .5-.1.7H26c1.9 0 3.5 1.6 3.5 3.5S27.9 15 26 15H5z" stroke="#17b0d6" stroke-width="1.2" fill="none" opacity=".7"/></svg>
+            <!-- Private jet (plane) flying across -->
+            <svg class="plane-wrap" width="64" height="32" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Fuselage -->
+              <path d="M4 17 Q16 15 36 16 L56 15 Q60 15 61 16.5 Q60 18 56 18 L36 17 Q16 18 4 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Nose cone -->
+              <path d="M56 15 Q63 16 61 18 Q63 16.5 56 18" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Main wing -->
+              <path d="M28 16.5 L18 8 L14 8.5 L24 16.5Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Tail wing -->
+              <path d="M10 17 L5 11 L3 11.5 L8 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Vertical tail -->
+              <path d="M8 17 L8 12 L11 12" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Engine under wing -->
+              <ellipse cx="21" cy="19" rx="4" ry="2" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Windows (3 dots) -->
+              <circle cx="40" cy="15.5" r="1" fill="#c9a84c"/>
+              <circle cx="45" cy="15.5" r="1" fill="#c9a84c"/>
+              <circle cx="50" cy="15.5" r="1" fill="#c9a84c"/>
+            </svg>
+              <svg class="plane-wrap-2" width="64" height="32" viewBox="0 0 64 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Fuselage -->
+              <path d="M4 17 Q16 15 36 16 L56 15 Q60 15 61 16.5 Q60 18 56 18 L36 17 Q16 18 4 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Nose cone -->
+              <path d="M56 15 Q63 16 61 18 Q63 16.5 56 18" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Main wing -->
+              <path d="M28 16.5 L18 8 L14 8.5 L24 16.5Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Tail wing -->
+              <path d="M10 17 L5 11 L3 11.5 L8 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Vertical tail -->
+              <path d="M8 17 L8 12 L11 12" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Engine under wing -->
+              <ellipse cx="21" cy="19" rx="4" ry="2" stroke="#c9a84c" stroke-width="1.2" fill="none"/>
+              <!-- Windows (3 dots) -->
+              <circle cx="40" cy="15.5" r="1" fill="#c9a84c"/>
+              <circle cx="45" cy="15.5" r="1" fill="#c9a84c"/>
+              <circle cx="50" cy="15.5" r="1" fill="#c9a84c"/>
+            </svg>
+          </div>
+        </div>
         <div>Waiting for quotes from operators...</div>
         <div style="font-size:12px;margin-top:8px;opacity:.6;">Operators have 60 minutes to respond</div>
+        <div class="facts-section" id="facts-section">
+          <div class="facts-label">Did you know?</div>
+          <div class="fact-card" id="fact-card"></div>
+          <div class="fact-dots" id="fact-dots"></div>
+        </div>
       </div>
     </div>
 

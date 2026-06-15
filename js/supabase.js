@@ -62,6 +62,7 @@ async function saveQueryToSupabase(queryData) {
     status:       'open',
     aircraft_category: queryData.aircraft_category || 'fixed_wing'
   };
+  if (queryData.vip) safe.vip = true;
   try {
     var response = await fetchWithTimeout(
       SUPABASE_URL + '/rest/v1/queries',
@@ -88,7 +89,8 @@ async function saveQueryToSupabase(queryData) {
     var saved = (Array.isArray(data) && data[0]) ? data[0] : null;
     if (saved) sendEmail('new_query_assigned', { query_id: saved.id });
     if (saved) { sessionStorage.setItem('sv_query_id', saved.id); sessionStorage.setItem('sv_query', JSON.stringify(saved)); sessionStorage.removeItem('sv_query_start'); }
-    return saved;
+if (saved && saved.booking_ref) sessionStorage.setItem('sv_booking_ref', saved.booking_ref);
+        return saved;
   } catch (e) {
     if (e.name === 'AbortError') {
       showToast('Request timed out. Please check your connection and try again.', 'error');

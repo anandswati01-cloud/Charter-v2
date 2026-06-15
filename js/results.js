@@ -109,6 +109,63 @@ function updateTimer() {
     document.getElementById('progress-fill').style.width = pct + '%';
 }
 
+// ── Aviation Facts ──
+var AVIATION_FACTS = [
+    { stat: '~900', text: 'charter flights operate in India every month' },
+    { stat: '3x', text: 'faster boarding than commercial airlines' },
+    { stat: '5,000+', text: 'private airports & airstrips across India' },
+    { stat: '60 min', text: 'average time saved per trip vs commercial flight' },
+    { stat: '99%', text: 'on-time performance for private charters' },
+    { stat: '₹0', text: 'hidden fees — price you see is the price you pay' },
+    { stat: '<2hrs', text: 'notice needed to book most charter flights' },
+    { stat: '150+', text: 'aircraft types available for charter in India' }
+];
+var factsInterval = null;
+var factsIndex = 0;
+
+function initFacts() {
+    var card = document.getElementById('fact-card');
+    var dotsEl = document.getElementById('fact-dots');
+    if (!card || !dotsEl) return;
+    // Always rebuild DOM (container was just reset), but keep current index if already cycling
+    var itemsHTML = AVIATION_FACTS.map(function(f, i) {
+        return '<div class="fact-item' + (i===factsIndex?' visible':'') + '" id="fact-item-'+i+'">' +
+               '<div class="fact-stat">'+f.stat+'</div>' +
+               '<div class="fact-text">'+f.text+'</div>' +
+               '</div>';
+    }).join('');
+    card.innerHTML = itemsHTML;
+    var dotsHTML = AVIATION_FACTS.map(function(_, i) {
+        return '<div class="fact-dot'+(i===factsIndex?' active':'')+'" id="fact-dot-'+i+'"></div>';
+    }).join('');
+    dotsEl.innerHTML = dotsHTML;
+    // Only start interval if not already running
+    if (!factsInterval) {
+        factsIndex = 0;
+        // Show first item
+        var firstItem = document.getElementById('fact-item-0');
+        var firstDot = document.getElementById('fact-dot-0');
+        if (firstItem) firstItem.classList.add('visible');
+        if (firstDot) firstDot.classList.add('active');
+        factsInterval = setInterval(function() {
+            var prev = factsIndex;
+            factsIndex = (factsIndex + 1) % AVIATION_FACTS.length;
+            var prevItem = document.getElementById('fact-item-'+prev);
+            var nextItem = document.getElementById('fact-item-'+factsIndex);
+            var prevDot = document.getElementById('fact-dot-'+prev);
+            var nextDot = document.getElementById('fact-dot-'+factsIndex);
+            if (prevItem) prevItem.classList.remove('visible');
+            if (nextItem) nextItem.classList.add('visible');
+            if (prevDot) prevDot.classList.remove('active');
+            if (nextDot) nextDot.classList.add('active');
+        }, 4000);
+    }
+}
+
+function stopFacts() {
+    if (factsInterval) { clearInterval(factsInterval); factsInterval = null; }
+}
+
 // ── Load quotes from Supabase ──
 async function loadQuotes() {
     if (!queryId) {
@@ -124,16 +181,14 @@ async function loadQuotes() {
           var quotes = await res.json();
           if (!Array.isArray(quotes)) return;
 
-      document.getElementById('stat-received').textContent = quotes.length;
+      document.getElementById('stat-received-txt').textContent = quotes.length;
 
-      var opRes = await fetch(SUPABASE_URL + '/rest/v1/operators?approval_status=eq.approved&select=id', {
-              headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-      });
-          var ops = await opRes.json();
-          var total = Array.isArray(ops) ? ops.length : 0;
-          document.getElementById('stat-notified').textContent = total;
-          document.getElementById('stat-reviewing').textContent = Math.max(0, total - quotes.length);
-
+    var viewRes = await fetch(SUPABASE_URL + '/rest/v1/query_views?query_id=eq.' + queryId + '&select=id', {
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    var views = await viewRes.json();
+    var notifiedCount = Array.isArray(views) ? views.length : 0;
+    document.getElementById('stat-notified-txt').textContent = notifiedCount;
       allQuotes = quotes;
           applyFilters();
     } catch(e) {
@@ -150,10 +205,12 @@ var aircraftImages = [
 function renderQuotes(quotes) {
     var container = document.getElementById('quotes-container');
     if (!quotes.length) {
-          container.innerHTML = '<div class="loading-state"><div class="spinner"></div><div>Waiting for quotes from operators...</div><div style="font-size:12px;margin-top:8px;opacity:.6;">Operators have 60 minutes to respond</div></div>';
+          container.innerHTML = '<div class="loading-state"><div class="sky-anim"><div class="sky-track"><svg class="cloud cloud-1" width="48" height="22" viewBox="0 0 48 22" fill="none"><path d="M6 16c-2.8 0-5-2.2-5-5 0-2.5 1.8-4.5 4.2-4.9C5.8 3.3 8.2 1.5 11 1.5c1.5 0 2.9.5 3.9 1.4C16 1.7 17.7 1 19.5 1 23.1 1 26 3.9 26 7.5c0 .3 0 .6-.1.9H27c2.2 0 4 1.8 4 4s-1.8 4-4 4H6z" stroke="#17b0d6" stroke-width="1.2" fill="none"/></svg><svg class="cloud cloud-2" width="60" height="28" viewBox="0 0 60 28" fill="none"><path d="M8 20c-3.3 0-6-2.7-6-6 0-3 2.1-5.5 5-5.9C7.7 4.4 11 2 15 2c2.2 0 4.2.8 5.7 2.1C22.5 2.8 25 2 27.5 2 33.3 2 38 6.7 38 12.5c0 .3 0 .7-.1 1H40c2.8 0 5 2.2 5 5s-2.2 5-5 5H8z" stroke="#17b0d6" stroke-width="1.3" fill="none"/></svg><svg class="cloud cloud-3" width="36" height="18" viewBox="0 0 36 18" fill="none"><path d="M5 13c-2.2 0-4-1.8-4-4 0-2 1.5-3.7 3.5-3.9C5 2.5 7.5 1 10.5 1c1.5 0 2.8.5 3.8 1.3C15.3 1.5 16.8 1 18.5 1 22 1 25 4 25 7.5c0 .2 0 .5-.1.7H26c1.9 0 3.5 1.6 3.5 3.5S27.9 15 26 15H5z" stroke="#17b0d6" stroke-width="1.2" fill="none" opacity=".7"/></svg><svg class="plane-wrap" width="64" height="32" viewBox="0 0 64 32" fill="none"><path d="M4 17 Q16 15 36 16 L56 15 Q60 15 61 16.5 Q60 18 56 18 L36 17 Q16 18 4 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/><path d="M28 16.5 L18 8 L14 8.5 L24 16.5Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/><path d="M10 17 L5 11 L3 11.5 L8 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/><path d="M8 17 L8 12 L11 12" stroke="#c9a84c" stroke-width="1.2" fill="none"/><ellipse cx="21" cy="19" rx="4" ry="2" stroke="#c9a84c" stroke-width="1.2" fill="none"/><circle cx="40" cy="15.5" r="1" fill="#c9a84c"/><circle cx="45" cy="15.5" r="1" fill="#c9a84c"/><circle cx="50" cy="15.5" r="1" fill="#c9a84c"/></svg><svg class="plane-wrap-2" width="64" height="32" viewBox="0 0 64 32" fill="none"><path d="M4 17 Q16 15 36 16 L56 15 Q60 15 61 16.5 Q60 18 56 18 L36 17 Q16 18 4 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/><path d="M28 16.5 L18 8 L14 8.5 L24 16.5Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/><path d="M10 17 L5 11 L3 11.5 L8 17Z" stroke="#c9a84c" stroke-width="1.2" fill="none"/><path d="M8 17 L8 12 L11 12" stroke="#c9a84c" stroke-width="1.2" fill="none"/><ellipse cx="21" cy="19" rx="4" ry="2" stroke="#c9a84c" stroke-width="1.2" fill="none"/><circle cx="40" cy="15.5" r="1" fill="#c9a84c"/><circle cx="45" cy="15.5" r="1" fill="#c9a84c"/><circle cx="50" cy="15.5" r="1" fill="#c9a84c"/></svg></div></div><div>Waiting for quotes from operators...</div><div style="font-size:12px;margin-top:8px;opacity:.6;">Operators have 60 minutes to respond</div><div class="facts-section" id="facts-section"><div class="facts-label">Did you know?</div><div class="fact-card" id="fact-card"></div><div class="fact-dots" id="fact-dots"></div></div></div>';
+          initFacts();
           return;
     }
 
+  stopFacts();
   var html = '';
     quotes.forEach(function(q, i) {
           quotesMap[q.id] = q;
@@ -218,9 +275,8 @@ function selectQuote(id) {
 }
 
 // ── Filters ──
-var filterSort = 'price';
+var filterPriceSort = 'asc';
 var filterMinSeats = 0;
-var filterMaxPrice = 0;
 var allQuotes = [];
 
 function toggleFilters() {
@@ -228,8 +284,10 @@ function toggleFilters() {
     panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
 }
 
-function setSort(val) {
-    filterSort = val;
+function setPriceSort(dir) {
+    filterPriceSort = dir;
+    document.getElementById('pill-price-asc').classList.toggle('active', dir === 'asc');
+    document.getElementById('pill-price-desc').classList.toggle('active', dir === 'desc');
     applyFilters();
 }
 
@@ -238,16 +296,12 @@ function setMinSeats(val) {
     applyFilters();
 }
 
-function setMaxPrice(val) {
-    filterMaxPrice = val;
-    applyFilters();
-}
-
 function resetFilters() {
-    filterSort = 'price';
+    filterPriceSort = 'asc';
     filterMinSeats = 0;
-    filterMaxPrice = 0;
     document.querySelectorAll('.filter-select').forEach(function(s){ s.selectedIndex = 0; });
+    document.getElementById('pill-price-asc').classList.add('active');
+    document.getElementById('pill-price-desc').classList.remove('active');
     applyFilters();
     document.getElementById('filter-panel').style.display = 'none';
 }
@@ -257,13 +311,10 @@ function applyFilters() {
     if (filterMinSeats > 0) {
           filtered = filtered.filter(function(q){ return (q.seats_available || 0) >= filterMinSeats; });
     }
-    if (filterMaxPrice > 0) {
-          filtered = filtered.filter(function(q){ return (q.price || 0) <= filterMaxPrice; });
-    }
-    if (filterSort === 'price') {
+    if (filterPriceSort === 'asc') {
           filtered.sort(function(a,b){ return (a.price||0) - (b.price||0); });
-    } else if (filterSort === 'seats') {
-          filtered.sort(function(a,b){ return (b.seats_available||0) - (a.seats_available||0); });
+    } else {
+          filtered.sort(function(a,b){ return (b.price||0) - (a.price||0); });
     }
     renderQuotes(filtered);
 }
