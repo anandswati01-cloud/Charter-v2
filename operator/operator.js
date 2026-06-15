@@ -1481,7 +1481,9 @@ async function loadProfileSection() {
   if (catHeli && currentUser.aircraft_category) {
     catHeli.checked = currentUser.aircraft_category.indexOf('heli') > -1;
   }
-}
+
+  // Load extended company profile data
+  loadExtendedProfile(currentUser.company_id || currentOperator.id);}
 
 // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Edit mode toggle ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function profileEditMode(section) {
@@ -3616,8 +3618,9 @@ function loadExtendedProfile(companyId) {
   fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId + '&select=*', {
     headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken }
   }).then(function(r){ return r.json(); }).then(function(rows){
-    if (!rows || !rows.length) return;
-    var d = rows[0];
+    // If no companies record found, use the operators table data (currentOperator) as fallback
+    var d = (rows && rows.length) ? rows[0] : currentOperator;
+    if (!d) return;
     // Overview
     renderOverviewView(d);
     document.getElementById('input-company-desc') && (document.getElementById('input-company-desc').value = d.company_description || '');
