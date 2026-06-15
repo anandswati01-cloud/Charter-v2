@@ -9,7 +9,7 @@ function escapeHtml(str){
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;')
     .replace(/'/g,'&#39;');
-}
+
 
 var currentUser=null,currentOperator=null,currentQueryId=null,currentClaimId=null;
 
@@ -88,6 +88,7 @@ async function doLogin(){
     rt.textContent=isOwner()?'Admin':'Employee';
     rt.className='role-tag '+(isOwner()?'':'employee');
     applyRoleRestrictions();
+    showSection('queries');
     await loadAllData();
   populateCategoryCheckboxes();
     refreshInterval=setInterval(loadAllData,5000);
@@ -1290,6 +1291,7 @@ window.addEventListener('beforeunload',function(){
         var rt=document.getElementById('sidebar-role-tag');
         if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
         applyRoleRestrictions();
+        showSection('queries');
         loadAllData();
         refreshInterval=setInterval(loadAllData,5000);
         claimRefreshInterval=setInterval(updateClaimTimers,1000);
