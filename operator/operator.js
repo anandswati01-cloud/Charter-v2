@@ -1496,11 +1496,6 @@ async function loadProfileSection() {
     if (opsCard) opsCard.style.display = 'none';
     if (certsCard) certsCard.style.display = 'none';
   }
-      }
-    } else {
-      companyCard.style.display = 'none';
-    }
-  }
 
   // Ã¢ÂÂÃ¢ÂÂ Aircraft category checkboxes Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
   var catFixed = document.getElementById('cat-fixed-wing');
