@@ -250,7 +250,7 @@ async function loadAllData(){
   if(!currentOperator)return;
   var opId=currentOperator.id;
   var results=await Promise.all([
-    sbFetch('queries?status=eq.open&aircraft_category=in.('+( currentOperator.aircraft_category||'fixed_wing')+')&expires_at=gt.'+encodeURIComponent(nowIso())+'&order=created_at.desc'),
+    sbFetch('queries?status=eq.open&aircraft_category=in.('+( currentOperator.aircraft_category||'fixed_wing')+')&created_at=gt.'+encodeURIComponent(new Date(Date.now()-60*60*1000).toISOString())+'&order=created_at.desc'),
     sbFetch('quotes?operator_id=eq.'+opId+'&select=*,queries(*)&order=created_at.desc'),
     sbFetch('query_claims?operator_id=eq.'+opId+'&expires_at=gt.'+encodeURIComponent(nowIso())),
     sbFetch('operator_users?operator_id=eq.'+opId+'&order=created_at.asc')
@@ -273,7 +273,7 @@ async function loadAllData(){
   var _cc=document.getElementById('count-confirmed');if(_cc)_cc.textContent=confirmed.length;
   var _qb=document.getElementById('queries-badge');if(_qb)_qb.textContent=unquoted.length+shared.length;
   var cat=currentOperator.aircraft_category||'fixed_wing';
-  sbFetch('queries?status=eq.open&aircraft_category=in.('+cat+')&expires_at=lt.'+encodeURIComponent(nowIso())+'&order=expires_at.desc&limit=100')
+  sbFetch('queries?status=eq.open&aircraft_category=in.('+cat+')&created_at=lt.'+encodeURIComponent(new Date(Date.now()-60*60*1000).toISOString())+'&order=created_at.desc&limit=100')
     .then(function(res){
       var expiredQueries=res.ok?res.data:[];
       var bookedIds=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';}).map(function(q){return q.query_id;});
@@ -281,7 +281,7 @@ async function loadAllData(){
       expiredQueries=expiredQueries.filter(function(q){return!bookedIds.includes(q.id);});
       // Also add our shared quotes whose query timer has expired but weren't accepted
       var expiredShared=allMyOperatorQuotes.filter(function(q){
-        return q.status==='shared' && q.queries && q.queries.expires_at && new Date(q.queries.expires_at)<new Date();
+        return q.status==='shared' && q.queries && q.queries.created_at && new Date(q.queries.created_at)<new Date(Date.now()-60*60*1000);
       });
       // Merge: deduplicate by query_id
       var expiredQueryIds=expiredQueries.map(function(q){return q.id;});
@@ -308,21 +308,22 @@ async function loadAllData(){
 
 /* ============ RENDER LISTS ============ */
 
-function getTimerBar(expiresAt) {
-  if (!expiresAt) return '';
+function getTimerBar(createdAt) {
+  if (!createdAt) return '';
   var totalMs = 60 * 60 * 1000;
   var now = new Date();
-  var expires = new Date(expiresAt);
-  var elapsed = now - (expires.getTime() - totalMs);
+  var created = new Date(createdAt);
+  var windowEnd = new Date(created.getTime() + totalMs);
+  var elapsed = now - created;
   var pct = Math.min(Math.max((elapsed / totalMs) * 100, 0), 100);
-  var remaining = expires - now;
+  var remaining = windowEnd - now;
   var isUrgent = remaining > 0 && remaining < 10 * 60 * 1000;
   var isExpired = remaining <= 0;
   var barColor = isExpired ? 'var(--red)' : isUrgent ? 'var(--amber)' : 'var(--gold)';
   var mins = remaining > 0 ? Math.floor(remaining / 60000) : 0;
   var secs = remaining > 0 ? Math.floor((remaining % 60000) / 1000) : 0;
   var label = isExpired ? 'Window closed' : mins + 'm ' + String(secs).padStart(2,'0') + 's remaining';
-  return '<div class="query-timer-wrap" data-expires="' + expiresAt + '">'
+  return '<div class="query-timer-wrap" data-created="' + createdAt + '">'
     + '<div class="query-timer-row">'
     + '<span class="query-timer-label" style="color:' + barColor + ';">' + label + '</span>'
     + '<span class="query-timer-pct" style="color:' + barColor + ';">' + (isExpired ? '100' : Math.round(pct)) + '%</span>'
@@ -354,7 +355,7 @@ function renderActiveList(queries){
       +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
       +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
       +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
-      +(q.expires_at ? getTimerBar(q.expires_at) : '')
+      +(q.created_at ? getTimerBar(q.created_at) : '')
       +lockInfo
       +'<div class="query-actions"><button class="btn-sm btn-blue" '+btnDisabled+' onclick="openQuoteModal(\''+escapeHtml(q.id)+'\')">'+btnTxt+'</button>'+(claim&&claim.claimed_by===currentUser.id?'<button class="btn-sm btn-red" onclick="declineQuery(\''+escapeHtml(q.id)+'\',\''+escapeHtml(claim.id)+'\')" style="margin-left:6px">Decline</button>':'')+'</div></div>';
   }).join('');
@@ -444,19 +445,20 @@ function renderExpiredList(queries){
       +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
       +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
       +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
-      +(q.expires_at ? getTimerBar(q.expires_at) : '')
+      +(q.created_at ? getTimerBar(q.created_at) : '')
       +'</div>';
   }).join('');
 }
 
 function updateClaimTimers(){
   document.querySelectorAll('.query-timer-wrap').forEach(function(wrap){
-    var expiresAt=wrap.getAttribute('data-expires');if(!expiresAt)return;
+    var createdAt=wrap.getAttribute('data-created');if(!createdAt)return;
     var totalMs=60*60*1000;
-    var now=new Date();var expires=new Date(expiresAt);
-    var elapsed=now-(expires.getTime()-totalMs);
+    var now=new Date();var created=new Date(createdAt);
+    var windowEnd=new Date(created.getTime()+totalMs);
+    var elapsed=now-created;
     var pct=Math.min(Math.max((elapsed/totalMs)*100,0),100);
-    var remaining=expires-now;
+    var remaining=windowEnd-now;
     var isUrgent=remaining>0&&remaining<10*60*1000;
     var isExpired=remaining<=0;
     var barColor=isExpired?'var(--red)':isUrgent?'var(--amber)':'var(--gold)';
