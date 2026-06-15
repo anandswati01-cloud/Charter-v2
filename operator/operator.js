@@ -337,6 +337,7 @@ function renderActiveList(queries){
   if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No active queries</div><div class="empty-sub">New client queries will appear here</div></div>';return;}
   el.innerHTML=queries.map(function(q){
     var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+'  →  '+escapeHtml(q.destination||'-');
+    var isUrgent=(function(){if(!q.flight_date)return false;var flightDt=new Date(q.flight_date+(q.flight_time?'T'+q.flight_time:'T00:00'));return(flightDt-new Date())<=4*60*60*1000&&(flightDt-new Date())>0;})();
     var claim=getClaimFor(q.id);
     var lockedBySomeoneElse=claim&&claim.claimed_by!==currentUser.id;
     var lockedByMe=claim&&claim.claimed_by===currentUser.id;
@@ -349,9 +350,10 @@ function renderActiveList(queries){
     }
     var btnTxt=lockedBySomeoneElse?'Locked':'Submit quote';
     var btnDisabled=lockedBySomeoneElse?'disabled':'';
-    return '<div class="query-card '+(lockedBySomeoneElse?'locked':'')+'">'
+    return '<div class="query-card '+(isUrgent?'query-card-urgent ':'')+(lockedBySomeoneElse?'locked':'')+'">'
+      +(isUrgent?'<div class="urgent-tape">URGENT &mdash; Flight within 4 hours</div>':'')
       +'<div class="query-top"><div><div class="query-route">'+r+'</div><div class="query-meta">'+fmtDate(q.flight_date)+(q.flight_time?' at '+escapeHtml(q.flight_time):'')+'</div></div>'
-      +(lockedBySomeoneElse?'<span class="badge badge-locked">Locked</span>':'<span class="badge badge-active">Active</span>')+'</div>'
+      +(lockedBySomeoneElse?'<span class="badge badge-locked">Locked</span>':isUrgent?'<span class="badge badge-urgent">Urgent</span>':'<span class="badge badge-active">Active</span>')+'</div>'
       +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
       +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
       +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')
