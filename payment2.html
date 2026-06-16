@@ -345,18 +345,6 @@ nav{
           <span class="row-value" id="p2-route" style="font-size:13px;">—</span>
           <span class="row-label" id="p2-date" style="margin-top:2px;font-size:11px;opacity:0.6;">—</span>
         </div>
-<div class="summary-row">
-          <span class="row-label">Base Fare</span>
-          <span class="row-value" id="p2-charter">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="row-label">Landing &amp; Handling</span>
-          <span class="row-value" id="p2-landing">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="row-label">Concierge Tax (GST)</span>
-          <span class="row-value" id="p2-gst">—</span>
-        </div>
       </div>
       <div class="total-row">
         <span class="total-label">Total Payable</span>
@@ -434,9 +422,6 @@ document.getElementById('p2-aircraft').textContent = (q.aircraft_type || q.aircr
     dateEl.textContent = dateDisplay;
   }
 })();
-document.getElementById('p2-charter').textContent = fmt(charter);
-document.getElementById('p2-landing').textContent = fmt(0);
-document.getElementById('p2-gst').textContent = fmt(0);
 document.getElementById('p2-total').textContent = fmt(price);
 
 var btn = document.getElementById('pay-btn');
