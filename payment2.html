@@ -393,9 +393,9 @@ if (!quoteRaw) {
 }
 
 var price = q.price || q.total_amount || 0;
-var landing = Math.round(price * 0.08);
-var gst = Math.round(price * 0.05);
-var charter = price - landing - gst;
+var landing = 0;
+var gst = 0;
+var charter = price;
 
 function fmt(n){ return n ? '₹' + Number(n).toLocaleString('en-IN') : '—'; }
 
@@ -435,8 +435,8 @@ document.getElementById('p2-aircraft').textContent = (q.aircraft_type || q.aircr
   }
 })();
 document.getElementById('p2-charter').textContent = fmt(charter);
-document.getElementById('p2-landing').textContent = fmt(landing);
-document.getElementById('p2-gst').textContent = fmt(gst);
+document.getElementById('p2-landing').textContent = fmt(0);
+document.getElementById('p2-gst').textContent = fmt(0);
 document.getElementById('p2-total').textContent = fmt(price);
 
 var btn = document.getElementById('pay-btn');
@@ -518,7 +518,7 @@ async function confirmBooking() {
     flight_date:   queryData.flight_date || queryData.rs_date || null,
     passengers:    parseInt(queryData.passengers || queryData.rs_pax) || null,
     total_amount:  price,
-    platform_fee:  landing,
+    platform_fee:  0,
     status:        'confirmed',
       user_id:         currentUser ? currentUser.id : null
   };
