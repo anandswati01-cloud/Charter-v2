@@ -55,14 +55,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var pax = queryData.passengers || queryData.rs_pax || q.pax || '—';
     setText('pay-pax', pax + ' Passenger' + (parseInt(pax) !== 1 ? 's' : ''));
 
-    // Price — no platform fee at this time
+    // Price
     var price = q.price || q.total_amount || null;
-    var platformFee = 0;
-    var charterFee = price;
 
     setText('pay-charter', price ? '₹' + Number(price).toLocaleString('en-IN') : '—');
-    setText('pay-platform', '₹0');
-    setText('pay-total', price ? '₹' + Number(price).toLocaleString('en-IN') : '—');
     setText('pay-total', price ? '₹' + Number(price).toLocaleString('en-IN') : '—');
 
     var btn = document.getElementById('pay-btn');
