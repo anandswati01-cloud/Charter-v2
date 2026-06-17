@@ -210,6 +210,11 @@
     [data-theme="light"] #theme-toggle { background: rgba(0,0,0,0.06) !important; color: rgba(13,27,42,0.5) !important; }
     [data-theme="light"] #theme-toggle:hover { background: rgba(0,0,0,0.1) !important; color: #0d1b2a !important; }
     [data-theme="light"] .status-msg { color: #c4942e !important; }
+      /* Booking timer + quote badge */
+    .booking-timer { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; color: var(--gold); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+    .booking-timer.expired-label { color: rgba(255,255,255,0.3); }
+    .timer-icon { font-size: 12px; }
+    .booking-quotes { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: rgba(251,191,36,0.08); color: rgba(251,191,36,0.7); border: 1px solid rgba(251,191,36,0.2); white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -386,12 +391,12 @@
     }
 
     function switchTab(name, btn) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
       btn.classList.add('active');
       document.getElementById('tab-' + name).classList.add('active');
+      if (window._svCurrentUserId) loadBookings(window._svCurrentUserId);
     }
-
     function formatDate(d) {
       if (!d) return '—';
       const dt = new Date(d);
@@ -409,102 +414,89 @@
       if (status === 'expired' || status === 'cancelled') return 'expired';
     }
 
-    function buildBookingCard(b) {
-      return `<div class="booking-item" onclick="location.href='results.html?query_id=${b.id}'" style="cursor:pointer;">
-        <div>
-          <div class="booking-route">${b.departure || '—'} <span class="arrow">&#8594;</span> ${b.destination || '—'}</div>
-          <div class="booking-meta">
-            <span>${formatDate(b.flight_date)}</span>
-            <span>${b.trip_type === 'roundtrip' ? 'Round Trip' : 'One Way'}</span>
-            <span>${b.passengers || 1} Pax</span>
-          </div>
-        </div>
-        <div class="booking-status ${statusClass(b.status)}">${statusLabel(b.status)}</div>
-      </div>`;
+    function buildBookingCard(b, quoteCount) {
+      const isActive = b.status === 'open' || b.status === 'pending';
+      let timerHtml = '';
+      if (isActive && b.created_at) {
+        const createdMs = new Date(b.created_at).getTime();
+        const expiresMs = createdMs + 60 * 60 * 1000;
+        const remainMs = expiresMs - Date.now();
+        if (remainMs > 0) {
+          const remMin = Math.floor(remainMs / 60000);
+          const remSec = Math.floor((remainMs % 60000) / 1000);
+          timerHtml = '<div class="booking-timer" data-expires="' + expiresMs + '"><span class="timer-icon">⏱</span><span class="timer-val">' + remMin + 'm ' + remSec + 's remaining</span></div>';
+        } else {
+          timerHtml = '<div class="booking-timer expired-label">Window closed</div>';
+        }
+      }
+      const qc = quoteCount != null ? quoteCount : 0;
+      const qBadge = isActive ? '<div class="booking-quotes">' + qc + ' quote' + (qc !== 1 ? 's' : '') + ' received</div>' : '';
+      return '<div class="booking-item" onclick="location.href=\'results.html?query_id=' + b.id + '\'" style="cursor:pointer">'
+        + '<div>'
+        + '<div class="booking-route">' + (b.departure || '—') + ' <span style="color:var(--gold);margin:0 6px">→</span> ' + (b.destination || '—') + '</div>'
+        + '<div class="booking-meta">'
+        + '<span>' + formatDate(b.flight_date) + '</span>'
+        + '<span>' + (b.trip_type === 'roundtrip' ? 'Round Trip' : 'One Way') + '</span>'
+        + '<span>' + (b.passengers || 1) + ' Pax</span>'
+        + '</div>'
+        + timerHtml
+        + '</div>'
+        + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">'
+        + '<div class="booking-status ' + statusClass(b.status) + '">' + statusLabel(b.status) + '</div>'
+        + qBadge
+        + '</div>'
+        + '</div>';
     }
-
     function loadBookings(userId) {
       const sb = window._svSupabase;
       if (!sb) return;
-      const today = new Date().toISOString().split('T')[0];
+      // Save userId so switchTab can refresh
+      window._svCurrentUserId = userId;
 
       sb.from('queries').select('*').eq('user_id', userId).order('created_at', { ascending: false })
-        .then(({ data, error }) => {
+        .then(function(res) {
+          const data = res.data; const error = res.error;
           if (error || !data) return;
-
-          const active = data.filter(b => b.status === 'open' || b.status === 'confirmed');
-          const past = data.filter(b => (b.status === 'confirmed' || b.status === 'expired') && b.flight_date < today);
-          const aList = document.getElementById('active-list');
-          const pList = document.getElementById('past-list');
-
+          const active = data.filter(function(b){ return b.status === 'open' || b.status === 'pending'; });
+          const past   = data.filter(function(b){ return b.status === 'confirmed' || b.status === 'expired'; });
+          const aList  = document.getElementById('active-list');
+          const pList  = document.getElementById('past-list');
           if (active.length > 0) {
             document.getElementById('active-empty').style.display = 'none';
-            aList.innerHTML = active.map(buildBookingCard).join('');
+            const activeIds = active.map(function(q){ return q.id; });
+            sb.from('quotes').select('query_id').in('query_id', activeIds)
+              .then(function(qres) {
+                const qdata = qres.data || [];
+                const countMap = {};
+                qdata.forEach(function(q){ countMap[q.query_id] = (countMap[q.query_id] || 0) + 1; });
+                aList.innerHTML = active.map(function(b){ return buildBookingCard(b, countMap[b.id] || 0); }).join('');
+                startBookingTimers();
+              });
           }
           if (past.length > 0) {
             document.getElementById('past-empty').style.display = 'none';
-            pList.innerHTML = past.map(buildBookingCard).join('');
+            pList.innerHTML = past.map(function(b){ return buildBookingCard(b, null); }).join('');
           }
         });
 
-      // Also load from bookings table
       sb.from('bookings').select('*').eq('user_id', userId).order('created_at', { ascending: false })
-        .then(({ data, error }) => {
+        .then(function(res) {
+          const data = res.data; const error = res.error;
           if (error || !data || data.length === 0) return;
-          const today = new Date().toISOString().split('T')[0];
-          const active = data.filter(b => b.status === 'pending' || b.status === 'confirmed');
-          const past = data.filter(b => b.status === 'confirmed' && b.flight_date < today);
+          const active = data.filter(function(b){ return b.status === 'pending' || b.status === 'confirmed'; });
+          const past   = data.filter(function(b){ return b.status !== 'pending' && b.status !== 'confirmed'; });
           const aList2 = document.getElementById('active-list');
           const pList2 = document.getElementById('past-list');
-
           if (active.length) {
             document.getElementById('active-empty').style.display = 'none';
-            aList2.innerHTML += active.map(buildBookingCard).join('');
+            aList2.innerHTML += active.map(function(b){ return buildBookingCard(b, null); }).join('');
           }
           if (past.length) {
             document.getElementById('past-empty').style.display = 'none';
-            pList2.innerHTML += past.map(buildBookingCard).join('');
+            pList2.innerHTML += past.map(function(b){ return buildBookingCard(b, null); }).join('');
           }
         });
     }
-
-    function loadProfile(session) {
-      const user = session && session.user ? session.user : session;
-      if (!user) return;
-      currentUserId = user.id;
-
-      document.getElementById('display-name').textContent = user.user_metadata?.full_name || user.email?.split('@')[0] || '—';
-      document.getElementById('display-email').textContent = user.email || '—';
-
-      const chip = document.getElementById('sv-user-chip');
-      const nameNav = document.getElementById('sv-user-name');
-      if (chip && user.user_metadata?.full_name) {
-        nameNav.textContent = user.user_metadata.full_name.split(' ')[0];
-        chip.style.display = 'flex';
-      }
-
-      const sb = window._svSupabase;
-      if (sb) {
-        sb.from('profiles').select('phone, date_of_birth, nationality, passport_number, aadhaar_number, kyc_verified').eq('id', user.id).single()
-          .then(({ data }) => {
-            if (!data) return;
-            if (data.phone) document.getElementById('phone-input').value = data.phone;
-            if (data.date_of_birth) document.getElementById('dob-input').value = data.date_of_birth;
-            if (data.nationality) document.getElementById('nationality-input').value = data.nationality;
-            if (data.passport_number) document.getElementById('passport-input').value = data.passport_number;
-            if (data.aadhaar_number) document.getElementById('aadhaar-input').value = data.aadhaar_number;
-            // Update KYC badge based on status
-            const status = data.kyc_verified ? 'verified' : (data.kyc_status || 'not_submitted');
-            updateKycBadge(status);
-
-            // Show existing uploaded docs
-            loadExistingDocs(user.id, sb);
-          });
-      }
-
-      loadBookings(user.id);
-    }
-
     function savePersonal() {
       const btn = document.getElementById('save-personal-btn');
       btn.disabled = true;
@@ -656,6 +648,24 @@
     }
 
     document.addEventListener('DOMContentLoaded', waitForAuth);
+  
+    function startBookingTimers() {
+      document.querySelectorAll('.booking-timer[data-expires]').forEach(function(el) {
+        function tick() {
+          var expires = parseInt(el.dataset.expires, 10);
+          var rem = expires - Date.now();
+          if (rem <= 0) {
+            el.textContent = 'Window closed';
+            el.classList.add('expired-label');
+            return;
+          }
+          var m = Math.floor(rem / 60000);
+          var s = Math.floor((rem % 60000) / 1000);
+          var valEl = el.querySelector('.timer-val');
+          if (valEl) valEl.textContent = m + 'm ' + s + 's remaining';
+          setTimeout(tick, 1000);
+        }
+        tick();
+      });
+    }
   </script>
-</body>
-</html>
