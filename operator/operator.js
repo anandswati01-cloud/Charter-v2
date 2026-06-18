@@ -295,6 +295,7 @@ async function loadAllData(){
       var nowExpiredQueryIds=expiredQueries.map(function(q){return q.id;});
       var activeShared=shared.filter(function(q){return!nowExpiredQueryIds.includes(q.query_id);});
       var _cs=document.getElementById('count-shared');if(_cs)_cs.textContent=activeShared.length;
+      var _qb2=document.getElementById('queries-badge');if(_qb2)_qb2.textContent=unquoted.length+activeShared.length;
       renderSharedList(activeShared);
       var ce=document.getElementById('count-expired');if(ce)ce.textContent=expiredQueries.length;
       renderExpiredList(expiredQueries);
