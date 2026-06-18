@@ -195,10 +195,10 @@ function goToPayment2() {
 
   /* — Auth gate: user must be signed in before proceeding to payment — */
   var _sbAuth = window._svSupabase;
-  if (!_sbAuth) { if (typeof openAuthModal === 'function') openAuthModal(); return; }
+  if (!_sbAuth) { if (typeof signInWithGoogle === 'function') signInWithGoogle(); return; }
   _sbAuth.auth.getSession().then(function(_authRes) {
     if (!_authRes.data || !_authRes.data.session) {
-      if (typeof openAuthModal === 'function') openAuthModal();
+      if (typeof signInWithGoogle === 'function') signInWithGoogle();
       return;
     }
     _doProceedToPayment2();
