@@ -294,7 +294,7 @@ async function doAdminLogin(){
   if(!pw){errEl.textContent='Please enter your password.';errEl.classList.add('show');return;}
   var email=SKYVAYU_CONFIG.adminEmail||'';
   if(!email){errEl.textContent='Admin email not configured.';errEl.classList.add('show');return;}
-  var sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+  if(!_adminSb)_adminSb=createClient(SUPABASE_URL,SUPABASE_KEY); var sb=_adminSb;
   window.__sb=sb;
   var authRes=await sb.auth.signInWithPassword({email:email,password:pw});
   if(authRes.error){errEl.textContent=authRes.error.message||'Invalid password.';errEl.classList.add('show');return;}
@@ -507,6 +507,7 @@ var _dbData={queries:[],quotes:[],clients:[],operators:[],aircraft:[],employees:
 var _dbFilter='';
 var _dbActiveTab='queries';
 var _dbLoaded=false;
+var _adminSb=null;
 
 function switchSection(section){
   var topBar=document.querySelector('.top-bar');
@@ -547,7 +548,7 @@ function dbSearch(val){
 }
 
 async function loadDatabaseSection(){
-  var sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+  if(!_adminSb)_adminSb=createClient(SUPABASE_URL,SUPABASE_KEY); var sb=_adminSb;
   var results=await Promise.all([
     sb.from('queries').select('*').order('created_at',{ascending:false}),
     sb.from('quotes').select('*').order('created_at',{ascending:false}),
