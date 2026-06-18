@@ -341,60 +341,97 @@ nav{
 </div>
 
 <script>
-var conf = JSON.parse(sessionStorage.getItem('sv_confirmation') || '{}');
-if (!conf.ref) { var _r = sessionStorage.getItem('sv_booking_ref'); if (_r) conf.ref = _r; }
+/* ── Confirmation page: load booking data from sessionStorage or Supabase ── */
+(function() {
+  var conf = JSON.parse(sessionStorage.getItem('sv_confirmation') || '{}');
 
-if (!conf.ref) {
-  // No confirmation data — redirect home
-  setTimeout(function(){ window.location.href = 'index.html'; }, 1500);
-}
+  // Also grab ref from URL param as fallback (?ref=SKY-1234)
+  var urlRef = (new URLSearchParams(window.location.search)).get('ref') || null;
+  if (!conf.ref && urlRef) conf.ref = urlRef;
 
-function setText(id, val) {
-  var el = document.getElementById(id);
-  if (el) el.textContent = val || '—';
-}
+  function setText(id, val) {
+    var el = document.getElementById(id);
+    if (el && val) el.textContent = val;
+  }
+  function getName(s){ return s ? s.replace(/\s*\([^)]+\)/,'').trim() : ''; }
+  function getCode(s){ var m = s ? s.match(/\(([A-Z]{3})\)/) : null; return m ? m[1] : (s ? s.substring(0,3).toUpperCase() : '—'); }
 
-// Populate
-setText('conf-ref', conf.ref);
-setText('conf-operator', conf.op_name);
-setText('conf-aircraft', conf.aircraft);
-setText('conf-total', conf.total);
-setText('conf-type', (conf.route && conf.route.includes('⇄')) ? 'ROUND TRIP CHARTER' : 'ONE WAY CHARTER');
-setText('conf-pax', conf.pax ? conf.pax + ' Traveller' + (parseInt(conf.pax) !== 1 ? 's' : '') : '—');
+  function populateConf(conf) {
+    setText('conf-ref', conf.ref);
+    setText('conf-operator', conf.op_name);
+    setText('conf-aircraft', conf.aircraft);
+    setText('conf-total', conf.total);
+    setText('conf-type', (conf.route && conf.route.includes('⇄')) ? 'ROUND TRIP CHARTER' : 'ONE WAY CHARTER');
+    setText('conf-pax', conf.pax ? conf.pax + (conf.pax === 1 ? ' Passenger' : ' Passengers') : '—');
 
-// Parse route
-var route = conf.route || '';
-var routeParts = route.split(/→|⇄/).map(function(s){ return s.trim(); });
-var dep = routeParts[0] || '';
-var dest = routeParts[1] || '';
-function getCode(s){ var m = s.match(/\(([^)]+)\)/); return m ? m[1] : s.substring(0,3).toUpperCase(); }
-function getName(s){ return s.replace(/\s*\([^)]+\)/,'').trim(); }
-setText('conf-dep-code', dep ? getCode(dep) : '—');
-setText('conf-dest-code', dest ? getCode(dest) : '—');
-setText('conf-route-full', (dep ? getName(dep) : '') + (dest ? ' to ' + getName(dest) : ''));
+    // Parse route
+    var routeParts = conf.route ? conf.route.split('→') : [];
+    var dep  = routeParts[0] ? routeParts[0].trim() : '';
+    var dest = routeParts[1] ? routeParts[1].trim() : '';
+    setText('conf-dep-code',   dep  ? getCode(dep)  : '—');
+    setText('conf-dest-code',  dest ? getCode(dest) : '—');
+    setText('conf-route-full', (dep ? getName(dep) : '') + (dest ? ' to ' + getName(dest) : ''));
 
-// Parse date/time
-var dateStr = conf.date || '';
-var dateParts = dateStr.split(',');
-setText('conf-date', dateParts[0] ? dateParts[0].trim() : dateStr);
-var timePart = dateParts[1] ? dateParts[1].trim() : '';
-// Try to extract time from rs_date format "01 Jun 2026, 10:30"
-setText('conf-time', timePart || '—');
+    // Parse date / time
+    var dateStr   = conf.date || '';
+    var dateParts = dateStr.split(',');
+    var timePart  = dateParts[1] ? dateParts[1].trim() : null;
+    setText('conf-date', dateParts[0] ? dateParts[0].trim() : dateStr);
+    setText('conf-time', timePart || '—');
+  }
 
-// Copy ref
+  function showFallback() {
+    var refEl = document.getElementById('conf-ref');
+    if (refEl) refEl.textContent = urlRef || '—';
+    var subEl = document.querySelector('.success-sub');
+    if (subEl) subEl.textContent = 'Your booking has been placed. Full details have been sent to your email and phone.';
+  }
+
+  if (conf.ref) {
+    populateConf(conf);
+  } else if (urlRef) {
+    // Ref in URL but no sessionStorage cache — fetch from Supabase
+    try {
+      var cfg = window.SKYVAYU_CONFIG || {};
+      var supaUrl = cfg.supabaseUrl || 'https://bkumggqijgxyfotpbcni.supabase.co';
+      var supaKey = cfg.supabaseKey || '';
+      fetch(supaUrl + '/rest/v1/bookings?ref=eq.' + encodeURIComponent(urlRef) + '&select=*&limit=1', {
+        headers: { 'apikey': supaKey, 'Authorization': 'Bearer ' + supaKey }
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(rows) {
+        if (rows && rows[0]) {
+          var b = rows[0];
+          populateConf({
+            ref:      b.ref,
+            op_name:  b.operator_name,
+            aircraft: b.aircraft,
+            total:    b.total_amount ? '₹' + Number(b.total_amount).toLocaleString('en-IN') : '—',
+            route:    b.route,
+            date:     b.flight_date,
+            pax:      b.passengers
+          });
+        } else { showFallback(); }
+      })
+      .catch(function() { showFallback(); });
+    } catch(e) { showFallback(); }
+  } else {
+    showFallback();
+  }
+})();
+
 function copyRef() {
-  navigator.clipboard.writeText(conf.ref || '').then(function(){
+  var refEl = document.getElementById('conf-ref');
+  var text = refEl ? refEl.textContent : '';
+  navigator.clipboard.writeText(text).then(function(){
     var btn = document.querySelector('.btn-copy');
-    if (btn) { btn.textContent = 'Copied!'; setTimeout(function(){ btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Reference'; }, 2000); }
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = 'Copy'; }, 2000); }
   });
 }
 
-function viewBookingDetails() {
-  window.location.href = 'payment.html';
-}
+function viewBookingDetails() { window.location.href = 'profile.html'; }
 
 function downloadInvoice() {
-  // Future: generate PDF invoice
   alert('Invoice download coming soon.');
 }
 </script>
