@@ -106,6 +106,18 @@ if (saved && saved.booking_ref) sessionStorage.setItem('sv_booking_ref', saved.b
 async function saveBookingToSupabase(bookingData) {
   var SUPABASE_URL = SKYVAYU_CONFIG.supabaseUrl;
   var SUPABASE_KEY = SKYVAYU_CONFIG.supabaseKey;
+
+  // Get current user's JWT for authenticated insert (satisfies RLS)
+  var authToken = SUPABASE_KEY; // default: anon key
+  try {
+    if (window._svSupabase) {
+      var sessionResp = await window._svSupabase.auth.getSession();
+      if (sessionResp.data && sessionResp.data.session && sessionResp.data.session.access_token) {
+        authToken = sessionResp.data.session.access_token;
+      }
+    }
+  } catch (e) { /* fall back to anon key */ }
+
   var safe = {
     query_id:      bookingData.query_id      || null,
     quote_id:      bookingData.quote_id      || null,
@@ -120,8 +132,7 @@ async function saveBookingToSupabase(bookingData) {
     passengers:    parseInt(bookingData.passengers)         || null,
     total_amount:  parseFloat(bookingData.total_amount)     || null,
     platform_fee:  parseFloat(bookingData.platform_fee)     || null,
-    status:        'confirmed',
-    user_id:       bookingData.user_id     || null
+    status:        'confirmed'
   };
   try {
     var response = await fetchWithTimeout(
@@ -131,21 +142,20 @@ async function saveBookingToSupabase(bookingData) {
         headers: {
           'Content-Type':  'application/json',
           'apikey':         SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Authorization': 'Bearer ' + authToken,
           'Prefer':         'return=representation'
         },
         body: JSON.stringify(safe)
       }
     );
-    var text = await response.text();
     if (!response.ok) {
-      var errMsg = 'Could not confirm your booking. Please contact support.';
-      try { var errData = JSON.parse(text); if (errData.message) errMsg = errData.message; } catch (e) {}
-      console.error('Booking save error', response.status, text);
+      var errText = await response.text();
+      var errMsg  = 'Booking save failed (' + response.status + '). Please try again or contact support.';
+      console.error('Booking save error', response.status, errText);
       showToast(errMsg, 'error');
       return null;
     }
-    var data = JSON.parse(text);
+    var data = await response.json();
     return (Array.isArray(data) && data[0]) ? data[0] : null;
   } catch (e) {
     if (e.name === 'AbortError') {
