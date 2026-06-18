@@ -211,6 +211,8 @@ nav{
 }
 </style>
 <script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/auth.js"></script>
 </head>
 <body>
 
@@ -487,7 +489,7 @@ async function confirmBooking() {
   var ref = generateRef(q.operator_name || q.name);
 
     // Get authenticated user
-    var sessionData = await supabase.auth.getSession();
+    var sessionData = await (window._svSupabase || window.supabase).auth.getSession();
     var currentUser = (sessionData && sessionData.data && sessionData.data.session) ? sessionData.data.session.user : null;
 
   var bookingPayload = {
