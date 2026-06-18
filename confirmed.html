@@ -344,10 +344,7 @@ nav{
 /* ── Confirmation page: load booking data from sessionStorage or Supabase ── */
 (function() {
   var conf = JSON.parse(sessionStorage.getItem('sv_confirmation') || '{}');
-
-  // Also grab ref from URL param as fallback (?ref=SKY-1234)
   var urlRef = (new URLSearchParams(window.location.search)).get('ref') || null;
-  if (!conf.ref && urlRef) conf.ref = urlRef;
 
   function setText(id, val) {
     var el = document.getElementById(id);
@@ -356,67 +353,71 @@ nav{
   function getName(s){ return s ? s.replace(/\s*\([^)]+\)/,'').trim() : ''; }
   function getCode(s){ var m = s ? s.match(/\(([A-Z]{3})\)/) : null; return m ? m[1] : (s ? s.substring(0,3).toUpperCase() : '—'); }
 
-  function populateConf(conf) {
-    setText('conf-ref', conf.ref);
-    setText('conf-operator', conf.op_name);
-    setText('conf-aircraft', conf.aircraft);
-    setText('conf-total', conf.total);
-    setText('conf-type', (conf.route && conf.route.includes('⇄')) ? 'ROUND TRIP CHARTER' : 'ONE WAY CHARTER');
-    setText('conf-pax', conf.pax ? conf.pax + (conf.pax === 1 ? ' Passenger' : ' Passengers') : '—');
-
-    // Parse route
-    var routeParts = conf.route ? conf.route.split('→') : [];
+  function populateConf(d) {
+    setText('conf-ref', d.ref);
+    setText('conf-operator', d.op_name);
+    setText('conf-aircraft', d.aircraft);
+    setText('conf-total', d.total);
+    setText('conf-type', (d.route && d.route.includes('⇄')) ? 'ROUND TRIP CHARTER' : 'ONE WAY CHARTER');
+    setText('conf-pax', d.pax ? d.pax + (d.pax === 1 ? ' Passenger' : ' Passengers') : '—');
+    var routeParts = d.route ? d.route.split('→') : [];
     var dep  = routeParts[0] ? routeParts[0].trim() : '';
     var dest = routeParts[1] ? routeParts[1].trim() : '';
     setText('conf-dep-code',   dep  ? getCode(dep)  : '—');
     setText('conf-dest-code',  dest ? getCode(dest) : '—');
     setText('conf-route-full', (dep ? getName(dep) : '') + (dest ? ' to ' + getName(dest) : ''));
-
-    // Parse date / time
-    var dateStr   = conf.date || '';
+    var dateStr   = d.date || '';
     var dateParts = dateStr.split(',');
     var timePart  = dateParts[1] ? dateParts[1].trim() : null;
     setText('conf-date', dateParts[0] ? dateParts[0].trim() : dateStr);
     setText('conf-time', timePart || '—');
   }
 
-  function showFallback() {
-    var refEl = document.getElementById('conf-ref');
-    if (refEl) refEl.textContent = urlRef || '—';
+  function populateFromBooking(b) {
+    populateConf({
+      ref:      b.ref,
+      op_name:  b.operator_name,
+      aircraft: b.aircraft,
+      total:    b.total_amount ? '₹' + Number(b.total_amount).toLocaleString('en-IN') : '—',
+      route:    b.route,
+      date:     b.flight_date,
+      pax:      b.passengers
+    });
+  }
+
+  function showFallback(ref) {
+    setText('conf-ref', ref || '—');
     var subEl = document.querySelector('.success-sub');
     if (subEl) subEl.textContent = 'Your booking has been placed. Full details have been sent to your email and phone.';
   }
 
-  if (conf.ref) {
-    populateConf(conf);
-  } else if (urlRef) {
-    // Ref in URL but no sessionStorage cache — fetch from Supabase
+  function fetchFromSupabase(ref) {
     try {
       var cfg = window.SKYVAYU_CONFIG || {};
       var supaUrl = cfg.supabaseUrl || 'https://bkumggqijgxyfotpbcni.supabase.co';
       var supaKey = cfg.supabaseKey || '';
-      fetch(supaUrl + '/rest/v1/bookings?ref=eq.' + encodeURIComponent(urlRef) + '&select=*&limit=1', {
+      fetch(supaUrl + '/rest/v1/bookings?ref=eq.' + encodeURIComponent(ref) + '&select=*&limit=1', {
         headers: { 'apikey': supaKey, 'Authorization': 'Bearer ' + supaKey }
       })
       .then(function(r){ return r.json(); })
       .then(function(rows) {
-        if (rows && rows[0]) {
-          var b = rows[0];
-          populateConf({
-            ref:      b.ref,
-            op_name:  b.operator_name,
-            aircraft: b.aircraft,
-            total:    b.total_amount ? '₹' + Number(b.total_amount).toLocaleString('en-IN') : '—',
-            route:    b.route,
-            date:     b.flight_date,
-            pax:      b.passengers
-          });
-        } else { showFallback(); }
+        if (rows && rows[0]) { populateFromBooking(rows[0]); }
+        else { showFallback(ref); }
       })
-      .catch(function() { showFallback(); });
-    } catch(e) { showFallback(); }
+      .catch(function() { showFallback(ref); });
+    } catch(e) { showFallback(ref); }
+  }
+
+  var confHasData = conf.op_name || conf.total || conf.aircraft;
+
+  if (confHasData) {
+    if (!conf.ref && urlRef) conf.ref = urlRef;
+    populateConf(conf);
+  } else if (urlRef) {
+    setText('conf-ref', urlRef);
+    fetchFromSupabase(urlRef);
   } else {
-    showFallback();
+    showFallback(null);
   }
 })();
 
