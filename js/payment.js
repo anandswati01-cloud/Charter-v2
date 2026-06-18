@@ -193,6 +193,18 @@ function goToPayment2() {
   // If still in edit mode, save first
   if (_editMode) setEditMode(false);
 
+  /* — Auth gate: user must be signed in before proceeding to payment — */
+  var _sbAuth = window._svSupabase;
+  if (!_sbAuth) { if (typeof openAuthModal === 'function') openAuthModal(); return; }
+  _sbAuth.auth.getSession().then(function(_authRes) {
+    if (!_authRes.data || !_authRes.data.session) {
+      if (typeof openAuthModal === 'function') openAuthModal();
+      return;
+    }
+    _doProceedToPayment2();
+  });
+}
+function _doProceedToPayment2() {
   var clientName  = (document.getElementById('client-name')  || {}).value || '';
   var clientEmail = (document.getElementById('client-email') || {}).value || '';
   var clientPhone = (document.getElementById('client-phone') || {}).value || '';
