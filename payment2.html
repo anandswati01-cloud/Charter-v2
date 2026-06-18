@@ -532,7 +532,7 @@ async function confirmBooking() {
   }));
   sessionStorage.setItem('sv_booking_ref', saved.ref || ref);
 
-  window.location.href = 'confirmed.html';
+  window.location.href = 'confirmed.html?ref=' + encodeURIComponent(saved.ref || ref);
 }
 </script>
 </body>
