@@ -669,3 +669,13 @@
       });
     }
   </script>
+<script>
+(function(){
+  var h=location.hash;
+  if(h==='#tab-active'||h==='#tab-past'){
+    var name=h.slice(5);
+    var btn=document.querySelector('.tab-btn');
+    if(typeof switchTab==='function') switchTab(name,btn);
+  }
+})();
+</script>
