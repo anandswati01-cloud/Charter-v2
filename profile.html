@@ -675,7 +675,13 @@
   if(h==='#tab-active'||h==='#tab-past'){
     var name=h.slice(5);
     var btn=document.querySelector('.tab-btn');
-    if(typeof switchTab==='function') switchTab(name,btn);
+    if(typeof switchTab==='function') {
+      switchTab(name,btn);
+      setTimeout(function(){
+        var el=document.getElementById('tab-'+name);
+        if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+      },100);
+    }
   }
 })();
 </script>
