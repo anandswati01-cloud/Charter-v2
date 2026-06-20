@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/theme.css">
-  <style>
+  <style> 
     :root {
       --navy: #0c1324;
       --navy-mid: #0f1a30;
@@ -629,6 +629,38 @@
       const sb = window._svSupabase;
       if (sb) sb.auth.signOut().then(() => { window.location.href = '/'; });
       else window.location.href = '/';
+    }
+
+    function loadProfile(session) {
+      var user = session && session.user ? session.user : session;
+      if (!user || !user.id) return;
+      currentUserId = user.id;
+      window._svCurrentUserId = user.id;
+      var nameEl = document.getElementById('display-name');
+      var emailEl = document.getElementById('display-email');
+      if (nameEl) nameEl.textContent = (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name : user.email || '\u2014';
+      if (emailEl) emailEl.textContent = user.email || '\u2014';
+      var sb = window._svSupabase;
+      if (!sb) { loadBookings(user.id); return; }
+      sb.from('profiles').select('*').eq('id', user.id).single()
+        .then(function(res) {
+          var p = res.data;
+          if (p) {
+            var ph = document.getElementById('phone-input');
+            if (ph && p.phone) ph.value = p.phone;
+            var dob = document.getElementById('dob-input');
+            if (dob && p.date_of_birth) dob.value = p.date_of_birth;
+            var nat = document.getElementById('nationality-input');
+            if (nat && p.nationality) nat.value = p.nationality;
+            var pass = document.getElementById('passport-input');
+            if (pass && p.passport_number) pass.value = p.passport_number;
+            var aadh = document.getElementById('aadhaar-input');
+            if (aadh && p.aadhaar_number) aadh.value = p.aadhaar_number;
+            updateKycBadge(p.kyc_status || 'unverified');
+            loadExistingDocs(user.id, sb);
+          }
+          loadBookings(user.id);
+        });
     }
 
     function waitForAuth() {
