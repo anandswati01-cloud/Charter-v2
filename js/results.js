@@ -171,6 +171,7 @@ async function loadQuotes() {
     if (!queryId) {
           console.warn('results.js: no queryId in sessionStorage or URL');
           document.getElementById('quotes-container').innerHTML = '<div class="loading-state"><div style="color:#e06060;font-size:13px;">No booking found. Please <a href="index.html" style="color:#17b0d6;">submit a new booking</a>.</div></div>';
+          var _snt=document.getElementById('stat-notified-txt');if(_snt)_snt.textContent='0';
           return;
     }
     console.log('results.js: loading quotes for query', queryId);
