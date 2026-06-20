@@ -337,6 +337,14 @@ nav{
     <a href="index.html#section-routes">Routes</a>
     <a href="index.html#section-why">About Us</a>
   </div>
+  <div style="position:absolute;right:40px;display:flex;align-items:center;gap:12px;">
+    <button id="sv-login-btn" onclick="signInWithGoogle()" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.6);background:transparent;border:1px solid rgba(255,255,255,0.25);padding:8px 16px;border-radius:2px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='#fbbf24';this.style.color='#fbbf24'" onmouseout="this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='rgba(255,255,255,0.6)'">Sign In</button>
+    <div id="sv-user-chip" style="display:none;align-items:center;gap:8px;">
+      <a href="/profile" id="sv-user-name" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:#fbbf24;text-transform:uppercase;text-decoration:none;"></a>
+      <a href="/profile#tab-active" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:rgba(255,255,255,0.6);text-transform:uppercase;text-decoration:none;border-left:1px solid rgba(255,255,255,0.15);padding-left:8px;" onmouseover="this.style.color='#fbbf24'" onmouseout="this.style.color='rgba(255,255,255,0.6)'">My Bookings</a>
+      <button onclick="signOut()" style="font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);background:transparent;border:none;cursor:pointer;padding:2px 6px;" title="Sign out">&#x2715;</button>
+    </div>
+  </div>
 </nav>
 
 <div class="page">
@@ -520,6 +528,7 @@ nav{
 
 <script src="js/config.js"></script>
 <script src="js/supabase.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/results.js"></script>
 </body>
 </html>
