@@ -104,6 +104,11 @@ function updateTimer() {
           el.textContent = mins + ' min ' + String(secs).padStart(2, '0') + ' sec remaining';
     } else {
           el.textContent = 'Quotation window closed';
+          if (!window._svExpiredShown) {
+            window._svExpiredShown = true;
+            var _exp = document.getElementById('results-expired-msg');
+            if (_exp) _exp.style.display = 'block';
+          }
     }
     var pct = Math.min((nowElapsed / totalSeconds) * 100, 100);
     document.getElementById('progress-fill').style.width = pct + '%';
