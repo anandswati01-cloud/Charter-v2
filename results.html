@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="css/theme.css"/>
 <title>Live Quotes — SkyVayu</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/> 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/> 
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -326,6 +326,19 @@ nav{
   [data-theme="light"] .view-queries-tab { background: #fff; border-color: rgba(13,27,42,0.12); }
 </style>
 <script src="js/theme.js"></script>
+
+  <style id="flow-progress-css">
+    .flow-progress{display:flex;align-items:center;justify-content:center;padding:14px 0 8px;background:var(--bg);border-bottom:1px solid var(--border);}
+    .flow-step{display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .flow-step-dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);background:transparent;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,.3);font-family:monospace;}
+    .flow-step.active .flow-step-dot{border-color:#fbbf24;background:#fbbf24;color:#0c1324;font-weight:700;}
+    .flow-step.done .flow-step-dot{border-color:#22c55e;background:#22c55e;color:#fff;}
+    .flow-step-label{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);white-space:nowrap;}
+    .flow-step.active .flow-step-label{color:#fbbf24;}
+    .flow-step.done .flow-step-label{color:#22c55e;}
+    .flow-connector{width:48px;height:1px;background:var(--border);margin:0 6px 13px;}
+    .flow-step.done + .flow-connector{background:#22c55e;}
+  </style>
 </head>
 <body>
 
@@ -346,6 +359,14 @@ nav{
     </div>
   </div>
 </nav>
+<div class="flow-progress">
+  <div class="flow-step done"><div class="flow-step-dot">✓</div><div class="flow-step-label">Your Route</div></div>
+  <div class="flow-connector"></div>
+  <div class="flow-step active"><div class="flow-step-dot">2</div><div class="flow-step-label">Live Quotes</div></div>
+  <div class="flow-connector"></div>
+  <div class="flow-step"><div class="flow-step-dot">3</div><div class="flow-step-label">Confirm</div></div>
+</div>
+
 
 <div class="page">
 
