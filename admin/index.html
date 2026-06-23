@@ -548,7 +548,7 @@ function dbSearch(val){
 }
 
 async function loadDatabaseSection(){
-  if(!_adminSb)_adminSb=createClient(SUPABASE_URL,SUPABASE_KEY); var sb=_adminSb;
+var sb=window.__sb||(window.__sb=createClient(SUPABASE_URL,SUPABASE_KEY));
   var results=await Promise.all([
     sb.from('queries').select('*').order('created_at',{ascending:false}),
     sb.from('quotes').select('*').order('created_at',{ascending:false}),
