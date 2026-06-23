@@ -4,17 +4,32 @@ var _editMode = true;
 
 document.addEventListener('DOMContentLoaded', function() {
   // Try sv_selected_quote (set by results.html) first, fall back to sv_selected_op
-  var raw = sessionStorage.getItem('sv_selected_quote') || sessionStorage.getItem('sv_selected_op');
+  var _urlP=new URLSearchParams(window.location.search);var _urlQuoteId=_urlP.get('quote_id');var _urlQueryId=_urlP.get('query_id');var raw=sessionStorage.getItem('sv_selected_quote')||sessionStorage.getItem('sv_selected_op');
   var queryRaw = sessionStorage.getItem('sv_query');
   var queryData = {};
   if (queryRaw) { try { queryData = JSON.parse(queryRaw); } catch(e){} }
 
-  if (!raw) {
+  if (!raw && !_urlQuoteId) {
     showToast('No quote selected. Please choose a quote first.', 'error');
-    setTimeout(function() { window.location.href = 'results.html'; }, 2500);
+    setTimeout(function() { window.location.href = (_urlQueryId ? 'results.html?query_id='+_urlQueryId : 'results.html'); }, 2500);
     return;
   }
 
+      // If quote_id in URL but no sessionStorage data, fetch from Supabase then reload
+      if (!raw && _urlQuoteId) {
+              fetch(SKYVAYU_CONFIG.supabaseUrl+'/rest/v1/quotes?id=eq.'+_urlQuoteId+'&select=*', {headers:{'apikey':SKYVAYU_CONFIG.supabaseKey,'Authorization':'Bearer '+SKYVAYU_CONFIG.supabaseKey}})
+                .then(function(r){return r.json();})
+                .then(function(data){
+                            if(Array.isArray(data)&&data.length>0){
+                                          sessionStorage.setItem('sv_selected_quote',JSON.stringify(data[0]));
+                                          window.location.reload();
+                            } else {
+                                          showToast('Quote not found.','error');
+                                          setTimeout(function(){window.location.href='results.html'+(queryData.id?'?query_id='+queryData.id:'');},2500);
+                            }
+                }).catch(function(){window.location.href='results.html';});
+              return;
+      }
   try {
     var q = JSON.parse(raw);
 
