@@ -1020,11 +1020,6 @@
   }
 })();
 </script>
-<div id="uc-banner" style="background:#1a2535;border-bottom:1px solid rgba(242,202,80,0.3);padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;z-index:9999;font-family:'DM Mono','Courier New',monospace;">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F2CA50" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-  <span style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(238,232,213,0.85);">This website is under construction — not a live product. Queries submitted are for testing only.</span>
-  <button onclick="document.getElementById('uc-banner').style.display='none'" style="position:absolute;right:16px;background:none;border:none;color:rgba(238,232,213,0.5);font-size:16px;cursor:pointer;line-height:1;padding:0;" title="Dismiss">&times;</button>
-</div>
 
   <!-- NAV -->
   <nav class="nav">
@@ -1338,7 +1333,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="footer-copy">© 2025 SkyVayu Aviation. The Celestial Navigator.</div>
+      <div class="footer-copy">© 2026 SkyVayu Aviation. The Celestial Navigator.</div>
       <div class="footer-ops">Global Ops: Mumbai · Delhi · Dubai</div>
     </div>
   </footer>
@@ -1412,7 +1407,7 @@ function getQuotes() {
     var pax=document.getElementById('paxNum')?document.getElementById('paxNum').textContent:'2';
     var acType=(document.querySelector('.aircraft-btn.active')||{dataset:{}}).dataset.type||'fixed_wing';var params=new URLSearchParams({from:from,to:to,date:date,pax:pax,trip:tripMode,ac:acType});
     if(tripMode==='Round Trip'&&returnDate)params.set('returnDate',returnDate);
-    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(paxEl?paxEl.textContent:2)||2});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open',aircraft_category:acType};
+    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)var secPaxEl=document.getElementById('sec-pax-'+n);sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(secPaxEl?secPaxEl.textContent:2)||2});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open',aircraft_category:acType};
     openOtpModal();
   }
   
