@@ -271,7 +271,7 @@ async function loadAllData(){
   var _ca=document.getElementById('count-active');if(_ca)_ca.textContent=unquoted.length;
   var _cs=document.getElementById('count-shared');if(_cs)_cs.textContent=shared.length;
   var _cc=document.getElementById('count-confirmed');if(_cc)_cc.textContent=confirmed.length;
-  var _qb=document.getElementById('queries-badge');if(_qb)_qb.textContent=unquoted.length+shared.length;
+  var _qb=document.getElementById('queries-badge');if(_qb)_qb.textContent=allActiveClaims.length;
   var cat=currentOperator.aircraft_category||'fixed_wing';
   sbFetch('queries?status=eq.open&aircraft_category=in.('+cat+')&created_at=lt.'+encodeURIComponent(new Date(Date.now()-60*60*1000).toISOString())+'&order=created_at.desc&limit=100')
     .then(function(res){
