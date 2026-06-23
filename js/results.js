@@ -46,7 +46,9 @@ function populateSidebar(data) {
     document.getElementById('meta-date').textContent = dateTimeDisplay;
 
   var pax = data.passengers || data.rs_pax || '—';
-    var tripType = data.trip_type || data.rs_type || 'One Way';
+    var tripTypeRaw = data.trip_type || data.rs_type || 'one_way';
+    var tripTypeMap = {'one_way':'One Way','round_trip':'Round Trip','roundtrip':'Round Trip','Round Trip':'Round Trip','One Way':'One Way','Multiple Sectors':'Multiple Sectors','multiple_sectors':'Multiple Sectors'};
+    var tripType = tripTypeMap[tripTypeRaw] || tripTypeRaw.replace(/_/g,' ').replace(/\b\w/g,function(c){return c.toUpperCase();});
     document.getElementById('meta-pax').textContent = pax + ' Passenger' + (parseInt(pax) !== 1 ? 's' : '') + ', ' + tripType;
 
   var reqs = [];
