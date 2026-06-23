@@ -404,7 +404,7 @@
     }
 
     function statusLabel(status) {
-      const map = { confirmed: 'Confirmed', open: 'Awaiting Quote', expired: 'Expired', cancelled: 'Cancelled', pending: 'Pending' };
+      const map = { confirmed: 'Confirmed', open: 'Awaiting Quote', expired: 'Window Closed', cancelled: 'Cancelled', pending: 'Pending', no_quotes: 'No Quotes Received' };
       return map[status] || status;
     }
 
