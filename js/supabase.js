@@ -6,7 +6,7 @@ var realtimeChannel = null;
 /* ── Toast notification ── */
 function showToast(message, type) {
   var existing = document.getElementById('sv-toast');
-  if (existing) existing.remove();
+  if (existing) existing.remove(); 
   var toast = document.createElement('div'); 
   toast.id = 'sv-toast';
   var bg = type === 'error' ? '#E24B4A' : type === 'success' ? '#2E7D52' : '#185FA5';
@@ -65,7 +65,8 @@ async function saveQueryToSupabase(queryData) {
   if (queryData.vip) safe.vip = true;
   try {
     var _svSess = await window._svSupabase.auth.getSession();
-    var _svJwt = (_svSess && _svSess.data && _svSess.data.session) ? _svSess.data.session.access_token : null;
+    var _svUid = (_svSess && _svSess.data && _svSess.data.session && _svSess.data.session.user) ? _svSess.data.session.user.id : null;
+    if (_svUid && !safe.user_id) { safe.user_id = _svUid; }
     var response = await fetchWithTimeout(
       SUPABASE_URL + '/rest/v1/queries',
       {
@@ -73,7 +74,7 @@ async function saveQueryToSupabase(queryData) {
         headers: {
           'Content-Type':  'application/json',
           'apikey':         SUPABASE_KEY,
-          'Authorization': 'Bearer ' + (_svJwt || SUPABASE_KEY),
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
           'Prefer':         'return=representation'
         },
         body: JSON.stringify(safe)
