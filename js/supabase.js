@@ -9,7 +9,7 @@ function showToast(message, type) {
   if (existing) existing.remove(); 
   var toast = document.createElement('div'); 
   toast.id = 'sv-toast';
-  var bg = type === 'error' ? '#E24B4A' : type === 'success' ? '#2E7D52' : '#185FA5';
+  var bg = type === 'error' ? '#E24B4A' : type == 'success' ? '#2E7D52' : '#185FA5';
   toast.style.cssText = [
     'position:fixed', 'bottom:24px', 'left:50%', 'transform:translateX(-50%)',
     'background:' + bg, 'color:#fff', 'padding:12px 20px', 'border-radius:8px',
@@ -135,7 +135,8 @@ async function saveBookingToSupabase(bookingData) {
     passengers:    parseInt(bookingData.passengers)         || null,
     total_amount:  parseFloat(bookingData.total_amount)     || null,
     platform_fee:  parseFloat(bookingData.platform_fee)     || null,
-    status:        'confirmed'
+    status:        'confirmed',
+        user_id:       bookingData.user_id || null
   };
   try {
     var response = await fetchWithTimeout(
