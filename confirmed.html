@@ -417,7 +417,7 @@ nav{
     setText('conf-ref', urlRef);
     fetchFromSupabase(urlRef);
   } else {
-    showFallback(null);
+    showFallback('—'); var noBookingDiv = document.getElementById('conf-ref'); if(noBookingDiv) noBookingDiv.closest('.confirmation-card') && (document.querySelector('.success-sub').textContent = 'No booking was found. Please return to your bookings and try again.'); document.querySelector('.btn-back') && (document.querySelector('.btn-back').style.display = 'inline-block');
   }
 })();
 
