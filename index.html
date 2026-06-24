@@ -988,7 +988,7 @@
   function showResumeBanner() {
     var qId = sessionStorage.getItem('sv_query_id');
     var qData = sessionStorage.getItem('sv_query');
-    if (!qId || sessionStorage.getItem('sv_banner_dismissed') === qId) return;
+    // Auto-clear stale session data if older than 60 minutes (3600000 ms)    var ts = sessionStorage.getItem('sv_query_ts');
     var banner = document.getElementById('resume-banner');
     if (!banner) return;
     banner.style.display = 'flex';
@@ -1386,7 +1386,7 @@ function getQuotes() {
     var valid=true;
     if(tripMode!=='Multiple Sectors'){
       if(!from){showErr('err-departure','Please enter a departure city');valid=false;}
-      if(!to){showErr('err-destination','Please enter a destination city');valid=false;}
+      if(!to){showErr('err-destination','Please enter a destination city');valid=false;}var secPaxEl=null;if(d&&ds&&dt){secPaxEl=document.getElementById('sec-pax-'+n);sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(secPaxEl?secPaxEl.textContent:2)||2});}
       if(!date){showErr('err-flight-date','Please select a departure date & time');valid=false;}
       if(tripMode==='Round Trip'&&!returnDate){showErr('err-return-date','Please select a return date & time');valid=false;}
             }
