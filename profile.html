@@ -404,7 +404,7 @@
     }
 
     function statusLabel(status) {
-      const map = { confirmed: 'Confirmed', open: 'Awaiting Quote', expired: 'Window Closed', cancelled: 'Cancelled', pending: 'Pending', no_quotes: 'No Quotes Received' };
+      const map = { confirmed: 'Confirmed', open: 'Awaiting Quote', expired: 'No Quotes Received', cancelled: 'Cancelled', pending: 'Pending', no_quotes: 'No Quotes Received' };
       return map[status] || status;
     }
 
@@ -457,7 +457,7 @@
         .then(function(res) {
           const data = res.data; const error = res.error;
           if (error || !data) return;
-          const active = data.filter(function(b){ return b.status === 'open' || b.status === 'pending'; });
+          const active = data.filter(function(b){ if (b.status !== 'open' && b.status !== 'pending') return false; if (b.status === 'open' && b.created_at && (Date.now() - new Date(b.created_at).getTime()) > 3600000) return false; return true; });
           const past   = data.filter(function(b){ return b.status === 'confirmed' || b.status === 'expired'; });
           const aList  = document.getElementById('active-list');
           const pList  = document.getElementById('past-list');
