@@ -8,7 +8,7 @@
     { "source": "/operator/(.*)", "destination": "/operator/$1" }
   ],
   "redirects": [
-    { "source": "/operator/profile", "destination": "/operator", "permanent": false }
+    { "source": "/operator/profile", "destination": "/operator", "permanent": false },    { "source": "/cookies", "destination": "/cookie", "permanent": true }
   ],
   "headers": [
     {
