@@ -105,7 +105,9 @@ function doLogout(){
   if(refreshInterval){clearInterval(refreshInterval);refreshInterval=null;}
   if(claimRefreshInterval){clearInterval(claimRefreshInterval);claimRefreshInterval=null;}
   if(currentClaimId)releaseClaim(currentClaimId);
-  currentUser=null;currentOperator=null;currentClaimId=null;localStorage.removeItem('opSession');
+  currentUser=null;currentOperator=null;currentClaimId=null;localStorage.removeItem('opSession');  _opAuthToken=SUPABASE_KEY;
+  if(window._svSupabase){window._svSupabase.auth.signOut();}
+
   document.getElementById('page-dashboard').style.display='none';
   document.getElementById('page-dashboard').classList.remove('active');
   document.getElementById('page-login').style.display='flex';
