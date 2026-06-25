@@ -970,7 +970,7 @@ async function uploadAcDoc(operatorId, acId, key, file){
   var path = 'aircraft/'+operatorId+'/'+acId+'/'+key+'-'+Date.now()+'.'+ext;
   var res = await fetch(SUPABASE_URL+'/storage/v1/object/operator-documents/'+path,{
     method:'POST',
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':file.type,'x-upsert':'true'},
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+_opAuthToken,'Content-Type':file.type,'x-upsert':'true'},
     body: file
   });
   if(!res.ok) return null;
@@ -1380,7 +1380,7 @@ async function uploadAopDocument(operatorId, file){
     method: 'POST',
     headers: {
       'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
+      'Authorization': 'Bearer ' + _opAuthToken,
       'Content-Type': file.type,
       'x-upsert': 'true'
     },
