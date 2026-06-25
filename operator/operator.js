@@ -1837,7 +1837,8 @@ async function profileChangePassword() {
   if (res.ok && res.data) {
     var result = Array.isArray(res.data) ? res.data[0] : res.data;
     if (result && result.success) {
-      profileMsg('pw', 'Password updated successfully.', 'success');
+            if(window._svSupabase){await window._svSupabase.auth.updateUser({password:newPw});}
+profileMsg('pw', 'Password updated successfully.', 'success');
       document.getElementById('input-current-pw').value = '';
       document.getElementById('input-new-pw').value = '';
       document.getElementById('input-confirm-pw').value = '';
