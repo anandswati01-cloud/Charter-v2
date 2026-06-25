@@ -2073,7 +2073,7 @@ function uploadCompanyLogo(input) {
   var path = 'company-logos/' + companyId + '/' + Date.now() + '_logo.' + file.name.split('.').pop();
   fetch(SUPABASE_URL + '/storage/v1/object/operator-assets/' + path, {
     method: 'POST',
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken },
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + _opAuthTokenken },
     body: formData
   }).then(function(r){ return r.json(); }).then(function(res){
     if (res && res.Key) {
@@ -2085,7 +2085,7 @@ function uploadCompanyLogo(input) {
       // Save URL to company record
       fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
         method: 'PATCH',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer '_opAuthTokenhToken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ logo_url: logoUrl })
       });
     }
@@ -2109,14 +2109,14 @@ function uploadCoverPhoto(input) {
   var path = 'company-covers/' + companyId + '/' + Date.now() + '_cover.' + file.name.split('.').pop();
   fetch(SUPABASE_URL + '/storage/v1/object/operator-assets/' + path, {
     method: 'POST',
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken },
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Beare_opAuthTokenAuthToken },
     body: formData
   }).then(function(r){ return r.json(); }).then(function(res){
     if (res && res.Key) {
       var coverUrl = SUPABASE_URL + '/storage/v1/object/public/operator-assets/' + path;
       fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
         method: 'PATCH',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Be_opAuthToken_opAuthToken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ cover_url: coverUrl })
       });
     }
