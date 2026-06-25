@@ -12,6 +12,7 @@ function escapeHtml(str){
 }
 
 var currentUser=null,currentOperator=null,currentQueryId=null,currentClaimId=null;
+var _opAuthToken=SUPABASE_KEY;
 
 var aircraftList=[],allOperatorUsers=[],allActiveQueries=[],allMyOperatorQuotes=[],allActiveClaims=[];
 
@@ -23,7 +24,7 @@ function nowIso(){return new Date().toISOString();}
 
 function sbFetch(path,opts){
   opts=opts||{};
-  var headers={'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
+  var headers={'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+_opAuthToken};
   if(opts.prefer)headers['Prefer']=opts.prefer;
   return fetch(SUPABASE_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:headers,body:opts.body?JSON.stringify(opts.body):undefined})
     .then(function(r){
@@ -77,6 +78,7 @@ async function doLogin(){
       errEl.classList.add('show');return;
     }
     currentUser=user;currentOperator=op;localStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
+    if(window._svSupabase){window._svSupabase.auth.signInWithPassword({email:user.username+'@operator.skyvayu.internal',password:'TemporaryPass#'+user.username+'2024!'}).then(function(authRes){if(!authRes.error&&authRes.data&&authRes.data.session){_opAuthToken=authRes.data.session.access_token;}});}
     /* Fire-and-forget last_login update ÃÂ¢ don't block on it */
     sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
