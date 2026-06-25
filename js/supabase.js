@@ -58,7 +58,7 @@ async function saveQueryToSupabase(queryData) {
     medivac:      queryData.medivac                     || false,
     pets:         queryData.pets                        || false,
     infants:      queryData.infants                     || false,
-    user_id:      queryData.user_id                     || null,
+    user_id:      queryData.user_id,
     status:       'open',
     aircraft_category: queryData.aircraft_category || 'fixed_wing'
   };
@@ -136,7 +136,7 @@ async function saveBookingToSupabase(bookingData) {
     total_amount:  parseFloat(bookingData.total_amount)     || null,
     platform_fee:  parseFloat(bookingData.platform_fee)     || null,
     status:        'confirmed',
-        user_id:       bookingData.user_id || null
+        user_id:       bookingData.user_id
   };
   try {
     var response = await fetchWithTimeout(
