@@ -67,6 +67,8 @@ async function saveQueryToSupabase(queryData) {
     var _svSess = await window._svSupabase.auth.getSession();
     var _svUid = (_svSess && _svSess.data && _svSess.data.session && _svSess.data.session.user) ? _svSess.data.session.user.id : null;
     if (_svUid && !safe.user_id) { safe.user_id = _svUid; }
+        var _svToken = SUPABASE_KEY;
+        if (_svSess && _svSess.data && _svSess.data.session && _svSess.data.session.access_token) { _svToken = _svSess.data.session.access_token; }
     var response = await fetchWithTimeout(
       SUPABASE_URL + '/rest/v1/queries',
       {
@@ -74,15 +76,13 @@ async function saveQueryToSupabase(queryData) {
         headers: {
           'Content-Type':  'application/json',
           'apikey':         SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Authorization': 'Bearer ' + _svToken,
           'Prefer':         'return=representation'
         },
         body: JSON.stringify(safe)
       }
     );
-    var text = await response.text();
-    if (!response.ok) {
-      var errMsg = 'Could not save your request. Please try again.';
+    var text = await response'Authorization': 'Bearer ' + _svTokenr errMsg = 'Could not save your request. Please try again.';
       try { var errData = JSON.parse(text); if (errData.message) errMsg = errData.message; } catch (e) {}
       console.error('Supabase error', response.status, text);
       showToast(errMsg, 'error');
