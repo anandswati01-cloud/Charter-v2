@@ -1449,6 +1449,15 @@ async function submitRegistration(){
   document.getElementById('aop-upload-label').style.display='block';
   document.getElementById('aop-upload-area').style.borderColor='';
   btn.disabled=false;btn.textContent='Submit application';
+  if(window._svSupabase){window._svSupabase.auth.signUp({
+    email:username+'@operator.skyvayu.internal',
+    password:password,
+    options:{data:{username:username,role:'operator'}}
+  }).then(function(authRes){
+    if(!authRes.error&&authRes.data&&authRes.data.user){
+      sbFetch('operator_users?username=eq.'+encodeURIComponent(username),{method:'PATCH',body:{auth_user_id:authRes.data.user.id}});
+    }
+  });}
   sendEmail('registration_received',{operator_id:opId});
   closeModal('register-modal');
   document.getElementById('page-login').style.display='none';
