@@ -216,29 +216,11 @@ async function doForgotPassword() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
   try {
-    var opUrl = SKYVAYU_CONFIG.supabaseUrl + '/rest/v1/operators?select=id,company_name,email&email=eq.' + encodeURIComponent(email) + '&limit=1';
-    var opRes = await fetch(opUrl, {
-      headers: {
-        'apikey': SKYVAYU_CONFIG.supabaseKey,
-        'Authorization': 'Bearer ' + SKYVAYU_CONFIG.supabaseKey
-      }
+    await fetch(SUPABASE_URL + '/rpc/request_password_reset', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY},
+      body: JSON.stringify({p_email: email})
     });
-    var ops = await opRes.json();
-    if (ops && ops.length > 0) {
-      var token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
-      var expiry = new Date(Date.now() + 3600000).toISOString();
-      await fetch(SKYVAYU_CONFIG.supabaseUrl + '/rest/v1/operators?id=eq.' + ops[0].id, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SKYVAYU_CONFIG.supabaseKey,
-          'Authorization': 'Bearer ' + SKYVAYU_CONFIG.supabaseKey,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ reset_token: token, reset_token_expiry: expiry })
-      });
-      await sendEmail('password_reset', { operator_id: ops[0].id, email: ops[0].email, company_name: ops[0].company_name, reset_token: token });
-    }
     okEl.style.display = 'block';
     btn.textContent = 'Sent!';
   } catch(e) {
