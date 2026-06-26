@@ -1,6 +1,17 @@
 // results.js — extracted from results.html
 // All results page logic lives here. results.html loads this via <script src="js/results.js"></script>
 
+/* XSS protection: escape all user-supplied strings before inserting into innerHTML */
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 var SUPABASE_URL = SKYVAYU_CONFIG.supabaseUrl;
 var SUPABASE_KEY = SKYVAYU_CONFIG.supabaseKey;
 // Support ?query_id= in URL as fallback (useful when navigating back from operator portal)
@@ -72,7 +83,7 @@ function populateSidebar(data) {
 // Fetch query from Supabase and populate sidebar
 async function loadQueryAndSidebar() {
     var sessionData = queryData || {};
-    var hasFullData = sessionData.flight_date || sessionData.passengers || sessionData.rs_route;
+    var hasFullData = escapeHtml(sessionData.flight_date) || sessionData.passengers || escapeHtml(sessionData.rs_route);
 
   if (!hasFullData && queryId) {
         try {
@@ -242,14 +253,14 @@ function renderQuotes(quotes) {
           html += '<div class="img-wrap">' + imgHtml + '<div class="img-gradient"></div>' + badge + '</div>';
           html += '<div class="card-body">';
           html += '<div class="card-top">';
-          html += '<div><div class="aircraft-name">' + esc(q.aircraft_type || 'Aircraft') + '</div><div class="operator-name">' + esc(q.operator_name || 'Operator') + '</div></div>';
+          html += '<div><div class="aircraft-name">' + esc(escapeHtml(q.aircraft_type) || 'Aircraft') + '</div><div class="operator-name">' + esc(escapeHtml(q.operator_name) || 'Operator') + '</div></div>';
           html += '<div class="price-col"><div class="price-label">All-inclusive price</div><div class="price-value">' + price + '</div></div>';
           html += '</div>';
           html += '<div class="amenities">';
           html += amenity('<path d="M4.583 3.333C4.125 3.333 3.733 3.17 3.406 2.844C3.08 2.517 2.917 2.125 2.917 1.667C2.917 1.208 3.08.816 3.406.49C3.733.163 4.125 0 4.583 0C5.042 0 5.434.163 5.76.49 6.087.816 6.25 1.208 6.25 1.667 6.25 2.125 6.087 2.517 5.76 2.844 5.434 3.17 5.042 3.333 4.583 3.333ZM9.167 15H3.792C3.333 15 2.913 14.837 2.531 14.51 2.149 14.184 1.91 13.792 1.813 13.333L0 4.167H1.708L3.542 13.333H9.167V15ZM13.75 16.667L11.333 12.5H5.542C5.139 12.5 4.788 12.378 4.49 12.135 4.191 11.892 4 11.569 3.917 11.167L3 6.708C2.847 6.042 3.003 5.451 3.469 4.938 3.934 4.424 4.5 4.167 5.167 4.167 5.653 4.167 6.094 4.313 6.49 4.604 6.885 4.896 7.139 5.292 7.25 5.792L8.167 10H10.875C11.167 10 11.438 10.076 11.688 10.229 11.938 10.382 12.139 10.583 12.292 10.833L15.208 15.833Z" fill="#17B0D6"', '16', '17', seats);
           html += amenity('<path d="M10 14.167C9.417 14.167 8.924 13.965 8.521 13.563 8.118 13.16 7.917 12.667 7.917 12.083 7.917 11.5 8.118 11.007 8.521 10.604 8.924 10.201 9.417 10 10 10 10.583 10 11.076 10.201 11.479 10.604 11.882 11.007 12.083 11.5 12.083 12.083 12.083 12.667 11.882 13.16 11.479 13.563 11.076 13.965 10.583 14.167 10 14.167ZM1.75 5.917L0 4.167C1.278 2.861 2.771 1.84 4.479 1.104 6.188.368 8.028 0 10 0 11.972 0 13.813.368 15.521 1.104 17.229 1.84 18.722 2.861 20 4.167L18.25 5.917C17.181 4.847 15.941 4.01 14.531 3.406 13.122 2.802 11.611 2.5 10 2.5 8.389 2.5 6.878 2.802 5.469 3.406 4.059 4.01 2.819 4.847 1.75 5.917Z" fill="#17B0D6"', '20', '15', 'WiFi');
           html += amenity('<path d="M2.5 16.667V9.042C1.792 8.847 1.198 8.458.719 7.875.24 7.292 0 6.611 0 5.833V0H1.667V5.833H2.5V0H4.167V5.833H5V0H6.667V5.833C6.667 6.611 6.427 7.292 5.948 7.875 5.469 8.458 4.875 8.847 4.167 9.042V16.667ZM10.833 16.667V10H8.333V4.167C8.333 3.014 8.74 2.031 9.552 1.219 10.365.406 11.347 0 12.5 0V16.667Z" fill="#17B0D6"', '13', '17', 'Catering');
-          html += amenity('<path d="M0 11.667V6.667C0 6.292.076 5.951.229 5.646.382 5.34.583 5.069.833 4.833V2.5C.833 1.806 1.076 1.215 1.563.729 2.049.243 2.639 0 3.333 0H6.667C6.986 0 7.285.059 7.563.177 7.84.295 8.097.458 8.333.667 8.569.458 8.826.295 9.104.177 9.382.059 9.681 0 10 0H13.333C14.028 0 14.618.243 15.104.729 15.59 1.215 15.833 1.806 15.833 2.5V4.833C16.083 5.069 16.285 5.34 16.438 5.646 16.59 5.951 16.667 6.292 16.667 6.667V11.667H15V10H1.667V11.667Z" fill="#17B0D6"', '17', '12', q.notes ? esc(q.notes.split(' ')[0]) : 'Premium');
+          html += amenity('<path d="M0 11.667V6.667C0 6.292.076 5.951.229 5.646.382 5.34.583 5.069.833 4.833V2.5C.833 1.806 1.076 1.215 1.563.729 2.049.243 2.639 0 3.333 0H6.667C6.986 0 7.285.059 7.563.177 7.84.295 8.097.458 8.333.667 8.569.458 8.826.295 9.104.177 9.382.059 9.681 0 10 0H13.333C14.028 0 14.618.243 15.104.729 15.59 1.215 15.833 1.806 15.833 2.5V4.833C16.083 5.069 16.285 5.34 16.438 5.646 16.59 5.951 16.667 6.292 16.667 6.667V11.667H15V10H1.667V11.667Z" fill="#17B0D6"', '17', '12', escapeHtml(q.notes) ? esc(escapeHtml(q.notes).split(' ')[0]) : 'Premium');
           html += '</div>';
           html += '<div class="card-footer">';
           html += '<div class="safety-row"><svg width="12" height="15" viewBox="0 0 12 15" fill="none"><path d="M5.213 10.163L9.45 5.925 8.381 4.856 5.213 8.025 3.638 6.45 2.569 7.519ZM6 15C4.263 14.563 2.828 13.566 1.697 12.009.566 10.453 0 8.725 0 6.825V2.25L6 0 12 2.25V6.825C12 8.725 11.434 10.453 10.303 12.009 9.172 13.566 7.738 14.563 6 15Z" fill="#10B981"/></svg><span class="safety-text ' + safetyClass + '">' + safetyText + '</span></div>';
