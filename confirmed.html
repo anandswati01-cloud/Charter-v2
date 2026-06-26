@@ -397,7 +397,7 @@ nav{
       var supaUrl = cfg.supabaseUrl || 'https://bkumggqijgxyfotpbcni.supabase.co';
       var supaKey = cfg.supabaseKey || '';
       fetch(supaUrl + '/rest/v1/bookings?ref=eq.' + encodeURIComponent(ref) + '&select=*&limit=1', {
-        headers: { 'apikey': supaKey, 'Authorization': 'Bearer ' + supaKey }
+        headers: { 'apikey': supaKey, 'Authorization': 'Bearer ' + (JSON.parse(localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token')||'{}')?.access_token||supaKey) }
       })
       .then(function(r){ return r.json(); })
       .then(function(rows) {
