@@ -1,6 +1,6 @@
 var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
 
-/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ XSS protection: escape all user-supplied strings before inserting into innerHTML ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
+/* ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ XSS protection: escape all user-supplied strings before inserting into innerHTML ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ */
 function escapeHtml(str){
   if(str==null)return'';
   return String(str)
@@ -46,7 +46,7 @@ async function doLogin(){
   if(!username||!password){errEl.textContent='Please enter username or email and password';errEl.classList.add('show');return;}
   var btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='Signing in...';
   try{
-    /* Ã¢ÂÂÃ¢ÂÂ Secure server-side login via verify_operator_login RPC Ã¢ÂÂÃ¢ÂÂ
+    /* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Secure server-side login via verify_operator_login RPC ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
      * Password is verified server-side using bcrypt; hash is NEVER sent to the client.
      * The old client-side comparison (password_hash === password) has been removed. */
     var rpcRes=await sbFetch('rpc/verify_operator_login',{method:'POST',body:{p_username:username.toLowerCase(),p_password:password}});
@@ -77,9 +77,9 @@ async function doLogin(){
       errEl.textContent='Your registration was not approved. Please contact SkyVayu.';
       errEl.classList.add('show');return;
     }
-    currentUser=user;currentOperator=op;localStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
+    currentUser=user;currentOperator=op;sessionStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
     if(window._svSupabase){window._svSupabase.auth.signInWithPassword({email:user.username+'@operator.skyvayu.internal',password:'TemporaryPass#'+user.username+'2024!'}).then(function(authRes){if(!authRes.error&&authRes.data&&authRes.data.session){_opAuthToken=authRes.data.session.access_token;}});}
-    /* Fire-and-forget last_login update ÃÂ¢ don't block on it */
+    /* Fire-and-forget last_login update ÃÂÃÂ¢ don't block on it */
     sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
     document.getElementById('page-dashboard').style.display='';document.getElementById('page-dashboard').classList.add('active');
@@ -105,7 +105,7 @@ function doLogout(){
   if(refreshInterval){clearInterval(refreshInterval);refreshInterval=null;}
   if(claimRefreshInterval){clearInterval(claimRefreshInterval);claimRefreshInterval=null;}
   if(currentClaimId)releaseClaim(currentClaimId);
-  currentUser=null;currentOperator=null;currentClaimId=null;localStorage.removeItem('opSession');  _opAuthToken=SUPABASE_KEY;
+  currentUser=null;currentOperator=null;currentClaimId=null;sessionStorage.removeItem('opSession');  _opAuthToken=SUPABASE_KEY;
   if(window._svSupabase){window._svSupabase.auth.signOut();}
 
   document.getElementById('page-dashboard').style.display='none';
@@ -157,7 +157,7 @@ function showSubtab(tab){
 
 /* ============ HELPERS ============ */
 
-function fmtDate(d){if(!d)return'ÃÂ¢ÃÂÃÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
+function fmtDate(d){if(!d)return'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
 function fmtDateShort(d){if(!d)return'';var parts=d.split('-');if(parts.length!==3)return d;return parts[2]+'-'+parts[1];}
 function fmtPrice(n){return'Rs.'+Number(n||0).toLocaleString('en-IN');}
 function fmtPriceShort(n){var v=Number(n||0);if(v>=10000000)return'Rs.'+(v/10000000).toFixed(1)+'Cr';if(v>=100000)return'Rs.'+(v/100000).toFixed(1)+'L';if(v>=1000)return'Rs.'+(v/1000).toFixed(0)+'K';return'Rs.'+v;}
@@ -277,7 +277,7 @@ async function loadAllData(){
           expiredQueryIds.push(q.query_id);
         }
       });
-      // Remove from shared tab too — move expired shared quotes out of shared list
+      // Remove from shared tab too â move expired shared quotes out of shared list
       var nowExpiredQueryIds=expiredQueries.map(function(q){return q.id;});
       var activeShared=shared.filter(function(q){return!nowExpiredQueryIds.includes(q.query_id);});
       var _cs=document.getElementById('count-shared');if(_cs)_cs.textContent=activeShared.length;
@@ -288,7 +288,7 @@ async function loadAllData(){
     });
   renderActiveList(unquoted);
   markQueriesViewed(unquoted.map(function(q){return q.id;}));
-  // Initial render of shared — may be updated again above once expired are known
+  // Initial render of shared â may be updated again above once expired are known
   renderSharedList(shared);
   renderConfirmedList(confirmed);
 }
@@ -323,7 +323,7 @@ function renderActiveList(queries){
   var el=document.getElementById('list-active');
   if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No active queries</div><div class="empty-sub">New client queries will appear here</div></div>';return;}
   el.innerHTML=queries.map(function(q){
-    var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+'  →  '+escapeHtml(q.destination||'-');
+    var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+'  â  '+escapeHtml(q.destination||'-');
     var isUrgent=(function(){if(!q.flight_date)return false;var flightDt=new Date(q.flight_date+(q.flight_time?'T'+q.flight_time:'T00:00'));return(flightDt-new Date())<=4*60*60*1000&&(flightDt-new Date())>0;})();
     var claim=getClaimFor(q.id);
     var lockedBySomeoneElse=claim&&claim.claimed_by!==currentUser.id;
@@ -331,9 +331,9 @@ function renderActiveList(queries){
     var lockInfo='';
     if(lockedBySomeoneElse){
       var rem=claimRemaining(claim.expires_at);
-      lockInfo='<div class="query-lock-info" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">Locked by '+escapeHtml(claim.claimed_by_name||'teammate')+' ÃÂ· '+(rem||'expiring')+'</div>';
+      lockInfo='<div class="query-lock-info" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">Locked by '+escapeHtml(claim.claimed_by_name||'teammate')+' ÃÂÃÂÂ· '+(rem||'expiring')+'</div>';
     }else if(lockedByMe){
-      lockInfo='<div class="query-lock-info" style="color:var(--green-light);" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">You have this locked ÃÂ· '+(claimRemaining(claim.expires_at)||'expiring')+'</div>';
+      lockInfo='<div class="query-lock-info" style="color:var(--green-light);" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">You have this locked ÃÂÃÂÂ· '+(claimRemaining(claim.expires_at)||'expiring')+'</div>';
     }
     var btnTxt=lockedBySomeoneElse?'Locked':'Submit quote';
     var btnDisabled=lockedBySomeoneElse?'disabled':'';
@@ -352,7 +352,7 @@ function renderActiveList(queries){
   }).join('');
 }
 
-// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ View Shared Quote ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+// ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ View Shared Quote ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
 var _viewQuoteData = null;
 
 function viewSharedQuote(quoteId) {
@@ -361,7 +361,7 @@ function viewSharedQuote(quoteId) {
   _viewQuoteData = q;
   var query = q.queries || {};
   var route = query.trip_type === 'multi' ? 'Multiple sectors'
-    : escapeHtml(query.departure || '-') + '  →  ' + escapeHtml(query.destination || '-');
+    : escapeHtml(query.departure || '-') + '  â  ' + escapeHtml(query.destination || '-');
   var date = fmtDate(query.flight_date) + (query.flight_time ? ' at ' + escapeHtml(query.flight_time) : '');
   var base = Number(q.base_charge || 0);
   var handling = Number(q.handling_fee || 0);
@@ -422,9 +422,9 @@ function renderSharedList(quotes){
   if(!quotes.length){var msg=isOwner()?'No quotes shared yet':'You haven\'t shared any quotes yet';el.innerHTML='<div class="empty-state"><div class="empty-title">'+msg+'</div></div>';return;}
   el.innerHTML=quotes.map(function(q){
     var query=q.queries||{};
-    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+'  →  '+escapeHtml(query.destination||'-');
+    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+'  â  '+escapeHtml(query.destination||'-');
     var empBadge='';
-    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card" style="cursor:pointer;" onclick="viewSharedQuote(\''+q.id+'\')">'+'<div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' ÃÂ· '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+escapeHtml(q.notes)+'</div>':'')+'</div>';
+    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card" style="cursor:pointer;" onclick="viewSharedQuote(\''+q.id+'\')">'+'<div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' ÃÂÃÂÂ· '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+escapeHtml(q.notes)+'</div>':'')+'</div>';
   }).join('');
   window._sharedQuotes = quotes;
 }
@@ -434,9 +434,9 @@ function renderConfirmedList(quotes){
   if(!quotes.length){var msg=isOwner()?'No confirmed bookings yet':'No confirmed bookings for you yet';el.innerHTML='<div class="empty-state"><div class="empty-title">'+msg+'</div></div>';return;}
   el.innerHTML=quotes.map(function(q){
     var query=q.queries||{};
-    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+'  →  '+escapeHtml(query.destination||'-');
+    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+'  â  '+escapeHtml(query.destination||'-');
     var empBadge='';
-    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' ÃÂ· '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
+    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' ÃÂÃÂÂ· '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
   }).join('');
 }
 
@@ -482,8 +482,8 @@ function updateClaimTimers(){
     var exp=el.getAttribute('data-expires');if(!exp)return;
     var rem=claimRemaining(exp);
     if(!rem){el.remove();return;}
-    var prefix=el.textContent.split(' ÃÂ· ')[0];
-    el.textContent=prefix+' ÃÂ· '+rem;
+    var prefix=el.textContent.split(' ÃÂÃÂÂ· ')[0];
+    el.textContent=prefix+' ÃÂÃÂÂ· '+rem;
   });
 }
 
@@ -550,7 +550,7 @@ function getBusyAircraftMap(){
     dates.forEach(function(d){
       if(!map[q.aircraft_id])map[q.aircraft_id]={};
       var u=lookupUser(q.submitted_by);
-      map[q.aircraft_id][d]={by:u?(u.full_name||u.username):'operator',route:(query.departure||'-')+' → '+(query.destination||'-')};
+      map[q.aircraft_id][d]={by:u?(u.full_name||u.username):'operator',route:(query.departure||'-')+' â '+(query.destination||'-')};
     });
   });
   return map;
@@ -570,7 +570,7 @@ function renderBidTable(bids, myOperatorId) {
   var beatMsg = document.getElementById('bid-beat-msg');
   if (!container) return;
   if (!bids.length) {
-    container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">No bids yet — be the first to quote.</div>';
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">No bids yet â be the first to quote.</div>';
     if (beatMsg) beatMsg.style.display = 'none';
     return;
   }
@@ -602,7 +602,7 @@ function renderBidTable(bids, myOperatorId) {
       beatMsg.style.display = 'block';
       beatMsg.style.color = 'var(--amber)';
     } else if (myBid && myBid.price === lowest) {
-      beatMsg.textContent = 'You have the lowest bid — you are winning.';
+      beatMsg.textContent = 'You have the lowest bid â you are winning.';
       beatMsg.style.display = 'block';
       beatMsg.style.color = 'var(--green-light)';
     } else {
@@ -643,7 +643,7 @@ async function openQuoteModal(queryId, existingQuoteId){
     showToast('Query not found. Please refresh.','error');
     return;
   }
-  var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'ÃÂ¢ÃÂÃÂ')+'  →  '+escapeHtml(query.destination||'ÃÂ¢ÃÂÃÂ');
+  var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ')+'  â  '+escapeHtml(query.destination||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ');
   document.getElementById('quote-query-info').innerHTML='<strong style="color:var(--text);">'+route+'</strong><br>'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' &nbsp;|&nbsp; '+escapeHtml(String(query.passengers))+' pax';
   var busyMap=getBusyAircraftMap();
   var expiredAcIds=getExpiredAircraftIds();
@@ -659,11 +659,11 @@ async function openQuoteModal(queryId, existingQuoteId){
       else if(returnDate&&busyMap[a.id][returnDate])conflict=returnDate;
     }
     var docExpired=expiredAcIds.indexOf(a.id)!==-1;
-    if(conflict){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  ÃÂ¢ÃÂÃÂ  Booked on '+fmtDate(conflict)+'</option>';}
-    if(docExpired){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  ÃÂ¢ÃÂÃÂ  Documents expired</option>';}
+    if(conflict){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ  Booked on '+fmtDate(conflict)+'</option>';}
+    if(docExpired){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ  Documents expired</option>';}
     return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'">'+a.aircraft_type+'  |  '+a.registration+'</option>';
   }).join('');
-  document.getElementById('quote-aircraft-help').textContent=anyConflict?'Some aircraft unavailable ÃÂ¢ÃÂÃÂ booked or documents expired.':'';
+  document.getElementById('quote-aircraft-help').textContent=anyConflict?'Some aircraft unavailable ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ booked or documents expired.':'';
   ['q-base','q-handling','q-crew','q-catering','q-notes'].forEach(function(id){document.getElementById(id).value='';});
   calcQuote();
   // Load live bids for reverse auction display
@@ -798,14 +798,14 @@ function checkDocumentStatus(){
       if(days <= 0){
         notifications.push({
           type:'error',
-          msg:ac.registration+' ÃÂ¢ÃÂÃÂ '+d.name+' has expired. This aircraft is unavailable until renewed.',
+          msg:ac.registration+' ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ '+d.name+' has expired. This aircraft is unavailable until renewed.',
           btn:'Upload updated document',
           onclick:'openDocRenewModal(\''+ac.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\')'
         });
       } else if(days <= 30){
         notifications.push({
           type:'warn',
-          msg:ac.registration+' ÃÂ¢ÃÂÃÂ '+d.name+' expires in '+days+' day'+(days===1?'':'s')+'.',
+          msg:ac.registration+' ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ '+d.name+' expires in '+days+' day'+(days===1?'':'s')+'.',
           btn:'Upload updated document',
           onclick:'openDocRenewModal(\''+ac.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\')'
         });
@@ -886,9 +886,9 @@ async function loadFleet(){
         var days = daysUntil(a[d.expKey]);
         if(days === null) return;
         var col = days <= 0 ? 'var(--red)' : 'var(--amber)';
-        var label = days <= 0 ? 'ÃÂ¢ÃÂÃÂ  Expired' : ('ÃÂ¢ÃÂÃÂ  '+days+'d left');
+        var label = days <= 0 ? 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ  Expired' : ('ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ  '+days+'d left');
         docStatusHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">'
-          +'<span style="font-size:10px;color:'+col+';">'+d.name+' ÃÂ¢ÃÂÃÂ '+label+'</span>'
+          +'<span style="font-size:10px;color:'+col+';">'+d.name+' ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ '+label+'</span>'
           +'<button onclick="openDocRenewModal(\''+a.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\') " '
           +'style="height:22px;padding:0 8px;background:transparent;border:0.5px solid '+col+';border-radius:4px;font-size:10px;color:'+col+';cursor:pointer;font-family:var(--font);white-space:nowrap;">'
           +'Upload updated document</button></div>';
@@ -902,12 +902,12 @@ async function loadFleet(){
   }
   if(pending.length){
     html += pending.map(function(a){
-      return '<div class="aircraft-card" style="opacity:.65;border-style:dashed;"><div style="position:absolute;top:8px;right:8px;font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Under review</div><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div>'+(a.seats?'<div class="aircraft-seats">'+escapeHtml(String(a.seats))+' seats</div>':'')+'<div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;">Documents submitted ÃÂ¢ÃÂÃÂ awaiting SkyVayu approval</div></div>';
+      return '<div class="aircraft-card" style="opacity:.65;border-style:dashed;"><div style="position:absolute;top:8px;right:8px;font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Under review</div><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div>'+(a.seats?'<div class="aircraft-seats">'+escapeHtml(String(a.seats))+' seats</div>':'')+'<div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;">Documents submitted ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ awaiting SkyVayu approval</div></div>';
     }).join('');
   }
   if(rejected.length){
     html += rejected.map(function(a){
-      return '<div class="aircraft-card" style="border-color:rgba(192,57,43,0.3);"><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div><div style="font-size:11px;color:var(--red);margin-top:6px;">Documents rejected'+(a.doc_rejection_reason?' ÃÂ¢ÃÂÃÂ '+escapeHtml(a.doc_rejection_reason):'')+'</div><button class="btn-sm btn-outline-sm" style="margin-top:8px;font-size:11px;height:28px;" onclick="resubmitAircraft(\''+escapeHtml(a.id)+'\')">Re-upload documents</button></div>';
+      return '<div class="aircraft-card" style="border-color:rgba(192,57,43,0.3);"><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div><div style="font-size:11px;color:var(--red);margin-top:6px;">Documents rejected'+(a.doc_rejection_reason?' ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ '+escapeHtml(a.doc_rejection_reason):'')+'</div><button class="btn-sm btn-outline-sm" style="margin-top:8px;font-size:11px;height:28px;" onclick="resubmitAircraft(\''+escapeHtml(a.id)+'\')">Re-upload documents</button></div>';
     }).join('');
   }
   if(!html){
@@ -924,7 +924,7 @@ function onAcDocSelected(input, key){
   if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
   acDocFiles[key] = file;
   var nameEl = document.getElementById(key+'-filename');
-  if(nameEl){ nameEl.textContent = 'ÃÂ¢ÃÂÃÂ '+file.name; nameEl.style.color='var(--gold)'; }
+  if(nameEl){ nameEl.textContent = 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ '+file.name; nameEl.style.color='var(--gold)'; }
   var areaEl = document.getElementById(key+'-upload-area');
   if(areaEl) areaEl.style.borderColor = 'var(--gold)';
 }
@@ -1052,7 +1052,7 @@ function onAopRenewFileSelected(input){
   if(!file) return;
   if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
   selectedAopRenewFile = file;
-  document.getElementById('aop-renew-filename').textContent = 'ÃÂ¢ÃÂÃÂ '+file.name;
+  document.getElementById('aop-renew-filename').textContent = 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ '+file.name;
   document.getElementById('aop-renew-filename').style.color = 'var(--gold)';
   document.getElementById('aop-renew-upload-area').style.borderColor = 'var(--gold)';
 }
@@ -1105,8 +1105,8 @@ function openDocRenewModal(acId, docKey, docName, expKey, urlKey, nameKey){
   docRenewState = {acId:acId, docKey:docKey, docName:docName, expKey:expKey, urlKey:urlKey, nameKey:nameKey};
   var ac = aircraftList.find(function(a){return a.id===acId;});
   document.getElementById('doc-renew-title').textContent = 'Upload updated '+docName;
-  document.getElementById('doc-renew-aircraft-info').textContent = ac ? ac.aircraft_type+' ÃÂ· '+ac.registration : '';
-  document.getElementById('doc-renew-current-expiry').textContent = ac && ac[expKey] ? fmtDate(ac[expKey]) : 'ÃÂ¢ÃÂÃÂ';
+  document.getElementById('doc-renew-aircraft-info').textContent = ac ? ac.aircraft_type+' ÃÂÃÂÂ· '+ac.registration : '';
+  document.getElementById('doc-renew-current-expiry').textContent = ac && ac[expKey] ? fmtDate(ac[expKey]) : 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
   document.getElementById('doc-renew-file-input').value = '';
   document.getElementById('doc-renew-filename').textContent = 'Upload PDF/JPG/PNG';
   document.getElementById('doc-renew-filename').style.color = '';
@@ -1121,7 +1121,7 @@ function onDocRenewFileSelected(input){
   if(!file) return;
   if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
   selectedDocRenewFile = file;
-  document.getElementById('doc-renew-filename').textContent = 'ÃÂ¢ÃÂÃÂ '+file.name;
+  document.getElementById('doc-renew-filename').textContent = 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ '+file.name;
   document.getElementById('doc-renew-filename').style.color = 'var(--gold)';
   document.getElementById('doc-renew-upload-area').style.borderColor = 'var(--gold)';
 }
@@ -1195,9 +1195,9 @@ async function loadRoster(){
           isMine=!!mine;
         }
         var bClass=isOwner()?'booking':(isMine?'booking mine':'booking other-emp');
-        var bLabel=isOwner()?booking.by:(isMine?'You':'ÃÂ¢ÃÂÃÂ');
-        var routeTxt=isOwner()||isMine?booking.route:'ÃÂ¢ÃÂÃÂ¢';
-        cellContent='<div class="'+bClass+'" title="'+booking.route+' ÃÂ· by '+booking.by+'"><span class="b-route">'+routeTxt+'</span><span class="b-emp">'+bLabel+'</span></div>';
+        var bLabel=isOwner()?booking.by:(isMine?'You':'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ');
+        var routeTxt=isOwner()||isMine?booking.route:'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ¢';
+        cellContent='<div class="'+bClass+'" title="'+booking.route+' ÃÂÃÂÂ· by '+booking.by+'"><span class="b-route">'+routeTxt+'</span><span class="b-emp">'+bLabel+'</span></div>';
       }
       html+='<div class="'+cls+'">'+cellContent+'</div>';
     });
@@ -1228,20 +1228,20 @@ async function loadEmployees(){
     var s=stats[e.id];
     var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
     var online=e.last_login&&(new Date()-new Date(e.last_login))<1800000;
-    var lastSeen=e.last_login?new Date(e.last_login).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'ÃÂ¢ÃÂÃÂ';
+    var lastSeen=e.last_login?new Date(e.last_login).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
     var isExpanded=expandedEmployeeId===e.id;
     var pendingBadge=e.is_approved===false?'<span style="font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:1px 6px;border-radius:3px;margin-left:6px;text-transform:uppercase;">Pending approval</span>':'';
-    var html='<tr onclick="toggleEmployee(\''+escapeHtml(e.id)+'\')"><td><span class="emp-avatar">'+escapeHtml(ini)+'</span><b>'+escapeHtml(e.full_name||e.username)+'</b>'+pendingBadge+'<br><span style="font-size:11px;color:var(--text-tertiary);">@'+escapeHtml(e.username)+(e.employee_id?' ÃÂ· ID: '+escapeHtml(e.employee_id):'')+'</span></td>'
+    var html='<tr onclick="toggleEmployee(\''+escapeHtml(e.id)+'\')"><td><span class="emp-avatar">'+escapeHtml(ini)+'</span><b>'+escapeHtml(e.full_name||e.username)+'</b>'+pendingBadge+'<br><span style="font-size:11px;color:var(--text-tertiary);">@'+escapeHtml(e.username)+(e.employee_id?' ÃÂÃÂÂ· ID: '+escapeHtml(e.employee_id):'')+'</span></td>'
       +'<td>'+s.shared+'</td><td>'+s.confirmed+'</td>'
       +'<td style="color:'+(online?'var(--green-light)':'var(--text-tertiary)')+';">'+(online?'Online':lastSeen)+'</td>'
       +'<td>'+fmtPriceShort(s.revenue)+'</td></tr>';
     if(isExpanded){
       var activityHtml=s.activity.slice(0,15).map(function(q){
         var qq=q.queries||{};
-        var route=escapeHtml(qq.departure||'-')+' → '+escapeHtml(qq.destination||'-');
+        var route=escapeHtml(qq.departure||'-')+' â '+escapeHtml(qq.destination||'-');
         var when=new Date(q.created_at).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
         var statusLabel=q.status==='shared'?'shared quote':(q.status==='accepted'||q.status==='confirmed'||q.status==='booked'?'won booking':escapeHtml(q.status));
-        return'<div class="emp-log-row"><span class="emp-log-time">'+when+'</span><span class="emp-log-action"><b>'+statusLabel+'</b> ÃÂ· '+route+' ÃÂ· '+fmtPrice(q.price)+' ÃÂ· '+escapeHtml(q.aircraft_type||'')+'</span></div>';
+        return'<div class="emp-log-row"><span class="emp-log-time">'+when+'</span><span class="emp-log-action"><b>'+statusLabel+'</b> ÃÂÃÂÂ· '+route+' ÃÂÃÂÂ· '+fmtPrice(q.price)+' ÃÂÃÂÂ· '+escapeHtml(q.aircraft_type||'')+'</span></div>';
       }).join('');
       if(!s.activity.length)activityHtml='<div style="color:var(--text-tertiary);font-size:12px;padding:8px 0;">No activity yet.</div>';
       var deactivateBtn=e.is_active?'<button class="btn-sm btn-danger-sm" onclick="event.stopPropagation();toggleEmployeeActive(\''+escapeHtml(e.id)+'\',false)">Deactivate account</button>':'<button class="btn-sm btn-outline-sm" onclick="event.stopPropagation();toggleEmployeeActive(\''+escapeHtml(e.id)+'\',true)">Reactivate</button>';
@@ -1303,14 +1303,14 @@ function loadRevenue(){
   if(lastMonthRev>0){
     var pct=((thisMonthRev-lastMonthRev)/lastMonthRev*100);
     var cls=pct>=0?'up':'down';
-    delta='<div class="rev-delta '+cls+'">'+(pct>=0?'ÃÂ¢ÃÂÃÂ² ':'ÃÂ¢ÃÂÃÂ¼ ')+Math.abs(pct).toFixed(1)+'% vs last month</div>';
+    delta='<div class="rev-delta '+cls+'">'+(pct>=0?'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ² ':'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ¼ ')+Math.abs(pct).toFixed(1)+'% vs last month</div>';
   }
   var byEmp={};
   confirmed.forEach(function(q){
     var id=q.submitted_by||'unknown';
     if(!byEmp[id])byEmp[id]={name:'',count:0,rev:0};
     var u=lookupUser(id);
-    byEmp[id].name=u?(u.full_name||u.username):'ÃÂ¢ÃÂÃÂ';
+    byEmp[id].name=u?(u.full_name||u.username):'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ';
     byEmp[id].count++;
     byEmp[id].rev+=Number(q.price||0);
   });
@@ -1321,7 +1321,7 @@ function loadRevenue(){
   var byAc={};
   confirmed.forEach(function(q){
     var id=q.aircraft_id||'unknown';
-    if(!byAc[id])byAc[id]={name:q.aircraft_type||'ÃÂ¢ÃÂÃÂ',reg:q.aircraft_registration||'',count:0,rev:0};
+    if(!byAc[id])byAc[id]={name:q.aircraft_type||'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ',reg:q.aircraft_registration||'',count:0,rev:0};
     byAc[id].count++;
     byAc[id].rev+=Number(q.price||0);
   });
@@ -1349,7 +1349,7 @@ function onAopFileSelected(input){
     input.value = ''; return;
   }
   selectedAopFile = file;
-  document.getElementById('aop-file-name').textContent = 'ÃÂ¢ÃÂÃÂ ' + file.name;
+  document.getElementById('aop-file-name').textContent = 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ ' + file.name;
   document.getElementById('aop-file-name').style.display = 'block';
   document.getElementById('aop-upload-label').style.display = 'none';
   document.getElementById('aop-upload-area').style.borderColor = 'var(--gold)';
@@ -1403,7 +1403,7 @@ async function submitRegistration(){
     btn.disabled=false;btn.textContent='Submit application';return;
   }
   var opId = opRes.data[0].id;
-  if(!opId){errEl.textContent='Registration failed ÃÂ¢ÃÂÃÂ could not create account. Please try again.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Submit application';return;}
+  if(!opId){errEl.textContent='Registration failed ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ could not create account. Please try again.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Submit application';return;}
   btn.textContent = 'Uploading document...';
   var uploadResult = await uploadAopDocument(opId, selectedAopFile);
   if(!uploadResult){
@@ -1463,7 +1463,7 @@ window.addEventListener('beforeunload',function(){
 });
 
 (function(){
-  var saved=localStorage.getItem('opSession');
+  var saved=sessionStorage.getItem('opSession');
   if(saved){
     try{
       var s=JSON.parse(saved);
@@ -1482,7 +1482,7 @@ window.addEventListener('beforeunload',function(){
         claimRefreshInterval=setInterval(updateClaimTimers,1000);
         return;
       }
-    }catch(e){localStorage.removeItem('opSession');}
+    }catch(e){sessionStorage.removeItem('opSession');}
   }
   document.getElementById('page-login').style.display='flex';
 })();
@@ -1547,7 +1547,7 @@ function populateCategoryCheckboxes(){
   if(heliEl) heliEl.checked = cats.indexOf('helicopter') !== -1;
 }
 
-// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Track which operators have seen each query ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+// ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Track which operators have seen each query ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
 async function markQueriesViewed(queryIds) {
   if (!queryIds || !queryIds.length || !currentOperator) return;
   // Use authenticated user JWT for RLS to pass
@@ -1575,21 +1575,21 @@ async function markQueriesViewed(queryIds) {
   }
 }
 
-/* Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
    PROFILE SECTION
-Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ */
+ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
 
 async function loadProfileSection() {
   if (!currentUser || !currentOperator) return;
 
-  // Ã¢ÂÂÃ¢ÂÂ Hero Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Hero ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   var initials = (currentUser.full_name || currentUser.username || '?')
     .split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();
   var avatarEl = document.getElementById('profile-logo-initials');
   if (avatarEl) avatarEl.textContent = initials;
 
   var nameEl = document.getElementById('profile-hero-name');
-  if (nameEl) nameEl.textContent = escapeHtml(currentUser.full_name || currentUser.username || 'â');
+  if (nameEl) nameEl.textContent = escapeHtml(currentUser.full_name || currentUser.username || 'Ã¢ÂÂ');
 
   var roleEl = document.getElementById('profile-hero-role');
   if (roleEl) {
@@ -1598,7 +1598,7 @@ async function loadProfileSection() {
   }
 
   var companyEl = document.getElementById('profile-hero-company');
-  if (companyEl) companyEl.textContent = escapeHtml(currentOperator.company_name || 'â');
+  if (companyEl) companyEl.textContent = escapeHtml(currentOperator.company_name || 'Ã¢ÂÂ');
 
   var sinceEl = document.getElementById('profile-stat-member');
   if (sinceEl && currentUser.created_at) sinceEl.textContent = fmtDate(currentUser.created_at);
@@ -1613,10 +1613,10 @@ async function loadProfileSection() {
       if (currentUser.aircraft_category.indexOf('fixed') > -1) cats.push('Fixed Wing');
       if (currentUser.aircraft_category.indexOf('heli') > -1) cats.push('Helicopter');
     }
-    catEl.textContent = cats.length ? cats.join(', ') : 'â';
+    catEl.textContent = cats.length ? cats.join(', ') : 'Ã¢ÂÂ';
   }
 
-  // Ã¢ÂÂÃ¢ÂÂ Personal fields Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Personal fields ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   // Populate personal view spans and inputs
   var setVal = function(id, val) { var el=document.getElementById(id); if(el)el.value=val||''; };
   var setTxt = function(id, val) { var el=document.getElementById(id); if(el)el.textContent=val||'\u2014'; };
@@ -1676,7 +1676,7 @@ async function loadProfileSection() {
     if (certsCard) certsCard.style.display = 'none';
   }
 
-  // Ã¢ÂÂÃ¢ÂÂ Aircraft category checkboxes Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Aircraft category checkboxes ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
   var catFixed = document.getElementById('cat-fixed-wing');
   var catHeli = document.getElementById('cat-helicopter');
   if (catFixed && currentUser.aircraft_category) {
@@ -1687,7 +1687,7 @@ async function loadProfileSection() {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Edit mode toggle Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Edit mode toggle ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function profileEditMode(section) {
   // This definition is overridden below by the extended version; kept for reference only.
   var actionsDiv = document.getElementById('profile-' + section + '-actions');
@@ -1706,7 +1706,7 @@ function profileCancelEdit(section) {
   if (msg) { msg.textContent = ''; msg.className = 'profile-msg'; }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Save personal details Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Save personal details ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 async function profileSavePersonal() {
   var fullName = document.getElementById('input-full-name').value.trim();
   var email = document.getElementById('input-email').value.trim();
@@ -1730,7 +1730,7 @@ async function profileSavePersonal() {
     currentUser.email = email;
     currentUser.phone = phone;
     // Update session
-    localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
     // Update sidebar name
     var sidebarName = document.getElementById('op-name');
     if (sidebarName) sidebarName.textContent = fullName;
@@ -1742,7 +1742,7 @@ async function profileSavePersonal() {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Save company details Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Save company details ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 async function profileSaveCompany() {
   var companyName = document.getElementById('input-company-name').value.trim();
   var companyEmail = document.getElementById('input-company-email').value.trim();
@@ -1778,7 +1778,7 @@ async function profileSaveCompany() {
 
   if (res.ok) {
     Object.assign(currentOperator, patchData);
-    localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
     // Update sidebar company
     var sidebarComp = document.getElementById('op-role');
     if (sidebarComp) sidebarComp.textContent = companyName;
@@ -1790,7 +1790,7 @@ async function profileSaveCompany() {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Change password Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Change password ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 async function profileChangePassword() {
   var current = document.getElementById('input-current-pw').value;
   var newPw = document.getElementById('input-new-pw').value;
@@ -1833,7 +1833,7 @@ profileMsg('pw', 'Password updated successfully.', 'success');
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Save aircraft category Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Save aircraft category ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 async function saveProfileCategory() {
   var fixed = document.getElementById('cat-fixed-wing') ? document.getElementById('cat-fixed-wing').checked : false;
   var heli = document.getElementById('cat-helicopter') ? document.getElementById('cat-helicopter').checked : false;
@@ -1854,7 +1854,7 @@ async function saveProfileCategory() {
 
   if (res.ok) {
     currentUser.aircraft_category = cat;
-    localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
     profileMsg('category', 'Aircraft category saved.', 'success');
     loadProfileSection();
   } else {
@@ -1862,7 +1862,7 @@ async function saveProfileCategory() {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Password strength indicator Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Password strength indicator ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 (function() {
   document.addEventListener('input', function(e) {
     if (e.target && (e.target.id === 'profile-pw-new' || e.target.id === 'input-new-pw')) {
@@ -1880,7 +1880,7 @@ async function saveProfileCategory() {
   });
 })();
 
-// Ã¢ÂÂÃ¢ÂÂ Helper: show message Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Helper: show message ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 function profileMsg(section, text, type) {
   var el = document.getElementById('profile-' + section + '-msg');
   if (!el) return;
@@ -1912,7 +1912,7 @@ function profileSaveOverview() {
     .then(function(res){
       if (res.ok) {
         Object.assign(currentOperator, data);
-        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('overview', 'Company overview saved.', 'success');
         renderOverviewView(data);
         profileCancelEdit('overview');
@@ -1923,15 +1923,15 @@ function profileSaveOverview() {
 }
 
 function renderOverviewView(d) {
-  setText('view-company-desc', d.company_description || '—');
-  setText('view-year-established', d.year_established || '—');
+  setText('view-company-desc', d.company_description || 'â');
+  setText('view-year-established', d.year_established || 'â');
   var websiteEl = document.getElementById('view-website');
-  if (websiteEl) websiteEl.innerHTML = d.website ? '<a href="' + escapeHtml(d.website) + '" target="_blank" rel="noopener">' + escapeHtml(d.website) + '</a>' : '—';
-  setText('view-home-base', d.home_base || '—');
-  setText('view-other-bases', d.other_bases || '—');
-  setText('view-sales-email', d.sales_email || '—');
-  setText('view-sales-phone', d.sales_phone || '—');
-  setText('view-ops-phone', d.ops_phone || '—');
+  if (websiteEl) websiteEl.innerHTML = d.website ? '<a href="' + escapeHtml(d.website) + '" target="_blank" rel="noopener">' + escapeHtml(d.website) + '</a>' : 'â';
+  setText('view-home-base', d.home_base || 'â');
+  setText('view-other-bases', d.other_bases || 'â');
+  setText('view-sales-email', d.sales_email || 'â');
+  setText('view-sales-phone', d.sales_phone || 'â');
+  setText('view-ops-phone', d.ops_phone || 'â');
   if (d.home_base) setText('profile-hero-base', d.home_base);
   if (d.company_description) setText('profile-hero-tagline', d.company_description.substring(0,80) + (d.company_description.length > 80 ? '...' : ''));
 }
@@ -1950,12 +1950,12 @@ function profileSaveOps() {
     .then(function(res){
       if (res.ok) {
         Object.assign(currentOperator, data);
-        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('ops','Operational details saved.','success');
-        setText('view-regions', data.regions_served || '—');
-        setText('view-max-range', data.max_range_nm ? data.max_range_nm + ' nm' : '—');
-        setText('view-ops-hours', data.ops_hours || '—');
-        setText('view-min-notice', data.min_notice_period || '—');
+        setText('view-regions', data.regions_served || 'â');
+        setText('view-max-range', data.max_range_nm ? data.max_range_nm + ' nm' : 'â');
+        setText('view-ops-hours', data.ops_hours || 'â');
+        setText('view-min-notice', data.min_notice_period || 'â');
         profileCancelEdit('ops');
       } else {
         profileMsg('ops','Save failed.','error');
@@ -1977,13 +1977,13 @@ function profileSaveCerts() {
     .then(function(res){
       if (res.ok) {
         Object.assign(currentOperator, data);
-        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('certs','Certifications saved.','success');
-        setText('view-dgca-licence', data.dgca_licence_no || '—');
-        setText('view-aop-expiry', data.aop_expiry_date ? fmtDate(data.aop_expiry_date) : '—');
-        setText('view-argus', data.argus_rating || '—');
-        setText('view-wyvern', data.wyvern_rating || '—');
-        setText('view-isbao', data.isbao_stage || '—');
+        setText('view-dgca-licence', data.dgca_licence_no || 'â');
+        setText('view-aop-expiry', data.aop_expiry_date ? fmtDate(data.aop_expiry_date) : 'â');
+        setText('view-argus', data.argus_rating || 'â');
+        setText('view-wyvern', data.wyvern_rating || 'â');
+        setText('view-isbao', data.isbao_stage || 'â');
         renderCertBadges({argus_rating:data.argus_rating,wyvern_rating:data.wyvern_rating,isbao_stage:data.isbao_stage});
         profileCancelEdit('certs');
       } else {
@@ -2018,14 +2018,14 @@ function profileSaveCompany() {
     .then(function(res){
       if (res.ok) {
         Object.assign(currentOperator, data);
-        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('company','Company info saved.','success');
-        setText('view-company-name', data.company_name || '—');
-        setText('view-company-email', data.email || '—');
-        setText('view-company-phone', data.phone || '—');
-        setText('view-owner-name', data.owner_name || '—');
-        setText('view-owner-email', data.owner_email || '—');
-        setText('view-owner-phone', data.owner_phone || '—');
+        setText('view-company-name', data.company_name || 'â');
+        setText('view-company-email', data.email || 'â');
+        setText('view-company-phone', data.phone || 'â');
+        setText('view-owner-name', data.owner_name || 'â');
+        setText('view-owner-email', data.owner_email || 'â');
+        setText('view-owner-phone', data.owner_phone || 'â');
         if (data.company_name) { setText('profile-hero-company', data.company_name); var _or=document.getElementById('op-role');if(_or)_or.textContent=data.company_name; }
         profileCancelEdit('company');
       } else {
@@ -2129,10 +2129,10 @@ function loadExtendedProfile(operatorId) {
     document.getElementById('input-sales-phone') && (document.getElementById('input-sales-phone').value = d.sales_phone || '');
     document.getElementById('input-ops-phone') && (document.getElementById('input-ops-phone').value = d.ops_phone || '');
     // Operations
-    setText('view-regions', d.regions_served || '—');
-    setText('view-max-range', d.max_range_nm ? d.max_range_nm + ' nm' : '—');
-    setText('view-ops-hours', d.ops_hours || '—');
-    setText('view-min-notice', d.min_notice_period || '—');
+    setText('view-regions', d.regions_served || 'â');
+    setText('view-max-range', d.max_range_nm ? d.max_range_nm + ' nm' : 'â');
+    setText('view-ops-hours', d.ops_hours || 'â');
+    setText('view-min-notice', d.min_notice_period || 'â');
     document.getElementById('input-max-range') && (document.getElementById('input-max-range').value = d.max_range_nm || '');
     document.getElementById('input-ops-hours') && (document.getElementById('input-ops-hours').value = d.ops_hours || '');
     document.getElementById('input-min-notice') && (document.getElementById('input-min-notice').value = d.min_notice_period || '');
@@ -2141,11 +2141,11 @@ function loadExtendedProfile(operatorId) {
       document.querySelectorAll('[name="region"]').forEach(function(cb){ cb.checked = regions.includes(cb.value); });
     }
     // Certifications
-    setText('view-dgca-licence', d.dgca_licence || '—');
-    setText('view-aop-expiry', d.aop_expiry ? fmtDate(d.aop_expiry) : '—');
-    setText('view-argus', d.argus_rating || '—');
-    setText('view-wyvern', d.wyvern_rating || '—');
-    setText('view-isbao', d.isbao_stage || '—');
+    setText('view-dgca-licence', d.dgca_licence || 'â');
+    setText('view-aop-expiry', d.aop_expiry ? fmtDate(d.aop_expiry) : 'â');
+    setText('view-argus', d.argus_rating || 'â');
+    setText('view-wyvern', d.wyvern_rating || 'â');
+    setText('view-isbao', d.isbao_stage || 'â');
     renderCertBadges(d);
     document.getElementById('input-dgca-licence') && (document.getElementById('input-dgca-licence').value = d.dgca_licence || '');
     document.getElementById('input-aop-expiry') && (document.getElementById('input-aop-expiry').value = d.aop_expiry || '');
@@ -2164,15 +2164,15 @@ function loadExtendedProfile(operatorId) {
       if (aopNone) aopNone.style.display = '';
     }
     // Certs view
-    setText('view-dgca-licence', d.dgca_licence_no || d.dgca_licence || '—');
-    setText('view-aop-expiry', (d.aop_expiry_date || d.aop_expiry) ? fmtDate(d.aop_expiry_date || d.aop_expiry) : '—');
+    setText('view-dgca-licence', d.dgca_licence_no || d.dgca_licence || 'â');
+    setText('view-aop-expiry', (d.aop_expiry_date || d.aop_expiry) ? fmtDate(d.aop_expiry_date || d.aop_expiry) : 'â');
     // Company basic info (operators table uses email/phone, not company_email/company_phone)
-    setText('view-company-name', d.company_name || '—');
-    setText('view-company-email', d.email || d.company_email || '—');
-    setText('view-company-phone', d.phone || d.company_phone || '—');
-    setText('view-owner-name', d.owner_name || '—');
-    setText('view-owner-email', d.owner_email || '—');
-    setText('view-owner-phone', d.owner_phone || '—');
+    setText('view-company-name', d.company_name || 'â');
+    setText('view-company-email', d.email || d.company_email || 'â');
+    setText('view-company-phone', d.phone || d.company_phone || 'â');
+    setText('view-owner-name', d.owner_name || 'â');
+    setText('view-owner-email', d.owner_email || 'â');
+    setText('view-owner-phone', d.owner_phone || 'â');
     document.getElementById('input-company-name') && (document.getElementById('input-company-name').value = d.company_name || '');
     document.getElementById('input-company-email') && (document.getElementById('input-company-email').value = d.email || d.company_email || '');
     document.getElementById('input-company-phone') && (document.getElementById('input-company-phone').value = d.phone || d.company_phone || '');
@@ -2181,7 +2181,7 @@ function loadExtendedProfile(operatorId) {
     document.getElementById('input-owner-phone') && (document.getElementById('input-owner-phone').value = d.owner_phone || '');
     // Fleet stats
     var fleetCount = document.querySelectorAll('#fleet-content .aircraft-card').length;
-    setText('profile-stat-fleet', fleetCount > 0 ? String(fleetCount) : (d.fleet_count ? String(d.fleet_count) : '—'));
+    setText('profile-stat-fleet', fleetCount > 0 ? String(fleetCount) : (d.fleet_count ? String(d.fleet_count) : 'â'));
     // Logo
     if (d.logo_url) {
       var img = document.getElementById('profile-logo-img');
