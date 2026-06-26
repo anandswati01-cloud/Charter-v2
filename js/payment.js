@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
       // If quote_id in URL but no sessionStorage data, fetch from Supabase then reload
       if (!raw && _urlQuoteId) {
-              fetch(SKYVAYU_CONFIG.supabaseUrl+'/rest/v1/quotes?id=eq.'+_urlQuoteId+'&select=*', {headers:{'apikey':SKYVAYU_CONFIG.supabaseKey,'Authorization':'Bearer '+SKYVAYU_CONFIG.supabaseKey}})
+              fetch(SKYVAYU_CONFIG.supabaseUrl+'/rest/v1/quotes?id=eq.'+_urlQuoteId+'&select=*', {headers:{'apikey':SKYVAYU_CONFIG.supabaseKey,'Authorization':'Bearer '+(JSON.parse(localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token')||'{}')?.access_token||SKYVAYU_CONFIG.supabaseKey)}})
                 .then(function(r){return r.json();})
                 .then(function(data){
                             if(Array.isArray(data)&&data.length>0){
