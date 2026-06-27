@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <link rel="stylesheet" href="css/theme.css"/>
 <title>Booking Confirmed — SkyVayu</title>
+<meta name="description" content="Your charter flight booking is confirmed. View your SkyVayu booking summary and details.">
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -343,6 +344,10 @@ nav{
 <script>
 /* ── Confirmation page: load booking data from sessionStorage or Supabase ── */
 (function() {
+  // Auth guard: redirect to home if not logged in
+  var _authToken = (function(){try{var s=localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token');return s?JSON.parse(s):null;}catch(e){return null;}})();
+  if (!_authToken || !_authToken.access_token) { window.location.replace('/'); return; }
+
   var conf = JSON.parse(sessionStorage.getItem('sv_confirmation') || '{}');
   var urlRef = (new URLSearchParams(window.location.search)).get('ref') || null;
 
