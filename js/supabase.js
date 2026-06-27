@@ -82,7 +82,8 @@ async function saveQueryToSupabase(queryData) {
         body: JSON.stringify(safe)
       }
     );
-    var text = await response'Authorization': 'Bearer ' + _svTokenr errMsg = 'Could not save your request. Please try again.';
+        var text = await response.text();
+    if (!response.ok) { var errMsg = 'Could not save your request. Please try again.';
       try { var errData = JSON.parse(text); if (errData.message) errMsg = errData.message; } catch (e) {}
       console.error('Supabase error', response.status, text);
       showToast(errMsg, 'error');
