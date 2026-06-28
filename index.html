@@ -947,7 +947,246 @@
     .hero-sub { animation: fadeUp 0.6s 0.2s ease both; }
     .trust-bar { animation: fadeUp 0.6s 0.3s ease both; }
     .booking-section { animation: fadeUp 0.6s 0.4s ease both; }
-  </style>
+  
+
+  /* ========================================
+     MOBILE RESPONSIVE STYLES
+     Breakpoint: max-width 768px (phones/small tablets)
+     ======================================== */
+  @media (max-width: 768px) {
+
+    /* ── NAV ── */
+    .nav {
+      padding: 0 20px;
+      height: 60px;
+    }
+    .nav-links {
+      display: none;
+    }
+    .nav-cta {
+      display: none;
+    }
+    #theme-toggle {
+      display: none;
+    }
+
+    /* ── HERO ── */
+    .hero-content {
+      padding: 100px 20px 40px;
+    }
+    .hero-h1 {
+      font-size: clamp(36px, 10vw, 72px);
+    }
+    .trust-bar {
+      padding: 0 20px 48px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* ── BOOKING FORM ── */
+    .booking-section {
+      padding: 0 12px 60px;
+    }
+    .booking-card {
+      padding: 24px 16px;
+    }
+    .inputs-grid {
+      grid-template-columns: 1fr;
+    }
+    .inputs-grid-rt {
+      grid-template-columns: 1fr;
+    }
+    .pax-control {
+      width: 100%;
+      justify-content: center;
+    }
+    .special-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .cta-btn {
+      width: 100%;
+      justify-content: center;
+      margin-top: 8px;
+    }
+    .trip-selector {
+      flex-wrap: wrap;
+    }
+    .aircraft-selector {
+      flex-wrap: wrap;
+    }
+    .flow-progress {
+      padding: 12px 0 4px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .section {
+      padding: 60px 20px;
+    }
+    .steps-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    /* ── WHY SKYVAYU ── */
+    .why-section {
+      padding: 60px 20px;
+    }
+    .bento-grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── POPULAR ROUTES ── */
+    .routes-section {
+      padding: 60px 20px;
+      max-width: 100%;
+    }
+    .routes-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .routes-grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── FINAL CTA ── */
+    .final-cta {
+      padding: 60px 20px;
+    }
+    .final-cta-content {
+      padding: 0;
+    }
+    .final-cta-title {
+      font-size: clamp(28px, 8vw, 48px);
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 48px 20px 24px;
+    }
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    /* ── GENERAL ── */
+    body {
+      overflow-x: hidden;
+    }
+    .section-title {
+      font-size: clamp(28px, 7vw, 56px);
+    }
+  
+    /* ── HAMBURGER MENU ── */
+    .nav-hamburger {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 24px;
+      height: 18px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 200;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--white-60);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .nav-hamburger.open span:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+    .nav-hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+    .nav-hamburger.open span:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+    .nav-mobile-menu {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0; right: 0;
+      background: rgba(12, 19, 36, 0.98);
+      backdrop-filter: blur(12px);
+      padding: 24px 20px 32px;
+      border-bottom: 1px solid var(--white-10);
+      z-index: 150;
+    }
+    .nav-mobile-menu.open {
+      display: block;
+    }
+    .nav-mobile-menu ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .nav-mobile-menu ul li a {
+      display: block;
+      padding: 14px 0;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white-60);
+      border-bottom: 1px solid var(--white-10);
+      transition: color 0.2s;
+    }
+    .nav-mobile-menu ul li a:hover,
+    .nav-mobile-menu ul li a.active {
+      color: var(--gold);
+    }
+}
+
+  /* Tablet: 769px - 1024px */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .nav {
+      padding: 0 24px;
+    }
+    .nav-links {
+      gap: 20px;
+    }
+    .hero-content {
+      padding: 120px 24px 60px;
+    }
+    .booking-section {
+      padding: 0 24px 80px;
+    }
+    .booking-card {
+      padding: 32px 32px;
+    }
+    .inputs-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .steps-grid {
+      gap: 20px;
+    }
+    .bento-grid {
+      gap: 16px;
+    }
+    .routes-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .why-section {
+      padding: 80px 24px;
+    }
+    .section {
+      padding: 80px 24px;
+    }
+    .routes-section {
+      padding: 80px 24px;
+    }
+  }</style>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta name="description" content="SkyVayu — Private charter flights across India and beyond. Direct quotes, no middlemen, transparent pricing. Book MumbaiâDelhi, DelhiâGoa, and international routes instantly.">
   <meta property="og:type" content="website">
@@ -1042,7 +1281,20 @@
       </div>
       <a href="#book" class="nav-cta">Get Quotes</a>
     </div>
-  </nav>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <!-- Mobile Nav Menu -->
+  <div class="nav-mobile-menu" id="nav-mobile-menu">
+    <ul>
+      <li><a href="#" class="active">Home</a></li>
+      <li><a href="/fleet">Fleet</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/operator">For Operators</a></li>
+    </ul>
+    <div id="sv-login-btn-mobile"></div>
+  </div>
+</nav>
 
   <!-- HERO -->
   <section class="hero">
@@ -1587,5 +1839,28 @@ function handleGoogleSignIn() {
     setTimeout(function(){ if (depEl) depEl.focus(); }, 600);
   }
 </script>
+
+  <script>
+    // Mobile nav hamburger toggle
+    (function() {
+      var btn = document.getElementById('nav-hamburger');
+      var menu = document.getElementById('nav-mobile-menu');
+      if (btn && menu) {
+        btn.addEventListener('click', function() {
+          var isOpen = menu.classList.toggle('open');
+          btn.classList.toggle('open', isOpen);
+          btn.setAttribute('aria-expanded', isOpen);
+        });
+        // Close menu on link click
+        menu.querySelectorAll('a').forEach(function(a) {
+          a.addEventListener('click', function() {
+            menu.classList.remove('open');
+            btn.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
