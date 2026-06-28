@@ -1462,7 +1462,7 @@ window.addEventListener('beforeunload',function(){
   }
 });
 
-(function(){
+(async function(){
   var saved=sessionStorage.getItem('opSession');
   if(saved){
     try{
@@ -1477,6 +1477,7 @@ window.addEventListener('beforeunload',function(){
         if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
         applyRoleRestrictions();
         showSection('queries');
+        try{var _gs=await window._svSupabase.auth.getSession();if(_gs&&_gs.data&&_gs.data.session&&_gs.data.session.access_token){_opAuthToken=_gs.data.session.access_token;}}catch(e){}
         loadAllData();
         refreshInterval=setInterval(loadAllData,5000);
         claimRefreshInterval=setInterval(updateClaimTimers,1000);
