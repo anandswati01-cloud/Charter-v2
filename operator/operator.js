@@ -1477,7 +1477,6 @@ window.addEventListener('beforeunload',function(){
         if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
         applyRoleRestrictions();
         showSection('queries');
-        try{var _lsAuth=JSON.parse(localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token')||'{}');if(_lsAuth.access_token){_opAuthToken=_lsAuth.access_token;}}catch(e){}
         loadAllData();
         refreshInterval=setInterval(loadAllData,5000);
         claimRefreshInterval=setInterval(updateClaimTimers,1000);
