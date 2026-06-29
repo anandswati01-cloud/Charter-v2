@@ -325,6 +325,21 @@ nav{
     border-color: var(--gold);
   }
   [data-theme="light"] .view-queries-tab { background: #fff; border-color: rgba(13,27,42,0.12); }
+
+@media(max-width:480px){
+  nav{padding:0 16px;height:60px;}
+  .nav-logo{font-size:20px;}
+  .nav-links{gap:16px;}
+  .page{padding-top:60px;}
+  .sidebar{padding:12px;}
+  .feed{padding:12px 12px 48px 12px;max-width:100%;}
+  .feed-header{flex-direction:column;align-items:flex-start;gap:8px;}
+  .quote-card{overflow:hidden;}
+  .card-body{padding:12px;}
+  .amenities{grid-template-columns:1fr;}
+  .price-col{min-width:0;}
+  body{overflow-x:hidden;}
+}
 </style>
 <script src="js/theme.js"></script>
 
