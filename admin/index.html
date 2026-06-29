@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+→<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -157,6 +157,106 @@ table.db-table td.db-name{color:var(--white);font-weight:500;}
 .db-stat-card{background:var(--bg-card);border:0.5px solid var(--white-10);border-radius:var(--radius);padding:12px 18px;min-width:100px;}
 .db-stat-num{font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--white);}
 .db-stat-label{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--white-30);margin-top:2px;}
+
+  /* ── MOBILE BASE ── */
+  .nav-hamburger-admin { display: none; }
+  .admin-mobile-menu { display: none; }
+
+  /* ── MOBILE: max-width 768px ── */
+  @media (max-width: 768px) {
+    #page-dashboard {
+      flex-direction: column;
+    }
+    .admin-sidebar {
+      width: 100%;
+      height: auto;
+      position: static;
+      flex-direction: row;
+      overflow-x: auto;
+      padding: 0;
+      border-right: none;
+      border-bottom: 0.5px solid var(--white-10);
+    }
+    .sidebar-logo {
+      display: none;
+    }
+    .admin-user-card {
+      display: none;
+    }
+    .sidebar-nav {
+      flex-direction: row;
+      overflow-x: auto;
+      padding: 8px;
+      gap: 4px;
+    }
+    .sidebar-nav-item {
+      white-space: nowrap;
+      padding: 8px 16px;
+      border-radius: 4px;
+    }
+    .sidebar-footer {
+      display: none;
+    }
+    .admin-main {
+      min-height: auto;
+    }
+    .top-bar {
+      padding: 12px 16px;
+    }
+    .top-user {
+      font-size: 11px;
+    }
+    .tabs-bar {
+      overflow-x: auto;
+      padding: 0 12px;
+      gap: 0;
+      flex-wrap: nowrap;
+    }
+    .tab {
+      white-space: nowrap;
+      padding: 12px 14px;
+      font-size: 10px;
+    }
+    .content {
+      padding: 12px;
+    }
+    .stats-row {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .op-details {
+      grid-template-columns: 1fr 1fr;
+    }
+    .action-row {
+      flex-wrap: wrap;
+    }
+    /* Database table */
+    table {
+      font-size: 11px;
+    }
+    .db-tabs {
+      overflow-x: auto;
+      flex-wrap: nowrap;
+    }
+    .db-tab {
+      white-space: nowrap;
+    }
+    body {
+      overflow-x: hidden;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .stats-row {
+      grid-template-columns: 1fr;
+    }
+    .op-details {
+      grid-template-columns: 1fr;
+    }
+    .top-bar {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+  }
 </style>
 </head>
 <body>
@@ -190,7 +290,7 @@ table.db-table td.db-name{color:var(--white);font-weight:500;}
     <p id="forgot-status" class="forgot-status"></p>
   </div>
 </div>
-<div id="page-dashboard"><aside class="admin-sidebar"><div class="sidebar-logo"><span class="brand-logo">SkyVayu</span><span class="portal-tag">Super Admin</span></div><div class="admin-user-card"><span class="admin-role">Super Admin</span><div class="admin-username" id="nav-username"></div></div><nav class="sidebar-nav"><div class="sidebar-nav-item active" onclick="switchTab('operators')">Operators <span class="sidebar-nav-badge" id="sb-pending">0</span></div><div class="sidebar-nav-item" onclick="switchTab('aircraft')">Aircraft</div><div class="sidebar-nav-item" onclick="switchTab('employees')">Employees</div><div class="sidebar-nav-item" id="nav-database" onclick="switchSection('database')">&#9783; Database</div></nav><div class="sidebar-footer"><button class="btn-logout" onclick="signOut()">Sign out</button></div></aside><div class="admin-main">
+<div id="page-dashboard"><aside class="admin-sidebar"><div class="sidebar-logo"><span class="brand-logo">SkyVayu</span><span class="portal-tag">Super Admin</span></div><div class="admin-user-card"><span class="admin-role">Super Admin</span><div class="admin-username" id="nav-username"></div></div><nav class="sidebar-nav"><div class="sidebar-nav-item active" onclick="showTab('pending')">Operators <span class="sidebar-nav-badge" id="sb-pending">0</span></div><div class="sidebar-nav-item" onclick="showTab('aircraft')">Aircraft</div><div class="sidebar-nav-item" onclick="showTab('employees')">Employees</div><div class="sidebar-nav-item" id="nav-database" onclick="switchSection('database')">&#9783; Database</div></nav><div class="sidebar-footer"><button class="btn-logout" onclick="signOut()">Sign out</button></div></aside><div class="admin-main">
   <div class="top-bar">
     <div class="top-logo">
       <span class="brand-logo">SkyVayu</span>
@@ -528,7 +628,7 @@ function switchSection(section){
     if(content)content.style.display='';
     dbSection.classList.remove('active');
     document.querySelectorAll('.sidebar-nav-item').forEach(function(el){
-      if(el.getAttribute('onclick')==="switchTab('operators')")el.classList.add('active');
+      if(el.getAttribute('onclick')==="showTab('pending')")el.classList.add('active');
     });
   }
 }
@@ -616,7 +716,7 @@ function renderQueriesTable(data){
     return '<tr>'+
       dbTd(q.id?q.id.substring(0,8)+'â¦':'-','db-id')+
       dbTd(q.trip_type)+
-      '<td style="color:var(--white);font-weight:500">'+escapeHtml((q.departure||'-'))+' â '+escapeHtml((q.destination||'-'))+'</td>'+
+      '<td style="color:var(--white);font-weight:500">'+escapeHtml((q.departure||'-'))+' &rarr; '+escapeHtml((q.destination||'-'))+'</td>'+
       dbTd(q.flight_date)+
       dbTd(q.passengers)+
       dbTd(q.aircraft_category)+
