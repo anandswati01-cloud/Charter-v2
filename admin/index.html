@@ -687,7 +687,7 @@ function dbBadge(status){
 }
 
 function dbTd(val,cls){
-  var v=(val===null||val===undefined)?'<span style="opacity:0.3">â</span>':escapeHtml(String(val));
+  var v=(val===null||val===undefined)?'<span style="opacity:0.3">&mdash;</span>':escapeHtml(String(val));
   return '<td class="'+(cls||'')+'">'+v+'</td>';
 }
 
@@ -714,7 +714,7 @@ function renderDbPane(tab){
 function renderQueriesTable(data){
   var rows=data.map(function(q){
     return '<tr>'+
-      dbTd(q.id?q.id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(q.id?q.id.substring(0,8)+'&hellip;':'-','db-id')+
       dbTd(q.trip_type)+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml((q.departure||'-'))+' &rarr; '+escapeHtml((q.destination||'-'))+'</td>'+
       dbTd(q.flight_date)+
@@ -722,7 +722,7 @@ function renderQueriesTable(data){
       dbTd(q.aircraft_category)+
       '<td>'+dbBadge(q.status)+'</td>'+
       dbTd(q.client_phone)+
-      dbTd(q.user_id?q.user_id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(q.user_id?q.user_id.substring(0,8)+'&hellip;':'-','db-id')+
       dbTd(q.created_at?q.created_at.substring(0,10):'-')+
       '</tr>';
   }).join('');
@@ -732,8 +732,8 @@ function renderQueriesTable(data){
 function renderQuotesTable(data){
   var rows=data.map(function(q){
     return '<tr>'+
-      dbTd(q.id?q.id.substring(0,8)+'â¦':'-','db-id')+
-      dbTd(q.query_id?q.query_id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(q.id?q.id.substring(0,8)+'&hellip;':'-','db-id')+
+      dbTd(q.query_id?q.query_id.substring(0,8)+'&hellip;':'-','db-id')+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(q.operator_name||'-')+'</td>'+
       dbTd(q.aircraft_type)+
       dbTd(q.aircraft_registration)+
@@ -766,7 +766,7 @@ function renderClientsTable(data){
 function renderOperatorsDbTable(data){
   var rows=data.map(function(o){
     return '<tr>'+
-      dbTd(o.id?o.id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(o.id?o.id.substring(0,8)+'&hellip;':'-','db-id')+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(o.company_name||'-')+'</td>'+
       dbTd(o.owner_name)+
       dbTd(o.owner_email)+
@@ -783,11 +783,11 @@ function renderOperatorsDbTable(data){
 function renderAircraftDbTable(data){
   var rows=data.map(function(a){
     return '<tr>'+
-      dbTd(a.id?a.id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(a.id?a.id.substring(0,8)+'&hellip;':'-','db-id')+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(a.aircraft_type||'-')+'</td>'+
       dbTd(a.registration)+
       dbTd(a.seats)+
-      dbTd(a.operator_id?a.operator_id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(a.operator_id?a.operator_id.substring(0,8)+'&hellip;':'-','db-id')+
       '<td>'+dbBadge(a.doc_status||'pending')+'</td>'+
       dbTd(a.coa_expiry)+
       dbTd(a.cor_expiry)+
@@ -801,14 +801,14 @@ function renderAircraftDbTable(data){
 function renderEmployeesTable(data){
   var rows=data.map(function(e){
     return '<tr>'+
-      dbTd(e.id?e.id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(e.id?e.id.substring(0,8)+'&hellip;':'-','db-id')+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(e.full_name||'-')+'</td>'+
       dbTd(e.username)+
       dbTd(e.email)+
       dbTd(e.phone)+
       dbTd(e.role)+
       dbTd(e.aircraft_category)+
-      dbTd(e.operator_id?e.operator_id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(e.operator_id?e.operator_id.substring(0,8)+'&hellip;':'-','db-id')+
       '<td>'+dbBadge(e.is_approved?'approved':'pending')+'</td>'+
       dbTd(e.created_at?e.created_at.substring(0,10):'-')+
       '</tr>';
