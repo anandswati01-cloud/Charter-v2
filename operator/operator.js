@@ -1348,8 +1348,8 @@ function onAopFileSelected(input){
     alert('File is too large. Maximum size is 10MB.');
     input.value = ''; return;
   }
-  if(!/\.odf$/i.test(file.name)){
-    alert('Only ODF (.odf) files are accepted for the Air Operator\'s Permit.');
+  if(!/\.pdf$/i.test(file.name)){
+    alert('Only PDF (.pdf) files are accepted for the Air Operator\'s Permit.');
     input.value=''; return;
   }
   selectedAopFile = file;
@@ -1367,7 +1367,7 @@ async function uploadAopDocument(operatorId, file){
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': 'Bearer ' + _opAuthToken,
-      'Content-Type': file.type || 'application/octet-stream',
+      'Content-Type': file.type || 'application/pdf',
       'x-upsert': 'true'
     },
     body: file
