@@ -71,6 +71,10 @@
     var sb = getClient();
     sb.auth.signOut().then(function () {
       updateAuthUI(null);
+      // Clear active quote request data on sign-out
+      ['sv_query_id','sv_query','sv_query_ts','sv_banner_dismissed'].forEach(function(k){ sessionStorage.removeItem(k); });
+      var banner = document.getElementById('resume-banner');
+      if (banner) { banner.style.display = 'none'; document.body.style.paddingTop = ''; }
       if (typeof showToast === 'function') {
         showToast('Signed out successfully.', 'success');
       }
@@ -132,6 +136,11 @@
             window.location.href = 'results.html';
           });
         }
+      }
+      if (event === 'SIGNED_OUT') {
+        ['sv_query_id','sv_query','sv_query_ts','sv_banner_dismissed'].forEach(function(k){ sessionStorage.removeItem(k); });
+        var banner = document.getElementById('resume-banner');
+        if (banner) { banner.style.display = 'none'; document.body.style.paddingTop = ''; }
       }
     });
 
