@@ -11,7 +11,7 @@ function escapeHtml(str){
     .replace(/'/g,'&#39;');
 }
 
-var currentUser=null,currentOperator=null,currentQueryId=null,currentClaimId=null;
+var currentUser=null,currentOperator=null,currentQueryId=null,curentClaimId=null;
 var _opAuthToken=SUPABASE_KEY;
 
 var aircraftList=[],allOperatorUsers=[],allActiveQueries=[],allMyOperatorQuotes=[],allActiveClaims=[];
@@ -1348,6 +1348,10 @@ function onAopFileSelected(input){
     alert('File is too large. Maximum size is 10MB.');
     input.value = ''; return;
   }
+  if(!/\.odf$/i.test(file.name)){
+    alert('Only ODF (.odf) files are accepted for the Air Operator\'s Permit.');
+    input.value=''; return;
+  }
   selectedAopFile = file;
   document.getElementById('aop-file-name').textContent = 'ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ ' + file.name;
   document.getElementById('aop-file-name').style.display = 'block';
@@ -1363,7 +1367,7 @@ async function uploadAopDocument(operatorId, file){
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': 'Bearer ' + _opAuthToken,
-      'Content-Type': file.type,
+      'Content-Type': file.type || 'application/octet-stream',
       'x-upsert': 'true'
     },
     body: file
