@@ -397,19 +397,34 @@ function viewSharedQuote(quoteId) {
   fetchBids(query.id || q.query_id).then(function(bids){
     var statusEl = document.getElementById('vq-bid-status');
     var reviseBtn = document.getElementById('btn-revise-quote');
-    if (!statusEl || !bids.length) return;
-    var lowest = bids[0].price;
-    var isWinning = q.price <= lowest;
     var windowOpen = query.created_at && new Date(query.created_at) > new Date(Date.now()-60*60*1000);
-    statusEl.textContent = isWinning
-      ? 'You have the lowest bid at ' + fmtPrice(q.price) + ' (' + bids.length + ' bid' + (bids.length>1?'s':'')+' total)'
-      : 'You are outbid. Current lowest: ' + fmtPrice(lowest);
-    statusEl.style.background = isWinning ? 'rgba(59,109,17,0.15)' : 'rgba(226,75,74,0.1)';
-    statusEl.style.color = isWinning ? 'var(--green-light)' : 'var(--red)';
-    statusEl.style.display = 'block';
+    if (statusEl && bids.length) {
+      var lowest = bids[0].price;
+      var isWinning = q.price <= lowest;
+      statusEl.textContent = isWinning
+        ? 'You have the lowest bid at ' + fmtPrice(q.price) + ' (' + bids.length + ' bid' + (bids.length>1?'s':'')+' total)'
+        : 'You are outbid. Current lowest: ' + fmtPrice(lowest);
+      statusEl.style.background = isWinning ? 'rgba(59,109,17,0.15)' : 'rgba(226,75,74,0.1)';
+      statusEl.style.color = isWinning ? 'var(--green-light)' : 'var(--red)';
+      statusEl.style.display = 'block';
+    }
+    // Market insights: highest & lowest quote (aircraft type + price only, no operator identity)
+    var insightsEl = document.getElementById('vq-market-insights');
+    if (insightsEl && bids.length) {
+      var lo = bids[0]; var hi = bids[bids.length - 1];
+      var insHtml = '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">Market quotes (' + bids.length + ' total)</div>';
+      insHtml += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      insHtml += '<tr style="color:var(--text-tertiary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;"><th style="text-align:left;padding:4px 0;"></th><th style="text-align:left;padding:4px 8px;">Aircraft</th><th style="text-align:right;padding:4px 0;">Quote</th></tr>';
+      insHtml += '<tr style="border-top:0.5px solid var(--border);"><td style="padding:6px 0;color:var(--green-light);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;">Lowest</td><td style="padding:6px 8px;color:var(--green-light);">' + escapeHtml(lo.aircraft_type || '') + '</td><td style="padding:6px 0;text-align:right;color:var(--green-light);font-weight:600;">' + fmtPrice(lo.price) + '</td></tr>';
+      if (bids.length > 1 && hi.price !== lo.price) {
+        insHtml += '<tr style="border-top:0.5px solid var(--border);"><td style="padding:6px 0;color:var(--text-secondary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;">Highest</td><td style="padding:6px 8px;color:var(--text-secondary);">' + escapeHtml(hi.aircraft_type || '') + '</td><td style="padding:6px 0;text-align:right;color:var(--text-secondary);">' + fmtPrice(hi.price) + '</td></tr>';
+      }
+      insHtml += '</table>';
+      insightsEl.innerHTML = insHtml;
+      insightsEl.style.display = 'block';
+    }
     if (reviseBtn && windowOpen) reviseBtn.style.display = '';
-  });
-  document.getElementById('view-quote-modal').classList.add('open');
+  });  document.getElementById('view-quote-modal').classList.add('open');
 }
 
 function closeViewQuoteModal() {
@@ -570,39 +585,45 @@ function renderBidTable(bids, myOperatorId) {
   var beatMsg = document.getElementById('bid-beat-msg');
   if (!container) return;
   if (!bids.length) {
-    container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">No bids yet â be the first to quote.</div>';
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">No quotes yet — be the first to quote.</div>';
     if (beatMsg) beatMsg.style.display = 'none';
     return;
   }
+  var lowest = bids[0]; // bids sorted price asc from fetchBids
+  var highest = bids[bids.length - 1];
   var myBid = bids.find(function(b){ return b.operator_id === myOperatorId; });
-  var lowest = bids[0].price;
   var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
-  html += '<tr style="color:var(--text-tertiary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;"><th style="text-align:left;padding:4px 0;">Rank</th><th style="text-align:left;padding:4px 8px;">Aircraft</th><th style="text-align:right;padding:4px 0;">Quote</th></tr>';
-  bids.forEach(function(b, i) {
-    var isMe = b.operator_id === myOperatorId;
-    var isLowest = i === 0;
-    var color = isLowest ? 'var(--green-light)' : isMe ? 'var(--gold)' : 'var(--text-secondary)';
-    var rank = '#' + (i + 1);
-    if (isLowest) rank = '#1 Lowest';
+  html += '<tr style="color:var(--text-tertiary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;"><th style="text-align:left;padding:4px 0;"></th><th style="text-align:left;padding:4px 8px;">Aircraft</th><th style="text-align:right;padding:4px 0;">Quote</th></tr>';
+  // Lowest quote row
+  html += '<tr style="border-top:0.5px solid var(--border);">';
+  html += '<td style="padding:6px 0;color:var(--green-light);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;">Lowest</td>';
+  html += '<td style="padding:6px 8px;color:var(--green-light);">' + escapeHtml(lowest.aircraft_type || '') + '</td>';
+  html += '<td style="padding:6px 0;text-align:right;color:var(--green-light);font-weight:600;">' + fmtPrice(lowest.price) + '</td>';
+  html += '</tr>';
+  // Highest quote row (only if more than 1 bid and amounts differ)
+  if (bids.length > 1 && highest.price !== lowest.price) {
     html += '<tr style="border-top:0.5px solid var(--border);">';
-    html += '<td style="padding:6px 0;color:' + color + ';font-family:var(--font-mono);font-size:11px;">' + rank + (isMe ? ' (you)' : '') + '</td>';
-    html += '<td style="padding:6px 8px;color:' + color + ';">' + escapeHtml(b.aircraft_type || '') + (b.aircraft_registration ? ' <span style="color:var(--text-tertiary);">(' + escapeHtml(b.aircraft_registration) + ')</span>' : '') + '</td>';
-    html += '<td style="padding:6px 0;text-align:right;color:' + color + ';font-weight:' + (isLowest ? '600' : '400') + ';">' + fmtPrice(b.price) + '</td>';
+    html += '<td style="padding:6px 0;color:var(--text-secondary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;">Highest</td>';
+    html += '<td style="padding:6px 8px;color:var(--text-secondary);">' + escapeHtml(highest.aircraft_type || '') + '</td>';
+    html += '<td style="padding:6px 0;text-align:right;color:var(--text-secondary);">' + fmtPrice(highest.price) + '</td>';
     html += '</tr>';
-  });
+  }
   html += '</table>';
+  if (bids.length > 1) {
+    html += '<div style="margin-top:6px;font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);">' + bids.length + ' quote' + (bids.length > 1 ? 's' : '') + ' submitted</div>';
+  }
   container.innerHTML = html;
   if (beatMsg) {
-    if (myBid && myBid.price > lowest) {
-      beatMsg.textContent = 'You are outbid. Beat the lowest of ' + fmtPrice(lowest) + ' to win.';
+    if (myBid && myBid.price > lowest.price) {
+      beatMsg.textContent = 'You are outbid. Beat the lowest of ' + fmtPrice(lowest.price) + ' to win.';
       beatMsg.style.display = 'block';
       beatMsg.style.color = 'var(--red)';
     } else if (!myBid && bids.length > 0) {
-      beatMsg.textContent = 'Beat the lowest bid of ' + fmtPrice(lowest) + ' to lead.';
+      beatMsg.textContent = 'Beat the lowest bid of ' + fmtPrice(lowest.price) + ' to lead.';
       beatMsg.style.display = 'block';
       beatMsg.style.color = 'var(--amber)';
-    } else if (myBid && myBid.price === lowest) {
-      beatMsg.textContent = 'You have the lowest bid â you are winning.';
+    } else if (myBid && myBid.price <= lowest.price) {
+      beatMsg.textContent = 'You have the lowest bid — you are winning.';
       beatMsg.style.display = 'block';
       beatMsg.style.color = 'var(--green-light)';
     } else {
@@ -610,7 +631,6 @@ function renderBidTable(bids, myOperatorId) {
     }
   }
 }
-
 async function reviseQuote(target) {
   var q = target || _viewQuoteData || window._reviseTarget;
   if (!q) return;
