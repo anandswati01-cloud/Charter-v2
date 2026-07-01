@@ -1240,17 +1240,23 @@
     var qData = sessionStorage.getItem('sv_query');
     // Auto-clear stale session data if older than 60 minutes (3600000 ms)    var ts = sessionStorage.getItem('sv_query_ts');
     var banner = document.getElementById('resume-banner');
-    if (!banner) return;
-    banner.style.display = 'flex';
-    if (qData) {
-      try {
-        var q = JSON.parse(qData);
-        var route = (q.departure||'')+' → '+(q.destination||'');
-        var routeEl = document.getElementById('resume-route');
-        if (routeEl && route.trim() !== '→') routeEl.textContent = route;
-      } catch(e) {}
-    }
-    document.body.style.paddingTop = '48px';
+    if (!banner || !qId) return;
+    // Only show banner when the user is logged in
+    var sb = window._svSupabase;
+    if (!sb) return;
+    sb.auth.getSession().then(function(res) {
+      if (!res.data || !res.data.session) return;
+      banner.style.display = 'flex';
+      if (qData) {
+        try {
+          var q = JSON.parse(qData);
+          var route = (q.departure||'')+' → '+(q.destination||'');
+          var routeEl = document.getElementById('resume-route');
+          if (routeEl && route.trim() !== '→') routeEl.textContent = route;
+        } catch(e) {}
+      }
+      document.body.style.paddingTop = '48px';
+    });
   }
   window.resumeQuery = function() {
     var qId = sessionStorage.getItem('sv_query_id');
