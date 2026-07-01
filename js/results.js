@@ -187,31 +187,40 @@ function stopFacts() {
 // ── Load quotes from Supabase ──
 async function loadQuotes() {
     if (!queryId) {
-          console.warn('results.js: no queryId in sessionStorage or URL');
           document.getElementById('quotes-container').innerHTML = '<div class="loading-state"><div style="color:#e06060;font-size:13px;">No booking found. Please <a href="index.html" style="color:#17b0d6;">submit a new booking</a>.</div></div>';
           var _snt=document.getElementById('stat-notified-txt');if(_snt)_snt.textContent='0';
           return;
     }
-    console.log('results.js: loading quotes for query', queryId);
+    // Prevent concurrent overlapping fetches
+    if (window._loadInFlight) return;
+    window._loadInFlight = true;
     try {
-          var res = await fetch(SUPABASE_URL + '/rest/v1/quotes?query_id=eq.' + queryId + '&order=price.asc', {
+          var res = await fetch(SUPABASE_URL + '/rest/v1/quotes?select=*&query_id=eq.' + queryId + '&status=eq.shared&order=price.asc', {
                   headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
           });
           var quotes = await res.json();
           if (!Array.isArray(quotes)) return;
 
-      document.getElementById('stat-received-txt').textContent = quotes.length;
+          document.getElementById('stat-received-txt').textContent = quotes.length;
 
-    var viewRes = await fetch(SUPABASE_URL + '/rest/v1/query_views?query_id=eq.' + queryId + '&select=id', {
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    });
-    var views = await viewRes.json();
-    var notifiedCount = Array.isArray(views) ? views.length : 0;
-    document.getElementById('stat-notified-txt').textContent = notifiedCount;
-      allQuotes = quotes;
+          var viewRes = await fetch(SUPABASE_URL + '/rest/v1/query_views?query_id=eq.' + queryId + '&select=id', {
+              headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+          });
+          var views = await viewRes.json();
+          var notifiedCount = Array.isArray(views) ? views.length : 0;
+          document.getElementById('stat-notified-txt').textContent = notifiedCount;
+
+          // Only re-render if data has actually changed (prevents DOM flicker on every poll)
+          var fingerprint = quotes.map(function(q){ return q.id + ':' + q.price + ':' + q.status; }).join('|');
+          if (fingerprint === window._lastQuoteFingerprint) return;
+          window._lastQuoteFingerprint = fingerprint;
+
+          allQuotes = quotes;
           applyFilters();
     } catch(e) {
           console.error('loadQuotes error:', e);
+    } finally {
+          window._loadInFlight = false;
     }
 }
 
@@ -360,13 +369,13 @@ startTimer();
 var debugEl = document.getElementById('debug-query-id');
 if (debugEl && queryId) debugEl.textContent = 'ID: ' + queryId.substring(0,8) + '…';
 loadQuotes();
-setInterval(loadQuotes, 5000);
+setInterval(loadQuotes, 30000);
 
 // Realtime
 if (queryId) {
     try {
           var ws = new WebSocket(SUPABASE_URL.replace('https://','wss://') + '/realtime/v1/websocket?apikey=' + SUPABASE_KEY + '&vsn=1.0.0');
           ws.onopen = function(){ ws.send(JSON.stringify({topic:'realtime:public:quotes:query_id=eq.'+queryId,event:'phx_join',payload:{},ref:'1'})); };
-          ws.onmessage = function(e){ try{ var m=JSON.parse(e.data); if(m.event==='INSERT') loadQuotes(); }catch(x){} };
+          ws.onmessage = function(e){ try{ var m=JSON.parse(e.data); if(m.event==='INSERT'||m.event==='UPDATE') { window._lastQuoteFingerprint=null; loadQuotes(); } }catch(x){} };
     } catch(e){}
 }
