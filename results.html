@@ -48,6 +48,7 @@ nav{
 .nav-links a{font-family:var(--font-mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;text-decoration:none;color:#94a3b8;transition:color .15s;}
 .nav-links a.active{color:var(--gold);border-bottom:2px solid var(--gold);padding-bottom:3px;font-weight:700;}
 .nav-links a:hover:not(.active){color:var(--text);}
+.nav-burger{display:none;}
 
 /* ── PAGE LAYOUT ── */
 .page{
@@ -329,7 +330,16 @@ nav{
 @media(max-width:480px){
   nav{padding:0 16px;height:60px;}
   .nav-logo{font-size:20px;}
-  .nav-links{gap:16px;}
+  /* Mobile nav */
+  .nav-burger{display:flex;flex-direction:column;justify-content:space-between;width:22px;height:16px;background:none;border:none;cursor:pointer;padding:0;z-index:200;}
+  .nav-burger span{display:block;height:2px;background:var(--text);border-radius:2px;transition:all .25s;}
+  .nav-burger.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+  .nav-burger.open span:nth-child(2){opacity:0;}
+  .nav-burger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+  .nav-links{display:none;position:fixed;top:60px;left:0;right:0;background:rgba(12,25,50,0.97);backdrop-filter:blur(16px);flex-direction:column;gap:0;padding:12px 0;z-index:150;border-bottom:1px solid var(--border);}
+  .nav-links.open{display:flex;}
+  .nav-links a{padding:14px 24px;font-size:13px;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .nav-auth-wrap{right:52px !important;}
   .page{padding-top:60px;}
   .sidebar{padding:12px;}
   .feed{padding:12px 12px 48px 12px;max-width:100%;}
@@ -369,6 +379,7 @@ nav{
             <a href="fleet.html">Fleet</a>
             <a href="/operator">Operator Login</a>
   </div>
+  <button class="nav-burger" id="nav-burger" aria-label="Menu" onclick="(function(){var b=document.getElementById('nav-burger'),nl=document.querySelector('.nav-links');b.classList.toggle('open');nl.classList.toggle('open');})()"><span></span><span></span><span></span></button>
   <div style="position:absolute;right:40px;display:flex;align-items:center;gap:12px;">
     <button id="sv-login-btn" onclick="signInWithGoogle()" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.6);background:transparent;border:1px solid rgba(255,255,255,0.25);padding:8px 16px;border-radius:2px;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='#fbbf24';this.style.color='#fbbf24'" onmouseout="this.style.borderColor='rgba(255,255,255,0.25)';this.style.color='rgba(255,255,255,0.6)'">Sign In</button>
     <div id="sv-user-chip" style="display:none;align-items:center;gap:8px;">
