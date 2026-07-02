@@ -1822,10 +1822,20 @@ function closeAuthModal() {
 }
 
 /* Called by the booking form submit — stash query, open auth or save directly */
-function openOtpModal() {
-  getSession(function(session) {
+async function openOtpModal() {
+  getSession(async function(session) {
     if (session) {
-      /* Already signed in — attach user_id and save query */
+      /* Paywall: first query free, subsequent require membership */
+      try {
+        var cRes = await fetch(SKYVAYU_CONFIG.supabaseUrl + '/rest/v1/queries?user_id=eq.' + session.user.id + '&select=id', {
+          headers: { 'apikey': SKYVAYU_CONFIG.supabaseKey, 'Authorization': 'Bearer ' + session.access_token, 'Prefer': 'count=exact', 'Range': '0-0' }
+        });
+        var cr = cRes.headers.get('Content-Range') || '';
+        var m = cr.match(/(\d+)$/);
+        var total = m ? parseInt(m[1], 10) : 0;
+        if (total >= 1) { window.location.href = 'register.html'; return; }
+      } catch(e) { console.warn('paywall check failed, proceeding', e); }
+      /* First query — proceed normally */
       if (window._pendingQueryData && typeof saveQueryToSupabase === 'function') {
         window._pendingQueryData.user_id = session.user.id;
         saveQueryToSupabase(window._pendingQueryData).then(function() {
@@ -1836,9 +1846,7 @@ function openOtpModal() {
       }
     } else {
       /* Not signed in — stash query and open Google sign-in */
-      if (window._pendingQueryData) {
-        stashPendingQuery(window._pendingQueryData);
-      }
+      if (window._pendingQueryData) { stashPendingQuery(window._pendingQueryData); }
       openAuthModal();
     }
   });
