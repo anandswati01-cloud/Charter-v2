@@ -11,7 +11,7 @@ function escapeHtml(str){
     .replace(/'/g,'&#39;');
 }
 
-var currentUser=null,currentOperator=null,currentQueryId=null,curentClaimId=null;
+var currentUser=null,currentOperator=null,currentQueryId=null,currentClaimId=null;
 var _opAuthToken=SUPABASE_KEY;
 
 var aircraftList=[],allOperatorUsers=[],allActiveQueries=[],allMyOperatorQuotes=[],allActiveClaims=[];
