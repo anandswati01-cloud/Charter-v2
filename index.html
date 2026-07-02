@@ -509,7 +509,7 @@
 /* ââ BOOKING GRID V2 (stacked date under each aerodrome) ââ */
 .inputs-grid-v2 {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr 1fr auto;
   gap: 16px;
   margin-bottom: 24px;
   align-items: start;
@@ -1386,26 +1386,30 @@
       </div>
 
       <div class="inputs-grid-v2">
-          <!-- COL 1: From + Departure Date -->
+          <!-- COL 1: From -->
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">From</div>
 <div class="ac-wrap"><input class="input-field" type="text" id="departure" tabindex="1" placeholder="Departure city or airport" autocomplete="off" oninput="acInput(this,'ac-dep');clearErr(this)" onkeydown="acKey(event,'ac-dep')" onfocus="acInput(this,'ac-dep')" onblur="acBlur('ac-dep')"><div class="ac-dropdown" id="ac-dep"></div></div>
               <span class="error-msg" id="err-departure">Please enter a departure city</span>
             </div>
-            <div class="input-group" style="margin-top:12px;">
-              <div class="input-label">Departure Date &amp; Time</div>
-              <input class="input-field" type="datetime-local" id="flightDateTime" tabindex="3" oninput="clearErr(this)">
-              <span class="error-msg" id="err-flight-date">Please select a departure date &amp; time</span>
-            </div>
           </div>
 
-          <!-- COL 2: To + Return Date (return hidden by default) -->
+          <!-- COL 2: To -->
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">To</div>
               <div class="ac-wrap"><input class="input-field" type="text" id="destination" tabindex="2" placeholder="Destination city or airport" autocomplete="off" oninput="acInput(this,'ac-dest');clearErr(this)" onkeydown="acKey(event,'ac-dest')" onfocus="acInput(this,'ac-dest')" onblur="acBlur('ac-dest')"><div class="ac-dropdown" id="ac-dest"></div></div>
               <span class="error-msg" id="err-destination">Please enter a destination city</span>
+            </div>
+          </div>
+
+          <!-- COL 3: Departure Date + Return Date -->
+          <div class="input-col">
+            <div class="input-group">
+              <div class="input-label">Departure Date &amp; Time</div>
+              <input class="input-field" type="datetime-local" id="flightDateTime" tabindex="3" oninput="clearErr(this)">
+              <span class="error-msg" id="err-flight-date">Please select a departure date &amp; time</span>
             </div>
             <div class="input-group" id="return-row" style="display:none; margin-top:12px;">
               <div class="input-label">Return Date &amp; Time</div>
@@ -1414,7 +1418,7 @@
             </div>
           </div>
 
-          <!-- COL 3: Passengers -->
+          <!-- COL 4: Passengers -->
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">Passengers</div>
