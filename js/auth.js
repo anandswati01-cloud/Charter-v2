@@ -127,15 +127,37 @@
           if (res.error) console.error('profile upsert failed:', res.error.message);
         });
         var pending = window.popPendingQuery();
-        if (pending && typeof saveQueryToSupabase === 'function') {
-          pending.user_id = session.user.id;
-          saveQueryToSupabase(pending).then(function () {
-            window.location.href = 'results.html';
-          }).catch(function (err) {
-            console.error('saveQuery failed after OAuth:', err);
-            window.location.href = 'results.html';
-          });
-        }
+if (pending && typeof saveQueryToSupabase === 'function') {
+                pending.user_id = session.user.id;
+                var userEmail = session.user.email || '';
+                var accessFn = typeof checkAndRecordUserAccess === 'function' ? checkAndRecordUserAccess : (typeof window.checkAndRecordUserAccess === 'function' ? window.checkAndRecordUserAccess : null);
+                if (accessFn) {
+                                  accessFn(session.user.id, userEmail).then(function(access) {
+                                                      if (!access.allowed && access.redirect === 'register') {
+                                                                            sessionStorage.removeItem('sv_query');
+                                                                            var regUrl = 'register.html?reason=membership_required&email=' + encodeURIComponent(userEmail);
+                                                                            window.location.href = regUrl;
+                                                      } else {
+                                                                            saveQueryToSupabase(pending).then(function () {
+                                                                                                    window.location.href = 'results.html';
+                                                                            }).catch(function (err) {
+                                                                                                    console.error('saveQuery failed after OAuth:', err);
+                                                                                                    window.location.href = 'results.html';
+                                                                            });
+                                                      }
+                                  }).catch(function(err) {
+                                                      console.error('access check failed:', err);
+                                                      saveQueryToSupabase(pending).then(function () { window.location.href = 'results.html'; }).catch(function() { window.location.href = 'results.html'; });
+                                  });
+                } else {
+                                  saveQueryToSupabase(pending).then(function () {
+                                                      window.location.href = 'results.html';
+                                  }).catch(function (err) {
+                                                      console.error('saveQuery failed after OAuth:', err);
+                                                      window.location.href = 'results.html';
+                                  });
+                }
+}
       }
       if (event === 'SIGNED_OUT') {
         ['sv_query_id','sv_query','sv_query_ts','sv_banner_dismissed'].forEach(function(k){ sessionStorage.removeItem(k); });
