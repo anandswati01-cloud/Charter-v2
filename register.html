@@ -114,3 +114,14 @@ async function submitReg(){
 </script>
 </body>
 </html>
+
+<script>
+  (function(){
+      var params=new URLSearchParams(window.location.search);
+      var reason=params.get('reason');
+      var emailParam=params.get('email');
+      if(emailParam){var ef=document.getElementById('re');if(ef){ef.value=decodeURIComponent(emailParam);ef.readOnly=true;ef.style.opacity='0.7';}}
+      if(reason==='membership_required'){var sub=document.querySelector('.page-sub');if(sub){sub.innerHTML='You have used your complimentary first query. To post more charter queries, please complete your annual membership below.';sub.style.color='#fbbf24';sub.style.fontWeight='600';}}
+  })();
+</script>
+</script>
