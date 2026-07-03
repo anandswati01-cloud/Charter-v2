@@ -253,3 +253,35 @@ async function sendEmail(type, payload) {
           console.warn('sendEmail failed:', type, e);
     }
 }
+
+
+/* — Charter User Access Gate — */
+/* Returns: { allowed: true } if first-time user (query_count was 0)
+             { allowed: false, redirect: 'register' } if query_count >= 1 and not a member
+             { allowed: true } if is_member = true (paid member)
+   Also increments query_count on first use.
+*/
+async function checkAndRecordUserAccess(userId, email) {
+    var sb = window._svSupabase;
+    if (!sb) return { allowed: false, error: 'no_client' };
+
+  /* Fetch existing record */
+  var res = await sb.from('charter_user_access').select('*').eq('email', email).maybeSingle();
+    if (res.error) { console.error('checkAccess fetch error:', res.error.message); return { allowed: false, error: res.error.message }; }
+
+  var record = res.data;
+
+  /* Paid member — always allowed */
+  if (record && record.is_member) return { allowed: true, member: true };
+
+  /* Second query onwards for non-member — redirect to registration */
+  if (record && record.query_count >= 1) return { allowed: false, redirect: 'register', email: email };
+
+  /* First time — upsert with count = 1 */
+  var now = new Date().toISOString();
+    var upsertData = { email: email, user_id: userId, query_count: 1, first_query_at: now, updated_at: now };
+    var upsertRes = await sb.from('charter_user_access').upsert(upsertData, { onConflict: 'email' });
+    if (upsertRes.error) { console.error('checkAccess upsert error:', upsertRes.error.message); return { allowed: false, error: upsertRes.error.message }; }
+    return { allowed: true, firstTime: true };
+}
+window.checkAndRecordUserAccess = checkAndRecordUserAccess;
