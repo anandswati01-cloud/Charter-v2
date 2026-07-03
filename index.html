@@ -1825,17 +1825,18 @@ function closeAuthModal() {
 async function openOtpModal() {
   getSession(async function(session) {
     if (session) {
-      /* Paywall: first query free, subsequent require membership */
-      try {
-        var cRes = await fetch(SKYVAYU_CONFIG.supabaseUrl + '/rest/v1/queries?user_id=eq.' + session.user.id + '&select=id', {
-          headers: { 'apikey': SKYVAYU_CONFIG.supabaseKey, 'Authorization': 'Bearer ' + session.access_token, 'Prefer': 'count=exact', 'Range': '0-0' }
-        });
-        var cr = cRes.headers.get('Content-Range') || '';
-        var m = cr.match(/(\d+)$/);
-        var total = m ? parseInt(m[1], 10) : 0;
-        if (total >= 1) { window.location.href = 'register.html'; return; }
-      } catch(e) { console.warn('paywall check failed, proceeding', e); }
-      /* First query — proceed normally */
+      /* Paywall: use charter_user_access gate — first query free, subsequent require membership */
+              var accessFn = typeof window.checkAndRecordUserAccess === 'function' ? window.checkAndRecordUserAccess : null;
+              if (accessFn) {
+                          try {
+                                        var access = await accessFn(session.user.id, session.user.email || '');
+                                        if (!access.allowed && access.redirect === 'register') {
+                                                        var regUrl = 'register.html?reason=membership_required&email=' + encodeURIComponent(session.user.email || '');
+                                                        window.location.href = regUrl; return;
+                                        }
+                          } catch(e) { console.warn('paywall check failed, proceeding', e); }
+              }
+              /* First query or paid member — proceed normally */
       if (window._pendingQueryData && typeof saveQueryToSupabase === 'function') {
         window._pendingQueryData.user_id = session.user.id;
         saveQueryToSupabase(window._pendingQueryData).then(function() {
