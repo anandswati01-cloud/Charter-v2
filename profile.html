@@ -570,7 +570,6 @@
         aadhaar_number: document.getElementById('aadhaar-input').value.trim() || null
       };
       // If new documents were uploaded, set status to pending for admin review
-      if (hasNewDocs) payload.kyc_status = 'pending';
 
       const { error } = await sb.from('profiles').upsert(payload, { onConflict: 'id' });
       btn.disabled = false;
@@ -657,7 +656,7 @@
             if (pass && p.passport_number) pass.value = p.passport_number;
             var aadh = document.getElementById('aadhaar-input');
             if (aadh && p.aadhaar_number) aadh.value = p.aadhaar_number;
-            updateKycBadge(p.kyc_status || 'unverified');
+            updateKycBadge(p.kyc_verified ? 'verified' : 'pending');
             loadExistingDocs(user.id, sb);
           }
           loadBookings(user.id);
