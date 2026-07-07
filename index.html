@@ -44,7 +44,7 @@
       overflow-x: hidden;
     }
 
-    /* ââ NAV ââ */
+    /* ── NAV ── */
     .nav {
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -106,7 +106,7 @@
 
     .nav-cta:hover { background: var(--gold-light); }
 
-    /* ââ HERO ââ */
+    /* ── HERO ── */
     .hero {
       position: relative;
       min-height: 100vh;
@@ -185,7 +185,7 @@
       font-weight: 500;
     }
 
-    /* ââ TRUST BAR ââ */
+    /* ── TRUST BAR ── */
     .trust-bar {
       position: relative;
       z-index: 2;
@@ -229,7 +229,7 @@
       margin-top: 2px;
     }
 
-    /* ââ BOOKING CARD ââ */
+    /* ── BOOKING CARD ── */
     .booking-section {
       padding: 0 48px 100px;
       position: relative;
@@ -289,7 +289,7 @@
       border-color: var(--gold);
     }
 
-    /* ââ AIRCRAFT TYPE SELECTOR (above trip tabs) ââ */
+    /* ── AIRCRAFT TYPE SELECTOR (above trip tabs) ── */
     .aircraft-selector {
       display: flex;
       gap: 4px;
@@ -461,7 +461,7 @@
     .cta-btn:hover .cta-arrow { transform: translateX(4px); }
 
 
-        /* ââ AIRPORT AUTOCOMPLETE ââ */
+        /* ── AIRPORT AUTOCOMPLETE ── */
         .ac-wrap { position: relative; }
         .ac-dropdown {
                 position: absolute;
@@ -506,7 +506,7 @@
         }
         .ac-city span { font-size: 11px; color: var(--white-60); margin-top: 2px; }
         .ac-icao { font-family: var(--font-mono); font-size: 11px; color: var(--gold); letter-spacing: 1.5px; }
-/* ââ BOOKING GRID V2 (stacked date under each aerodrome) ââ */
+/* ── BOOKING GRID V2 (stacked date under each aerodrome) ── */
 .inputs-grid-v2 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr auto;
@@ -520,7 +520,7 @@
 }
 
         
-/* ââ MULTI-SECTOR PANEL ââ */
+/* ── MULTI-SECTOR PANEL ── */
 .multi-sector-wrap { display: none; margin-bottom: 24px; }
 .sector-row { margin-bottom: 0; }
 .sector-row + .sector-row { border-top: 1px solid rgba(255,255,255,0.07); margin-top: 20px; padding-top: 20px; }
@@ -532,7 +532,7 @@
 .add-sector-btn { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; padding: 10px 20px; border: 1px dashed rgba(251,191,36,0.35); border-radius: 6px; background: rgba(251,191,36,0.04); color: var(--gold); cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; margin-top: 4px; }
 .add-sector-btn:hover { border-color: var(--gold); background: rgba(251,191,36,0.08); }
 
-        /* ââ HOW IT WORKS ââ */
+        /* ── HOW IT WORKS ── */
     .section {
       padding: 100px 48px;
       max-width: 1280px;
@@ -595,7 +595,7 @@
       color: var(--white-60);
     }
 
-    /* ââ WHY SKYVAYU ââ */
+    /* ── WHY SKYVAYU ── */
     .why-section {
       padding: 100px 48px;
       background: var(--navy-mid);
@@ -651,7 +651,7 @@
       color: var(--white-60);
     }
 
-    /* ââ POPULAR ROUTES ââ */
+    /* ── POPULAR ROUTES ── */
     .routes-section {
       padding: 100px 48px;
       max-width: 1280px;
@@ -756,7 +756,7 @@
       color: var(--navy);
     }
 
-    /* ââ FINAL CTA ââ */
+    /* ── FINAL CTA ── */
     .final-cta {
       position: relative;
       padding: 120px 48px;
@@ -802,7 +802,7 @@
       line-height: 1.7;
     }
 
-    /* ââ FOOTER ââ */
+    /* ── FOOTER ── */
     .footer {
       background: var(--navy-mid);
       border-top: 1px solid var(--white-10);
@@ -936,7 +936,7 @@
       color: var(--white-30);
     }
 
-    /* ââ ANIMATIONS ââ */
+    /* ── ANIMATIONS ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(24px); }
       to { opacity: 1; transform: translateY(0); }
@@ -1199,7 +1199,7 @@
     }
   }</style>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <meta name="description" content="SkyVayu — Private charter flights across India and beyond. Direct quotes, no middlemen, transparent pricing. Book MumbaiâDelhi, DelhiâGoa, and international routes instantly.">
+  <meta name="description" content="SkyVayu — Private charter flights across India and beyond. Direct quotes, no middlemen, transparent pricing. Book Mumbai–Delhi, Delhi–Goa, and international routes instantly.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.skyvayu.com/">
   <meta property="og:title" content="SkyVayu — Private Charter Flights. Direct. Transparent. Fast.">
@@ -1225,7 +1225,7 @@
   </style>
 </head>
 <body>
-<!-- ââ Active query resume banner âââââââââââââââââââ -->
+<!-- ── Active query resume banner ─────────────────── -->
 <div id="resume-banner" style="display:none;position:fixed;top:0;left:0;width:100%;z-index:9999;background:linear-gradient(90deg,#c9a84c,#e8c86a);color:#1a1a1a;padding:12px 20px;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,0,0,0.15);font-family:'DM Sans',sans-serif;font-size:14px;">
   <span>✈️ You have an active quote request. <strong id="resume-route"></strong></span>
   <div style="display:flex;gap:10px;align-items:center;">
@@ -1803,7 +1803,7 @@ function getQuotes() {
   </div>
 </div>
 <script>
-/* ââ Auth modal helpers âââââââââââââââââââââââââââââââââââ */
+/* ── Auth modal helpers ─────────────────────────────────── */
 function openAuthModal() {
   var m = document.getElementById('auth-modal');
   if (m) m.style.display = 'flex';
