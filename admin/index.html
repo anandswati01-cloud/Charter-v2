@@ -1,4 +1,4 @@
-â<!DOCTYPE html>
+→<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -158,11 +158,11 @@ table.db-table td.db-name{color:var(--white);font-weight:500;}
 .db-stat-num{font-family:var(--font-display);font-size:26px;font-weight:300;color:var(--white);}
 .db-stat-label{font-family:var(--font-mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--white-30);margin-top:2px;} .hist-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;padding:20px;} .hist-modal-overlay.open{display:flex;} .hist-modal{background:rgba(15,26,48,0.97);backdrop-filter:blur(16px);border:0.5px solid var(--white-10);border-radius:var(--radius-lg);padding:28px 28px 24px;width:100%;max-width:900px;max-height:80vh;overflow-y:auto;position:relative;box-shadow:0 20px 60px rgba(0,0,0,0.5);} .hist-modal-close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--text);opacity:0.5;font-size:24px;cursor:pointer;line-height:1;padding:2px 6px;} .hist-modal-close:hover{opacity:1;} .hist-modal h3{font-family:var(--font-display);color:var(--gold);font-size:22px;margin:0 0 4px;} .hist-modal .hist-sub{font-size:12px;color:var(--white-30);margin-bottom:16px;} .btn-view-history{height:30px;padding:0 14px;background:rgba(251,191,36,0.12);color:var(--gold);border:0.5px solid var(--gold-border);border-radius:var(--radius);font-size:10px;font-weight:500;font-family:var(--font-mono);letter-spacing:1px;text-transform:uppercase;cursor:pointer;white-space:nowrap;} .btn-view-history:hover{background:rgba(251,191,36,0.22);}
 
-  /* ââ MOBILE BASE ââ */
+  /* ── MOBILE BASE ── */
   .nav-hamburger-admin { display: none; }
   .admin-mobile-menu { display: none; }
 
-  /* ââ MOBILE: max-width 768px ââ */
+  /* ── MOBILE: max-width 768px ── */
   @media (max-width: 768px) {
     #page-dashboard {
       flex-direction: column;
@@ -450,8 +450,8 @@ async function loadPendingEmployees(){
     var opName=(e.operators&&e.operators.company_name)||'Unknown';
     var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
     return '<div class="op-card">'
-      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+escapeHtml(ini)+'</div><div><div class="op-company">'+escapeHtml(e.full_name||e.username)+'</div><div class="op-meta">'+escapeHtml(opName)+' ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ· @'+escapeHtml(e.username)+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
-      +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+escapeHtml(e.employee_id||'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Company</span>'+escapeHtml(opName)+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
+      +'<div class="op-card-top"><div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:40px;border-radius:50%;background:var(--blue-faint);border:0.5px solid var(--blue-border);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:var(--gold);">'+escapeHtml(ini)+'</div><div><div class="op-company">'+escapeHtml(e.full_name||e.username)+'</div><div class="op-meta">'+escapeHtml(opName)+' · @'+escapeHtml(e.username)+'</div></div></div><span class="status-badge status-pending">Pending approval</span></div>'
+      +'<div class="op-details"><div class="op-detail"><span>Employee ID</span>'+escapeHtml(e.employee_id||'—')+'</div><div class="op-detail"><span>Company</span>'+escapeHtml(opName)+'</div><div class="op-detail"><span>Applied</span>'+new Date(e.created_at).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})+'</div></div>'
       +'<div class="action-row"><button class="btn-approve" onclick="approveEmployee(\''+escapeHtml(e.id)+'\')">&#10003; Approve</button><button class="btn-reject" onclick="showEmpRejectInput(\''+escapeHtml(e.id)+'\')">&#10007; Reject</button><input class="rejection-input" id="emp-reject-reason-'+escapeHtml(e.id)+'" placeholder="Reason (optional)"><button class="btn-confirm-reject" id="emp-confirm-reject-'+escapeHtml(e.id)+'" onclick="rejectEmployee(\''+escapeHtml(e.id)+'\')">Confirm</button></div>'
       +'</div>';
   }).join('');
@@ -489,8 +489,8 @@ function showTab(tab){
   document.getElementById('tab-content-'+tab).style.display='block';
 }
 
-function fmtDateTime(iso){if(!iso)return'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ';return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
-function fmtDate(d){if(!d)return'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
+function fmtDateTime(iso){if(!iso)return'—';return new Date(iso).toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function fmtDate(d){if(!d)return'—';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
 
 async function openDocument(docUrl){
   if(!docUrl){showToast('No document uploaded','error');return;}
@@ -537,7 +537,7 @@ function renderOperatorCard(op){
   }
   return '<div class="op-card">'
     +'<div class="op-card-top"><div><div class="op-company">'+escapeHtml(op.company_name)+'</div><div class="op-meta">Applied '+fmtDateTime(op.created_at)+(empCount?' &middot; '+empCount+' emp':'')+'</div></div><span class="status-badge '+statusClass+'">'+statusLabel+'</span></div>'
-    +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+escapeHtml(op.owner_name||'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Phone</span>'+escapeHtml(op.owner_phone||'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Email</span>'+escapeHtml(op.owner_email||'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+escapeHtml(owner.username):'ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ')+'</div></div>'
+    +'<div class="op-details"><div class="op-detail"><span>Owner</span>'+escapeHtml(op.owner_name||'—')+'</div><div class="op-detail"><span>Phone</span>'+escapeHtml(op.owner_phone||'—')+'</div><div class="op-detail"><span>Email</span>'+escapeHtml(op.owner_email||'—')+'</div><div class="op-detail"><span>Username</span>'+(owner?'@'+escapeHtml(owner.username):'—')+'</div></div>'
     +docHtml+actionHtml+'</div>';
 }
 
@@ -729,7 +729,7 @@ function renderQuotesTable(data){
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(q.operator_name||'-')+'</td>'+
       dbTd(q.aircraft_type)+
       dbTd(q.aircraft_registration)+
-      '<td style="color:var(--gold);font-weight:500">Ã¢ÂÂ¹'+escapeHtml(q.price?Number(q.price).toLocaleString('en-IN'):'-')+'</td>'+
+      '<td style="color:var(--gold);font-weight:500">₹'+escapeHtml(q.price?Number(q.price).toLocaleString('en-IN'):'-')+'</td>'+
       '<td>'+dbBadge(q.status)+'</td>'+
       dbTd(q.notes,'',120)+
       dbTd(q.created_at?q.created_at.substring(0,10):'-')+
@@ -741,7 +741,7 @@ function renderQuotesTable(data){
 function renderClientsTable(data){
   var rows=data.map(function(c){
     return '<tr>'+
-      dbTd(c.id?c.id.substring(0,8)+'â¦':'-','db-id')+
+      dbTd(c.id?c.id.substring(0,8)+'…':'-','db-id')+
       '<td style="color:var(--white);font-weight:500">'+escapeHtml(c.full_name||'-')+'</td>'+
       dbTd(c.email)+
       dbTd(c.phone)+
