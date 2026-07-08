@@ -376,11 +376,11 @@ document.addEventListener('click', function(e) {
 });
 
 // ── Boot ──
-loadQueryAndSidebar();
+
 startTimer();
 var debugEl = document.getElementById('debug-query-id');
 if (debugEl && queryId) debugEl.textContent = 'ID: ' + queryId.substring(0,8) + '…';
-loadQuotes();
+function bootData(){ loadQueryAndSidebar(); loadQuotes(); } if (typeof window.getSession === 'function') { window.getSession(function(){ bootData(); }); } else { bootData(); }
 setInterval(loadQuotes, 30000);
 
 // Realtime
