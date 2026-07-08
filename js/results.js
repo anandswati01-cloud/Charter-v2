@@ -14,6 +14,18 @@ function escapeHtml(str) {
 
 var SUPABASE_URL = SKYVAYU_CONFIG.supabaseUrl;
 var SUPABASE_KEY = SKYVAYU_CONFIG.supabaseKey;
+async function getAuthHeaders() {
+      var token = SUPABASE_KEY;
+      try {
+              if (window._svSupabase) {
+                        var sessionResp = await window._svSupabase.auth.getSession();
+                        if (sessionResp.data && sessionResp.data.session && sessionResp.data.session.access_token) {
+                                    token = sessionResp.data.session.access_token;
+                        }
+              }
+      } catch (e) { /* fall back to anon key */ }
+      return { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + token };
+}
 // Support ?query_id= in URL as fallback (useful when navigating back from operator portal)
 var urlParams = new URLSearchParams(window.location.search);
 var queryId = urlParams.get('query_id') || sessionStorage.getItem('sv_query_id');
@@ -88,7 +100,7 @@ async function loadQueryAndSidebar() {
   if (!hasFullData && queryId) {
         try {
                 var res = await fetch(SUPABASE_URL + '/rest/v1/queries?id=eq.' + queryId + '&limit=1', {
-                          headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+                          headers: await getAuthHeaders()
                 });
                 var rows = await res.json();
                 if (Array.isArray(rows) && rows.length > 0) {
@@ -196,7 +208,7 @@ async function loadQuotes() {
     window._loadInFlight = true;
     try {
           var res = await fetch(SUPABASE_URL + '/rest/v1/quotes?select=*&query_id=eq.' + queryId + '&status=eq.shared&order=price.asc', {
-                  headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+                  headers: await getAuthHeaders()
           });
           var quotes = await res.json();
           if (!Array.isArray(quotes)) return;
@@ -204,7 +216,7 @@ async function loadQuotes() {
           document.getElementById('stat-received-txt').textContent = quotes.length;
 
           var viewRes = await fetch(SUPABASE_URL + '/rest/v1/query_views?query_id=eq.' + queryId + '&select=id', {
-              headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+              headers: await getAuthHeaders()
           });
           var views = await viewRes.json();
           var notifiedCount = Array.isArray(views) ? views.length : 0;
