@@ -551,24 +551,36 @@
 
       if (passportFile) {
         try {
-          await uploadDoc(sb, currentUserId, 'passport', passportFile);
-          hasNewDocs = true;
-        } catch(e) { uploadErrors.push(e.message); }
-      }
-      if (aadhaarFile) {
-        try {
-          await uploadDoc(sb, currentUserId, 'aadhaar', aadhaarFile);
-          hasNewDocs = true;
-        } catch(e) { uploadErrors.push(e.message); }
-      }
+          let hasNewDocs = false;
+              let passportUploaded = false;
+              let aadhaarUploaded = false;
 
-      const payload = {
-        id: currentUserId,
-        date_of_birth: document.getElementById('dob-input').value || null,
-        nationality: document.getElementById('nationality-input').value.trim() || null,
-        passport_number: document.getElementById('passport-input').value.trim() || null,
-        aadhaar_number: document.getElementById('aadhaar-input').value.trim() || null
-      };
+              if (passportFile) {
+                      try {
+                                await uploadDoc(sb, currentUserId, 'passport', passportFile);
+                                hasNewDocs = true;
+                                passportUploaded = true;
+                      } catch(e) { uploadErrors.push(e.message); }
+              }
+              if (aadhaarFile) {
+                      try {
+                                await uploadDoc(sb, currentUserId, 'aadhaar', aadhaarFile);
+                                hasNewDocs = true;
+                                aadhaarUploaded = true;
+                      } catch(e) { uploadErrors.push(e.message); }
+              }
+
+              const payload = {
+                      id: currentUserId,
+                      date_of_birth: document.getElementById('dob-input').value || null,
+                      nationality: document.getElementById('nationality-input').value.trim() || null,
+                      passport_number: document.getElementById('passport-input').value.trim() || null,
+                      aadhaar_number: document.getElementById('aadhaar-input').value.trim() || null
+              };
+              // Record successful uploads as boolean flags on the profile row instead of
+              // relying on public storage URL probing (see loadExistingDocs) for security.
+              if (passportUploaded) payload.passport_uploaded = true;
+              if (aadhaarUploaded) payload.aadhaar_uploaded = true;
       // If new documents were uploaded, set status to pending for admin review
 
       const { error } = await sb.from('profiles').upsert(payload, { onConflict: 'id' });
@@ -603,27 +615,23 @@
       }
     }
 
-    async function loadExistingDocs(userId, sb) {
-      const types = ['passport', 'aadhaar'];
-      for (const type of types) {
-        const label = document.getElementById(type + '-file-name');
-        if (!label) continue;
-        // Check if file exists in storage (try common extensions)
-        for (const ext of ['pdf', 'jpg', 'jpeg', 'png']) {
-          const path = userId + '/' + type + '.' + ext;
-          const { data } = sb.storage.from('kyc-documents').getPublicUrl(path);
-          // Verify URL is reachable
-          try {
-            const r = await fetch(data.publicUrl, { method: 'HEAD' });
-            if (r.ok) {
-              label.textContent = type.charAt(0).toUpperCase() + type.slice(1) + ' uploaded ✓';
-              label.style.color = 'var(--green)';
-              break;
-            }
-          } catch(e) { /* file not found, try next ext */ }
+function loadExistingDocs(userId, sb, profile) {
+        // Secure check: read boolean flags from the profiles row instead of probing
+        // public storage URLs client-side (avoids exposing guessable KYC document paths).
+        const flags = {
+                  passport: !!(profile && profile.passport_uploaded),
+                  aadhaar: !!(profile && profile.aadhaar_uploaded)
+        };
+        const types = ['passport', 'aadhaar'];
+        for (const type of types) {
+                  const label = document.getElementById(type + '-file-name');
+                  if (!label) continue;
+                  if (flags[type]) {
+                              label.textContent = type.charAt(0).toUpperCase() + type.slice(1) + ' uploaded ✓';
+                              label.style.color = 'var(--green)';
+                  }
         }
-      }
-    }
+}
 
     function handleSignOut() {
       const sb = window._svSupabase;
@@ -657,7 +665,7 @@
             var aadh = document.getElementById('aadhaar-input');
             if (aadh && p.aadhaar_number) aadh.value = p.aadhaar_number;
             updateKycBadge(p.kyc_verified ? 'verified' : 'pending');
-            loadExistingDocs(user.id, sb);
+            loadExistingDocs(user.id, sb, p);
           }
           loadBookings(user.id);
         });
