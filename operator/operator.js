@@ -1305,57 +1305,67 @@ async function saveEmployee(){
 /* ============ REVENUE (admin only) ============ */
 
 function loadRevenue(){
-  if(!isOwner())return;
-  var container=document.getElementById('revenue-content');
-  var confirmed=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';});
-  if(!confirmed.length){container.innerHTML='<div class="empty-state"><div class="empty-title">No revenue yet</div><div class="empty-sub">Confirmed bookings will appear here</div></div>';return;}
-  var total=confirmed.reduce(function(a,q){return a+Number(q.price||0);},0);
-  var now=new Date();
-  var thisMonth=now.getMonth(),thisYear=now.getFullYear();
-  var lastDate=new Date(thisYear,thisMonth-1,1);
-  var lastMonth=lastDate.getMonth(),lastYear=lastDate.getFullYear();
-  var thisMonthRev=0,lastMonthRev=0;
-  confirmed.forEach(function(q){
-    var d=q.queries&&q.queries.flight_date?new Date(q.queries.flight_date):new Date(q.created_at);
-    if(d.getMonth()===thisMonth&&d.getFullYear()===thisYear)thisMonthRev+=Number(q.price||0);
-    else if(d.getMonth()===lastMonth&&d.getFullYear()===lastYear)lastMonthRev+=Number(q.price||0);
-  });
-  var delta='';
-  if(lastMonthRev>0){
-    var pct=((thisMonthRev-lastMonthRev)/lastMonthRev*100);
-    var cls=pct>=0?'up':'down';
-    delta='<div class="rev-delta '+cls+'">'+(pct>=0?'▲ ':'▼ ')+Math.abs(pct).toFixed(1)+'% vs last month</div>';
-  }
-  var byEmp={};
-  confirmed.forEach(function(q){
-    var id=q.submitted_by||'unknown';
-    if(!byEmp[id])byEmp[id]={name:'',count:0,rev:0};
-    var u=lookupUser(id);
-    byEmp[id].name=u?(u.full_name||u.username):'—';
-    byEmp[id].count++;
-    byEmp[id].rev+=Number(q.price||0);
-  });
-  var empRows=Object.keys(byEmp).map(function(k){return byEmp[k];}).sort(function(a,b){return b.rev-a.rev;}).map(function(r){
-    var avg=r.count>0?Math.round(r.rev/r.count):0;
-    return'<tr><td><b>'+escapeHtml(r.name)+'</b></td><td>'+r.count+'</td><td>'+fmtPrice(avg)+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
-  }).join('');
-  var byAc={};
-  confirmed.forEach(function(q){
-    var id=q.aircraft_id||'unknown';
-    if(!byAc[id])byAc[id]={name:q.aircraft_type||'—',reg:q.aircraft_registration||'',count:0,rev:0};
-    byAc[id].count++;
-    byAc[id].rev+=Number(q.price||0);
-  });
-  var acRows=Object.keys(byAc).map(function(k){return byAc[k];}).sort(function(a,b){return b.rev-a.rev;}).map(function(r){
-    var avg=r.count>0?Math.round(r.rev/r.count):0;
-    return'<tr><td><b>'+escapeHtml(r.name)+'</b> <span style="color:var(--text-tertiary);font-size:11px;font-family:monospace;">'+escapeHtml(r.reg)+'</span></td><td>'+r.count+'</td><td>'+fmtPrice(avg)+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
-  }).join('');
-  container.innerHTML=
-    '<div class="rev-hero"><div class="rev-hero-label">Total revenue (confirmed)</div><div class="rev-hero-num">'+fmtPrice(total)+'</div><div class="rev-hero-meta">'+confirmed.length+' confirmed bookings</div></div>'
-    +'<div class="rev-grid"><div class="rev-month-card"><div class="rev-month-label">This month</div><div class="rev-month-num">'+fmtPrice(thisMonthRev)+'</div>'+delta+'</div>'
-    +'<div class="rev-month-card"><div class="rev-month-label">Last month</div><div class="rev-month-num">'+fmtPrice(lastMonthRev)+'</div></div></div>'
-    +'<div class="card"><div class="card-header"><span class="card-title">Revenue by employee</span></div><div class="card-body"><table class="emp-table"><thead><tr><th>Employee</th><th>Bookings</th><th>Avg ticket</th><th>Revenue</th></tr></thead><tbody>'+empRows+'</tbody></table></div></div>'
-    +'<div class="card"><div class="card-header"><span class="card-title">Revenue by aircraft</span></div><div class="card-body"><table class="emp-table"><thead><tr><th>Aircraft</th><th>Flights</th><th>Avg ticket</th><th>Revenue</th></tr></thead><tbody>'+acRows+'</tbody></table></div></div>';
+    if(!isOwner())return;
+    var container=document.getElementById('revenue-content');
+    var commissionRate=0.10;
+    var confirmed=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';});
+    if(!confirmed.length){container.innerHTML='<div class="empty-state"><div class="empty-title">No revenue yet</div><div class="empty-sub">Confirmed bookings will appear here once a client accepts one of your quotes.</div></div>';return;}
+    var total=confirmed.reduce(function(a,q){return a+Number(q.price||0);},0);
+    var commissionOwed=total*commissionRate;
+    var netPayable=total-commissionOwed;
+    var now=new Date();
+    var thisMonth=now.getMonth(),thisYear=now.getFullYear();
+    var lastDate=new Date(thisYear,thisMonth-1,1);
+    var lastMonth=lastDate.getMonth(),lastYear=lastDate.getFullYear();
+    var thisMonthRev=0,lastMonthRev=0;
+    confirmed.forEach(function(q){
+          var d=q.queries&&q.queries.flight_date?new Date(q.queries.flight_date):new Date(q.created_at);
+          if(d.getMonth()===thisMonth&&d.getFullYear()===thisYear)thisMonthRev+=Number(q.price||0);
+          else if(d.getMonth()===lastMonth&&d.getFullYear()===lastYear)lastMonthRev+=Number(q.price||0);
+    });
+    var delta='';
+    if(lastMonthRev>0){
+          var pct=((thisMonthRev-lastMonthRev)/lastMonthRev*100);
+          var cls=pct>=0?'up':'down';
+          delta='<div class="rev-delta '+cls+'">'+(pct>=0?'\u25b2 ':'\u25bc ')+Math.abs(pct).toFixed(1)+'% vs last month</div>';
+    }
+    var byEmp={};
+    confirmed.forEach(function(q){
+          var id=q.submitted_by||'unknown';
+          if(!byEmp[id])byEmp[id]={name:'\u2014',count:0,rev:0};
+          var u=lookupUser(id);
+          byEmp[id].name=u?(u.full_name||u.username):'\u2014';
+          byEmp[id].count++;
+          byEmp[id].rev+=Number(q.price||0);
+    });
+    var empRows=Object.keys(byEmp).map(function(k){return byEmp[k];}).sort(function(a,b){return b.rev-a.rev;}).map(function(r){
+          var avg=r.count>0?Math.round(r.rev/r.count):0;
+          return '<tr><td><b>'+escapeHtml(r.name)+'</b></td><td>'+r.count+'</td><td>'+fmtPrice(avg)+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
+    }).join('');
+    var byAc={};
+    confirmed.forEach(function(q){
+          var id=q.aircraft_id||'unknown';
+          if(!byAc[id])byAc[id]={name:q.aircraft_type||'\u2014',reg:q.aircraft_registration||'',count:0,rev:0};
+          byAc[id].count++;
+          byAc[id].rev+=Number(q.price||0);
+    });
+    var acRows=Object.keys(byAc).map(function(k){return byAc[k];}).sort(function(a,b){return b.rev-a.rev;}).map(function(r){
+          var avg=r.count>0?Math.round(r.rev/r.count):0;
+          return '<tr><td><b>'+escapeHtml(r.name)+'</b> <span style="color:var(--text-tertiary);font-size:11px;font-family:monospace;">'+escapeHtml(r.reg)+'</span></td><td>'+r.count+'</td><td>'+fmtPrice(avg)+'</td><td><b>'+fmtPrice(r.rev)+'</b></td></tr>';
+    }).join('');
+    container.innerHTML=
+          '<div class="rev-hero"><div class="rev-hero-label">Total revenue (confirmed)</div><div class="rev-hero-num">'+fmtPrice(total)+'</div><div class="rev-hero-sub">From confirmed bookings</div></div>'
+      +'<div class="rev-grid"><div class="rev-month-card"><div class="rev-month-label">This month</div><div class="rev-month-num">'+fmtPrice(thisMonthRev)+'</div>'+delta+'</div>'
+      +'<div class="rev-month-card"><div class="rev-month-label">Last month</div><div class="rev-month-num">'+fmtPrice(lastMonthRev)+'</div></div></div>'
+      +'<div class="card"><div class="card-header"><span class="card-title">Platform commission &amp; payout</span></div><div class="card-body">'
+      +'<div class="rev-grid">'
+      +'<div class="rev-month-card"><div class="rev-month-label">Commission owed to SkyVayu (10%)</div><div class="rev-month-num">'+fmtPrice(commissionOwed)+'</div></div>'
+      +'<div class="rev-month-card"><div class="rev-month-label">Net payable to you</div><div class="rev-month-num">'+fmtPrice(netPayable)+'</div></div>'
+      +'</div>'
+      +'<div class="empty-sub" style="margin-top:10px;">Commission is calculated at 10% of the confirmed quote value shown above. This is an estimate based on your recorded bookings and does not reflect actual invoicing or payment status.</div>'
+      +'</div></div>'
+      +'<div class="card"><div class="card-header"><span class="card-title">Revenue by employee</span></div><div class="card-body"><table style="width:100%;border-collapse:collapse;"><thead><tr><th>Employee</th><th>Bookings</th><th>Avg ticket</th><th>Revenue</th></tr></thead><tbody>'+empRows+'</tbody></table></div></div>'
+      +'<div class="card"><div class="card-header"><span class="card-title">Revenue by aircraft</span></div><div class="card-body"><table style="width:100%;border-collapse:collapse;"><thead><tr><th>Aircraft</th><th>Bookings</th><th>Avg ticket</th><th>Revenue</th></tr></thead><tbody>'+acRows+'</tbody></table></div></div>';
 }
 
 /* ============ REGISTRATION ============ */
