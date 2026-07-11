@@ -1502,9 +1502,21 @@ window.addEventListener('beforeunload',function(){
         if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
         applyRoleRestrictions();
         showSection('queries');
-        loadAllData();
-        refreshInterval=setInterval(loadAllData,5000);
-        claimRefreshInterval=setInterval(updateClaimTimers,1000);
+var _startDashboard=function(){
+              loadAllData();
+              refreshInterval=setInterval(loadAllData,5000);
+              claimRefreshInterval=setInterval(updateClaimTimers,1000);
+};
+                  if(window._svSupabase){
+                                window._svSupabase.auth.getSession().then(function(res){
+                                                if(res&&res.data&&res.data.session&&res.data.session.access_token){
+                                                                  _opAuthToken=res.data.session.access_token;
+                                                }
+                                                _startDashboard();
+                                }).catch(function(){_startDashboard();});
+                  } else {
+                                _startDashboard();
+                  }
         return;
       }
     }catch(e){sessionStorage.removeItem('opSession');}
