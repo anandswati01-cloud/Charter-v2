@@ -78,7 +78,7 @@ async function doLogin(){
       errEl.classList.add('show');return;
     }
     currentUser=user;currentOperator=op;sessionStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
-    if(window._svSupabase){window._svSupabase.auth.signInWithPassword({email:user.username+'@operator.skyvayu.internal',password:'TemporaryPass#'+user.username+'2024!'}).then(function(authRes){if(!authRes.error&&authRes.data&&authRes.data.session){_opAuthToken=authRes.data.session.access_token;}});}
+if(window._svSupabase){try{var lexRes=await fetch(SUPABASE_URL+'/functions/v1/login-exchange',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify({username:username,password:password})});var lex=await lexRes.json();if(lexRes.ok&&lex&&lex.access_token&&lex.refresh_token){await window._svSupabase.auth.setSession({access_token:lex.access_token,refresh_token:lex.refresh_token});_opAuthToken=lex.access_token;}else{console.error('login-exchange failed',lex);}}catch(_lexErr){console.error('login-exchange error',_lexErr);}}
     /* Fire-and-forget last_login update â don't block on it */
     sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
