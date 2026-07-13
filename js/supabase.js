@@ -161,7 +161,30 @@ async function saveBookingToSupabase(bookingData) {
       return null;
     }
     var data = await response.json();
-    return (Array.isArray(data) && data[0]) ? data[0] : null;
+    var savedRow = (Array.isArray(data) && data[0]) ? data[0] : null;
+
+        // Keep the originating query in sync so it's shown as booked consistently
+        if (savedRow && safe.query_id) {
+                try {
+                          await fetchWithTimeout(
+                                      SUPABASE_URL + '/rest/v1/queries?id=eq.' + encodeURIComponent(safe.query_id),
+                            {
+                                          method: 'PATCH',
+                                          headers: {
+                                                          'Content-Type': 'application/json',
+                                                          'apikey': SUPABASE_KEY,
+                                                          'Authorization': 'Bearer ' + authToken,
+                                                          'Prefer': 'return=minimal'
+                                          },
+                                          body: JSON.stringify({ status: 'confirmed' })
+                            }
+                                    );
+                } catch (syncErr) {
+                          console.warn('Query status sync failed:', syncErr);
+                }
+        }
+
+        return savedRow;
   } catch (e) {
     if (e.name === 'AbortError') {
       showToast('Request timed out. Booking could not be saved. Please contact support.', 'error');
