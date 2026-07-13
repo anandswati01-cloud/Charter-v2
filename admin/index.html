@@ -809,17 +809,22 @@ function renderEmployeesTable(data){
 }
 
 function renderUserProfilesTable(data){ var rows=data.map(function(u){ var memberBadge = u.is_paid_member ? '<span class="db-badge approved">Member</span>' : '<span class="db-badge pending">Not member</span>'; return '<tr>'+ dbTd(u.user_id?u.user_id.substring(0,8)+'&hellip;':'-','db-id')+ '<td style="color:var(--white);font-weight:500">'+escapeHtml(u.full_name||'-')+'</td>'+ dbTd(u.email)+ dbTd(u.phone)+ dbTd(u.total_queries_posted)+ dbTd(u.queries_claimed_by_operator)+ dbTd(u.queries_confirmed)+ dbTd(u.payments_made)+ '<td style="color:var(--gold);font-weight:500">&#8377;'+escapeHtml(u.total_platform_fees_collected?Number(u.total_platform_fees_collected).toLocaleString('en-IN'):'0')+'</td>'+ '<td>'+memberBadge+'</td>'+ dbTd(u.last_flight_date)+ '<td><button class="btn-view-history" onclick="openUserHistory(\''+u.user_id+'\')">View history</button></td>'+ '</tr>'; }).join(''); return '<table class="db-table"><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Phone</th><th>Total Queries</th><th>Claimed</th><th>Confirmed</th><th>Payments</th><th>Fees Collected</th><th>Membership</th><th>Last Flight</th><th>History</th></tr></thead><tbody>'+rows+'</tbody></table>'; } async function openUserHistory(userId){ var overlay=document.getElementById('hist-modal-overlay'); var body=document.getElementById('hist-modal-body'); var nameEl=document.getElementById('hist-modal-name'); var emailEl=document.getElementById('hist-modal-email'); var profile=(_dbData.userprofiles||[]).find(function(u){return u.user_id===userId;}); nameEl.textContent=profile?(profile.full_name||'Query history'):'Query history'; emailEl.textContent=profile?profile.email:''; body.innerHTML='<div class="db-loading">Loading...</div>'; overlay.classList.add('open'); var sb=window.__sb||(window.__sb=createClient(SUPABASE_URL,SUPABASE_KEY)); var res=await sb.rpc('get_admin_user_query_history',{p_user_id:userId}); var rows=res.data||[]; if(res.error){body.innerHTML='<div class="db-empty">Failed to load history.</div>';return;} if(!rows.length){body.innerHTML='<div class="db-empty">No queries found for this user.</div>';return;} var trs=rows.map(function(q){ var vipTag=q.vip?' <span class="db-badge active">VIP</span>':''; return '<tr>'+ '<td style="color:var(--white);font-weight:500">'+escapeHtml((q.departure||'-'))+' &rarr; '+escapeHtml((q.destination||'-'))+vipTag+'</td>'+ dbTd(q.flight_date)+ dbTd(q.passengers)+ dbTd(q.aircraft_category)+ dbTd(q.claimed_by_operator)+ '<td>'+(q.booking_status?dbBadge(q.booking_status):'<span style="opacity:0.3">&mdash;</span>')+'</td>'+ '<td>'+(q.platform_fee?('&#8377;'+Number(q.platform_fee).toLocaleString('en-IN')):'<span style="opacity:0.3">&mdash;</span>')+'</td>'+ dbTd(q.booking_ref)+ '</tr>'; }).join(''); body.innerHTML='<div class="db-table-wrap"><table class="db-table"><thead><tr><th>Route</th><th>Date</th><th>Pax</th><th>Category</th><th>Claimed By</th><th>Booking Status</th><th>Fee</th><th>Booking Ref</th></tr></thead><tbody>'+trs+'</tbody></table></div>'; } function closeUserHistory(){document.getElementById('hist-modal-overlay').classList.remove('open');} (async()=>{
-  const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
-  window.__sb=sb;
-  const{data:{session}}=await sb.auth.getSession();
-  if(session){
-    const check=await sb.from('profiles').select('is_admin').eq('id',session.user.id).single();
-    if(check.data&&check.data.is_admin){
-      document.getElementById('page-login').style.display='none';
-      document.getElementById('page-dashboard').style.display='flex';
-      await loadAll();
-      return;
-    }
+  try{
+        const sb=createClient(SUPABASE_URL,SUPABASE_KEY);
+        window.__sb=sb;
+        const{data:{session}}=await sb.auth.getSession();
+        if(session){
+                const check=await sb.from('profiles').select('is_admin').eq('id',session.user.id).single();
+                if(check.data&&check.data.is_admin){
+                          document.getElementById('page-login').style.display='none';
+                          document.getElementById('page-dashboard').style.display='flex';
+                          await loadAll();
+                          return;
+                }
+        }
+  }catch(e){
+          var errEl=document.getElementById('login-error');
+          if(errEl){errEl.textContent='Connection issue \u2014 please refresh and try again.';errEl.classList.add('show');}
   }
   document.getElementById('page-login').style.display='flex';
 })();
