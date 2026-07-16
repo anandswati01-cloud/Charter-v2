@@ -1804,10 +1804,7 @@ function getQuotes() {
 </div>
 <script>
 /* ── Auth modal helpers ─────────────────────────────────── */
-function openAuthModal() {
-  var m = document.getElementById('auth-modal');
-  if (m) m.style.display = 'flex';
-}
+function openAuthModal() { var m = document.getElementById('auth-modal'); if (m) m.style.display = 'flex'; } (function(){ try { var p = new URLSearchParams(window.location.search); if (p.get('login') === '1') { setTimeout(function(){ openAuthModal(); }, 300); } var resumeTo = sessionStorage.getItem('sv_resume_after_login'); if (resumeTo && window._svSupabase) { window._svSupabase.auth.getSession().then(function(res){ if (res && res.data && res.data.session) { sessionStorage.removeItem('sv_resume_after_login'); window.location.href = resumeTo; } }); } } catch(e) {} })();
 function changeSectorPax(n, delta) {
   var el = document.getElementById('sec-pax-' + n);
   if (!el) return;
