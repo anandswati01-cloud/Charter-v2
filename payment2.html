@@ -534,7 +534,7 @@ async function confirmBooking() {
 
     // Get authenticated user
     var sessionData = await (window._svSupabase || window.supabase).auth.getSession();
-    var currentUser = (sessionData && sessionData.data && sessionData.data.session) ? sessionData.data.session.user : null;
+    var currentUser = (sessionData && sessionData.data && sessionData.data.session) ? sessionData.data.session.user : null; if (!currentUser) { _inProgress = false; if (btn) { btn.disabled = false; btn.textContent = 'Pay & Confirm Booking'; } sessionStorage.setItem('sv_resume_after_login', 'payment2.html'); window.location.href = 'index.html?login=1&resume=1'; return; }
 
   var bookingPayload = {
     query_id:      sessionStorage.getItem('sv_query_id') || null,
@@ -562,7 +562,7 @@ async function confirmBooking() {
     return;
   }
 
-  sendEmail('booking_confirmed', { booking_id: saved.id, booking_ref: ref });
+  if (q.id) { try { await (window._svSupabase || window.supabase).from('quotes').update({ status: 'accepted' }).eq('id', q.id); } catch (e) {} } sendEmail('booking_confirmed', { booking_id: saved.id, booking_ref: ref });
 
   sessionStorage.setItem('sv_confirmation', JSON.stringify({
     ref:          saved.ref || ref,
