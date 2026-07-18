@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+undefined<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -272,14 +272,15 @@
       </div>
 
       <!-- KYC INFORMATION -->
-      <div class="section-header">
-        <span class="section-title">KYC Information</span>
-        <span class="kyc-badge pending" id="kyc-badge">
-          <span class="kyc-dot pending" id="kyc-dot"></span>
-          <span id="kyc-status-text">Not Verified</span>
-        </span>
-      </div>
-      <div class="profile-card">
+      <div id="kyc-incomplete-block">
+        <div class="section-header">
+          <span class="section-title">KYC Information</span>
+          <span class="kyc-badge pending" id="kyc-badge">
+            <span class="kyc-dot pending" id="kyc-dot"></span>
+            <span id="kyc-status-text">Not Verified</span>
+          </span>
+        </div>
+        <div class="profile-card">
         <div class="field-grid">
           <div class="field-group">
             <div class="field-label">Date of Birth</div>
@@ -345,9 +346,21 @@
         <button class="save-btn" id="save-kyc-btn" onclick="saveKyc()">Save KYC Details</button>
         <div class="status-msg" id="kyc-status"></div>
 
-        <div class="signout-row">
-          <button class="signout-btn" onclick="handleSignOut()">Sign out</button>
         </div>
+      </div>
+
+      <div id="kyc-complete-row" class="profile-card" style="display:none; cursor:pointer;" onclick="window.location.href='/kyc-details'">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span class="kyc-dot verified"></span>
+            <span style="font-size:13px; font-weight:500;">KYC Complete</span>
+          </div>
+          <span style="font-size:11px; color:var(--white-60); font-family:var(--font-mono); letter-spacing:1px;">VIEW DETAILS &rsaquo;</span>
+        </div>
+      </div>
+
+      <div class="signout-row">
+        <button class="signout-btn" onclick="handleSignOut()">Sign out</button>
       </div>
 
       <!-- BOOKINGS -->
@@ -665,6 +678,15 @@
       const badge = document.getElementById('kyc-badge');
       const dot = document.getElementById('kyc-dot');
       const txt = document.getElementById('kyc-status-text');
+      const incompleteBlock = document.getElementById('kyc-incomplete-block');
+      const completeRow = document.getElementById('kyc-complete-row');
+      if (status === 'verified') {
+        if (incompleteBlock) incompleteBlock.style.display = 'none';
+        if (completeRow) completeRow.style.display = 'block';
+      } else {
+        if (incompleteBlock) incompleteBlock.style.display = '';
+        if (completeRow) completeRow.style.display = 'none';
+      }
       if (!badge) return;
       if (status === 'verified') {
         badge.className = 'kyc-badge verified';
@@ -681,7 +703,7 @@
       }
     }
 
-function loadExistingDocs(userId, sb, profile) {
+    function loadExistingDocs(userId, sb, profile) {
         // Secure check: read boolean flags from the profiles row instead of probing
         // public storage URLs client-side (avoids exposing guessable KYC document paths).
         const flags = {
