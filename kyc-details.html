@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KYC Details — SkyVayu</title>
+  <meta name="description" content="View your submitted KYC verification details for SkyVayu charter bookings.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/theme.css">
+  <style> 
+    :root {
+      --navy: #0c1324;
+      --navy-mid: #0f1a30;
+      --navy-light: #162040;
+      --gold: #fbbf24;
+      --gold-light: #fcd34d;
+      --white: #ffffff;
+      --white-60: rgba(255,255,255,0.6);
+      --white-30: rgba(255,255,255,0.3);
+      --white-10: rgba(255,255,255,0.1);
+      --green: #22c55e;
+      --red: #ef4444;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--navy);
+      color: var(--white);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      margin: 0; padding: 0;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* NAV */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(2,6,23,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--white-10);
+      height: 64px;
+      display: flex;
+      align-items: center;
+      padding: 0 32px;
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .nav-logo { font-family: var(--font-display); font-size: 26px; font-weight: 400; font-style: italic; letter-spacing: -0.5px; color: var(--gold); }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; margin: 0; padding: 0; }
+    .nav-links a { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--white-60); transition: color 0.2s; }
+    .nav-links a:hover { color: var(--white); }
+    .nav-right { display: flex; align-items: center; gap: 16px; }
+    .nav-cta { background: var(--gold); color: var(--navy) !important; padding: 8px 20px; border-radius: 2px; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; }
+    .nav-cta:hover { background: var(--gold-light) !important; }
+
+    #theme-toggle { background: rgba(255,255,255,0.08); border: none; cursor: pointer; color: var(--white-60); border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; padding: 0; }
+    #theme-toggle:hover { color: var(--white); }
+
+    /* PAGE LAYOUT */
+    .profile-page { padding-top: 100px; padding-bottom: 80px; }
+    .profile-container { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+
+    /* PAGE HEADER */
+    .page-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--white-60); margin-bottom: 10px; }
+    .page-title { font-family: var(--font-display); font-size: 3rem; font-weight: 400; color: var(--white); margin: 0 0 8px 0; }
+    .page-subtitle { font-family: var(--font-body); color: var(--white-60); font-size: 17px; margin: 0 0 48px 0; }
+
+    /* SECTION HEADERS */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; margin-top: 40px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--white-10);
+    }
+    .section-header:first-of-type { margin-top: 0; }
+    .section-title { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--white-60); }
+    .kyc-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px;
+    }
+    .kyc-badge.verified { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.3); }
+    .kyc-badge.pending { background: rgba(251,191,36,0.12); color: var(--gold); border: 1px solid rgba(251,191,36,0.3); }
+    .kyc-dot { width: 6px; height: 6px; border-radius: 50%; }
+    .kyc-dot.verified { background: var(--green); }
+    .kyc-dot.pending { background: var(--gold); }
+
+    /* CARD */
+    .profile-card { background: var(--navy-mid); border: 1px solid var(--white-10); border-radius: 4px; padding: 32px 36px; }
+
+    /* FIELD GRID */
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 32px; }
+    .field-grid.single { grid-template-columns: 1fr; }
+    .field-group { margin-bottom: 28px; }
+    .field-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--white-60); margin-bottom: 8px; }
+    .field-value { font-size: 0.95rem; color: var(--white); font-family: var(--font-mono); padding: 10px 0; border-bottom: 1px solid var(--white-10); }
+    .field-note { font-family: var(--font-body); font-size: 13px; color: var(--white-30); margin-top: 5px; }
+    .field-input {
+      width: 100%; background: transparent; border: none;
+      border-bottom: 1px solid var(--white-30); color: var(--white);
+      font-family: var(--font-mono); font-size: 0.95rem;
+      padding: 10px 0; outline: none; transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+    .field-input::placeholder { color: var(--white-30); }
+    .field-input:focus { border-bottom-color: var(--gold); }
+
+    /* SAVE BUTTON */
+    .save-btn {
+      background: var(--gold); color: var(--navy); border: none;
+      padding: 12px 28px; font-family: var(--font-mono);
+      font-size: 12px; font-weight: 500; letter-spacing: 1.5px;
+      text-transform: uppercase; cursor: pointer; border-radius: 2px;
+      transition: background 0.2s; margin-top: 4px;
+    }
+    .save-btn:hover { background: var(--gold-light); }
+    .save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status-msg { margin-top: 12px; font-family: var(--font-body); font-size: 13px; color: var(--gold); min-height: 18px; }
+
+    /* SIGN OUT */
+    .signout-row { margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--white-10); }
+    .signout-btn { background: none; border: none; cursor: pointer; font-family: var(--font-mono); font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--white-30); padding: 0; transition: color 0.2s; }
+    .signout-btn:hover { color: var(--white-60); }
+
+    /* BOOKINGS SECTION */
+    .bookings-section { margin-top: 48px; }
+    .bookings-tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid var(--white-10); }
+    .tab-btn {
+      background: none; border: none; cursor: pointer;
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--white-30); padding: 10px 20px 10px 0;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px; transition: color 0.2s;
+    }
+    .tab-btn.active { color: var(--white); border-bottom-color: var(--gold); }
+    .tab-btn:hover { color: var(--white-60); }
+
+    .tab-panel { display: none; margin-top: 20px; }
+    .tab-panel.active { display: block; }
+
+    /* BOOKING CARD */
+    .booking-item {
+      background: var(--navy-mid); border: 1px solid var(--white-10);
+      border-radius: 4px; padding: 20px 24px;
+      display: grid; grid-template-columns: 1fr auto;
+      align-items: center; gap: 16px;
+      margin-bottom: 12px;
+      transition: border-color 0.2s;
+    }
+    .booking-item:hover { border-color: var(--white-30); }
+    .booking-route { font-family: var(--font-display); font-size: 1.15rem; font-weight: 400; color: var(--white); margin-bottom: 6px; }
+    .booking-route .arrow { color: var(--gold); margin: 0 8px; }
+    .booking-meta { font-size: 0.75rem; color: var(--white-60); font-family: var(--font-mono); }
+    .booking-meta span { margin-right: 16px; }
+    .booking-status {
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+    }
+    .booking-status.confirmed { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.25); }
+    .booking-status.open { background: rgba(251,191,36,0.12); color: var(--gold); border: 1px solid rgba(251,191,36,0.25); }
+    .booking-status.expired { background: rgba(255,255,255,0.05); color: var(--white-30); border: 1px solid var(--white-10); }
+
+    .empty-state { padding: 40px 0; text-align: center; color: var(--white-30); font-family: var(--font-body); font-size: 14px; }
+    .empty-state .empty-icon { font-size: 2rem; margin-bottom: 12px; opacity: 0.4; }
+
+    /* LIGHT THEME */
+        /* ── LIGHT MODE ── */
+    [data-theme="light"] body { background: #f4f6f9 !important; color: #0d1b2a !important; }
+    [data-theme="light"] .nav { background: rgba(255,255,255,0.92) !important; border-bottom-color: rgba(13,27,42,0.1) !important; }
+    [data-theme="light"] .nav-logo { color: #c4942e !important; }
+    [data-theme="light"] .nav-links a { color: rgba(13,27,42,0.65) !important; }
+    [data-theme="light"] .page-title { color: #0d1b2a !important; }
+    [data-theme="light"] .page-subtitle,
+    [data-theme="light"] .page-label,
+    [data-theme="light"] .section-title,
+    [data-theme="light"] .field-label { color: rgba(13,27,42,0.55) !important; }
+    [data-theme="light"] .profile-card,
+    [data-theme="light"] .booking-item { background: #ffffff !important; border-color: rgba(13,27,42,0.1) !important; }
+    [data-theme="light"] .field-value,
+    [data-theme="light"] .field-input { color: #0d1b2a !important; border-bottom-color: rgba(13,27,42,0.15) !important; }
+    [data-theme="light"] .field-input::placeholder { color: rgba(13,27,42,0.35) !important; }
+    [data-theme="light"] .field-note { color: rgba(13,27,42,0.4) !important; }
+    [data-theme="light"] .section-header,
+    [data-theme="light"] .signout-row,
+    [data-theme="light"] .bookings-tabs { border-color: rgba(13,27,42,0.1) !important; }
+    [data-theme="light"] .tab-btn { color: rgba(13,27,42,0.4) !important; }
+    [data-theme="light"] .tab-btn.active { color: #0d1b2a !important; border-bottom-color: #c4942e !important; }
+    [data-theme="light"] .booking-route { color: #0d1b2a !important; }
+    [data-theme="light"] .booking-meta { color: rgba(13,27,42,0.55) !important; }
+    [data-theme="light"] .empty-state { color: rgba(13,27,42,0.35) !important; }
+    [data-theme="light"] .signout-btn { color: rgba(13,27,42,0.4) !important; }
+    [data-theme="light"] .signout-btn:hover { color: #0d1b2a !important; }
+    [data-theme="light"] #theme-toggle { background: rgba(0,0,0,0.06) !important; color: rgba(13,27,42,0.5) !important; }
+    [data-theme="light"] #theme-toggle:hover { background: rgba(0,0,0,0.1) !important; color: #0d1b2a !important; }
+    [data-theme="light"] .status-msg { color: #c4942e !important; }
+      /* Booking timer + quote badge */
+    .booking-timer { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; color: var(--gold); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+    .booking-timer.expired-label { color: rgba(255,255,255,0.3); }
+    .timer-icon { font-size: 12px; }
+    .booking-quotes { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: rgba(251,191,36,0.08); color: rgba(251,191,36,0.7); border: 1px solid rgba(251,191,36,0.2); white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">SkyVayu</a>
+      <ul class="nav-links">
+        <li><a href="/">Home</a></li>
+        <li><a href="/fleet">Fleet</a></li>
+        <li><a href="/about">About Us</a></li>
+      </ul>
+      <div class="nav-right">
+        <button id="theme-toggle" onclick="toggleTheme()" title="Switch to light mode"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg></button>
+        <div id="sv-user-chip" style="display:none; align-items:center; gap:8px;">
+          <a href="/profile" id="sv-user-name" style="font-family:'DM Mono',monospace;font-size:11px;font-weight:400;letter-spacing:1px;text-transform:uppercase;color:#fbbf24;text-decoration:none;"></a>
+        </div>
+        <a href="/payment" class="nav-cta">GET QUOTES</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="profile-page">
+    <div class="profile-container">
+      <div style="margin-bottom:20px;">
+        <a href="/profile" style="font-family:var(--font-mono); font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--white-60); text-decoration:none;">&lsaquo; Back to Profile</a>
+      </div>
+      <h1 class="page-title">KYC Details</h1>
+
+      <div class="section-header">
+        <span class="section-title">Verification Status</span>
+        <span class="kyc-badge verified" id="kyc-badge">
+          <span class="kyc-dot verified" id="kyc-dot"></span>
+          <span id="kyc-status-text">Verified</span>
+        </span>
+      </div>
+
+      <div class="profile-card" id="kyc-details-card" style="margin-bottom:28px;">
+        <div class="field-grid">
+          <div class="field-group">
+            <div class="field-label">Full Name</div>
+            <div class="field-value" id="kyc-name">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Date of Birth</div>
+            <div class="field-value" id="kyc-dob">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Nationality</div>
+            <div class="field-value" id="kyc-nationality">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Passport Number</div>
+            <div class="field-value" id="kyc-passport">—</div>
+          </div>
+          <div class="field-group">
+            <div class="field-label">Aadhaar Number</div>
+            <div class="field-value" id="kyc-aadhaar">—</div>
+          </div>
+        </div>
+
+        <div class="field-note" style="margin-top:8px;">Your documents are encrypted and used only for flight compliance. DGCA regulations require KYC for all charter passengers.</div>
+
+        <div style="margin-top:24px;">
+          <div class="field-label" style="margin-bottom:12px; font-size:11px; letter-spacing:1.5px; color:var(--white-60);">DOCUMENT UPLOADS</div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px; border:1px solid var(--white-10); border-radius:6px;">
+              <div style="font-size:12px; font-weight:500;">Passport Scan</div>
+              <div id="kyc-passport-doc" style="font-size:11px; color:var(--white-60);">Not uploaded</div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:12px; border:1px solid var(--white-10); border-radius:6px;">
+              <div style="font-size:12px; font-weight:500;">Aadhaar Card</div>
+              <div id="kyc-aadhaar-doc" style="font-size:11px; color:var(--white-60);">Not uploaded</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="status-msg" id="kyc-details-status"></div>
+      </div>
+
+      <div class="signout-row">
+        <button class="signout-btn" onclick="handleSignOut()">Sign out</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/supabase.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/theme.js"></script>
+  <script>
+    function showStatus(id, msg, isError) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = msg;
+      el.style.color = isError ? '#f87171' : 'var(--gold)';
+    }
+
+    function handleSignOut() {
+      const sb = window._svSupabase;
+      if (sb) sb.auth.signOut().then(() => { window.location.href = '/'; });
+      else window.location.href = '/';
+    }
+
+    function loadKycDetails(session) {
+      var user = session && session.user ? session.user : session;
+      if (!user || !user.id) return;
+      var sb = window._svSupabase;
+      if (!sb) return;
+      sb.from('profiles').select('*').eq('id', user.id).single()
+        .then(function(res) {
+          var p = res.data;
+          if (!p) return;
+          if (!p.kyc_verified) {
+            window.location.href = '/profile';
+            return;
+          }
+          var nameEl = document.getElementById('kyc-name');
+          if (nameEl) nameEl.textContent = p.full_name || user.email || '—';
+          var dobEl = document.getElementById('kyc-dob');
+          if (dobEl) dobEl.textContent = p.date_of_birth || '—';
+          var natEl = document.getElementById('kyc-nationality');
+          if (natEl) natEl.textContent = p.nationality || '—';
+          var passEl = document.getElementById('kyc-passport');
+          if (passEl) passEl.textContent = p.passport_number || '—';
+          var aadhEl = document.getElementById('kyc-aadhaar');
+          if (aadhEl) aadhEl.textContent = p.aadhaar_number || '—';
+
+          var passDoc = document.getElementById('kyc-passport-doc');
+          if (passDoc && p.passport_uploaded) { passDoc.textContent = 'Uploaded ✓'; passDoc.style.color = 'var(--green)'; }
+          var aadhDoc = document.getElementById('kyc-aadhaar-doc');
+          if (aadhDoc && p.aadhaar_uploaded) { aadhDoc.textContent = 'Uploaded ✓'; aadhDoc.style.color = 'var(--green)'; }
+        });
+    }
+
+    function waitForAuth() {
+      var attempts = 0;
+      function check() {
+        attempts++;
+        if (typeof getSession === 'function') {
+          getSession(function(session) {
+            const user = session && session.user ? session.user : session;
+            if (user && user.id) { loadKycDetails(session); }
+            else { window.location.href = '/?signin=required'; }
+          });
+        } else if (attempts < 20) { setTimeout(check, 300); }
+        else { showStatus('kyc-details-status', 'Auth failed to load.', true); }
+      }
+      check();
+    }
+
+    document.addEventListener('DOMContentLoaded', waitForAuth);
+  </script>
+
+</body>
+</html>
