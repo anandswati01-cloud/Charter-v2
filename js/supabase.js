@@ -6,10 +6,10 @@ var realtimeChannel = null;
 /* ── Toast notification ── */
 function showToast(message, type) {
   var existing = document.getElementById('sv-toast');
-  if (existing) existing.remove();
-  var toast = document.createElement('div');
+  if (existing) existing.remove(); 
+  var toast = document.createElement('div'); 
   toast.id = 'sv-toast';
-  var bg = type === 'error' ? '#E24B4A' : type === 'success' ? '#2E7D52' : '#185FA5';
+  var bg = type === 'error' ? '#E24B4A' : type == 'success' ? '#2E7D52' : '#185FA5';
   toast.style.cssText = [
     'position:fixed', 'bottom:24px', 'left:50%', 'transform:translateX(-50%)',
     'background:' + bg, 'color:#fff', 'padding:12px 20px', 'border-radius:8px',
@@ -58,11 +58,17 @@ async function saveQueryToSupabase(queryData) {
     medivac:      queryData.medivac                     || false,
     pets:         queryData.pets                        || false,
     infants:      queryData.infants                     || false,
-    user_id:      queryData.user_id                     || null,
+    user_id:      queryData.user_id,
     status:       'open',
     aircraft_category: queryData.aircraft_category || 'fixed_wing'
   };
+  if (queryData.vip) safe.vip = true;
   try {
+    var _svSess = await window._svSupabase.auth.getSession();
+    var _svUid = (_svSess && _svSess.data && _svSess.data.session && _svSess.data.session.user) ? _svSess.data.session.user.id : null;
+    if (_svUid && !safe.user_id) { safe.user_id = _svUid; }
+        var _svToken = SUPABASE_KEY;
+        if (_svSess && _svSess.data && _svSess.data.session && _svSess.data.session.access_token) { _svToken = _svSess.data.session.access_token; }
     var response = await fetchWithTimeout(
       SUPABASE_URL + '/rest/v1/queries',
       {
@@ -70,15 +76,14 @@ async function saveQueryToSupabase(queryData) {
         headers: {
           'Content-Type':  'application/json',
           'apikey':         SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Authorization': 'Bearer ' + _svToken,
           'Prefer':         'return=representation'
         },
         body: JSON.stringify(safe)
       }
     );
-    var text = await response.text();
-    if (!response.ok) {
-      var errMsg = 'Could not save your request. Please try again.';
+        var text = await response.text();
+    if (!response.ok) { var errMsg = 'Could not save your request. Please try again.';
       try { var errData = JSON.parse(text); if (errData.message) errMsg = errData.message; } catch (e) {}
       console.error('Supabase error', response.status, text);
       showToast(errMsg, 'error');
@@ -88,7 +93,8 @@ async function saveQueryToSupabase(queryData) {
     var saved = (Array.isArray(data) && data[0]) ? data[0] : null;
     if (saved) sendEmail('new_query_assigned', { query_id: saved.id });
     if (saved) { sessionStorage.setItem('sv_query_id', saved.id); sessionStorage.setItem('sv_query', JSON.stringify(saved)); sessionStorage.removeItem('sv_query_start'); }
-    return saved;
+if (saved && saved.booking_ref) sessionStorage.setItem('sv_booking_ref', saved.booking_ref);
+        return saved;
   } catch (e) {
     if (e.name === 'AbortError') {
       showToast('Request timed out. Please check your connection and try again.', 'error');
@@ -104,6 +110,18 @@ async function saveQueryToSupabase(queryData) {
 async function saveBookingToSupabase(bookingData) {
   var SUPABASE_URL = SKYVAYU_CONFIG.supabaseUrl;
   var SUPABASE_KEY = SKYVAYU_CONFIG.supabaseKey;
+
+  // Get current user's JWT for authenticated insert (satisfies RLS)
+  var authToken = SUPABASE_KEY; // default: anon key
+  try {
+    if (window._svSupabase) {
+      var sessionResp = await window._svSupabase.auth.getSession();
+      if (sessionResp.data && sessionResp.data.session && sessionResp.data.session.access_token) {
+        authToken = sessionResp.data.session.access_token;
+      }
+    }
+  } catch (e) { /* fall back to anon key */ }
+
   var safe = {
     query_id:      bookingData.query_id      || null,
     quote_id:      bookingData.quote_id      || null,
@@ -119,7 +137,7 @@ async function saveBookingToSupabase(bookingData) {
     total_amount:  parseFloat(bookingData.total_amount)     || null,
     platform_fee:  parseFloat(bookingData.platform_fee)     || null,
     status:        'confirmed',
-    user_id:       bookingData.user_id     || null
+        user_id:       bookingData.user_id
   };
   try {
     var response = await fetchWithTimeout(
@@ -129,22 +147,44 @@ async function saveBookingToSupabase(bookingData) {
         headers: {
           'Content-Type':  'application/json',
           'apikey':         SUPABASE_KEY,
-          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Authorization': 'Bearer ' + authToken,
           'Prefer':         'return=representation'
         },
         body: JSON.stringify(safe)
       }
     );
-    var text = await response.text();
     if (!response.ok) {
-      var errMsg = 'Could not confirm your booking. Please contact support.';
-      try { var errData = JSON.parse(text); if (errData.message) errMsg = errData.message; } catch (e) {}
-      console.error('Booking save error', response.status, text);
+      var errText = await response.text();
+      var errMsg  = 'Booking save failed (' + response.status + '). Please try again or contact support.';
+      console.error('Booking save error', response.status, errText);
       showToast(errMsg, 'error');
       return null;
     }
-    var data = JSON.parse(text);
-    return (Array.isArray(data) && data[0]) ? data[0] : null;
+    var data = await response.json();
+    var savedRow = (Array.isArray(data) && data[0]) ? data[0] : null;
+
+        // Keep the originating query in sync so it's shown as booked consistently
+        if (savedRow && safe.query_id) {
+                try {
+                          await fetchWithTimeout(
+                                      SUPABASE_URL + '/rest/v1/queries?id=eq.' + encodeURIComponent(safe.query_id),
+                            {
+                                          method: 'PATCH',
+                                          headers: {
+                                                          'Content-Type': 'application/json',
+                                                          'apikey': SUPABASE_KEY,
+                                                          'Authorization': 'Bearer ' + authToken,
+                                                          'Prefer': 'return=minimal'
+                                          },
+                                          body: JSON.stringify({ status: 'confirmed' })
+                            }
+                                    );
+                } catch (syncErr) {
+                          console.warn('Query status sync failed:', syncErr);
+                }
+        }
+
+        return savedRow;
   } catch (e) {
     if (e.name === 'AbortError') {
       showToast('Request timed out. Booking could not be saved. Please contact support.', 'error');
@@ -236,3 +276,35 @@ async function sendEmail(type, payload) {
           console.warn('sendEmail failed:', type, e);
     }
 }
+
+
+/* — Charter User Access Gate — */
+/* Returns: { allowed: true } if first-time user (query_count was 0)
+             { allowed: false, redirect: 'register' } if query_count >= 1 and not a member
+             { allowed: true } if is_member = true (paid member)
+   Also increments query_count on first use.
+*/
+async function checkAndRecordUserAccess(userId, email) {
+    var sb = window._svSupabase;
+    if (!sb) return { allowed: false, error: 'no_client' };
+
+  /* Fetch existing record */
+  var res = await sb.from('charter_user_access').select('*').eq('email', email).maybeSingle();
+    if (res.error) { console.error('checkAccess fetch error:', res.error.message); return { allowed: false, error: res.error.message }; }
+
+  var record = res.data;
+
+  /* Paid member — always allowed */
+  if (record && record.is_member) return { allowed: true, member: true };
+
+  /* Second query onwards for non-member — redirect to registration */
+  if (record && record.query_count >= 1) return { allowed: false, redirect: 'register', email: email };
+
+  /* First time — upsert with count = 1 */
+  var now = new Date().toISOString();
+    var upsertData = { email: email, user_id: userId, query_count: 1, first_query_at: now, updated_at: now };
+    var upsertRes = await sb.from('charter_user_access').upsert(upsertData, { onConflict: 'email' });
+    if (upsertRes.error) { console.error('checkAccess upsert error:', upsertRes.error.message); return { allowed: false, error: upsertRes.error.message }; }
+    return { allowed: true, firstTime: true };
+}
+window.checkAndRecordUserAccess = checkAndRecordUserAccess;

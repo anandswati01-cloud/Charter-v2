@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+—<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -6,10 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="css/theme.css"/>
   <script src="js/theme.js"></script>
-  <title>SkyVayu — Private Charter Flights. Direct. Transparent. Fast.</title>
+  <title>SkyVayu — Private Charter Flights. Direct. Transparent. Fast.</title> 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.om/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after {
       box-sizing: border-box;
@@ -509,7 +509,7 @@
 /* ── BOOKING GRID V2 (stacked date under each aerodrome) ── */
 .inputs-grid-v2 {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 1fr 1fr 1fr auto;
   gap: 16px;
   margin-bottom: 24px;
   align-items: start;
@@ -947,7 +947,257 @@
     .hero-sub { animation: fadeUp 0.6s 0.2s ease both; }
     .trust-bar { animation: fadeUp 0.6s 0.3s ease both; }
     .booking-section { animation: fadeUp 0.6s 0.4s ease both; }
-  </style>
+  
+
+  /* ========================================
+     MOBILE RESPONSIVE STYLES
+     Breakpoint: max-width 768px (phones/small tablets)
+     ======================================== */
+  /* ── MOBILE NAV BASE (hidden on desktop) ── */
+  .nav-hamburger { display: none; }
+  .nav-mobile-menu { display: none; }
+
+  @media (max-width: 768px) {
+
+    /* ── NAV ── */
+    .nav {
+      padding: 0 20px;
+      height: 60px;
+    }
+    .nav-links {
+      display: none;
+    }
+    .nav-cta {
+      display: none;
+    }
+    #theme-toggle {
+      display: none;
+    }
+
+    /* ── HERO ── */
+    .hero-content {
+      padding: 100px 20px 40px;
+    }
+    .hero-h1 {
+      font-size: clamp(36px, 10vw, 72px);
+    }
+    .trust-bar {
+      padding: 0 20px 48px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    /* ── BOOKING FORM ── */
+    .booking-section {
+      padding: 0 12px 60px;
+    }
+    .booking-card {
+      padding: 24px 16px;
+    }
+    .inputs-grid {
+      grid-template-columns: 1fr;
+    }
+    .inputs-grid-rt {
+      grid-template-columns: 1fr;
+    }
+    .inputs-grid-v2 {
+      grid-template-columns: 1fr;
+    }
+    .input-col {
+      width: 100%;
+    }
+
+    .pax-control {
+      width: 100%;
+      justify-content: center;
+    }
+    .special-row {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .cta-btn {
+      width: 100%;
+      justify-content: center;
+      margin-top: 8px;
+    }
+    .trip-selector {
+      flex-wrap: wrap;
+    }
+    .aircraft-selector {
+      flex-wrap: wrap;
+    }
+    .flow-progress {
+      padding: 12px 0 4px;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .section {
+      padding: 60px 20px;
+    }
+    .steps-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    /* ── WHY SKYVAYU ── */
+    .why-section {
+      padding: 60px 20px;
+    }
+    .bento-grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── POPULAR ROUTES ── */
+    .routes-section {
+      padding: 60px 20px;
+      max-width: 100%;
+    }
+    .routes-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .routes-grid {
+      grid-template-columns: 1fr;
+    }
+
+    /* ── FINAL CTA ── */
+    .final-cta {
+      padding: 60px 20px;
+    }
+    .final-cta-content {
+      padding: 0;
+    }
+    .final-cta-title {
+      font-size: clamp(28px, 8vw, 48px);
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+      padding: 48px 20px 24px;
+    }
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    /* ── GENERAL ── */
+    body {
+      overflow-x: hidden;
+    }
+    .section-title {
+      font-size: clamp(28px, 7vw, 56px);
+    }
+  
+    /* ── HAMBURGER MENU ── */
+    .nav-hamburger {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 24px;
+      height: 18px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 200;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 100%;
+      height: 2px;
+      background: var(--white-60);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .nav-hamburger.open span:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+    .nav-hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
+    .nav-hamburger.open span:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+    .nav-mobile-menu {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0; right: 0;
+      background: rgba(12, 19, 36, 0.98);
+      backdrop-filter: blur(12px);
+      padding: 24px 20px 32px;
+      border-bottom: 1px solid var(--white-10);
+      z-index: 150;
+    }
+    .nav-mobile-menu.open {
+      display: block;
+    }
+    .nav-mobile-menu ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+    .nav-mobile-menu ul li a {
+      display: block;
+      padding: 14px 0;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--white-60);
+      border-bottom: 1px solid var(--white-10);
+      transition: color 0.2s;
+    }
+    .nav-mobile-menu ul li a:hover,
+    .nav-mobile-menu ul li a.active {
+      color: var(--gold);
+    }
+}
+
+  /* Tablet: 769px - 1024px */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .nav {
+      padding: 0 24px;
+    }
+    .nav-links {
+      gap: 20px;
+    }
+    .hero-content {
+      padding: 120px 24px 60px;
+    }
+    .booking-section {
+      padding: 0 24px 80px;
+    }
+    .booking-card {
+      padding: 32px 32px;
+    }
+    .inputs-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .steps-grid {
+      gap: 20px;
+    }
+    .bento-grid {
+      gap: 16px;
+    }
+    .routes-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .why-section {
+      padding: 80px 24px;
+    }
+    .section {
+      padding: 80px 24px;
+    }
+    .routes-section {
+      padding: 80px 24px;
+    }
+  }</style>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <meta name="description" content="SkyVayu — Private charter flights across India and beyond. Direct quotes, no middlemen, transparent pricing. Book Mumbai–Delhi, Delhi–Goa, and international routes instantly.">
   <meta property="og:type" content="website">
@@ -961,6 +1211,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/auth.js"></script>
+
+  <style>
+    .flow-progress{display:flex;align-items:center;justify-content:center;gap:0;padding:20px 0 4px;}
+    .flow-step{display:flex;flex-direction:column;align-items:center;gap:4px;}
+    .flow-step-dot{width:24px;height:24px;border-radius:50%;border:2px solid var(--white-10);background:transparent;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:10px;color:var(--white-30);transition:.2s;}
+    .flow-step.active .flow-step-dot{border-color:var(--gold);background:var(--gold);color:#0c1324;font-weight:700;}
+    .flow-step.done .flow-step-dot{border-color:var(--green);background:var(--green);color:#fff;}
+    .flow-step-label{font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--white-30);white-space:nowrap;}
+    .flow-step.active .flow-step-label{color:var(--gold);}
+    .flow-step.done .flow-step-label{color:var(--green);}
+    .flow-connector{width:60px;height:1px;background:var(--white-10);margin:0 8px;margin-bottom:14px;}
+  </style>
 </head>
 <body>
 <!-- ── Active query resume banner ─────────────────── -->
@@ -976,19 +1238,25 @@
   function showResumeBanner() {
     var qId = sessionStorage.getItem('sv_query_id');
     var qData = sessionStorage.getItem('sv_query');
-    if (!qId || sessionStorage.getItem('sv_banner_dismissed') === qId) return;
+    // Auto-clear stale session data if older than 60 minutes (3600000 ms)    var ts = sessionStorage.getItem('sv_query_ts');
     var banner = document.getElementById('resume-banner');
-    if (!banner) return;
-    banner.style.display = 'flex';
-    if (qData) {
-      try {
-        var q = JSON.parse(qData);
-        var route = (q.departure||'')+' → '+(q.destination||'');
-        var routeEl = document.getElementById('resume-route');
-        if (routeEl && route.trim() !== '→') routeEl.textContent = route;
-      } catch(e) {}
-    }
-    document.body.style.paddingTop = '48px';
+    if (!banner || !qId) return;
+    // Only show banner when the user is logged in
+    var sb = window._svSupabase;
+    if (!sb) return;
+    sb.auth.getSession().then(function(res) {
+      if (!res.data || !res.data.session) return;
+      banner.style.display = 'flex';
+      if (qData) {
+        try {
+          var q = JSON.parse(qData);
+          var route = (q.departure||'')+' → '+(q.destination||'');
+          var routeEl = document.getElementById('resume-route');
+          if (routeEl && route.trim() !== '→') routeEl.textContent = route;
+        } catch(e) {}
+      }
+      document.body.style.paddingTop = '48px';
+    });
   }
   window.resumeQuery = function() {
     var qId = sessionStorage.getItem('sv_query_id');
@@ -1008,11 +1276,6 @@
   }
 })();
 </script>
-<div id="uc-banner" style="background:#1a2535;border-bottom:1px solid rgba(242,202,80,0.3);padding:10px 24px;display:flex;align-items:center;justify-content:center;gap:12px;position:relative;z-index:9999;font-family:'DM Mono','Courier New',monospace;">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F2CA50" stroke-width="2" stroke-linecap="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-  <span style="font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(238,232,213,0.85);">This website is under construction — not a live product. Queries submitted are for testing only.</span>
-  <button onclick="document.getElementById('uc-banner').style.display='none'" style="position:absolute;right:16px;background:none;border:none;color:rgba(238,232,213,0.5);font-size:16px;cursor:pointer;line-height:1;padding:0;" title="Dismiss">&times;</button>
-</div>
 
   <!-- NAV -->
   <nav class="nav">
@@ -1021,6 +1284,7 @@
       <li><a href="#" class="active">Home</a></li>
       <li><a href="/fleet">Fleet</a></li>
       <li><a href="/about">About Us</a></li>
+      <li><a href="/operator" style="color:var(--white-60);font-size:12px;letter-spacing:1px;text-transform:uppercase;font-family:var(--font-mono)">Operator Login</a></li>
     </ul>
     <div style="display:flex;align-items:center;gap:12px;">
       <button id="theme-toggle" onclick="toggleTheme()" title="Switch to light mode"></button>
@@ -1029,11 +1293,25 @@
       <!-- User chip (shown when logged in) -->
       <div id="sv-user-chip" style="display:none;align-items:center;gap:8px;">
         <a href="/profile" id="sv-user-name" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--gold);text-transform:uppercase;text-decoration:none;"></a>
+        <a href="/profile#tab-active" style="font-family:var(--font-mono);font-size:11px;letter-spacing:1px;color:var(--white-60);text-transform:uppercase;text-decoration:none;border-left:1px solid rgba(255,255,255,0.15);padding-left:8px;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--white-60)'">My Bookings</a>
         <button onclick="signOut()" style="font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);background:transparent;border:none;cursor:pointer;padding:2px 6px;" title="Sign out">&#x2715;</button>
       </div>
       <a href="#book" class="nav-cta">Get Quotes</a>
     </div>
-  </nav>
+    <button class="nav-hamburger" id="nav-hamburger" aria-label="Open menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <!-- Mobile Nav Menu -->
+  <div class="nav-mobile-menu" id="nav-mobile-menu">
+    <ul>
+      <li><a href="#" class="active">Home</a></li>
+      <li><a href="/fleet">Fleet</a></li>
+      <li><a href="/about">About</a></li>
+      <li><a href="/operator">For Operators</a></li>
+    </ul>
+    <div id="sv-login-btn-mobile"></div>
+  </div>
+</nav>
 
   <!-- HERO -->
   <section class="hero">
@@ -1041,7 +1319,7 @@
     <div class="hero-overlay"></div>
 
     <div class="hero-content">
-      <div class="hero-eyebrow">DGCA Licensed Operators · India's Charter Marketplace</div>
+      <div class="hero-eyebrow">India’s largest marketplace of DGCA licensed Non Scheduled operators</div>
       <h1 class="hero-h1">
         Private Charter Flights.<br>
         <em>Direct. Transparent. Fast.</em>
@@ -1056,7 +1334,7 @@
       <div class="trust-item">
         <div class="trust-icon">✈</div>
         <div>
-          <div class="trust-num">115+</div>
+          <div class="trust-num">350+</div>
           <div class="trust-label">Airports Covered</div>
         </div>
       </div>
@@ -1079,6 +1357,14 @@
 
   <!-- BOOKING CARD -->
   <section class="booking-section" id="book">
+  <div class="flow-progress">
+    <div class="flow-step active"><div class="flow-step-dot">1</div><div class="flow-step-label">Your Route</div></div>
+    <div class="flow-connector"></div>
+    <div class="flow-step"><div class="flow-step-dot">2</div><div class="flow-step-label">Live Quotes</div></div>
+    <div class="flow-connector"></div>
+    <div class="flow-step"><div class="flow-step-dot">3</div><div class="flow-step-label">Confirm</div></div>
+  </div>
+
     <div class="booking-card">
       <div class="booking-card-header">
         <div class="booking-card-title">Book a charter flight</div>
@@ -1100,26 +1386,30 @@
       </div>
 
       <div class="inputs-grid-v2">
-          <!-- COL 1: From + Departure Date -->
+          <!-- COL 1: From -->
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">From</div>
 <div class="ac-wrap"><input class="input-field" type="text" id="departure" tabindex="1" placeholder="Departure city or airport" autocomplete="off" oninput="acInput(this,'ac-dep');clearErr(this)" onkeydown="acKey(event,'ac-dep')" onfocus="acInput(this,'ac-dep')" onblur="acBlur('ac-dep')"><div class="ac-dropdown" id="ac-dep"></div></div>
               <span class="error-msg" id="err-departure">Please enter a departure city</span>
             </div>
-            <div class="input-group" style="margin-top:12px;">
-              <div class="input-label">Departure Date &amp; Time</div>
-              <input class="input-field" type="datetime-local" id="flightDateTime" tabindex="3" oninput="clearErr(this)">
-              <span class="error-msg" id="err-flight-date">Please select a departure date &amp; time</span>
-            </div>
           </div>
 
-          <!-- COL 2: To + Return Date (return hidden by default) -->
+          <!-- COL 2: To -->
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">To</div>
               <div class="ac-wrap"><input class="input-field" type="text" id="destination" tabindex="2" placeholder="Destination city or airport" autocomplete="off" oninput="acInput(this,'ac-dest');clearErr(this)" onkeydown="acKey(event,'ac-dest')" onfocus="acInput(this,'ac-dest')" onblur="acBlur('ac-dest')"><div class="ac-dropdown" id="ac-dest"></div></div>
               <span class="error-msg" id="err-destination">Please enter a destination city</span>
+            </div>
+          </div>
+
+          <!-- COL 3: Departure Date + Return Date -->
+          <div class="input-col">
+            <div class="input-group">
+              <div class="input-label">Departure Date &amp; Time</div>
+              <input class="input-field" type="datetime-local" id="flightDateTime" tabindex="3" oninput="clearErr(this)">
+              <span class="error-msg" id="err-flight-date">Please select a departure date &amp; time</span>
             </div>
             <div class="input-group" id="return-row" style="display:none; margin-top:12px;">
               <div class="input-label">Return Date &amp; Time</div>
@@ -1128,7 +1418,7 @@
             </div>
           </div>
 
-          <!-- COL 3: Passengers -->
+          <!-- COL 4: Passengers -->
           <div class="input-col">
             <div class="input-group">
               <div class="input-label">Passengers</div>
@@ -1162,7 +1452,7 @@
           </div>
         </div>
         <button class="cta-btn" onclick="getQuotes()">
-          Get Instant Quotations
+          Get Fastest Quotes
           <span class="cta-arrow">→</span>
         </button>
       </div>
@@ -1213,7 +1503,7 @@
         <div class="bento-card">
           <div class="bento-icon">🌏</div>
           <div class="bento-title">Domestic and international</div>
-          <p class="bento-desc">From Leh to Lakshadweep or Mumbai to Dubai — one platform for all your charter needs across 115+ airports.</p>
+          <p class="bento-desc">From Leh to Lakshadweep or Mumbai to Dubai — one platform for all your charter needs across 350+ airports.</p>
         </div>
         <div class="bento-card">
           <div class="bento-icon">₹</div>
@@ -1272,7 +1562,7 @@
       <h2 class="final-cta-title">Ready to fly private?</h2>
       <p class="final-cta-sub">Experience the pinnacle of aviation logistics. Get your verified quotes in under an hour.</p>
       <button class="cta-btn" style="margin: 0 auto;" onclick="document.getElementById('book').scrollIntoView({behavior:'smooth'})">
-        Get Instant Quotes
+        Get Fastest Quotes
         <span class="cta-arrow">→</span>
       </button>
     </div>
@@ -1316,7 +1606,7 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="footer-copy">© 2025 SkyVayu Aviation. The Celestial Navigator.</div>
+      <div class="footer-copy">© 2026 SkyVayu Aviation. The Celestial Navigator.</div>
       <div class="footer-ops">Global Ops: Mumbai · Delhi · Dubai</div>
     </div>
   </footer>
@@ -1390,7 +1680,7 @@ function getQuotes() {
     var pax=document.getElementById('paxNum')?document.getElementById('paxNum').textContent:'2';
     var acType=(document.querySelector('.aircraft-btn.active')||{dataset:{}}).dataset.type||'fixed_wing';var params=new URLSearchParams({from:from,to:to,date:date,pax:pax,trip:tripMode,ac:acType});
     if(tripMode==='Round Trip'&&returnDate)params.set('returnDate',returnDate);
-    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(paxEl?paxEl.textContent:2)||2});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open',aircraft_category:acType};
+    window._pendingQuoteUrl='results.html';var chips=document.querySelectorAll('.req-chip.active');var medivac=false,pets=false,infants=false,vip=false;chips.forEach(function(c){var t=c.textContent.toLowerCase();if(t.includes('medivac'))medivac=true;if(t.includes('pet'))pets=true;if(t.includes('infant'))infants=true;if(t.includes('vip'))vip=true;});var sectors=[];if(tripMode==='Multiple Sectors'){document.querySelectorAll('.sector-row').forEach(function(row){var n=row.id.replace('sector-','');var d=document.getElementById('sec-dep-'+n);var ds=document.getElementById('sec-dest-'+n);var dt=document.getElementById('sec-date-'+n);if(d&&ds&&dt)var secPaxEl=document.getElementById('sec-pax-'+n);sectors.push({from:d.value.trim(),to:ds.value.trim(),datetime:dt.value,passengers:parseInt(secPaxEl?secPaxEl.textContent:2)||2});});}window._pendingQueryData={trip_type:tripMode,departure:from,destination:to,flight_date:date?date.split('T')[0]:'',flight_time:date?date.split('T')[1]||'':'',return_date:returnDate?returnDate.split('T')[0]:'',return_time:returnDate?returnDate.split('T')[1]||'':'',passengers:parseInt(pax)||2,medivac:medivac,pets:pets,infants:infants,vip:vip,sectors:sectors,status:'open',aircraft_category:acType};
     openOtpModal();
   }
   
@@ -1514,10 +1804,7 @@ function getQuotes() {
 </div>
 <script>
 /* ── Auth modal helpers ─────────────────────────────────── */
-function openAuthModal() {
-  var m = document.getElementById('auth-modal');
-  if (m) m.style.display = 'flex';
-}
+function openAuthModal() { var m = document.getElementById('auth-modal'); if (m) m.style.display = 'flex'; } (function(){ try { var p = new URLSearchParams(window.location.search); if (p.get('login') === '1') { setTimeout(function(){ openAuthModal(); }, 300); } var resumeTo = sessionStorage.getItem('sv_resume_after_login'); if (resumeTo && window._svSupabase) { window._svSupabase.auth.getSession().then(function(res){ if (res && res.data && res.data.session) { sessionStorage.removeItem('sv_resume_after_login'); window.location.href = resumeTo; } }); } } catch(e) {} })();
 function changeSectorPax(n, delta) {
   var el = document.getElementById('sec-pax-' + n);
   if (!el) return;
@@ -1532,10 +1819,21 @@ function closeAuthModal() {
 }
 
 /* Called by the booking form submit — stash query, open auth or save directly */
-function openOtpModal() {
-  getSession(function(session) {
+async function openOtpModal() {
+  getSession(async function(session) {
     if (session) {
-      /* Already signed in — attach user_id and save query */
+      /* Paywall: use charter_user_access gate — first query free, subsequent require membership */
+              var accessFn = typeof window.checkAndRecordUserAccess === 'function' ? window.checkAndRecordUserAccess : null;
+              if (accessFn) {
+                          try {
+                                        var access = await accessFn(session.user.id, session.user.email || '');
+                                        if (!access.allowed && access.redirect === 'register') {
+                                                        var regUrl = 'register.html?reason=membership_required&email=' + encodeURIComponent(session.user.email || '');
+                                                        window.location.href = regUrl; return;
+                                        }
+                          } catch(e) { console.warn('paywall check failed, proceeding', e); }
+              }
+              /* First query or paid member — proceed normally */
       if (window._pendingQueryData && typeof saveQueryToSupabase === 'function') {
         window._pendingQueryData.user_id = session.user.id;
         saveQueryToSupabase(window._pendingQueryData).then(function() {
@@ -1546,9 +1844,7 @@ function openOtpModal() {
       }
     } else {
       /* Not signed in — stash query and open Google sign-in */
-      if (window._pendingQueryData) {
-        stashPendingQuery(window._pendingQueryData);
-      }
+      if (window._pendingQueryData) { stashPendingQuery(window._pendingQueryData); }
       openAuthModal();
     }
   });
@@ -1570,5 +1866,28 @@ function handleGoogleSignIn() {
     setTimeout(function(){ if (depEl) depEl.focus(); }, 600);
   }
 </script>
+
+  <script>
+    // Mobile nav hamburger toggle
+    (function() {
+      var btn = document.getElementById('nav-hamburger');
+      var menu = document.getElementById('nav-mobile-menu');
+      if (btn && menu) {
+        btn.addEventListener('click', function() {
+          var isOpen = menu.classList.toggle('open');
+          btn.classList.toggle('open', isOpen);
+          btn.setAttribute('aria-expanded', isOpen);
+        });
+        // Close menu on link click
+        menu.querySelectorAll('a').forEach(function(a) {
+          a.addEventListener('click', function() {
+            menu.classList.remove('open');
+            btn.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+          });
+        });
+      }
+    })();
+  </script>
 </body>
 </html>

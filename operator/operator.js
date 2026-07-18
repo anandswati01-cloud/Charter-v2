@@ -1,6 +1,6 @@
 var SUPABASE_URL=SKYVAYU_CONFIG.supabaseUrl;var SUPABASE_KEY=SKYVAYU_CONFIG.supabaseKey;
 
-/* ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ XSS protection: escape all user-supplied strings before inserting into innerHTML ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ */
+/* ── XSS protection: escape all user-supplied strings before inserting into innerHTML ── */
 function escapeHtml(str){
   if(str==null)return'';
   return String(str)
@@ -12,6 +12,7 @@ function escapeHtml(str){
 }
 
 var currentUser=null,currentOperator=null,currentQueryId=null,currentClaimId=null;
+var _opAuthToken=SUPABASE_KEY;
 
 var aircraftList=[],allOperatorUsers=[],allActiveQueries=[],allMyOperatorQuotes=[],allActiveClaims=[];
 
@@ -23,7 +24,7 @@ function nowIso(){return new Date().toISOString();}
 
 function sbFetch(path,opts){
   opts=opts||{};
-  var headers={'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY};
+  var headers={'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+_opAuthToken};
   if(opts.prefer)headers['Prefer']=opts.prefer;
   return fetch(SUPABASE_URL+'/rest/v1/'+path,{method:opts.method||'GET',headers:headers,body:opts.body?JSON.stringify(opts.body):undefined})
     .then(function(r){
@@ -45,7 +46,7 @@ async function doLogin(){
   if(!username||!password){errEl.textContent='Please enter username or email and password';errEl.classList.add('show');return;}
   var btn=document.getElementById('login-btn');btn.disabled=true;btn.textContent='Signing in...';
   try{
-    /* Ã¢ÂÂÃ¢ÂÂ Secure server-side login via verify_operator_login RPC Ã¢ÂÂÃ¢ÂÂ
+    /* ── Secure server-side login via verify_operator_login RPC ──
      * Password is verified server-side using bcrypt; hash is NEVER sent to the client.
      * The old client-side comparison (password_hash === password) has been removed. */
     var rpcRes=await sbFetch('rpc/verify_operator_login',{method:'POST',body:{p_username:username.toLowerCase(),p_password:password}});
@@ -76,8 +77,9 @@ async function doLogin(){
       errEl.textContent='Your registration was not approved. Please contact SkyVayu.';
       errEl.classList.add('show');return;
     }
-    currentUser=user;currentOperator=op;localStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
-    /* Fire-and-forget last_login update ÃÂ¢ don't block on it */
+    currentUser=user;currentOperator=op;sessionStorage.setItem('opSession',JSON.stringify({user:user,operator:op}));
+if(window._svSupabase){try{var lexRes=await fetch(SUPABASE_URL+'/functions/v1/login-exchange',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY},body:JSON.stringify({username:username,password:password})});var lex=await lexRes.json();if(lexRes.ok&&lex&&lex.access_token&&lex.refresh_token){await window._svSupabase.auth.setSession({access_token:lex.access_token,refresh_token:lex.refresh_token});_opAuthToken=lex.access_token;}else{console.error('login-exchange failed',lex);}}catch(_lexErr){console.error('login-exchange error',_lexErr);}}
+    /* Fire-and-forget last_login update â don't block on it */
     sbFetch('operator_users?id=eq.'+currentUser.id,{method:'PATCH',body:{last_login:nowIso()}}).catch(function(){});
     document.getElementById('page-login').style.display='none';
     document.getElementById('page-dashboard').style.display='';document.getElementById('page-dashboard').classList.add('active');
@@ -103,7 +105,9 @@ function doLogout(){
   if(refreshInterval){clearInterval(refreshInterval);refreshInterval=null;}
   if(claimRefreshInterval){clearInterval(claimRefreshInterval);claimRefreshInterval=null;}
   if(currentClaimId)releaseClaim(currentClaimId);
-  currentUser=null;currentOperator=null;currentClaimId=null;localStorage.removeItem('opSession');
+  currentUser=null;currentOperator=null;currentClaimId=null;sessionStorage.removeItem('opSession');  _opAuthToken=SUPABASE_KEY;
+  if(window._svSupabase){window._svSupabase.auth.signOut();}
+
   document.getElementById('page-dashboard').style.display='none';
   document.getElementById('page-dashboard').classList.remove('active');
   document.getElementById('page-login').style.display='flex';
@@ -143,17 +147,17 @@ function showSection(section){
 }
 
 function showSubtab(tab){
-  ['active','shared','confirmed'].forEach(function(t){
-    document.getElementById('list-'+t).style.display='none';
-    document.querySelector('.subtab[data-subtab="'+t+'"]').classList.remove('active');
+  ['active','shared','confirmed','expired'].forEach(function(t){
+    var el=document.getElementById('list-'+t);if(el)el.style.display='none';
+    var nav=document.querySelector('.subtab[data-subtab="'+t+'"]');if(nav)nav.classList.remove('active');
   });
-  document.getElementById('list-'+tab).style.display='block';
-  document.querySelector('.subtab[data-subtab="'+tab+'"]').classList.add('active');
+  var el=document.getElementById('list-'+tab);if(el)el.style.display='block';
+  var nav=document.querySelector('.subtab[data-subtab="'+tab+'"]');if(nav)nav.classList.add('active');
 }
 
 /* ============ HELPERS ============ */
 
-function fmtDate(d){if(!d)return'ÃÂ¢ÃÂÃÂ';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
+function fmtDate(d){if(!d)return'—';var p=d.split('-');if(p.length!==3)return d;return p[2]+'-'+p[1]+'-'+p[0];}
 function fmtDateShort(d){if(!d)return'';var parts=d.split('-');if(parts.length!==3)return d;return parts[2]+'-'+parts[1];}
 function fmtPrice(n){return'Rs.'+Number(n||0).toLocaleString('en-IN');}
 function fmtPriceShort(n){var v=Number(n||0);if(v>=10000000)return'Rs.'+(v/10000000).toFixed(1)+'Cr';if(v>=100000)return'Rs.'+(v/100000).toFixed(1)+'L';if(v>=1000)return'Rs.'+(v/1000).toFixed(0)+'K';return'Rs.'+v;}
@@ -212,29 +216,11 @@ async function doForgotPassword() {
   btn.disabled = true;
   btn.textContent = 'Sending...';
   try {
-    var opUrl = SKYVAYU_CONFIG.supabaseUrl + '/rest/v1/operators?select=id,company_name,email&email=eq.' + encodeURIComponent(email) + '&limit=1';
-    var opRes = await fetch(opUrl, {
-      headers: {
-        'apikey': SKYVAYU_CONFIG.supabaseKey,
-        'Authorization': 'Bearer ' + SKYVAYU_CONFIG.supabaseKey
-      }
+    await fetch(SUPABASE_URL + '/rpc/request_password_reset', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json', 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY},
+      body: JSON.stringify({p_email: email})
     });
-    var ops = await opRes.json();
-    if (ops && ops.length > 0) {
-      var token = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
-      var expiry = new Date(Date.now() + 3600000).toISOString();
-      await fetch(SKYVAYU_CONFIG.supabaseUrl + '/rest/v1/operators?id=eq.' + ops[0].id, {
-        method: 'PATCH',
-        headers: {
-          'apikey': SKYVAYU_CONFIG.supabaseKey,
-          'Authorization': 'Bearer ' + SKYVAYU_CONFIG.supabaseKey,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify({ reset_token: token, reset_token_expiry: expiry })
-      });
-      await sendEmail('password_reset', { operator_id: ops[0].id, email: ops[0].email, company_name: ops[0].company_name, reset_token: token });
-    }
     okEl.style.display = 'block';
     btn.textContent = 'Sent!';
   } catch(e) {
@@ -250,8 +236,8 @@ async function loadAllData(){
   if(!currentOperator)return;
   var opId=currentOperator.id;
   var results=await Promise.all([
-    sbFetch('queries?status=eq.open&aircraft_category=in.('+( currentOperator.aircraft_category||'fixed_wing')+')&order=created_at.desc'),
-    sbFetch('quotes?operator_id=eq.'+opId+'&select=*,queries(*)&order=created_at.desc'),
+    sbFetch('queries?status=eq.open&aircraft_category=in.('+( currentOperator.aircraft_category||'fixed_wing')+')&created_at=gt.'+encodeURIComponent(new Date(Date.now()-60*60*1000).toISOString())+'&order=created_at.desc'),
+    sbFetch('quotes?operator_id=eq.'+opId+'&select=*,queries(*),quote_items(*)&order=created_at.desc&quote_items.order=created_at.desc'),
     sbFetch('query_claims?operator_id=eq.'+opId+'&expires_at=gt.'+encodeURIComponent(nowIso())),
     sbFetch('operator_users?operator_id=eq.'+opId+'&order=created_at.asc')
   ]);
@@ -271,46 +257,102 @@ async function loadAllData(){
   var _ca=document.getElementById('count-active');if(_ca)_ca.textContent=unquoted.length;
   var _cs=document.getElementById('count-shared');if(_cs)_cs.textContent=shared.length;
   var _cc=document.getElementById('count-confirmed');if(_cc)_cc.textContent=confirmed.length;
-  var _qb=document.getElementById('queries-badge');if(_qb)_qb.textContent=unquoted.length+shared.length;
+  var _qb=document.getElementById('queries-badge');if(_qb)_qb.textContent=allActiveClaims.length;
+  var cat=currentOperator.aircraft_category||'fixed_wing';
+  sbFetch('queries?status=eq.open&aircraft_category=in.('+cat+')&created_at=lt.'+encodeURIComponent(new Date(Date.now()-60*60*1000).toISOString())+'&order=created_at.desc&limit=100')
+    .then(function(res){
+      var expiredQueries=res.ok?res.data:[];
+      var bookedIds=allMyOperatorQuotes.filter(function(q){return q.status==='accepted'||q.status==='confirmed'||q.status==='booked';}).map(function(q){return q.query_id;});
+      // Expired = timer ran out AND not booked (includes both unquoted and quote-shared-but-unaccepted)
+      expiredQueries=expiredQueries.filter(function(q){return!bookedIds.includes(q.id);});
+      // Also add our shared quotes whose query timer has expired but weren't accepted
+      var expiredShared=allMyOperatorQuotes.filter(function(q){
+        return q.status==='shared' && q.queries && q.queries.created_at && new Date(q.queries.created_at)<new Date(Date.now()-60*60*1000);
+      });
+      // Merge: deduplicate by query_id
+      var expiredQueryIds=expiredQueries.map(function(q){return q.id;});
+      expiredShared.forEach(function(q){
+        if(!expiredQueryIds.includes(q.query_id) && q.queries){
+          expiredQueries.push(q.queries);
+          expiredQueryIds.push(q.query_id);
+        }
+      });
+      // Remove from shared tab too — move expired shared quotes out of shared list
+      var nowExpiredQueryIds=expiredQueries.map(function(q){return q.id;});
+      var activeShared=shared.filter(function(q){return!nowExpiredQueryIds.includes(q.query_id);});
+      var _cs=document.getElementById('count-shared');if(_cs)_cs.textContent=activeShared.length;
+      var _qb2=document.getElementById('queries-badge');if(_qb2)_qb2.textContent=unquoted.length+activeShared.length;
+      renderSharedList(activeShared);
+      var ce=document.getElementById('count-expired');if(ce)ce.textContent=expiredQueries.length;
+      renderExpiredList(expiredQueries);
+    });
   renderActiveList(unquoted);
   markQueriesViewed(unquoted.map(function(q){return q.id;}));
+  // Initial render of shared — may be updated again above once expired are known
   renderSharedList(shared);
   renderConfirmedList(confirmed);
 }
 
 /* ============ RENDER LISTS ============ */
 
+function getTimerBar(createdAt) {
+  if (!createdAt) return '';
+  var totalMs = 60 * 60 * 1000;
+  var now = new Date();
+  var created = new Date(createdAt);
+  var windowEnd = new Date(created.getTime() + totalMs);
+  var elapsed = now - created;
+  var pct = Math.min(Math.max((elapsed / totalMs) * 100, 0), 100);
+  var remaining = windowEnd - now;
+  var isUrgent = remaining > 0 && remaining < 10 * 60 * 1000;
+  var isExpired = remaining <= 0;
+  var barColor = isExpired ? 'var(--red)' : isUrgent ? 'var(--amber)' : 'var(--gold)';
+  var mins = remaining > 0 ? Math.floor(remaining / 60000) : 0;
+  var secs = remaining > 0 ? Math.floor((remaining % 60000) / 1000) : 0;
+  var label = isExpired ? 'Window closed' : mins + 'm ' + String(secs).padStart(2,'0') + 's remaining';
+  return '<div class="query-timer-wrap" data-created="' + createdAt + '">'
+    + '<div class="query-timer-row">'
+    + '<span class="query-timer-label" style="color:' + barColor + ';">' + label + '</span>'
+    + '<span class="query-timer-pct" style="color:' + barColor + ';">' + (isExpired ? '100' : Math.round(pct)) + '%</span>'
+    + '</div>'
+    + '<div class="query-timer-bar"><div class="query-timer-fill" style="width:' + pct + '%;background:' + barColor + ';"></div></div>'
+    + '</div>';
+}
+
 function renderActiveList(queries){
   var el=document.getElementById('list-active');
   if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No active queries</div><div class="empty-sub">New client queries will appear here</div></div>';return;}
   el.innerHTML=queries.map(function(q){
-    var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+' ÃÂ¢ÃÂÃÂ '+escapeHtml(q.destination||'-');
-    var timer=q.expires_at?timeRemaining(q.expires_at):'';
+    var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+'  &#8594;  '+escapeHtml(q.destination||'-');
+    var isUrgent=(function(){if(!q.flight_date)return false;var flightDt=new Date(q.flight_date+(q.flight_time?'T'+q.flight_time:'T00:00'));return(flightDt-new Date())<=4*60*60*1000&&(flightDt-new Date())>0;})();
     var claim=getClaimFor(q.id);
     var lockedBySomeoneElse=claim&&claim.claimed_by!==currentUser.id;
     var lockedByMe=claim&&claim.claimed_by===currentUser.id;
     var lockInfo='';
     if(lockedBySomeoneElse){
       var rem=claimRemaining(claim.expires_at);
-      lockInfo='<div class="query-lock-info" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">Locked by '+escapeHtml(claim.claimed_by_name||'teammate')+' ÃÂÃÂ· '+(rem||'expiring')+'</div>';
+      lockInfo='<div class="query-lock-info" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">Locked by '+escapeHtml(claim.claimed_by_name||'teammate')+' &middot; '+(rem||'expiring')+'</div>';
     }else if(lockedByMe){
-      lockInfo='<div class="query-lock-info" style="color:var(--green-light);" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">You have this locked ÃÂÃÂ· '+(claimRemaining(claim.expires_at)||'expiring')+'</div>';
+      lockInfo='<div class="query-lock-info" style="color:var(--green-light);" data-query="'+escapeHtml(q.id)+'" data-expires="'+escapeHtml(claim.expires_at)+'">You have this locked &middot; '+(claimRemaining(claim.expires_at)||'expiring')+'</div>';
     }
     var btnTxt=lockedBySomeoneElse?'Locked':'Submit quote';
     var btnDisabled=lockedBySomeoneElse?'disabled':'';
-    return '<div class="query-card '+(lockedBySomeoneElse?'locked':'')+'">'
+    return '<div class="query-card '+(isUrgent?'query-card-urgent ':'')+(lockedBySomeoneElse?'locked':'')+'">'
+      +(isUrgent?'<div class="urgent-tape">URGENT &mdash; Flight within 4 hours</div>':'')
       +'<div class="query-top"><div><div class="query-route">'+r+'</div><div class="query-meta">'+fmtDate(q.flight_date)+(q.flight_time?' at '+escapeHtml(q.flight_time):'')+'</div></div>'
-      +(lockedBySomeoneElse?'<span class="badge badge-locked">Locked</span>':'<span class="badge badge-active">Active</span>')+'</div>'
+      +(lockedBySomeoneElse?'<span class="badge badge-locked">Locked</span>':isUrgent?'<span class="badge badge-urgent">Urgent</span>':'<span class="badge badge-active">Active</span>')+'</div>'
       +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
       +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
-      +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')+'</div>'
-      +(timer?'<div class="query-timer">Window: '+timer+' remaining</div>':'')
+      +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')
+      +(q.vip?'<div class="query-detail"><span>VIP</span>Yes</div>':'')
+      +(q.infants?'<div class="query-detail"><span>Infants</span>Yes</div>':'')+'</div>'
+      +(q.created_at ? getTimerBar(q.created_at) : '')
       +lockInfo
       +'<div class="query-actions"><button class="btn-sm btn-blue" '+btnDisabled+' onclick="openQuoteModal(\''+escapeHtml(q.id)+'\')">'+btnTxt+'</button>'+(claim&&claim.claimed_by===currentUser.id?'<button class="btn-sm btn-red" onclick="declineQuery(\''+escapeHtml(q.id)+'\',\''+escapeHtml(claim.id)+'\')" style="margin-left:6px">Decline</button>':'')+'</div></div>';
   }).join('');
 }
 
-// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ View Shared Quote ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+// ── View Shared Quote ────────────────────────────────────
 var _viewQuoteData = null;
 
 function viewSharedQuote(quoteId) {
@@ -319,12 +361,13 @@ function viewSharedQuote(quoteId) {
   _viewQuoteData = q;
   var query = q.queries || {};
   var route = query.trip_type === 'multi' ? 'Multiple sectors'
-    : escapeHtml(query.departure || '-') + ' ÃÂ¢ÃÂÃÂ ' + escapeHtml(query.destination || '-');
+    : escapeHtml(query.departure || '-') + '  &#8594;  ' + escapeHtml(query.destination || '-');
   var date = fmtDate(query.flight_date) + (query.flight_time ? ' at ' + escapeHtml(query.flight_time) : '');
-  var base = Number(q.base_charge || 0);
-  var handling = Number(q.handling_fee || 0);
-  var crew = Number(q.crew_accommodation || 0);
-  var catering = Number(q.catering || 0);
+  var qi = (q.quote_items && q.quote_items[0]) || {};
+  var base = Number(qi.base_charge || 0);
+  var handling = Number(qi.handling_fee || 0);
+  var crew = Number(qi.crew_accommodation || 0);
+  var catering = Number(qi.catering || 0);
   var subtotal = base + handling + crew + catering;
   var gst = Math.round(subtotal * 0.18);
   var total = subtotal + gst;
@@ -351,7 +394,38 @@ function viewSharedQuote(quoteId) {
     if(u) { byEl.style.display = ''; document.getElementById('vq-by').textContent = escapeHtml(u.full_name || u.username); }
     else { byEl.style.display = 'none'; }
   } else { byEl.style.display = 'none'; }
-  document.getElementById('view-quote-modal').classList.add('open');
+  // Show bid status
+  fetchBids(query.id || q.query_id).then(function(bids){
+    var statusEl = document.getElementById('vq-bid-status');
+    var reviseBtn = document.getElementById('btn-revise-quote');
+    var windowOpen = query.created_at && new Date(query.created_at) > new Date(Date.now()-60*60*1000);
+    if (statusEl && bids.length) {
+      var lowest = bids[0].price;
+      var isWinning = q.price <= lowest;
+      statusEl.textContent = isWinning
+        ? 'You have the lowest bid at ' + fmtPrice(q.price) + ' (' + bids.length + ' bid' + (bids.length>1?'s':'')+' total)'
+        : 'You are outbid. Current lowest: ' + fmtPrice(lowest);
+      statusEl.style.background = isWinning ? 'rgba(59,109,17,0.15)' : 'rgba(226,75,74,0.1)';
+      statusEl.style.color = isWinning ? 'var(--green-light)' : 'var(--red)';
+      statusEl.style.display = 'block';
+    }
+    // Market insights: highest & lowest quote (aircraft type + price only, no operator identity)
+    var insightsEl = document.getElementById('vq-market-insights');
+    if (insightsEl && bids.length) {
+      var lo = bids[0]; var hi = bids[bids.length - 1];
+      var insHtml = '<div style="font-family:var(--font-mono);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:8px;">Market quotes (' + bids.length + ' total)</div>';
+      insHtml += '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+      insHtml += '<tr style="color:var(--text-tertiary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;"><th style="text-align:left;padding:4px 0;"></th><th style="text-align:left;padding:4px 8px;">Aircraft</th><th style="text-align:right;padding:4px 0;">Quote</th></tr>';
+      insHtml += '<tr style="border-top:0.5px solid var(--border);"><td style="padding:6px 0;color:var(--green-light);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;">Lowest</td><td style="padding:6px 8px;color:var(--green-light);">' + escapeHtml(lo.aircraft_type || '') + '</td><td style="padding:6px 0;text-align:right;color:var(--green-light);font-weight:600;">' + fmtPrice(lo.price) + '</td></tr>';
+      if (bids.length > 1 && hi.price !== lo.price) {
+        insHtml += '<tr style="border-top:0.5px solid var(--border);"><td style="padding:6px 0;color:var(--text-secondary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;">Highest</td><td style="padding:6px 8px;color:var(--text-secondary);">' + escapeHtml(hi.aircraft_type || '') + '</td><td style="padding:6px 0;text-align:right;color:var(--text-secondary);">' + fmtPrice(hi.price) + '</td></tr>';
+      }
+      insHtml += '</table>';
+      insightsEl.innerHTML = insHtml;
+      insightsEl.style.display = 'block';
+    }
+    if (reviseBtn && windowOpen) reviseBtn.style.display = '';
+  });  document.getElementById('view-quote-modal').classList.add('open');
 }
 
 function closeViewQuoteModal() {
@@ -364,9 +438,9 @@ function renderSharedList(quotes){
   if(!quotes.length){var msg=isOwner()?'No quotes shared yet':'You haven\'t shared any quotes yet';el.innerHTML='<div class="empty-state"><div class="empty-title">'+msg+'</div></div>';return;}
   el.innerHTML=quotes.map(function(q){
     var query=q.queries||{};
-    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+' ÃÂ¢ÃÂÃÂ '+escapeHtml(query.destination||'-');
+    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+'  &#8594;  '+escapeHtml(query.destination||'-');
     var empBadge='';
-    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card" style="cursor:pointer;" onclick="viewSharedQuote(\''+q.id+'\')">'+'<div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' ÃÂÃÂ· '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+escapeHtml(q.notes)+'</div>':'')+'</div>';
+    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card" style="cursor:pointer;" onclick="viewSharedQuote(\''+q.id+'\')">'+'<div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' &middot; '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-shared">Shared</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Quote</span>'+fmtPrice(q.price)+'</div></div>'+(q.notes?'<div class="query-detail" style="margin-top:8px;"><span>Note</span>'+escapeHtml(q.notes)+'</div>':'')+'</div>';
   }).join('');
   window._sharedQuotes = quotes;
 }
@@ -376,19 +450,56 @@ function renderConfirmedList(quotes){
   if(!quotes.length){var msg=isOwner()?'No confirmed bookings yet':'No confirmed bookings for you yet';el.innerHTML='<div class="empty-state"><div class="empty-title">'+msg+'</div></div>';return;}
   el.innerHTML=quotes.map(function(q){
     var query=q.queries||{};
-    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+' ÃÂ¢ÃÂÃÂ '+escapeHtml(query.destination||'-');
+    var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'-')+'  &#8594;  '+escapeHtml(query.destination||'-');
     var empBadge='';
-    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' ÃÂÃÂ· '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
+    if(isOwner()){var u=lookupUser(q.submitted_by);empBadge=u?'<span class="badge badge-by">by '+escapeHtml(u.full_name||u.username)+'</span>':'';}    return '<div class="query-card"><div class="query-top"><div><div class="query-route">'+route+empBadge+'</div><div class="query-meta">'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' &middot; '+escapeHtml(q.aircraft_type||'')+(q.aircraft_registration?' ('+escapeHtml(q.aircraft_registration)+')':'')+'</div></div><span class="badge badge-accepted">Confirmed</span></div><div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(query.passengers||'-'))+'</div><div class="query-detail"><span>Revenue</span>'+fmtPrice(q.price)+'</div></div></div>';
+  }).join('');
+}
+
+function renderExpiredList(queries){
+  var el=document.getElementById('list-expired');
+  if(!el)return;
+  if(!queries.length){el.innerHTML='<div class="empty-state"><div class="empty-title">No expired queries</div><div class="empty-sub">Queries where the 60-minute window closed with no booking</div></div>';return;}
+  el.innerHTML=queries.map(function(q){
+    var r=q.trip_type==='multi'?'Multiple sectors':escapeHtml(q.departure||'-')+' to '+escapeHtml(q.destination||'-');
+    return '<div class="query-card" style="opacity:0.65;">'
+      +'<div class="query-top"><div><div class="query-route">'+r+'</div><div class="query-meta">'+fmtDate(q.flight_date)+(q.flight_time?' at '+escapeHtml(q.flight_time):'')+'</div></div>'
+      +'<span class="badge badge-expired">Expired</span></div>'
+      +'<div class="query-details"><div class="query-detail"><span>Pax</span>'+escapeHtml(String(q.passengers||'-'))+'</div>'
+      +(q.medivac?'<div class="query-detail"><span>Medivac</span>Yes</div>':'')
+      +(q.pets?'<div class="query-detail"><span>Pets</span>Yes</div>':'')
+      +(q.vip?'<div class="query-detail"><span>VIP</span>Yes</div>':'')
+      +(q.infants?'<div class="query-detail"><span>Infants</span>Yes</div>':'')+'</div>'
+      +(q.created_at ? getTimerBar(q.created_at) : '')
+      +'</div>';
   }).join('');
 }
 
 function updateClaimTimers(){
+  document.querySelectorAll('.query-timer-wrap').forEach(function(wrap){
+    var createdAt=wrap.getAttribute('data-created');if(!createdAt)return;
+    var totalMs=60*60*1000;
+    var now=new Date();var created=new Date(createdAt);
+    var windowEnd=new Date(created.getTime()+totalMs);
+    var elapsed=now-created;
+    var pct=Math.min(Math.max((elapsed/totalMs)*100,0),100);
+    var remaining=windowEnd-now;
+    var isUrgent=remaining>0&&remaining<10*60*1000;
+    var isExpired=remaining<=0;
+    var barColor=isExpired?'var(--red)':isUrgent?'var(--amber)':'var(--gold)';
+    var mins=remaining>0?Math.floor(remaining/60000):0;
+    var secs=remaining>0?Math.floor((remaining%60000)/1000):0;
+    var label=isExpired?'Window closed':mins+'m '+String(secs).padStart(2,'0')+'s remaining';
+    var bar=wrap.querySelector('.query-timer-fill');if(bar){bar.style.width=pct+'%';bar.style.background=barColor;}
+    var labelEl=wrap.querySelector('.query-timer-label');if(labelEl){labelEl.textContent=label;labelEl.style.color=barColor;}
+    var pctEl=wrap.querySelector('.query-timer-pct');if(pctEl){pctEl.textContent=(isExpired?'100':Math.round(pct))+'%';pctEl.style.color=barColor;}
+  });
   document.querySelectorAll('.query-lock-info').forEach(function(el){
     var exp=el.getAttribute('data-expires');if(!exp)return;
     var rem=claimRemaining(exp);
     if(!rem){el.remove();return;}
-    var prefix=el.textContent.split(' ÃÂÃÂ· ')[0];
-    el.textContent=prefix+' ÃÂÃÂ· '+rem;
+    var prefix=el.textContent.split(' &middot; ')[0];
+    el.textContent=prefix+' &middot; '+rem;
   });
 }
 
@@ -455,7 +566,7 @@ function getBusyAircraftMap(){
     dates.forEach(function(d){
       if(!map[q.aircraft_id])map[q.aircraft_id]={};
       var u=lookupUser(q.submitted_by);
-      map[q.aircraft_id][d]={by:u?(u.full_name||u.username):'operator',route:(query.departure||'-')+'ÃÂ¢ÃÂÃÂ'+(query.destination||'-')};
+      map[q.aircraft_id][d]={by:u?(u.full_name||u.username):'operator',route:(query.departure||'-')+' &#8594; '+(query.destination||'-')};
     });
   });
   return map;
@@ -463,7 +574,74 @@ function getBusyAircraftMap(){
 
 /* ============ QUOTE MODAL ============ */
 
-async function openQuoteModal(queryId){
+// ============ REVERSE AUCTION BIDDING ============
+
+async function fetchBids(queryId) {
+  var res = await sbFetch('quotes?query_id=eq.' + queryId + '&status=eq.shared&select=price,aircraft_type,aircraft_registration,operator_id&order=price.asc');
+  return res.ok ? res.data : [];
+}
+
+function renderBidTable(bids, myOperatorId) {
+  var container = document.getElementById('live-bids-table');
+  var beatMsg = document.getElementById('bid-beat-msg');
+  if (!container) return;
+  if (!bids.length) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--text-tertiary);padding:8px 0;">No quotes yet — be the first to quote.</div>';
+    if (beatMsg) beatMsg.style.display = 'none';
+    return;
+  }
+  var lowest = bids[0]; // bids sorted price asc from fetchBids
+  var highest = bids[bids.length - 1];
+  var myBid = bids.find(function(b){ return b.operator_id === myOperatorId; });
+  var html = '<table style="width:100%;border-collapse:collapse;font-size:12px;">';
+  html += '<tr style="color:var(--text-tertiary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;"><th style="text-align:left;padding:4px 0;"></th><th style="text-align:left;padding:4px 8px;">Aircraft</th><th style="text-align:right;padding:4px 0;">Quote</th></tr>';
+  // Lowest quote row
+  html += '<tr style="border-top:0.5px solid var(--border);">';
+  html += '<td style="padding:6px 0;color:var(--green-light);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;">Lowest</td>';
+  html += '<td style="padding:6px 8px;color:var(--green-light);">' + escapeHtml(lowest.aircraft_type || '') + '</td>';
+  html += '<td style="padding:6px 0;text-align:right;color:var(--green-light);font-weight:600;">' + fmtPrice(lowest.price) + '</td>';
+  html += '</tr>';
+  // Highest quote row (only if more than 1 bid and amounts differ)
+  if (bids.length > 1 && highest.price !== lowest.price) {
+    html += '<tr style="border-top:0.5px solid var(--border);">';
+    html += '<td style="padding:6px 0;color:var(--text-secondary);font-family:var(--font-mono);font-size:10px;letter-spacing:.5px;text-transform:uppercase;">Highest</td>';
+    html += '<td style="padding:6px 8px;color:var(--text-secondary);">' + escapeHtml(highest.aircraft_type || '') + '</td>';
+    html += '<td style="padding:6px 0;text-align:right;color:var(--text-secondary);">' + fmtPrice(highest.price) + '</td>';
+    html += '</tr>';
+  }
+  html += '</table>';
+  if (bids.length > 1) {
+    html += '<div style="margin-top:6px;font-size:11px;color:var(--text-tertiary);font-family:var(--font-mono);">' + bids.length + ' quote' + (bids.length > 1 ? 's' : '') + ' submitted</div>';
+  }
+  container.innerHTML = html;
+  if (beatMsg) {
+    if (myBid && myBid.price > lowest.price) {
+      beatMsg.textContent = 'You are outbid. Beat the lowest of ' + fmtPrice(lowest.price) + ' to win.';
+      beatMsg.style.display = 'block';
+      beatMsg.style.color = 'var(--red)';
+    } else if (!myBid && bids.length > 0) {
+      beatMsg.textContent = 'Beat the lowest bid of ' + fmtPrice(lowest.price) + ' to lead.';
+      beatMsg.style.display = 'block';
+      beatMsg.style.color = 'var(--amber)';
+    } else if (myBid && myBid.price <= lowest.price) {
+      beatMsg.textContent = 'You have the lowest bid — you are winning.';
+      beatMsg.style.display = 'block';
+      beatMsg.style.color = 'var(--green-light)';
+    } else {
+      beatMsg.style.display = 'none';
+    }
+  }
+}
+async function reviseQuote(target) {
+  var q = target || _viewQuoteData || window._reviseTarget;
+  if (!q) return;
+  window._reviseTarget = null;
+  closeViewQuoteModal();
+  await openQuoteModal(q.query_id, q.id);
+}
+
+var _revisingQuoteId = null;
+async function openQuoteModal(queryId, existingQuoteId){
   if(isAopExpired()){
     showToast('Your AOP has expired. Renew it before submitting quotes.','error');
     return;
@@ -475,6 +653,7 @@ async function openQuoteModal(queryId){
     return;
   }
   currentQueryId=queryId;
+  _revisingQuoteId = existingQuoteId || null;
   currentClaimId=claimRes.claim&&claimRes.claim.id?claimRes.claim.id:null;
   sendEmail('new_query_assigned',{query_id:queryId,operator_id:currentOperator.id});
   var res=await sbFetch('queries?id=eq.'+queryId);
@@ -485,7 +664,7 @@ async function openQuoteModal(queryId){
     showToast('Query not found. Please refresh.','error');
     return;
   }
-  var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'ÃÂ¢ÃÂÃÂ')+' ÃÂ¢ÃÂÃÂ '+escapeHtml(query.destination||'ÃÂ¢ÃÂÃÂ');
+  var route=query.trip_type==='multi'?'Multiple sectors':escapeHtml(query.departure||'—')+'  &#8594;  '+escapeHtml(query.destination||'—');
   document.getElementById('quote-query-info').innerHTML='<strong style="color:var(--text);">'+route+'</strong><br>'+fmtDate(query.flight_date)+(query.flight_time?' at '+escapeHtml(query.flight_time):'')+' &nbsp;|&nbsp; '+escapeHtml(String(query.passengers))+' pax';
   var busyMap=getBusyAircraftMap();
   var expiredAcIds=getExpiredAircraftIds();
@@ -501,13 +680,17 @@ async function openQuoteModal(queryId){
       else if(returnDate&&busyMap[a.id][returnDate])conflict=returnDate;
     }
     var docExpired=expiredAcIds.indexOf(a.id)!==-1;
-    if(conflict){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  ÃÂ¢ÃÂÃÂ  Booked on '+fmtDate(conflict)+'</option>';}
-    if(docExpired){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  ÃÂ¢ÃÂÃÂ  Documents expired</option>';}
+    if(conflict){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  —  Booked on '+fmtDate(conflict)+'</option>';}
+    if(docExpired){anyConflict=true;return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'" disabled>'+a.aircraft_type+'  |  '+a.registration+'  —  Documents expired</option>';}
     return'<option value="'+a.id+'" data-type="'+a.aircraft_type+'" data-reg="'+a.registration+'">'+a.aircraft_type+'  |  '+a.registration+'</option>';
   }).join('');
-  document.getElementById('quote-aircraft-help').textContent=anyConflict?'Some aircraft unavailable ÃÂ¢ÃÂÃÂ booked or documents expired.':'';
+  document.getElementById('quote-aircraft-help').textContent=anyConflict?'Some aircraft unavailable — booked or documents expired.':'';
   ['q-base','q-handling','q-crew','q-catering','q-notes'].forEach(function(id){document.getElementById(id).value='';});
   calcQuote();
+  // Load live bids for reverse auction display
+  var titleEl = document.getElementById('quote-modal-title');
+  if (titleEl) titleEl.textContent = 'Submit Quote';
+  fetchBids(queryId).then(function(bids) { renderBidTable(bids, currentOperator.id); });
   document.getElementById('quote-modal').classList.add('open');
 }
 
@@ -552,11 +735,19 @@ async function submitQuote(){
   var s=b+h+c+ca;var g=Math.round(s*0.18);var t=s+g;
   var sel=document.getElementById('quote-aircraft');var opt=sel.options[sel.selectedIndex];
   var at=opt.dataset.type;var ar=opt.dataset.reg;
-  var qRes=await sbFetch('quotes',{method:'POST',prefer:'return=representation',body:{
-    query_id:currentQueryId,operator_id:currentOperator.id,operator_name:currentOperator.company_name,
-    aircraft_id:aircraftId,aircraft_type:at,aircraft_registration:ar,
-    price:t,notes:notes,status:'shared',submitted_by:currentUser.id
-  }});
+  var qRes;
+  if (_revisingQuoteId) {
+    qRes=await sbFetch('quotes?id=eq.'+_revisingQuoteId,{method:'PATCH',prefer:'return=representation',body:{
+      aircraft_id:aircraftId,aircraft_type:at,aircraft_registration:ar,
+      price:t,notes:notes
+    }});
+  } else {
+    qRes=await sbFetch('quotes',{method:'POST',prefer:'return=representation',body:{
+      query_id:currentQueryId,operator_id:currentOperator.id,operator_name:currentOperator.company_name,
+      aircraft_id:aircraftId,aircraft_type:at,aircraft_registration:ar,
+      price:t,notes:notes,status:'shared',submitted_by:currentUser.id
+    }});
+  }
   if(!qRes.ok){
     if(qRes.status===409){showToast('Your team already submitted a quote for this query.','error');}
     else{showToast('Failed to submit quote. Please try again.','error');}
@@ -628,14 +819,14 @@ function checkDocumentStatus(){
       if(days <= 0){
         notifications.push({
           type:'error',
-          msg:ac.registration+' ÃÂ¢ÃÂÃÂ '+d.name+' has expired. This aircraft is unavailable until renewed.',
+          msg:ac.registration+' — '+d.name+' has expired. This aircraft is unavailable until renewed.',
           btn:'Upload updated document',
           onclick:'openDocRenewModal(\''+ac.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\')'
         });
       } else if(days <= 30){
         notifications.push({
           type:'warn',
-          msg:ac.registration+' ÃÂ¢ÃÂÃÂ '+d.name+' expires in '+days+' day'+(days===1?'':'s')+'.',
+          msg:ac.registration+' — '+d.name+' expires in '+days+' day'+(days===1?'':'s')+'.',
           btn:'Upload updated document',
           onclick:'openDocRenewModal(\''+ac.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\')'
         });
@@ -716,9 +907,9 @@ async function loadFleet(){
         var days = daysUntil(a[d.expKey]);
         if(days === null) return;
         var col = days <= 0 ? 'var(--red)' : 'var(--amber)';
-        var label = days <= 0 ? 'ÃÂ¢ÃÂÃÂ  Expired' : ('ÃÂ¢ÃÂÃÂ  '+days+'d left');
+        var label = days <= 0 ? '⚠ Expired' : ('⚠ '+days+'d left');
         docStatusHtml += '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:5px;">'
-          +'<span style="font-size:10px;color:'+col+';">'+d.name+' ÃÂ¢ÃÂÃÂ '+label+'</span>'
+          +'<span style="font-size:10px;color:'+col+';">'+d.name+' — '+label+'</span>'
           +'<button onclick="openDocRenewModal(\''+a.id+'\',\''+d.docKey+'\',\''+d.name+'\',\''+d.expKey+'\',\''+d.urlKey+'\',\''+d.nameKey+'\') " '
           +'style="height:22px;padding:0 8px;background:transparent;border:0.5px solid '+col+';border-radius:4px;font-size:10px;color:'+col+';cursor:pointer;font-family:var(--font);white-space:nowrap;">'
           +'Upload updated document</button></div>';
@@ -732,12 +923,12 @@ async function loadFleet(){
   }
   if(pending.length){
     html += pending.map(function(a){
-      return '<div class="aircraft-card" style="opacity:.65;border-style:dashed;"><div style="position:absolute;top:8px;right:8px;font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Under review</div><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div>'+(a.seats?'<div class="aircraft-seats">'+escapeHtml(String(a.seats))+' seats</div>':'')+'<div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;">Documents submitted ÃÂ¢ÃÂÃÂ awaiting SkyVayu approval</div></div>';
+      return '<div class="aircraft-card" style="opacity:.65;border-style:dashed;"><div style="position:absolute;top:8px;right:8px;font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:2px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:.05em;">Under review</div><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div>'+(a.seats?'<div class="aircraft-seats">'+escapeHtml(String(a.seats))+' seats</div>':'')+'<div style="font-size:11px;color:var(--text-tertiary);margin-top:6px;">Documents submitted — awaiting SkyVayu approval</div></div>';
     }).join('');
   }
   if(rejected.length){
     html += rejected.map(function(a){
-      return '<div class="aircraft-card" style="border-color:rgba(192,57,43,0.3);"><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div><div style="font-size:11px;color:var(--red);margin-top:6px;">Documents rejected'+(a.doc_rejection_reason?' ÃÂ¢ÃÂÃÂ '+escapeHtml(a.doc_rejection_reason):'')+'</div><button class="btn-sm btn-outline-sm" style="margin-top:8px;font-size:11px;height:28px;" onclick="resubmitAircraft(\''+escapeHtml(a.id)+'\')">Re-upload documents</button></div>';
+      return '<div class="aircraft-card" style="border-color:rgba(192,57,43,0.3);"><div class="aircraft-type">'+escapeHtml(a.aircraft_type)+'</div><div class="aircraft-reg">'+escapeHtml(a.registration)+'</div><div style="font-size:11px;color:var(--red);margin-top:6px;">Documents rejected'+(a.doc_rejection_reason?' — '+escapeHtml(a.doc_rejection_reason):'')+'</div><button class="btn-sm btn-outline-sm" style="margin-top:8px;font-size:11px;height:28px;" onclick="resubmitAircraft(\''+escapeHtml(a.id)+'\')">Re-upload documents</button></div>';
     }).join('');
   }
   if(!html){
@@ -754,7 +945,7 @@ function onAcDocSelected(input, key){
   if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
   acDocFiles[key] = file;
   var nameEl = document.getElementById(key+'-filename');
-  if(nameEl){ nameEl.textContent = 'ÃÂ¢ÃÂÃÂ '+file.name; nameEl.style.color='var(--gold)'; }
+  if(nameEl){ nameEl.textContent = '✓ '+file.name; nameEl.style.color='var(--gold)'; }
   var areaEl = document.getElementById(key+'-upload-area');
   if(areaEl) areaEl.style.borderColor = 'var(--gold)';
 }
@@ -782,7 +973,7 @@ async function uploadAcDoc(operatorId, acId, key, file){
   var path = 'aircraft/'+operatorId+'/'+acId+'/'+key+'-'+Date.now()+'.'+ext;
   var res = await fetch(SUPABASE_URL+'/storage/v1/object/operator-documents/'+path,{
     method:'POST',
-    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':file.type,'x-upsert':'true'},
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+_opAuthToken,'Content-Type':file.type,'x-upsert':'true'},
     body: file
   });
   if(!res.ok) return null;
@@ -882,7 +1073,7 @@ function onAopRenewFileSelected(input){
   if(!file) return;
   if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
   selectedAopRenewFile = file;
-  document.getElementById('aop-renew-filename').textContent = 'ÃÂ¢ÃÂÃÂ '+file.name;
+  document.getElementById('aop-renew-filename').textContent = '✓ '+file.name;
   document.getElementById('aop-renew-filename').style.color = 'var(--gold)';
   document.getElementById('aop-renew-upload-area').style.borderColor = 'var(--gold)';
 }
@@ -935,8 +1126,8 @@ function openDocRenewModal(acId, docKey, docName, expKey, urlKey, nameKey){
   docRenewState = {acId:acId, docKey:docKey, docName:docName, expKey:expKey, urlKey:urlKey, nameKey:nameKey};
   var ac = aircraftList.find(function(a){return a.id===acId;});
   document.getElementById('doc-renew-title').textContent = 'Upload updated '+docName;
-  document.getElementById('doc-renew-aircraft-info').textContent = ac ? ac.aircraft_type+' ÃÂÃÂ· '+ac.registration : '';
-  document.getElementById('doc-renew-current-expiry').textContent = ac && ac[expKey] ? fmtDate(ac[expKey]) : 'ÃÂ¢ÃÂÃÂ';
+  document.getElementById('doc-renew-aircraft-info').textContent = ac ? ac.aircraft_type+' &middot; '+ac.registration : '';
+  document.getElementById('doc-renew-current-expiry').textContent = ac && ac[expKey] ? fmtDate(ac[expKey]) : '—';
   document.getElementById('doc-renew-file-input').value = '';
   document.getElementById('doc-renew-filename').textContent = 'Upload PDF/JPG/PNG';
   document.getElementById('doc-renew-filename').style.color = '';
@@ -951,7 +1142,7 @@ function onDocRenewFileSelected(input){
   if(!file) return;
   if(file.size > 10*1024*1024){alert('Max 10MB');input.value='';return;}
   selectedDocRenewFile = file;
-  document.getElementById('doc-renew-filename').textContent = 'ÃÂ¢ÃÂÃÂ '+file.name;
+  document.getElementById('doc-renew-filename').textContent = '✓ '+file.name;
   document.getElementById('doc-renew-filename').style.color = 'var(--gold)';
   document.getElementById('doc-renew-upload-area').style.borderColor = 'var(--gold)';
 }
@@ -1025,9 +1216,9 @@ async function loadRoster(){
           isMine=!!mine;
         }
         var bClass=isOwner()?'booking':(isMine?'booking mine':'booking other-emp');
-        var bLabel=isOwner()?booking.by:(isMine?'You':'ÃÂ¢ÃÂÃÂ');
-        var routeTxt=isOwner()||isMine?booking.route:'ÃÂ¢ÃÂÃÂ¢';
-        cellContent='<div class="'+bClass+'" title="'+booking.route+' ÃÂÃÂ· by '+booking.by+'"><span class="b-route">'+routeTxt+'</span><span class="b-emp">'+bLabel+'</span></div>';
+        var bLabel=isOwner()?booking.by:(isMine?'You':'—');
+        var routeTxt=isOwner()||isMine?booking.route:'•';
+        cellContent='<div class="'+bClass+'" title="'+booking.route+' &middot; by '+booking.by+'"><span class="b-route">'+routeTxt+'</span><span class="b-emp">'+bLabel+'</span></div>';
       }
       html+='<div class="'+cls+'">'+cellContent+'</div>';
     });
@@ -1058,20 +1249,20 @@ async function loadEmployees(){
     var s=stats[e.id];
     var ini=(e.full_name||e.username).split(' ').map(function(w){return w[0];}).join('').substring(0,2).toUpperCase();
     var online=e.last_login&&(new Date()-new Date(e.last_login))<1800000;
-    var lastSeen=e.last_login?new Date(e.last_login).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'ÃÂ¢ÃÂÃÂ';
+    var lastSeen=e.last_login?new Date(e.last_login).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—';
     var isExpanded=expandedEmployeeId===e.id;
     var pendingBadge=e.is_approved===false?'<span style="font-size:9px;background:rgba(196,134,10,0.15);color:var(--gold);padding:1px 6px;border-radius:3px;margin-left:6px;text-transform:uppercase;">Pending approval</span>':'';
-    var html='<tr onclick="toggleEmployee(\''+escapeHtml(e.id)+'\')"><td><span class="emp-avatar">'+escapeHtml(ini)+'</span><b>'+escapeHtml(e.full_name||e.username)+'</b>'+pendingBadge+'<br><span style="font-size:11px;color:var(--text-tertiary);">@'+escapeHtml(e.username)+(e.employee_id?' ÃÂÃÂ· ID: '+escapeHtml(e.employee_id):'')+'</span></td>'
+    var html='<tr onclick="toggleEmployee(\''+escapeHtml(e.id)+'\')"><td><span class="emp-avatar">'+escapeHtml(ini)+'</span><b>'+escapeHtml(e.full_name||e.username)+'</b>'+pendingBadge+'<br><span style="font-size:11px;color:var(--text-tertiary);">@'+escapeHtml(e.username)+(e.employee_id?' &middot; ID: '+escapeHtml(e.employee_id):'')+'</span></td>'
       +'<td>'+s.shared+'</td><td>'+s.confirmed+'</td>'
       +'<td style="color:'+(online?'var(--green-light)':'var(--text-tertiary)')+';">'+(online?'Online':lastSeen)+'</td>'
       +'<td>'+fmtPriceShort(s.revenue)+'</td></tr>';
     if(isExpanded){
       var activityHtml=s.activity.slice(0,15).map(function(q){
         var qq=q.queries||{};
-        var route=escapeHtml(qq.departure||'-')+'ÃÂ¢ÃÂÃÂ'+escapeHtml(qq.destination||'-');
+        var route=escapeHtml(qq.departure||'-')+' &#8594; '+escapeHtml(qq.destination||'-');
         var when=new Date(q.created_at).toLocaleString('en-IN',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
         var statusLabel=q.status==='shared'?'shared quote':(q.status==='accepted'||q.status==='confirmed'||q.status==='booked'?'won booking':escapeHtml(q.status));
-        return'<div class="emp-log-row"><span class="emp-log-time">'+when+'</span><span class="emp-log-action"><b>'+statusLabel+'</b> ÃÂÃÂ· '+route+' ÃÂÃÂ· '+fmtPrice(q.price)+' ÃÂÃÂ· '+escapeHtml(q.aircraft_type||'')+'</span></div>';
+        return'<div class="emp-log-row"><span class="emp-log-time">'+when+'</span><span class="emp-log-action"><b>'+statusLabel+'</b> &middot; '+route+' &middot; '+fmtPrice(q.price)+' &middot; '+escapeHtml(q.aircraft_type||'')+'</span></div>';
       }).join('');
       if(!s.activity.length)activityHtml='<div style="color:var(--text-tertiary);font-size:12px;padding:8px 0;">No activity yet.</div>';
       var deactivateBtn=e.is_active?'<button class="btn-sm btn-danger-sm" onclick="event.stopPropagation();toggleEmployeeActive(\''+escapeHtml(e.id)+'\',false)">Deactivate account</button>':'<button class="btn-sm btn-outline-sm" onclick="event.stopPropagation();toggleEmployeeActive(\''+escapeHtml(e.id)+'\',true)">Reactivate</button>';
@@ -1133,14 +1324,14 @@ function loadRevenue(){
   if(lastMonthRev>0){
     var pct=((thisMonthRev-lastMonthRev)/lastMonthRev*100);
     var cls=pct>=0?'up':'down';
-    delta='<div class="rev-delta '+cls+'">'+(pct>=0?'ÃÂ¢ÃÂÃÂ² ':'ÃÂ¢ÃÂÃÂ¼ ')+Math.abs(pct).toFixed(1)+'% vs last month</div>';
+    delta='<div class="rev-delta '+cls+'">'+(pct>=0?'▲ ':'▼ ')+Math.abs(pct).toFixed(1)+'% vs last month</div>';
   }
   var byEmp={};
   confirmed.forEach(function(q){
     var id=q.submitted_by||'unknown';
     if(!byEmp[id])byEmp[id]={name:'',count:0,rev:0};
     var u=lookupUser(id);
-    byEmp[id].name=u?(u.full_name||u.username):'ÃÂ¢ÃÂÃÂ';
+    byEmp[id].name=u?(u.full_name||u.username):'—';
     byEmp[id].count++;
     byEmp[id].rev+=Number(q.price||0);
   });
@@ -1151,7 +1342,7 @@ function loadRevenue(){
   var byAc={};
   confirmed.forEach(function(q){
     var id=q.aircraft_id||'unknown';
-    if(!byAc[id])byAc[id]={name:q.aircraft_type||'ÃÂ¢ÃÂÃÂ',reg:q.aircraft_registration||'',count:0,rev:0};
+    if(!byAc[id])byAc[id]={name:q.aircraft_type||'—',reg:q.aircraft_registration||'',count:0,rev:0};
     byAc[id].count++;
     byAc[id].rev+=Number(q.price||0);
   });
@@ -1178,8 +1369,12 @@ function onAopFileSelected(input){
     alert('File is too large. Maximum size is 10MB.');
     input.value = ''; return;
   }
+  if(!/\.pdf$/i.test(file.name)){
+    alert('Only PDF (.pdf) files are accepted for the Air Operator\'s Permit.');
+    input.value=''; return;
+  }
   selectedAopFile = file;
-  document.getElementById('aop-file-name').textContent = 'ÃÂ¢ÃÂÃÂ ' + file.name;
+  document.getElementById('aop-file-name').textContent = '✓ ' + file.name;
   document.getElementById('aop-file-name').style.display = 'block';
   document.getElementById('aop-upload-label').style.display = 'none';
   document.getElementById('aop-upload-area').style.borderColor = 'var(--gold)';
@@ -1192,8 +1387,8 @@ async function uploadAopDocument(operatorId, file){
     method: 'POST',
     headers: {
       'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': file.type,
+      'Authorization': 'Bearer ' + _opAuthToken,
+      'Content-Type': file.type || 'application/pdf',
       'x-upsert': 'true'
     },
     body: file
@@ -1233,7 +1428,7 @@ async function submitRegistration(){
     btn.disabled=false;btn.textContent='Submit application';return;
   }
   var opId = opRes.data[0].id;
-  if(!opId){errEl.textContent='Registration failed ÃÂ¢ÃÂÃÂ could not create account. Please try again.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Submit application';return;}
+  if(!opId){errEl.textContent='Registration failed — could not create account. Please try again.';errEl.classList.add('show');btn.disabled=false;btn.textContent='Submit application';return;}
   btn.textContent = 'Uploading document...';
   var uploadResult = await uploadAopDocument(opId, selectedAopFile);
   if(!uploadResult){
@@ -1261,6 +1456,15 @@ async function submitRegistration(){
   document.getElementById('aop-upload-label').style.display='block';
   document.getElementById('aop-upload-area').style.borderColor='';
   btn.disabled=false;btn.textContent='Submit application';
+  if(window._svSupabase){window._svSupabase.auth.signUp({
+    email:username+'@operator.skyvayu.internal',
+    password:password,
+    options:{data:{username:username,role:'operator'}}
+  }).then(function(authRes){
+    if(!authRes.error&&authRes.data&&authRes.data.user){
+      sbFetch('operator_users?username=eq.'+encodeURIComponent(username),{method:'PATCH',body:{auth_user_id:authRes.data.user.id}});
+    }
+  });}
   sendEmail('registration_received',{operator_id:opId});
   closeModal('register-modal');
   document.getElementById('page-login').style.display='none';
@@ -1284,7 +1488,7 @@ window.addEventListener('beforeunload',function(){
 });
 
 (function(){
-  var saved=localStorage.getItem('opSession');
+  var saved=sessionStorage.getItem('opSession');
   if(saved){
     try{
       var s=JSON.parse(saved);
@@ -1298,12 +1502,24 @@ window.addEventListener('beforeunload',function(){
         if(rt){rt.textContent=isOwner()?'Admin':'Employee';rt.className='role-tag '+(isOwner()?'':'employee');}
         applyRoleRestrictions();
         showSection('queries');
-        loadAllData();
-        refreshInterval=setInterval(loadAllData,5000);
-        claimRefreshInterval=setInterval(updateClaimTimers,1000);
+var _startDashboard=function(){
+              loadAllData();
+              refreshInterval=setInterval(loadAllData,5000);
+              claimRefreshInterval=setInterval(updateClaimTimers,1000);
+};
+                  if(window._svSupabase){
+                                window._svSupabase.auth.getSession().then(function(res){
+                                                if(res&&res.data&&res.data.session&&res.data.session.access_token){
+                                                                  _opAuthToken=res.data.session.access_token;
+                                                }
+                                                _startDashboard();
+                                }).catch(function(){_startDashboard();});
+                  } else {
+                                _startDashboard();
+                  }
         return;
       }
-    }catch(e){localStorage.removeItem('opSession');}
+    }catch(e){sessionStorage.removeItem('opSession');}
   }
   document.getElementById('page-login').style.display='flex';
 })();
@@ -1368,7 +1584,7 @@ function populateCategoryCheckboxes(){
   if(heliEl) heliEl.checked = cats.indexOf('helicopter') !== -1;
 }
 
-// ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Track which operators have seen each query ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+// ── Track which operators have seen each query ──
 async function markQueriesViewed(queryIds) {
   if (!queryIds || !queryIds.length || !currentOperator) return;
   // Use authenticated user JWT for RLS to pass
@@ -1396,21 +1612,21 @@ async function markQueriesViewed(queryIds) {
   }
 }
 
-/* Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+/* ═══════════════════════════════════════════════════════════════
    PROFILE SECTION
-Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ */
+═══════════════════════════════════════════════════════════════ */
 
 async function loadProfileSection() {
   if (!currentUser || !currentOperator) return;
 
-  // Ã¢ÂÂÃ¢ÂÂ Hero Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ── Hero ──────────────────────────────────────────────────────
   var initials = (currentUser.full_name || currentUser.username || '?')
     .split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase();
   var avatarEl = document.getElementById('profile-logo-initials');
   if (avatarEl) avatarEl.textContent = initials;
 
   var nameEl = document.getElementById('profile-hero-name');
-  if (nameEl) nameEl.textContent = escapeHtml(currentUser.full_name || currentUser.username || 'â');
+  if (nameEl) nameEl.textContent = escapeHtml(currentUser.full_name || currentUser.username || '—');
 
   var roleEl = document.getElementById('profile-hero-role');
   if (roleEl) {
@@ -1419,7 +1635,7 @@ async function loadProfileSection() {
   }
 
   var companyEl = document.getElementById('profile-hero-company');
-  if (companyEl) companyEl.textContent = escapeHtml(currentOperator.company_name || 'â');
+  if (companyEl) companyEl.textContent = escapeHtml(currentOperator.company_name || '—');
 
   var sinceEl = document.getElementById('profile-stat-member');
   if (sinceEl && currentUser.created_at) sinceEl.textContent = fmtDate(currentUser.created_at);
@@ -1434,10 +1650,10 @@ async function loadProfileSection() {
       if (currentUser.aircraft_category.indexOf('fixed') > -1) cats.push('Fixed Wing');
       if (currentUser.aircraft_category.indexOf('heli') > -1) cats.push('Helicopter');
     }
-    catEl.textContent = cats.length ? cats.join(', ') : 'â';
+    catEl.textContent = cats.length ? cats.join(', ') : '—';
   }
 
-  // Ã¢ÂÂÃ¢ÂÂ Personal fields Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ── Personal fields ───────────────────────────────────────────
   // Populate personal view spans and inputs
   var setVal = function(id, val) { var el=document.getElementById(id); if(el)el.value=val||''; };
   var setTxt = function(id, val) { var el=document.getElementById(id); if(el)el.textContent=val||'\u2014'; };
@@ -1496,13 +1712,8 @@ async function loadProfileSection() {
     if (opsCard) opsCard.style.display = 'none';
     if (certsCard) certsCard.style.display = 'none';
   }
-      }
-    } else {
-      companyCard.style.display = 'none';
-    }
-  }
 
-  // Ã¢ÂÂÃ¢ÂÂ Aircraft category checkboxes Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+  // ── Aircraft category checkboxes ──────────────────────────────
   var catFixed = document.getElementById('cat-fixed-wing');
   var catHeli = document.getElementById('cat-helicopter');
   if (catFixed && currentUser.aircraft_category) {
@@ -1513,7 +1724,7 @@ async function loadProfileSection() {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Edit mode toggle Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ── Edit mode toggle ─────────────────────────────────────────────
 function profileEditMode(section) {
   // This definition is overridden below by the extended version; kept for reference only.
   var actionsDiv = document.getElementById('profile-' + section + '-actions');
@@ -1532,7 +1743,7 @@ function profileCancelEdit(section) {
   if (msg) { msg.textContent = ''; msg.className = 'profile-msg'; }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Save personal details Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ── Save personal details ────────────────────────────────────────
 async function profileSavePersonal() {
   var fullName = document.getElementById('input-full-name').value.trim();
   var email = document.getElementById('input-email').value.trim();
@@ -1556,7 +1767,7 @@ async function profileSavePersonal() {
     currentUser.email = email;
     currentUser.phone = phone;
     // Update session
-    localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
     // Update sidebar name
     var sidebarName = document.getElementById('op-name');
     if (sidebarName) sidebarName.textContent = fullName;
@@ -1568,7 +1779,7 @@ async function profileSavePersonal() {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Save company details Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ── Save company details ─────────────────────────────────────────
 async function profileSaveCompany() {
   var companyName = document.getElementById('input-company-name').value.trim();
   var companyEmail = document.getElementById('input-company-email').value.trim();
@@ -1604,7 +1815,7 @@ async function profileSaveCompany() {
 
   if (res.ok) {
     Object.assign(currentOperator, patchData);
-    localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
     // Update sidebar company
     var sidebarComp = document.getElementById('op-role');
     if (sidebarComp) sidebarComp.textContent = companyName;
@@ -1616,7 +1827,7 @@ async function profileSaveCompany() {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Change password Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ── Change password ──────────────────────────────────────────────
 async function profileChangePassword() {
   var current = document.getElementById('input-current-pw').value;
   var newPw = document.getElementById('input-new-pw').value;
@@ -1645,7 +1856,8 @@ async function profileChangePassword() {
   if (res.ok && res.data) {
     var result = Array.isArray(res.data) ? res.data[0] : res.data;
     if (result && result.success) {
-      profileMsg('pw', 'Password updated successfully.', 'success');
+            if(window._svSupabase){await window._svSupabase.auth.updateUser({password:newPw});}
+profileMsg('pw', 'Password updated successfully.', 'success');
       document.getElementById('input-current-pw').value = '';
       document.getElementById('input-new-pw').value = '';
       document.getElementById('input-confirm-pw').value = '';
@@ -1658,7 +1870,7 @@ async function profileChangePassword() {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Save aircraft category Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ── Save aircraft category ───────────────────────────────────────
 async function saveProfileCategory() {
   var fixed = document.getElementById('cat-fixed-wing') ? document.getElementById('cat-fixed-wing').checked : false;
   var heli = document.getElementById('cat-helicopter') ? document.getElementById('cat-helicopter').checked : false;
@@ -1679,7 +1891,7 @@ async function saveProfileCategory() {
 
   if (res.ok) {
     currentUser.aircraft_category = cat;
-    localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+    sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
     profileMsg('category', 'Aircraft category saved.', 'success');
     loadProfileSection();
   } else {
@@ -1687,7 +1899,7 @@ async function saveProfileCategory() {
   }
 }
 
-// Ã¢ÂÂÃ¢ÂÂ Password strength indicator Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ── Password strength indicator ──────────────────────────────────
 (function() {
   document.addEventListener('input', function(e) {
     if (e.target && (e.target.id === 'profile-pw-new' || e.target.id === 'input-new-pw')) {
@@ -1705,7 +1917,7 @@ async function saveProfileCategory() {
   });
 })();
 
-// Ã¢ÂÂÃ¢ÂÂ Helper: show message Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+// ── Helper: show message ─────────────────────────────────────────
 function profileMsg(section, text, type) {
   var el = document.getElementById('profile-' + section + '-msg');
   if (!el) return;
@@ -1737,7 +1949,7 @@ function profileSaveOverview() {
     .then(function(res){
       if (res.ok) {
         Object.assign(currentOperator, data);
-        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('overview', 'Company overview saved.', 'success');
         renderOverviewView(data);
         profileCancelEdit('overview');
@@ -1775,7 +1987,7 @@ function profileSaveOps() {
     .then(function(res){
       if (res.ok) {
         Object.assign(currentOperator, data);
-        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('ops','Operational details saved.','success');
         setText('view-regions', data.regions_served || '—');
         setText('view-max-range', data.max_range_nm ? data.max_range_nm + ' nm' : '—');
@@ -1802,7 +2014,7 @@ function profileSaveCerts() {
     .then(function(res){
       if (res.ok) {
         Object.assign(currentOperator, data);
-        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('certs','Certifications saved.','success');
         setText('view-dgca-licence', data.dgca_licence_no || '—');
         setText('view-aop-expiry', data.aop_expiry_date ? fmtDate(data.aop_expiry_date) : '—');
@@ -1843,7 +2055,7 @@ function profileSaveCompany() {
     .then(function(res){
       if (res.ok) {
         Object.assign(currentOperator, data);
-        localStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
+        sessionStorage.setItem('opSession', JSON.stringify({ user: currentUser, operator: currentOperator }));
         profileMsg('company','Company info saved.','success');
         setText('view-company-name', data.company_name || '—');
         setText('view-company-email', data.email || '—');
@@ -1880,7 +2092,7 @@ function uploadCompanyLogo(input) {
   var path = 'company-logos/' + companyId + '/' + Date.now() + '_logo.' + file.name.split('.').pop();
   fetch(SUPABASE_URL + '/storage/v1/object/operator-assets/' + path, {
     method: 'POST',
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken },
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + _opAuthToken },
     body: formData
   }).then(function(r){ return r.json(); }).then(function(res){
     if (res && res.Key) {
@@ -1892,7 +2104,7 @@ function uploadCompanyLogo(input) {
       // Save URL to company record
       fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
         method: 'PATCH',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + _opAuthToken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ logo_url: logoUrl })
       });
     }
@@ -1916,14 +2128,14 @@ function uploadCoverPhoto(input) {
   var path = 'company-covers/' + companyId + '/' + Date.now() + '_cover.' + file.name.split('.').pop();
   fetch(SUPABASE_URL + '/storage/v1/object/operator-assets/' + path, {
     method: 'POST',
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken },
+    headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + _opAuthToken },
     body: formData
   }).then(function(r){ return r.json(); }).then(function(res){
     if (res && res.Key) {
       var coverUrl = SUPABASE_URL + '/storage/v1/object/public/operator-assets/' + path;
       fetch(SUPABASE_URL + '/rest/v1/companies?id=eq.' + companyId, {
         method: 'PATCH',
-        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + userToken, 'Content-Type': 'application/json' },
+        headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + _opAuthToken, 'Content-Type': 'application/json' },
         body: JSON.stringify({ cover_url: coverUrl })
       });
     }

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <link rel="stylesheet" href="css/theme.css"/>
 <title>Secure Payment — SkyVayu</title>
+<meta name="description" content="Final payment step for your SkyVayu charter flight booking. Confirm and complete your secure payment.">
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -209,8 +210,37 @@ nav{
   .field-row{flex-direction:column;}
   .field-group.half{width:100%;}
 }
+
+@media(max-width:480px){
+  nav{padding:0 16px;height:60px;}
+  .page{padding:72px 12px 40px;grid-template-columns:1fr;}
+  .summary-card{position:static;}
+  .form-section{padding:16px;}
+  .trust-grid{grid-template-columns:1fr;}
+  .field-row{flex-direction:column;}
+  body{overflow-x:hidden;}
+}
 </style>
 <script src="js/theme.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/auth.js"></script>
+
+<style id="flow-progress-css">
+.flow-progress{display:flex;align-items:center;justify-content:center;gap:0;background:var(--bg,#0c1324);border-bottom:1px solid rgba(143,144,151,0.18);padding:14px 24px;width:100%;position:fixed;top:72px;left:0;right:0;z-index:90;}
+.flow-step{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:90px;}
+.flow-step-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;border:2px solid rgba(255,255,255,0.25);}
+.flow-step-dot.done{background:#10b981;border-color:#10b981;color:#fff;}
+.flow-step-dot.active{background:var(--gold,#fbbf24);border-color:var(--gold,#fbbf24);color:#0c1324;}
+.flow-step-dot.pending{background:transparent;border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.35);}
+.flow-step-label{font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;}
+.flow-step-label.done{color:#10b981;}
+.flow-step-label.active{color:var(--gold,#fbbf24);}
+.flow-step-label.pending{color:rgba(255,255,255,0.3);}
+.flow-connector{flex:1;max-width:60px;height:2px;margin-bottom:20px;}
+.flow-connector.done{background:#10b981;}
+.flow-connector.pending{background:rgba(255,255,255,0.12);}
+.page{margin-top:120px!important;}
+</style>
 </head>
 <body>
 
@@ -222,6 +252,22 @@ nav{
     <a href="index.html#section-why">About Us</a>
   </div>
 </nav>
+<div class="flow-progress">
+  <div class="flow-step">
+    <div class="flow-step-dot done">&#10003;</div>
+    <span class="flow-step-label done">Your Route</span>
+  </div>
+  <div class="flow-connector done"></div>
+  <div class="flow-step">
+    <div class="flow-step-dot done">&#10003;</div>
+    <span class="flow-step-label done">Live Quotes</span>
+  </div>
+  <div class="flow-connector pending"></div>
+  <div class="flow-step">
+    <div class="flow-step-dot active">3</div>
+    <span class="flow-step-label active">Confirm</span>
+  </div>
+</div>
 
 <div class="page">
 
@@ -345,18 +391,6 @@ nav{
           <span class="row-value" id="p2-route" style="font-size:13px;">—</span>
           <span class="row-label" id="p2-date" style="margin-top:2px;font-size:11px;opacity:0.6;">—</span>
         </div>
-<div class="summary-row">
-          <span class="row-label">Base Fare</span>
-          <span class="row-value" id="p2-charter">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="row-label">Landing &amp; Handling</span>
-          <span class="row-value" id="p2-landing">—</span>
-        </div>
-        <div class="summary-row">
-          <span class="row-label">Concierge Tax (GST)</span>
-          <span class="row-value" id="p2-gst">—</span>
-        </div>
       </div>
       <div class="total-row">
         <span class="total-label">Total Payable</span>
@@ -393,9 +427,9 @@ if (!quoteRaw) {
 }
 
 var price = q.price || q.total_amount || 0;
-var landing = Math.round(price * 0.08);
-var gst = Math.round(price * 0.05);
-var charter = price - landing - gst;
+var landing = 0;
+var gst = 0;
+var charter = price;
 
 function fmt(n){ return n ? '₹' + Number(n).toLocaleString('en-IN') : '—'; }
 
@@ -413,21 +447,27 @@ document.getElementById('p2-aircraft').textContent = (q.aircraft_type || q.aircr
     points = points.filter(function(p, i) { return i === 0 || p !== points[i-1]; });
     routeStr = points.join(' → ');
   } else {
-    // Single-sector fallback: use q.route or queryData.rs_route
-    var raw = q.route || queryData.rs_route || '';
-    if (raw) { routeStr = String(raw).replace(/-/g, ' → '); }
+    // Single-sector: build from departure/destination in sv_query
+    var dep = queryData.departure || '';
+    var dest = queryData.destination || '';
+    var raw = q.route || queryData.rs_route || (dep && dest ? dep + ' \u2192 ' + dest : '');
+    if (raw) { routeStr = String(raw); }
   }
   var routeEl = document.getElementById('p2-route');
   if (routeEl) routeEl.textContent = routeStr || '—';
   var dateEl = document.getElementById('p2-date');
   if (dateEl) {
-    var d = queryData.rs_date || queryData.flight_date || '';
-    dateEl.textContent = d ? new Date(d).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}) : '';
+    var d = queryData.flight_date || queryData.rs_date || '';
+    var t = queryData.flight_time || '';
+    var dateDisplay = '';
+    if (d) {
+      try { dateDisplay = new Date(d).toLocaleDateString('en-IN', {day:'2-digit',month:'short',year:'numeric'}); }
+      catch(e) { dateDisplay = d; }
+      if (t) dateDisplay += ', ' + t;
+    }
+    dateEl.textContent = dateDisplay;
   }
 })();
-document.getElementById('p2-charter').textContent = fmt(charter);
-document.getElementById('p2-landing').textContent = fmt(landing);
-document.getElementById('p2-gst').textContent = fmt(gst);
 document.getElementById('p2-total').textContent = fmt(price);
 
 var btn = document.getElementById('pay-btn');
@@ -493,8 +533,8 @@ async function confirmBooking() {
   var ref = generateRef(q.operator_name || q.name);
 
     // Get authenticated user
-    var sessionData = await supabase.auth.getSession();
-    var currentUser = (sessionData && sessionData.data && sessionData.data.session) ? sessionData.data.session.user : null;
+    var sessionData = await (window._svSupabase || window.supabase).auth.getSession();
+    var currentUser = (sessionData && sessionData.data && sessionData.data.session) ? sessionData.data.session.user : null; if (!currentUser) { _inProgress = false; if (btn) { btn.disabled = false; btn.textContent = 'Pay & Confirm Booking'; } sessionStorage.setItem('sv_resume_after_login', 'payment2.html'); window.location.href = 'index.html?login=1&resume=1'; return; }
 
   var bookingPayload = {
     query_id:      sessionStorage.getItem('sv_query_id') || null,
@@ -505,11 +545,11 @@ async function confirmBooking() {
     client_phone:  traveller.phone || '',
     operator_name: q.operator_name || q.name || '',
     aircraft:      q.aircraft_type || q.aircraft || null,
-    route:         q.route || queryData.rs_route || null,
-    flight_date:   queryData.rs_date || null,
-    passengers:    parseInt(queryData.rs_pax) || null,
+    route:         q.route || queryData.rs_route || (queryData.departure && queryData.destination ? queryData.departure + ' \u2192 ' + queryData.destination : null),
+    flight_date:   queryData.flight_date || queryData.rs_date || null,
+    passengers:    parseInt(queryData.passengers || queryData.rs_pax) || null,
     total_amount:  price,
-    platform_fee:  landing,
+    platform_fee:  0,
     status:        'confirmed',
       user_id:         currentUser ? currentUser.id : null
   };
@@ -522,7 +562,7 @@ async function confirmBooking() {
     return;
   }
 
-  sendEmail('booking_confirmed', { booking_id: saved.id, booking_ref: ref });
+  if (q.id) { try { await (window._svSupabase || window.supabase).from('quotes').update({ status: 'accepted' }).eq('id', q.id); } catch (e) {} } sendEmail('booking_confirmed', { booking_id: saved.id, booking_ref: ref });
 
   sessionStorage.setItem('sv_confirmation', JSON.stringify({
     ref:          saved.ref || ref,
@@ -538,7 +578,7 @@ async function confirmBooking() {
   }));
   sessionStorage.setItem('sv_booking_ref', saved.ref || ref);
 
-  window.location.href = 'confirmed.html';
+  window.location.href = 'confirmed.html?ref=' + encodeURIComponent(saved.ref || ref);
 }
 </script>
 </body>

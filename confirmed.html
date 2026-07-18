@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <link rel="stylesheet" href="css/theme.css"/>
 <title>Booking Confirmed — SkyVayu</title>
+<meta name="description" content="Your charter flight booking is confirmed. View your SkyVayu booking summary and details.">
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -341,60 +342,102 @@ nav{
 </div>
 
 <script>
-var conf = JSON.parse(sessionStorage.getItem('sv_confirmation') || '{}');
-if (!conf.ref) { var _r = sessionStorage.getItem('sv_booking_ref'); if (_r) conf.ref = _r; }
+/* ── Confirmation page: load booking data from sessionStorage or Supabase ── */
+(function() {
+  // Auth guard: redirect to home if not logged in
+  var _authToken = (function(){try{var s=localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token');return s?JSON.parse(s):null;}catch(e){return null;}})();
+  if (!_authToken || !_authToken.access_token) { window.location.replace('/'); return; }
 
-if (!conf.ref) {
-  // No confirmation data — redirect home
-  setTimeout(function(){ window.location.href = 'index.html'; }, 1500);
-}
+  var conf = JSON.parse(sessionStorage.getItem('sv_confirmation') || '{}');
+  var urlRef = (new URLSearchParams(window.location.search)).get('ref') || null;
 
-function setText(id, val) {
-  var el = document.getElementById(id);
-  if (el) el.textContent = val || '—';
-}
+  function setText(id, val) {
+    var el = document.getElementById(id);
+    if (el && val) el.textContent = val;
+  }
+  function getName(s){ return s ? s.replace(/\s*\([^)]+\)/,'').trim() : ''; }
+  function getCode(s){ var m = s ? s.match(/\(([A-Z]{3})\)/) : null; return m ? m[1] : (s ? s.substring(0,3).toUpperCase() : '—'); }
 
-// Populate
-setText('conf-ref', conf.ref);
-setText('conf-operator', conf.op_name);
-setText('conf-aircraft', conf.aircraft);
-setText('conf-total', conf.total);
-setText('conf-type', (conf.route && conf.route.includes('⇄')) ? 'ROUND TRIP CHARTER' : 'ONE WAY CHARTER');
-setText('conf-pax', conf.pax ? conf.pax + ' Traveller' + (parseInt(conf.pax) !== 1 ? 's' : '') : '—');
+  function populateConf(d) {
+    setText('conf-ref', d.ref);
+    setText('conf-operator', d.op_name);
+    setText('conf-aircraft', d.aircraft);
+    setText('conf-total', d.total);
+    setText('conf-type', (d.route && d.route.includes('⇄')) ? 'ROUND TRIP CHARTER' : 'ONE WAY CHARTER');
+    setText('conf-pax', d.pax ? d.pax + (d.pax === 1 ? ' Passenger' : ' Passengers') : '—');
+    var routeParts = d.route ? d.route.split('→') : [];
+    var dep  = routeParts[0] ? routeParts[0].trim() : '';
+    var dest = routeParts[1] ? routeParts[1].trim() : '';
+    setText('conf-dep-code',   dep  ? getCode(dep)  : '—');
+    setText('conf-dest-code',  dest ? getCode(dest) : '—');
+    setText('conf-route-full', (dep ? getName(dep) : '') + (dest ? ' to ' + getName(dest) : ''));
+    var dateStr   = d.date || '';
+    var dateParts = dateStr.split(',');
+    var timePart  = dateParts[1] ? dateParts[1].trim() : null;
+    setText('conf-date', dateParts[0] ? dateParts[0].trim() : dateStr);
+    setText('conf-time', timePart || '—');
+  }
 
-// Parse route
-var route = conf.route || '';
-var routeParts = route.split(/→|⇄/).map(function(s){ return s.trim(); });
-var dep = routeParts[0] || '';
-var dest = routeParts[1] || '';
-function getCode(s){ var m = s.match(/\(([^)]+)\)/); return m ? m[1] : s.substring(0,3).toUpperCase(); }
-function getName(s){ return s.replace(/\s*\([^)]+\)/,'').trim(); }
-setText('conf-dep-code', dep ? getCode(dep) : '—');
-setText('conf-dest-code', dest ? getCode(dest) : '—');
-setText('conf-route-full', (dep ? getName(dep) : '') + (dest ? ' to ' + getName(dest) : ''));
+  function populateFromBooking(b) {
+    populateConf({
+      ref:      b.ref,
+      op_name:  b.operator_name,
+      aircraft: b.aircraft,
+      total:    b.total_amount ? '₹' + Number(b.total_amount).toLocaleString('en-IN') : '—',
+      route:    b.route,
+      date:     b.flight_date,
+      pax:      b.passengers
+    });
+  }
 
-// Parse date/time
-var dateStr = conf.date || '';
-var dateParts = dateStr.split(',');
-setText('conf-date', dateParts[0] ? dateParts[0].trim() : dateStr);
-var timePart = dateParts[1] ? dateParts[1].trim() : '';
-// Try to extract time from rs_date format "01 Jun 2026, 10:30"
-setText('conf-time', timePart || '—');
+  function showFallback(ref) {
+    setText('conf-ref', ref || '—');
+    var subEl = document.querySelector('.success-sub');
+    if (subEl) subEl.textContent = 'Your booking has been placed. Full details have been sent to your email and phone.';
+  }
 
-// Copy ref
+  function fetchFromSupabase(ref) {
+    try {
+      var cfg = window.SKYVAYU_CONFIG || {};
+      var supaUrl = cfg.supabaseUrl || 'https://bkumggqijgxyfotpbcni.supabase.co';
+      var supaKey = cfg.supabaseKey || '';
+      fetch(supaUrl + '/rest/v1/bookings?ref=eq.' + encodeURIComponent(ref) + '&select=*&limit=1', {
+        headers: { 'apikey': supaKey, 'Authorization': 'Bearer ' + (JSON.parse(localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token')||'{}')?.access_token||supaKey) }
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(rows) {
+        if (rows && rows[0]) { populateFromBooking(rows[0]); }
+        else { showFallback(ref); }
+      })
+      .catch(function() { showFallback(ref); });
+    } catch(e) { showFallback(ref); }
+  }
+
+  var confHasData = conf.op_name || conf.total || conf.aircraft;
+
+  if (confHasData) {
+    if (!conf.ref && urlRef) conf.ref = urlRef;
+    populateConf(conf);
+  } else if (urlRef) {
+    setText('conf-ref', urlRef);
+    fetchFromSupabase(urlRef);
+  } else {
+    showFallback('—'); var noBookingDiv = document.getElementById('conf-ref'); if(noBookingDiv) noBookingDiv.closest('.confirmation-card') && (document.querySelector('.success-sub').textContent = 'No booking was found. Please return to your bookings and try again.'); document.querySelector('.btn-back') && (document.querySelector('.btn-back').style.display = 'inline-block');
+  }
+})();
+
 function copyRef() {
-  navigator.clipboard.writeText(conf.ref || '').then(function(){
+  var refEl = document.getElementById('conf-ref');
+  var text = refEl ? refEl.textContent : '';
+  navigator.clipboard.writeText(text).then(function(){
     var btn = document.querySelector('.btn-copy');
-    if (btn) { btn.textContent = 'Copied!'; setTimeout(function(){ btn.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Reference'; }, 2000); }
+    if (btn) { btn.textContent = 'Copied!'; setTimeout(function(){ btn.textContent = 'Copy'; }, 2000); }
   });
 }
 
-function viewBookingDetails() {
-  window.location.href = 'payment.html';
-}
+function viewBookingDetails() { window.location.href = 'profile.html'; }
 
 function downloadInvoice() {
-  // Future: generate PDF invoice
   alert('Invoice download coming soon.');
 }
 </script>

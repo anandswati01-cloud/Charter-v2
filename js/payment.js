@@ -4,53 +4,76 @@ var _editMode = true;
 
 document.addEventListener('DOMContentLoaded', function() {
   // Try sv_selected_quote (set by results.html) first, fall back to sv_selected_op
-  var raw = sessionStorage.getItem('sv_selected_quote') || sessionStorage.getItem('sv_selected_op');
+  var _urlP=new URLSearchParams(window.location.search);var _urlQuoteId=_urlP.get('quote_id');var _urlQueryId=_urlP.get('query_id');var raw=sessionStorage.getItem('sv_selected_quote')||sessionStorage.getItem('sv_selected_op');
   var queryRaw = sessionStorage.getItem('sv_query');
   var queryData = {};
   if (queryRaw) { try { queryData = JSON.parse(queryRaw); } catch(e){} }
 
-  if (!raw) {
+  if (!raw && !_urlQuoteId) {
     showToast('No quote selected. Please choose a quote first.', 'error');
-    setTimeout(function() { window.location.href = 'results.html'; }, 2500);
+    setTimeout(function() { window.location.href = (_urlQueryId ? 'results.html?query_id='+_urlQueryId : 'results.html'); }, 2500);
     return;
   }
 
+      // If quote_id in URL but no sessionStorage data, fetch from Supabase then reload
+      if (!raw && _urlQuoteId) {
+              fetch(SKYVAYU_CONFIG.supabaseUrl+'/rest/v1/quotes?id=eq.'+_urlQuoteId+'&select=*', {headers:{'apikey':SKYVAYU_CONFIG.supabaseKey,'Authorization':'Bearer '+(JSON.parse(localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token')||'{}')?.access_token||SKYVAYU_CONFIG.supabaseKey)}})
+                .then(function(r){return r.json();})
+                .then(function(data){
+                            if(Array.isArray(data)&&data.length>0){
+                                          sessionStorage.setItem('sv_selected_quote',JSON.stringify(data[0]));
+                                          window.location.reload();
+                            } else {
+                                          showToast('Quote not found.','error');
+                                          setTimeout(function(){window.location.href='results.html'+(queryData.id?'?query_id='+queryData.id:'');},2500);
+                            }
+                }).catch(function(){window.location.href='results.html';});
+              return;
+      }
   try {
     var q = JSON.parse(raw);
 
     // Populate subtitle
     setText('pay-subtitle', 'Complete your booking with ' + (q.operator_name || q.name || 'operator'));
 
-    // Route short (e.g. BOM → DXB) — parse from route string
-    var route = q.route || queryData.rs_route || '—';
-    var routeParts = route.split(/→|⇄/).map(function(s){ return s.trim(); });
-    var depCode = routeParts[0] ? (routeParts[0].match(/\(([^)]+)\)/) || ['',''])[1] || routeParts[0].substring(0,3).toUpperCase() : '—';
-    var destCode = routeParts[1] ? (routeParts[1].match(/\(([^)]+)\)/) || ['',''])[1] || routeParts[1].substring(0,3).toUpperCase() : '—';
-    setText('pay-route-short', depCode + ' → ' + destCode);
+    // Build route from query data (departure/destination) or fallback to quote route string
+    var dep = queryData.departure || '';
+    var dest = queryData.destination || '';
+    var route = q.route || queryData.rs_route || (dep && dest ? dep + ' \u2192 ' + dest : '—');
+    var routeParts = route.split(/\u2192|\u21c4|→|⇄/).map(function(s){ return s.trim(); });
+    function getCode(s) { var m = (s||'').match(/\(([^)]+)\)/); return m ? m[1] : (s||'').substring(0,3).toUpperCase() || '—'; }
+    setText('pay-route-short', getCode(routeParts[0]) + ' \u2192 ' + getCode(routeParts[1] || ''));
+    setText('pay-route', route);
 
-    // Aircraft name in cyan header
+    // Aircraft
     setText('pay-aircraft', q.aircraft_type || q.aircraft || '—');
     setText('pay-aircraft-full', q.aircraft_type || q.aircraft || '—');
 
-    // Date
-    var dateStr = queryData.rs_date || q.date || '—';
+    // Date — read from sv_query flight_date + flight_time
+    var flightDate = queryData.flight_date || queryData.rs_date || q.date || '';
+    var flightTime = queryData.flight_time || '';
+    var dateStr = '—';
+    if (flightDate) {
+      try {
+        var d = new Date(flightDate);
+        dateStr = d.toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+        if (flightTime) dateStr += ', ' + flightTime;
+      } catch(e) { dateStr = flightDate + (flightTime ? ', ' + flightTime : ''); }
+    }
     setText('pay-date', dateStr);
     setText('pay-datetime', dateStr);
 
-    // Other fields
+    // Operator
     setText('pay-op', q.operator_name || q.name || '—');
-    setText('pay-route', route);
 
-    var pax = queryData.rs_pax || q.pax || '—';
+    // Passengers
+    var pax = queryData.passengers || queryData.rs_pax || q.pax || '—';
     setText('pay-pax', pax + ' Passenger' + (parseInt(pax) !== 1 ? 's' : ''));
 
-    // Price breakdown — use quote price, estimate platform fee as ~10%
+    // Price
     var price = q.price || q.total_amount || null;
-    var platformFee = price ? Math.round(price * 0.1) : null;
-    var charterFee = price && platformFee ? price - platformFee : price;
 
-    setText('pay-charter', charterFee ? '₹' + Number(charterFee).toLocaleString('en-IN') : '—');
-    setText('pay-platform', platformFee ? '₹' + Number(platformFee).toLocaleString('en-IN') : '—');
+    setText('pay-charter', price ? '₹' + Number(price).toLocaleString('en-IN') : '—');
     setText('pay-total', price ? '₹' + Number(price).toLocaleString('en-IN') : '—');
 
     var btn = document.getElementById('pay-btn');
@@ -185,6 +208,18 @@ function goToPayment2() {
   // If still in edit mode, save first
   if (_editMode) setEditMode(false);
 
+  /* — Auth gate: user must be signed in before proceeding to payment — */
+  var _sbAuth = window._svSupabase;
+  if (!_sbAuth) { if (typeof signInWithGoogle === 'function') signInWithGoogle(); return; }
+  _sbAuth.auth.getSession().then(function(_authRes) {
+    if (!_authRes.data || !_authRes.data.session) {
+      if (typeof signInWithGoogle === 'function') signInWithGoogle();
+      return;
+    }
+    _doProceedToPayment2();
+  });
+}
+function _doProceedToPayment2() {
   var clientName  = (document.getElementById('client-name')  || {}).value || '';
   var clientEmail = (document.getElementById('client-email') || {}).value || '';
   var clientPhone = (document.getElementById('client-phone') || {}).value || '';

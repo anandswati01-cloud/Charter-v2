@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="stylesheet" href="/css/theme.css"/><script src="/js/theme.js"></script>
+  <title>Cookie Policy — SkyVayu</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Mono&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0c1324;
+      --navy-mid: #0f1a30;
+      --navy-light: #162040;
+      --gold: #fbbf24;
+      --gold-light: #fcd34d;
+      --white: #ffffff;
+      --white-60: rgba(255,255,255,0.6);
+      --white-30: rgba(255,255,255,0.3);
+      --white-10: rgba(255,255,255,0.1);
+      --white-5: rgba(255,255,255,0.05);
+      --green: #22c55e;
+      --red: #ef4444;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'DM Mono', monospace;
+      --font-body: 'DM Sans', sans-serif;
+    }
+    body { background: var(--navy); color: var(--white); font-family: var(--font-body); margin:0; padding:0; }
+    .page-nav { display: flex; align-items: center; justify-content: space-between; padding: 20px 48px; border-bottom: 1px solid var(--white-10); }
+    .nav-logo { font-family: var(--font-display); font-size: 22px; color: var(--gold); text-decoration: none; letter-spacing: 0.02em; }
+    .nav-back { font-family: var(--font-mono); font-size: 11px; color: var(--white-60); text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase; transition: color 0.2s; }
+    .nav-back:hover { color: var(--gold); }
+    .page-hero { padding: 72px 48px 48px; max-width: 800px; margin: 0 auto; }
+    .page-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; }
+    .page-title { font-family: var(--font-display); font-size: clamp(36px, 5vw, 56px); font-weight: 600; line-height: 1.1; margin: 0 0 20px; }
+    .page-subtitle { font-size: 16px; color: var(--white-60); line-height: 1.6; margin: 0; }
+    .page-content { max-width: 800px; margin: 0 auto; padding: 0 48px 80px; }
+    .section { margin-bottom: 48px; }
+    .meta { font-size: 13px; color: var(--white-30); font-style: italic; margin-bottom: 40px; }
+    .section h2 { font-family: var(--font-display); font-size: 24px; font-weight: 600; margin-bottom: 16px; color: var(--white); }
+    .section p, .section li { font-size: 15px; color: var(--white-60); line-height: 1.8; margin-bottom: 12px; }
+    .section ul { padding-left: 20px; }
+    .section a { color: var(--gold); text-decoration: none; }
+    .section a:hover { text-decoration: underline; }
+    .divider { border: none; border-top: 1px solid var(--white-10); margin: 32px 0; }
+    .contact-box { background: var(--white-5); border: 1px solid var(--white-10); border-radius: 12px; padding: 32px; margin-top: 48px; }
+    .contact-box h3 { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+    .contact-box p { font-size: 15px; color: var(--white-60); line-height: 1.6; margin: 0; }
+    .contact-box a { color: var(--gold); }
+    footer { border-top: 1px solid var(--white-10); padding: 24px 48px; display: flex; align-items: center; justify-content: space-between; }
+    .footer-copy { font-family: var(--font-mono); font-size: 10px; color: var(--white-30); letter-spacing: 0.05em; }
+    footer nav a { font-family: var(--font-mono); font-size: 10px; color: var(--white-30); text-decoration: none; margin-left: 20px; letter-spacing: 0.05em; }
+    footer nav a:hover { color: var(--gold); }
+  </style>
+</head>
+<body>
+  <nav class="page-nav">
+    <a href="/" class="nav-logo">SkyVayu</a>
+    <a href="/" class="nav-back">← Back to Home</a>
+  </nav>
+  <header class="page-hero">
+    <div class="page-label">Legal</div>
+    <h1 class="page-title">Cookie Policy</h1>
+    <p class="page-subtitle">How we use browser storage on the SkyVayu platform.</p>
+  </header>
+  <main class="page-content">
+    <p class="meta">Last updated: 22 June 2026</p>
+    <div class="section">
+      <h2>What Are Cookies?</h2>
+      <p>Cookies are small text files stored on your device when you visit a website. We also use similar browser storage technologies including localStorage and sessionStorage to make the platform work correctly.</p>
+    </div>
+    <hr class="divider">
+    <div class="section">
+      <h2>How We Use Browser Storage</h2>
+      <p>SkyVayu uses browser storage strictly for functional purposes. We do not use advertising or third-party tracking pixels.</p>
+      <ul>
+        <li><strong>Authentication</strong> — We store your session via Supabase so you stay signed in across page loads.</li>
+        <li><strong>Booking state</strong> — We temporarily store your query ID and flight details in sessionStorage to carry them through the booking flow (results → payment). This data is cleared when you close the browser tab.</li>
+        <li><strong>Theme preference</strong> — We store your light/dark mode preference in localStorage so it persists between visits.</li>
+      </ul>
+    </div>
+    <hr class="divider">
+    <div class="section">
+      <h2>Third-Party Services</h2>
+      <p>We use the following third-party services which may set their own storage:</p>
+      <ul>
+        <li><strong>Supabase</strong> — Our backend provider. Stores authentication tokens in browser storage to manage your session securely.</li>
+        <li><strong>Google OAuth</strong> — If you sign in with Google, Google may set its own Cookies as part of the sign-in flow. These are governed by <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google’s Privacy Policy</a>.</li>
+        <li><strong>Google Fonts</strong> — We load fonts from the Google Fonts CDN. Google may log font request metadata. See Google’s Privacy Policy for details.</li>
+      </ul>
+    </div>
+    <hr class="divider">
+    <div class="section">
+      <h2>Your Choices</h2>
+      <p>You can clear browser storage at any time via your browser settings (Settings → Privacy → Clear browsing data). Note that clearing storage will sign you out of SkyVayu and reset your theme preference.</p>
+      <p>Most modern browsers allow you to block third-party Cookies. This will not affect core SkyVayu functionality as we do not rely on third-party Cookies for essential features.</p>
+    </div>
+    <hr class="divider">
+    <div class="section">
+      <h2>Changes to This Policy</h2>
+      <p>We may update this policy as we add new features or as regulations change. The “Last updated” date at the top of this page will always reflect the most recent revision.</p>
+    </div>
+    <div class="contact-box">
+      <h3>Questions?</h3>
+      <p>If you have any questions about how SkyVayu uses browser storage, email us at <a href="mailto:support@skyvayu.com">support@skyvayu.com</a>.</p>
+    </div>
+  </main>
+  <footer>
+    <span class="footer-copy">© 2026 SkyVayu Air Pvt Ltd</span>
+    <nav>
+      <a href="/terms">Terms</a>
+      <a href="/privacy">Privacy</a>
+      <a href="/cookie">Cookies</a>
+      <a href="/help">Help</a>
+    </nav>
+  </footer>
+</body>
+</html>

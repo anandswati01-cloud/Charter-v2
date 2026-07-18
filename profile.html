@@ -4,11 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Profile — SkyVayu</title>
+  <meta name="description" content="Manage your SkyVayu account, view your charter flight booking history and update your profile.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/theme.css">
-  <style>
+  <style> 
     :root {
       --navy: #0c1324;
       --navy-mid: #0f1a30;
@@ -210,6 +211,11 @@
     [data-theme="light"] #theme-toggle { background: rgba(0,0,0,0.06) !important; color: rgba(13,27,42,0.5) !important; }
     [data-theme="light"] #theme-toggle:hover { background: rgba(0,0,0,0.1) !important; color: #0d1b2a !important; }
     [data-theme="light"] .status-msg { color: #c4942e !important; }
+      /* Booking timer + quote badge */
+    .booking-timer { font-family: var(--font-mono); font-size: 11px; letter-spacing: 1px; color: var(--gold); margin-top: 8px; display: flex; align-items: center; gap: 6px; }
+    .booking-timer.expired-label { color: rgba(255,255,255,0.3); }
+    .timer-icon { font-size: 12px; }
+    .booking-quotes { font-family: var(--font-mono); font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; background: rgba(251,191,36,0.08); color: rgba(251,191,36,0.7); border: 1px solid rgba(251,191,36,0.2); white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -386,12 +392,12 @@
     }
 
     function switchTab(name, btn) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+      document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
       btn.classList.add('active');
       document.getElementById('tab-' + name).classList.add('active');
+      if (window._svCurrentUserId) loadBookings(window._svCurrentUserId);
     }
-
     function formatDate(d) {
       if (!d) return '—';
       const dt = new Date(d);
@@ -399,7 +405,7 @@
     }
 
     function statusLabel(status) {
-      const map = { confirmed: 'Confirmed', open: 'Awaiting Quote', expired: 'Expired', cancelled: 'Cancelled', pending: 'Pending' };
+      const map = { confirmed: 'Confirmed', open: 'Awaiting Quote', expired: 'No Quotes Received', cancelled: 'Cancelled', pending: 'Pending', no_quotes: 'No Quotes Received' };
       return map[status] || status;
     }
 
@@ -409,102 +415,89 @@
       if (status === 'expired' || status === 'cancelled') return 'expired';
     }
 
-    function buildBookingCard(b) {
-      return `<div class="booking-item" onclick="location.href='results.html?query_id=${b.id}'" style="cursor:pointer;">
-        <div>
-          <div class="booking-route">${b.departure || '—'} <span class="arrow">&#8594;</span> ${b.destination || '—'}</div>
-          <div class="booking-meta">
-            <span>${formatDate(b.flight_date)}</span>
-            <span>${b.trip_type === 'roundtrip' ? 'Round Trip' : 'One Way'}</span>
-            <span>${b.passengers || 1} Pax</span>
-          </div>
-        </div>
-        <div class="booking-status ${statusClass(b.status)}">${statusLabel(b.status)}</div>
-      </div>`;
+    function buildBookingCard(b, quoteCount) {
+      const isActive = b.status === 'open' || b.status === 'pending';
+      let timerHtml = '';
+      if (isActive && b.created_at) {
+        const createdMs = new Date(b.created_at).getTime();
+        const expiresMs = createdMs + 60 * 60 * 1000;
+        const remainMs = expiresMs - Date.now();
+        if (remainMs > 0) {
+          const remMin = Math.floor(remainMs / 60000);
+          const remSec = Math.floor((remainMs % 60000) / 1000);
+          timerHtml = '<div class="booking-timer" data-expires="' + expiresMs + '"><span class="timer-icon">⏱</span><span class="timer-val">' + remMin + 'm ' + remSec + 's remaining</span></div>';
+        } else {
+          timerHtml = '<div class="booking-timer expired-label">Window closed</div>';
+        }
+      }
+      const qc = quoteCount != null ? quoteCount : 0;
+      const qBadge = isActive ? '<div class="booking-quotes">' + qc + ' quote' + (qc !== 1 ? 's' : '') + ' received</div>' : '';
+      return '<div class="booking-item" onclick="location.href=\'results.html?query_id=' + b.id + '\'" style="cursor:pointer">'
+        + '<div>'
+        + '<div class="booking-route">' + (b.departure || '—') + ' <span style="color:var(--gold);margin:0 6px">→</span> ' + (b.destination || '—') + '</div>'
+        + '<div class="booking-meta">'
+        + '<span>' + formatDate(b.flight_date) + '</span>'
+        + '<span>' + (b.trip_type === 'roundtrip' ? 'Round Trip' : 'One Way') + '</span>'
+        + '<span>' + (b.passengers || 1) + ' Pax</span>'
+        + '</div>'
+        + timerHtml
+        + '</div>'
+        + '<div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">'
+        + '<div class="booking-status ' + statusClass(b.status) + '">' + statusLabel(b.status) + '</div>'
+        + qBadge
+        + '</div>'
+        + '</div>';
     }
-
     function loadBookings(userId) {
       const sb = window._svSupabase;
       if (!sb) return;
-      const today = new Date().toISOString().split('T')[0];
+      // Save userId so switchTab can refresh
+      window._svCurrentUserId = userId;
 
       sb.from('queries').select('*').eq('user_id', userId).order('created_at', { ascending: false })
-        .then(({ data, error }) => {
+        .then(function(res) {
+          const data = res.data; const error = res.error;
           if (error || !data) return;
-
-          const active = data.filter(b => b.status === 'open' || b.status === 'confirmed');
-          const past = data.filter(b => (b.status === 'confirmed' || b.status === 'expired') && b.flight_date < today);
-          const aList = document.getElementById('active-list');
-          const pList = document.getElementById('past-list');
-
+          const active = data.filter(function(b){ if (b.status !== 'open' && b.status !== 'pending') return false; if (b.status === 'open' && b.created_at && (Date.now() - new Date(b.created_at).getTime()) > 3600000) return false; return true; });
+          const past   = data.filter(function(b){ return b.status === 'confirmed' || b.status === 'expired'; });
+          const aList  = document.getElementById('active-list');
+          const pList  = document.getElementById('past-list');
           if (active.length > 0) {
             document.getElementById('active-empty').style.display = 'none';
-            aList.innerHTML = active.map(buildBookingCard).join('');
+            const activeIds = active.map(function(q){ return q.id; });
+            sb.from('quotes').select('query_id').in('query_id', activeIds)
+              .then(function(qres) {
+                const qdata = qres.data || [];
+                const countMap = {};
+                qdata.forEach(function(q){ countMap[q.query_id] = (countMap[q.query_id] || 0) + 1; });
+                aList.innerHTML = active.map(function(b){ return buildBookingCard(b, countMap[b.id] || 0); }).join('');
+                startBookingTimers();
+              });
           }
           if (past.length > 0) {
             document.getElementById('past-empty').style.display = 'none';
-            pList.innerHTML = past.map(buildBookingCard).join('');
+            pList.innerHTML = past.map(function(b){ return buildBookingCard(b, null); }).join('');
           }
         });
 
-      // Also load from bookings table
       sb.from('bookings').select('*').eq('user_id', userId).order('created_at', { ascending: false })
-        .then(({ data, error }) => {
+        .then(function(res) {
+          const data = res.data; const error = res.error;
           if (error || !data || data.length === 0) return;
-          const today = new Date().toISOString().split('T')[0];
-          const active = data.filter(b => b.status === 'pending' || b.status === 'confirmed');
-          const past = data.filter(b => b.status === 'confirmed' && b.flight_date < today);
+          const active = data.filter(function(b){ return b.status === 'pending' || b.status === 'confirmed'; });
+          const past   = data.filter(function(b){ return b.status !== 'pending' && b.status !== 'confirmed'; });
           const aList2 = document.getElementById('active-list');
           const pList2 = document.getElementById('past-list');
-
           if (active.length) {
             document.getElementById('active-empty').style.display = 'none';
-            aList2.innerHTML += active.map(buildBookingCard).join('');
+            aList2.innerHTML += active.map(function(b){ return buildBookingCard(b, null); }).join('');
           }
           if (past.length) {
             document.getElementById('past-empty').style.display = 'none';
-            pList2.innerHTML += past.map(buildBookingCard).join('');
+            pList2.innerHTML += past.map(function(b){ return buildBookingCard(b, null); }).join('');
           }
         });
     }
-
-    function loadProfile(session) {
-      const user = session && session.user ? session.user : session;
-      if (!user) return;
-      currentUserId = user.id;
-
-      document.getElementById('display-name').textContent = user.user_metadata?.full_name || user.email?.split('@')[0] || '—';
-      document.getElementById('display-email').textContent = user.email || '—';
-
-      const chip = document.getElementById('sv-user-chip');
-      const nameNav = document.getElementById('sv-user-name');
-      if (chip && user.user_metadata?.full_name) {
-        nameNav.textContent = user.user_metadata.full_name.split(' ')[0];
-        chip.style.display = 'flex';
-      }
-
-      const sb = window._svSupabase;
-      if (sb) {
-        sb.from('profiles').select('phone, date_of_birth, nationality, passport_number, aadhaar_number, kyc_verified').eq('id', user.id).single()
-          .then(({ data }) => {
-            if (!data) return;
-            if (data.phone) document.getElementById('phone-input').value = data.phone;
-            if (data.date_of_birth) document.getElementById('dob-input').value = data.date_of_birth;
-            if (data.nationality) document.getElementById('nationality-input').value = data.nationality;
-            if (data.passport_number) document.getElementById('passport-input').value = data.passport_number;
-            if (data.aadhaar_number) document.getElementById('aadhaar-input').value = data.aadhaar_number;
-            // Update KYC badge based on status
-            const status = data.kyc_verified ? 'verified' : (data.kyc_status || 'not_submitted');
-            updateKycBadge(status);
-
-            // Show existing uploaded docs
-            loadExistingDocs(user.id, sb);
-          });
-      }
-
-      loadBookings(user.id);
-    }
-
     function savePersonal() {
       const btn = document.getElementById('save-personal-btn');
       btn.disabled = true;
@@ -556,28 +549,36 @@
       let uploadErrors = [];
       let hasNewDocs = false;
 
-      if (passportFile) {
-        try {
-          await uploadDoc(sb, currentUserId, 'passport', passportFile);
-          hasNewDocs = true;
-        } catch(e) { uploadErrors.push(e.message); }
-      }
-      if (aadhaarFile) {
-        try {
-          await uploadDoc(sb, currentUserId, 'aadhaar', aadhaarFile);
-          hasNewDocs = true;
-        } catch(e) { uploadErrors.push(e.message); }
-      }
+              let passportUploaded = false;
+              let aadhaarUploaded = false;
 
-      const payload = {
-        id: currentUserId,
-        date_of_birth: document.getElementById('dob-input').value || null,
-        nationality: document.getElementById('nationality-input').value.trim() || null,
-        passport_number: document.getElementById('passport-input').value.trim() || null,
-        aadhaar_number: document.getElementById('aadhaar-input').value.trim() || null
-      };
+              if (passportFile) {
+                      try {
+                                await uploadDoc(sb, currentUserId, 'passport', passportFile);
+                                hasNewDocs = true;
+                                passportUploaded = true;
+                      } catch(e) { uploadErrors.push(e.message); }
+              }
+              if (aadhaarFile) {
+                      try {
+                                await uploadDoc(sb, currentUserId, 'aadhaar', aadhaarFile);
+                                hasNewDocs = true;
+                                aadhaarUploaded = true;
+                      } catch(e) { uploadErrors.push(e.message); }
+              }
+
+              const payload = {
+                      id: currentUserId,
+                      date_of_birth: document.getElementById('dob-input').value || null,
+                      nationality: document.getElementById('nationality-input').value.trim() || null,
+                      passport_number: document.getElementById('passport-input').value.trim() || null,
+                      aadhaar_number: document.getElementById('aadhaar-input').value.trim() || null
+              };
+              // Record successful uploads as boolean flags on the profile row instead of
+              // relying on public storage URL probing (see loadExistingDocs) for security.
+              if (passportUploaded) payload.passport_uploaded = true;
+              if (aadhaarUploaded) payload.aadhaar_uploaded = true;
       // If new documents were uploaded, set status to pending for admin review
-      if (hasNewDocs) payload.kyc_status = 'pending';
 
       const { error } = await sb.from('profiles').upsert(payload, { onConflict: 'id' });
       btn.disabled = false;
@@ -611,32 +612,60 @@
       }
     }
 
-    async function loadExistingDocs(userId, sb) {
-      const types = ['passport', 'aadhaar'];
-      for (const type of types) {
-        const label = document.getElementById(type + '-file-name');
-        if (!label) continue;
-        // Check if file exists in storage (try common extensions)
-        for (const ext of ['pdf', 'jpg', 'jpeg', 'png']) {
-          const path = userId + '/' + type + '.' + ext;
-          const { data } = sb.storage.from('kyc-documents').getPublicUrl(path);
-          // Verify URL is reachable
-          try {
-            const r = await fetch(data.publicUrl, { method: 'HEAD' });
-            if (r.ok) {
-              label.textContent = type.charAt(0).toUpperCase() + type.slice(1) + ' uploaded ✓';
-              label.style.color = 'var(--green)';
-              break;
-            }
-          } catch(e) { /* file not found, try next ext */ }
+function loadExistingDocs(userId, sb, profile) {
+        // Secure check: read boolean flags from the profiles row instead of probing
+        // public storage URLs client-side (avoids exposing guessable KYC document paths).
+        const flags = {
+                  passport: !!(profile && profile.passport_uploaded),
+                  aadhaar: !!(profile && profile.aadhaar_uploaded)
+        };
+        const types = ['passport', 'aadhaar'];
+        for (const type of types) {
+                  const label = document.getElementById(type + '-file-name');
+                  if (!label) continue;
+                  if (flags[type]) {
+                              label.textContent = type.charAt(0).toUpperCase() + type.slice(1) + ' uploaded ✓';
+                              label.style.color = 'var(--green)';
+                  }
         }
-      }
-    }
+}
 
     function handleSignOut() {
       const sb = window._svSupabase;
       if (sb) sb.auth.signOut().then(() => { window.location.href = '/'; });
       else window.location.href = '/';
+    }
+
+    function loadProfile(session) {
+      var user = session && session.user ? session.user : session;
+      if (!user || !user.id) return;
+      currentUserId = user.id;
+      window._svCurrentUserId = user.id;
+      var nameEl = document.getElementById('display-name');
+      var emailEl = document.getElementById('display-email');
+      if (nameEl) nameEl.textContent = (user.user_metadata && user.user_metadata.full_name) ? user.user_metadata.full_name : user.email || '\u2014';
+      if (emailEl) emailEl.textContent = user.email || '\u2014';
+      var sb = window._svSupabase;
+      if (!sb) { loadBookings(user.id); return; }
+      sb.from('profiles').select('*').eq('id', user.id).single()
+        .then(function(res) {
+          var p = res.data;
+          if (p) {
+            var ph = document.getElementById('phone-input');
+            if (ph && p.phone) ph.value = p.phone;
+            var dob = document.getElementById('dob-input');
+            if (dob && p.date_of_birth) dob.value = p.date_of_birth;
+            var nat = document.getElementById('nationality-input');
+            if (nat && p.nationality) nat.value = p.nationality;
+            var pass = document.getElementById('passport-input');
+            if (pass && p.passport_number) pass.value = p.passport_number;
+            var aadh = document.getElementById('aadhaar-input');
+            if (aadh && p.aadhaar_number) aadh.value = p.aadhaar_number;
+            updateKycBadge(p.kyc_verified ? 'verified' : 'pending');
+            loadExistingDocs(user.id, sb, p);
+          }
+          loadBookings(user.id);
+        });
     }
 
     function waitForAuth() {
@@ -656,6 +685,40 @@
     }
 
     document.addEventListener('DOMContentLoaded', waitForAuth);
+  
+    function startBookingTimers() {
+      document.querySelectorAll('.booking-timer[data-expires]').forEach(function(el) {
+        function tick() {
+          var expires = parseInt(el.dataset.expires, 10);
+          var rem = expires - Date.now();
+          if (rem <= 0) {
+            el.textContent = 'Window closed';
+            el.classList.add('expired-label');
+            return;
+          }
+          var m = Math.floor(rem / 60000);
+          var s = Math.floor((rem % 60000) / 1000);
+          var valEl = el.querySelector('.timer-val');
+          if (valEl) valEl.textContent = m + 'm ' + s + 's remaining';
+          setTimeout(tick, 1000);
+        }
+        tick();
+      });
+    }
   </script>
-</body>
-</html>
+<script>
+(function(){
+  var h=location.hash;
+  if(h==='#tab-active'||h==='#tab-past'){
+    var name=h.slice(5);
+    var btn=document.querySelector('.tab-btn');
+    if(typeof switchTab==='function') {
+      switchTab(name,btn);
+      setTimeout(function(){
+        var el=document.getElementById('tab-'+name);
+        if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+      },100);
+    }
+  }
+})();
+</script>
