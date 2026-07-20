@@ -268,6 +268,11 @@ nav{
       <span class="total-label">Total Paid</span>
       <span class="total-value" id="conf-total">—</span>
     </div>
+
+    <div class="total-row" id="conf-saved-row" style="display:none;">
+      <span class="total-label">You Saved</span>
+      <span class="total-value" id="conf-saved-value" style="color:var(--gold);">—</span>
+    </div>
   </div>
 
   <!-- CONCIERGE TIMELINE -->
@@ -406,11 +411,40 @@ nav{
       })
       .then(function(r){ return r.json(); })
       .then(function(rows) {
-        if (rows && rows[0]) { populateFromBooking(rows[0]); }
+        if (rows && rows[0]) { populateFromBooking(rows[0]); showMoneySaved(rows[0], supaUrl, supaKey); }
         else { showFallback(ref); }
       })
       .catch(function() { showFallback(ref); });
     } catch(e) { showFallback(ref); }
+  }
+
+  function showMoneySaved(b, supaUrl, supaKey) {
+    try {
+      if (!b || !b.query_id) return;
+      fetch(supaUrl + '/rest/v1/quotes?query_id=eq.' + encodeURIComponent(b.query_id) + '&select=id,price', {
+        headers: { 'apikey': supaKey, 'Authorization': 'Bearer ' + (JSON.parse(localStorage.getItem('sb-bkumggqijgxyfotpbcni-auth-token')||'{}')?.access_token||supaKey) }
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(quotes) {
+        if (!quotes || quotes.length < 2) return;
+        var prices = quotes.map(function(q){ return Number(q.price) || 0; });
+        var highest = Math.max.apply(null, prices);
+        var lowest = Math.min.apply(null, prices);
+        var chosenPrice = null;
+        var chosenQuote = quotes.filter(function(q){ return q.id === b.quote_id; })[0];
+        if (chosenQuote) chosenPrice = Number(chosenQuote.price) || 0;
+        else if (b.total_amount != null) chosenPrice = Number(b.total_amount) - Number(b.platform_fee || 0);
+        if (chosenPrice == null) return;
+        var saved = ((highest + lowest) / 2) - chosenPrice;
+        if (saved > 0) {
+          var row = document.getElementById('conf-saved-row');
+          var val = document.getElementById('conf-saved-value');
+          if (val) val.textContent = '₹' + Math.round(saved).toLocaleString('en-IN');
+          if (row) row.style.display = '';
+        }
+      })
+      .catch(function(){});
+    } catch(e) {}
   }
 
   var confHasData = conf.op_name || conf.total || conf.aircraft;
